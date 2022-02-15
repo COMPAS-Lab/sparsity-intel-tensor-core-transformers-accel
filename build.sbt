@@ -9,8 +9,13 @@ val spinalIdslPlugin = compilerPlugin("com.github.spinalhdl" %% "spinalhdl-idsl-
 
 lazy val mylib = (project in file("."))
   .settings(
-    name := "SpinalTemplateSbt",
+    name := "MvmTensorCore",
     libraryDependencies ++= Seq(spinalCore, spinalLib, spinalIdslPlugin)
   )
 
+//exclude files under development
+unmanagedSources / excludeFilter := "TensorCoreChainArray.scala"
+
 fork := true
+
+
