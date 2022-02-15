@@ -76,6 +76,8 @@ class TensorCoreChain(chain_len: Int, out_buf_delay: Int) extends Component {
   tcEntry.io.load_bb_one <> loadBufCtrl(0)
   tcEntry.io.load_bb_two <> loadBufCtrl(1)
   tcEntry.io.cascade_weight_in <> U"88'd0"
+  tcEntry.io.side_in_1 <> U"8'd0"
+  tcEntry.io.side_in_2 <> U"8'd0"
   tcEntry.io.cascade_data_in_col_1 <> U"32'd0"
   tcEntry.io.cascade_data_in_col_2 <> U"32'd0"
   tcEntry.io.cascade_data_in_col_3 <> U"32'd0"
@@ -91,6 +93,8 @@ class TensorCoreChain(chain_len: Int, out_buf_delay: Int) extends Component {
   tcCoreChainElems(0).io.load_buf_sel <> loadBufSel
   tcCoreChainElems(0).io.load_bb_one <> loadBufCtrl(0)
   tcCoreChainElems(0).io.load_bb_two <> loadBufCtrl(1)
+  tcCoreChainElems(0).io.side_in_1 <> U"8'd0"
+  tcCoreChainElems(0).io.side_in_2 <> U"8'd0"
   tcCoreChainElems(0).io.cascade_data_in_col_1 <> U"32'd0"
   tcCoreChainElems(0).io.cascade_data_in_col_2 <> U"32'd0"
   tcCoreChainElems(0).io.cascade_data_in_col_3 <> U"32'd0"
@@ -111,6 +115,8 @@ class TensorCoreChain(chain_len: Int, out_buf_delay: Int) extends Component {
     tcCoreChainElems(i).io.load_bb_two <> loadBufCtrl(1)
     // TODO: take care of the feed sel: this is just a modification
     tcCoreChainElems(i).io.feed_sel := U"2'd2"
+    tcCoreChainElems(i).io.side_in_1 <> U"8'd0"
+    tcCoreChainElems(i).io.side_in_2 <> U"8'd0"
   }
 
   val oBuffer = Vec(Reg(UInt(24 bits)) init 0, 3)
@@ -139,6 +145,6 @@ class TensorCoreChain(chain_len: Int, out_buf_delay: Int) extends Component {
 object TensorCoreChainGen {
   def main(args: Array[String]): Unit = {
     val gen = new DefaultConfig
-    gen.defaultSpinalConfig.generate(new TensorCoreChain(3, 3))
+    gen.defaultSpinalConfig.generate(new TensorCoreChain(3, 3)).printPruned()
   }
 }

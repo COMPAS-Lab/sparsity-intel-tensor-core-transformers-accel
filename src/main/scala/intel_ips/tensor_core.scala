@@ -18,6 +18,8 @@ class TensorCoreInterface extends Bundle {
   // data input port
   val data_in_1, data_in_2, data_in_3, data_in_4, data_in_5,
   data_in_6, data_in_7, data_in_8, data_in_9, data_in_10 = in UInt(8 bits)
+  // side in ports
+  val side_in_1, side_in_2 = in UInt(8 bits)
   // exponent port
   val shared_exponent_data = in UInt(8 bits)
   // control ports

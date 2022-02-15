@@ -1,6 +1,6 @@
 // Generator : SpinalHDL v1.6.0    git head : 73c8d8e2b86b45646e9d0b2e729291f2b65e6be3
 // Component : TensorCoreChain
-// Git hash  : 16cca3e7ca68666d7965f4b737ddd3d2d443a608
+// Git hash  : 6bca74ef562bde80f4e7860f23593b4ba24f4515
 
 
 
@@ -168,6 +168,8 @@ module TensorCoreChain (
     .data_in_8                 (tcEntry_data_in_8               ), //i
     .data_in_9                 (tcEntry_data_in_9               ), //i
     .data_in_10                (tcEntry_data_in_10              ), //i
+    .side_in_1                 (8'h0                            ), //i
+    .side_in_2                 (8'h0                            ), //i
     .shared_exponent_data      (io_expCascadeIn                 ), //i
     .feed_sel                  (2'b00                           ), //i
     .load_bb_one               (tcEntry_load_bb_one             ), //i
@@ -216,6 +218,8 @@ module TensorCoreChain (
     .data_in_8                 (tensor_core_1_data_in_8               ), //i
     .data_in_9                 (tensor_core_1_data_in_9               ), //i
     .data_in_10                (tensor_core_1_data_in_10              ), //i
+    .side_in_1                 (8'h0                                  ), //i
+    .side_in_2                 (8'h0                                  ), //i
     .shared_exponent_data      (io_expIn_0                            ), //i
     .feed_sel                  (2'b10                                 ), //i
     .load_bb_one               (tensor_core_1_load_bb_one             ), //i
@@ -247,6 +251,8 @@ module TensorCoreChain (
     .data_in_8                 (tensor_core_2_data_in_8               ), //i
     .data_in_9                 (tensor_core_2_data_in_9               ), //i
     .data_in_10                (tensor_core_2_data_in_10              ), //i
+    .side_in_1                 (8'h0                                  ), //i
+    .side_in_2                 (8'h0                                  ), //i
     .shared_exponent_data      (io_expIn_1_delay_1                    ), //i
     .feed_sel                  (2'b10                                 ), //i
     .load_bb_one               (tensor_core_2_load_bb_one             ), //i
@@ -278,6 +284,8 @@ module TensorCoreChain (
     .data_in_8                 (tensor_core_3_data_in_8               ), //i
     .data_in_9                 (tensor_core_3_data_in_9               ), //i
     .data_in_10                (tensor_core_3_data_in_10              ), //i
+    .side_in_1                 (8'h0                                  ), //i
+    .side_in_2                 (8'h0                                  ), //i
     .shared_exponent_data      (io_expIn_2_delay_2                    ), //i
     .feed_sel                  (2'b10                                 ), //i
     .load_bb_one               (tensor_core_3_load_bb_one             ), //i
