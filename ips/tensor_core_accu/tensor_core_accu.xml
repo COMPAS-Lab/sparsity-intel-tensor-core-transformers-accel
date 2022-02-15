@@ -1,0 +1,225 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<deploy
+ date="2022.02.14.15:55:07"
+ outputDirectory="C:/Users/tianchu.ji/Documents/quartus_tryer/quartus_proj_nx10/ips/tensor_core_accu/">
+ <perimeter>
+  <parameter
+     name="AUTO_GENERATION_ID"
+     type="Integer"
+     defaultValue="0"
+     onHdl="0"
+     affectsHdl="1" />
+  <parameter
+     name="AUTO_UNIQUE_ID"
+     type="String"
+     defaultValue=""
+     onHdl="0"
+     affectsHdl="1" />
+  <parameter
+     name="AUTO_DEVICE_FAMILY"
+     type="String"
+     defaultValue="Stratix 10"
+     onHdl="0"
+     affectsHdl="1" />
+  <parameter
+     name="AUTO_DEVICE"
+     type="String"
+     defaultValue="1SN21BHU2F53E2VG"
+     onHdl="0"
+     affectsHdl="1" />
+  <parameter
+     name="AUTO_DEVICE_SPEEDGRADE"
+     type="String"
+     defaultValue="2"
+     onHdl="0"
+     affectsHdl="1" />
+  <interface name="clk" kind="conduit" start="0">
+   <property name="associatedClock" value="" />
+   <property name="associatedReset" value="" />
+   <property name="prSafe" value="false" />
+   <port name="clk" direction="input" role="clk" width="1" />
+  </interface>
+  <interface name="acc_en" kind="conduit" start="0">
+   <property name="associatedClock" value="" />
+   <property name="associatedReset" value="" />
+   <property name="prSafe" value="false" />
+   <port name="acc_en" direction="input" role="acc_en" width="1" />
+  </interface>
+  <interface name="zero_en" kind="conduit" start="0">
+   <property name="associatedClock" value="" />
+   <property name="associatedReset" value="" />
+   <property name="prSafe" value="false" />
+   <port name="zero_en" direction="input" role="zero_en" width="1" />
+  </interface>
+  <interface name="bf24_a1" kind="conduit" start="0">
+   <property name="associatedClock" value="" />
+   <property name="associatedReset" value="" />
+   <property name="prSafe" value="false" />
+   <port name="bf24_a1" direction="input" role="data_in" width="24" />
+  </interface>
+  <interface name="cascade_data_in_col_1" kind="conduit" start="0">
+   <property name="associatedClock" value="" />
+   <property name="associatedReset" value="" />
+   <property name="prSafe" value="false" />
+   <port
+       name="cascade_data_in_col_1"
+       direction="input"
+       role="cascade_data_in"
+       width="32" />
+  </interface>
+  <interface name="cascade_data_out_col_1" kind="conduit" start="0">
+   <property name="associatedClock" value="" />
+   <property name="associatedReset" value="" />
+   <property name="prSafe" value="false" />
+   <port
+       name="cascade_data_out_col_1"
+       direction="output"
+       role="cascade_data_out"
+       width="32" />
+  </interface>
+  <interface name="bf24_a2" kind="conduit" start="0">
+   <property name="associatedClock" value="" />
+   <property name="associatedReset" value="" />
+   <property name="prSafe" value="false" />
+   <port name="bf24_a2" direction="input" role="data_in" width="24" />
+  </interface>
+  <interface name="cascade_data_in_col_2" kind="conduit" start="0">
+   <property name="associatedClock" value="" />
+   <property name="associatedReset" value="" />
+   <property name="prSafe" value="false" />
+   <port
+       name="cascade_data_in_col_2"
+       direction="input"
+       role="cascade_data_in"
+       width="32" />
+  </interface>
+  <interface name="cascade_data_out_col_2" kind="conduit" start="0">
+   <property name="associatedClock" value="" />
+   <property name="associatedReset" value="" />
+   <property name="prSafe" value="false" />
+   <port
+       name="cascade_data_out_col_2"
+       direction="output"
+       role="cascade_data_out"
+       width="32" />
+  </interface>
+  <interface name="bf24_a3" kind="conduit" start="0">
+   <property name="associatedClock" value="" />
+   <property name="associatedReset" value="" />
+   <property name="prSafe" value="false" />
+   <port name="bf24_a3" direction="input" role="data_in" width="24" />
+  </interface>
+  <interface name="cascade_data_in_col_3" kind="conduit" start="0">
+   <property name="associatedClock" value="" />
+   <property name="associatedReset" value="" />
+   <property name="prSafe" value="false" />
+   <port
+       name="cascade_data_in_col_3"
+       direction="input"
+       role="cascade_data_in"
+       width="32" />
+  </interface>
+  <interface name="cascade_data_out_col_3" kind="conduit" start="0">
+   <property name="associatedClock" value="" />
+   <property name="associatedReset" value="" />
+   <property name="prSafe" value="false" />
+   <port
+       name="cascade_data_out_col_3"
+       direction="output"
+       role="cascade_data_out"
+       width="32" />
+  </interface>
+  <interface name="bf24_col_1" kind="conduit" start="0">
+   <property name="associatedClock" value="" />
+   <property name="associatedReset" value="" />
+   <property name="prSafe" value="false" />
+   <port name="bf24_col_1" direction="output" role="result_l" width="24" />
+  </interface>
+  <interface name="bf24_col_2" kind="conduit" start="0">
+   <property name="associatedClock" value="" />
+   <property name="associatedReset" value="" />
+   <property name="prSafe" value="false" />
+   <port
+       name="bf24_col_2"
+       direction="output"
+       role="result_l,result_h"
+       width="24" />
+  </interface>
+  <interface name="bf24_col_3" kind="conduit" start="0">
+   <property name="associatedClock" value="" />
+   <property name="associatedReset" value="" />
+   <property name="prSafe" value="false" />
+   <port name="bf24_col_3" direction="output" role="result_h" width="24" />
+  </interface>
+ </perimeter>
+ <entity kind="tensor_core_accu" version="1.0" name="tensor_core_accu">
+  <parameter name="AUTO_GENERATION_ID" value="0" />
+  <parameter name="AUTO_DEVICE" value="1SN21BHU2F53E2VG" />
+  <parameter name="AUTO_DEVICE_FAMILY" value="Stratix 10" />
+  <parameter name="AUTO_UNIQUE_ID" value="" />
+  <parameter name="AUTO_DEVICE_SPEEDGRADE" value="2" />
+  <generatedFiles>
+   <file
+       path="C:\Users\tianchu.ji\Documents\quartus_tryer\quartus_proj_nx10\ips\tensor_core_accu\synth\tensor_core_accu.v"
+       attributes="CONTAINS_INLINE_CONFIGURATION" />
+  </generatedFiles>
+  <childGeneratedFiles>
+   <file
+       path="C:\Users\tianchu.ji\Documents\quartus_tryer\quartus_proj_nx10\ips\tensor_core_accu\synth\tensor_core_accu.v"
+       attributes="CONTAINS_INLINE_CONFIGURATION" />
+  </childGeneratedFiles>
+  <sourceFiles>
+   <file
+       path="C:/Users/tianchu.ji/Documents/quartus_tryer/quartus_proj_nx10/ips/tensor_core_accu.ip" />
+  </sourceFiles>
+  <childSourceFiles>
+   <file path="C:/intelfpga_pro/20.4/ip/altera/dsp_prime/dsp_prime_hw.tcl" />
+  </childSourceFiles>
+  <messages>
+   <message level="Info" culprit="tensor_core_accu">"Generating: tensor_core_accu"</message>
+   <message level="Info" culprit="tensor_core_accu">"Generating: tensor_core_accu_dsp_prime_10_wcj43fa"</message>
+   <message level="Info" culprit="dsp_prime_0">generating top-level entity tensor_core_accu_dsp_prime_10_wcj43fa</message>
+  </messages>
+ </entity>
+ <entity
+   kind="dsp_prime"
+   version="1.0"
+   name="tensor_core_accu_dsp_prime_10_wcj43fa">
+  <parameter name="enable_cascade_weight_out" value="No" />
+  <parameter name="enable_ena" value="No" />
+  <parameter name="enable_zero_en" value="Yes" />
+  <parameter name="enable_cascade_weight_in" value="No" />
+  <parameter name="enable_feed_sel" value="No" />
+  <parameter name="enable_clr1" value="No" />
+  <parameter name="enable_load_buf_sel" value="No" />
+  <parameter name="base_device" value="ND4P" />
+  <parameter name="enable_clr0" value="No" />
+  <parameter name="enable_cascade_data_out" value="Yes" />
+  <parameter name="dsp_mode" value="TENSOR_ACC_BF24" />
+  <parameter name="dsp_sel_int4" value="SELECT_INT8" />
+  <parameter name="dsp_cascade" value="CASCADE_ENABLED" />
+  <parameter name="enable_load_bb_one" value="No" />
+  <parameter name="enable_load_bb_two" value="No" />
+  <parameter name="enable_acc_en" value="Yes" />
+  <parameter name="dsp_fp32_sub_en" value="FLOAT_SUB_DISABLED" />
+  <generatedFiles>
+   <file
+       path="C:\Users\tianchu.ji\Documents\quartus_tryer\quartus_proj_nx10\ips\tensor_core_accu\dsp_prime_10\synth\tensor_core_accu_dsp_prime_10_wcj43fa.v"
+       attributes="" />
+  </generatedFiles>
+  <childGeneratedFiles>
+   <file
+       path="C:\Users\tianchu.ji\Documents\quartus_tryer\quartus_proj_nx10\ips\tensor_core_accu\dsp_prime_10\synth\tensor_core_accu_dsp_prime_10_wcj43fa.v"
+       attributes="" />
+  </childGeneratedFiles>
+  <sourceFiles>
+   <file path="C:/intelfpga_pro/20.4/ip/altera/dsp_prime/dsp_prime_hw.tcl" />
+  </sourceFiles>
+  <childSourceFiles/>
+  <instantiator instantiator="tensor_core_accu" as="dsp_prime_0" />
+  <messages>
+   <message level="Info" culprit="tensor_core_accu">"Generating: tensor_core_accu_dsp_prime_10_wcj43fa"</message>
+   <message level="Info" culprit="dsp_prime_0">generating top-level entity tensor_core_accu_dsp_prime_10_wcj43fa</message>
+  </messages>
+ </entity>
+</deploy>
