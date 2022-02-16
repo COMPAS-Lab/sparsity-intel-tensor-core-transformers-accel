@@ -24,5 +24,44 @@ object LeadingZeros {
       )
     }
   }
+}
 
+class DynaCounter(width: Int) extends ImplicitArea[UInt] {
+  require(width > 0)
+  val overflowVal = UInt(width bits)
+  val (start, end) = (BigInt(0), BigInt(2 << width))
+
+  val willIncrement = False.allowOverride
+  val willClear = False.allowOverride
+
+  def clear(): Unit = willClear := True
+  def increment(): Unit = willIncrement := True
+
+  val valueNext = UInt(width bit)
+  val value = RegNext(valueNext) init(start)
+  val willOverflowIfInc = value >= overflowVal
+  val willOverflow = willOverflowIfInc && willIncrement
+
+  when(willOverflow){
+    valueNext := U(start)
+  } otherwise {
+    valueNext := (value + U(willIncrement)).resized
+  }
+
+  when(willClear) {
+    valueNext := start
+  }
+
+  willOverflowIfInc.allowPruning
+  willOverflow.allowPruning
+
+  override def implicitValue: UInt = this.value
+}
+
+object DynaCounter {
+  def apply(width: Int, overflowVal: UInt): DynaCounter = {
+    val dynaCounter = new DynaCounter(width)
+    dynaCounter.overflowVal := overflowVal-1
+    dynaCounter
+  }
 }

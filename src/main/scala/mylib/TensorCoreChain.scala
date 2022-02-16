@@ -5,7 +5,7 @@ import spinal.lib._
 
 import config._
 import intel_ips._
-import intel_ips.TensorCoreType._
+import util._
 
 class TensorCoreChain(chain_len: Int, out_buf_delay: Int) extends Component {
   val io = new Bundle{
@@ -15,10 +15,12 @@ class TensorCoreChain(chain_len: Int, out_buf_delay: Int) extends Component {
     val expCascadeIn = in UInt(8 bits)
     //data valid and data in should be 1 clock earlier than
     //the first loading because of data load reg and load_buf_sel reg
-    val data_valid = in Bool()
-    val load_valid = in Bool()
-    val load_ready = out Bool()
+    val dataValid = in Bool()
+    val loadValid = in Bool()
+    val loadReady = out Bool()
     val res = out Vec(UInt(24 bits), 3)
+    val inputIters = in UInt(8 bits)
+    val outValid = out Bool()
   }
 
   // helper function: connect data in ports
@@ -41,24 +43,27 @@ class TensorCoreChain(chain_len: Int, out_buf_delay: Int) extends Component {
   val tcCoreChainElems = new Array[tensor_core](chain_len)
   val tcAccu = new tensor_core_accu_24
 
-  val loadCounter = Counter((chain_len+1)*3)
+  // loading requires 3 extra cycles, align the valid signal
+  // with the first compute core here
+  val loadValidD3t = Delay(io.loadValid, 3)
+  val loadCounter = Counter(chain_len*3)
   val loadBufCtrlReg = Reg(UInt(2 bits)) init U"2'b01"
   val loadBufCtrl = UInt(2 bits)
-  when(io.load_valid){
+  when(loadValidD3t){
     loadCounter.increment()
   }
 
   when(loadCounter.willOverflow) {
-    io.load_ready := True
+    io.loadReady := True
     loadBufCtrlReg := loadBufCtrlReg.rotateLeft(1)
   } .otherwise {
-    io.load_ready := False
+    io.loadReady := False
   }
-  loadBufCtrl := Mux(io.load_valid, loadBufCtrlReg, U"2'b00")
+  loadBufCtrl := Mux(loadValidD3t, loadBufCtrlReg, U"2'b00")
   //TODO: may need to change this to a dynamic config counter
-  val inputCounter = Counter((chain_len+1)*3)
+  val inputCounter = DynaCounter(8, io.inputIters)
   val loadBufSel = Reg(Bool()) init False
-  when(io.data_valid) {
+  when(io.dataValid) {
     inputCounter.increment()
   }
 
@@ -66,15 +71,20 @@ class TensorCoreChain(chain_len: Int, out_buf_delay: Int) extends Component {
     loadBufSel := !loadBufSel
   }
 
-  //output buffer ctrl logic
-  val oBufferLoadValid = Delay(io.data_valid, 4+2*chain_len)
+  //output buffer ctrl logic.
+  val oBufferLoadValid = Delay(io.dataValid, 4+2*chain_len)
+  //counting the output iterations for output valid
+  val outValidCounter = DynaCounter(8, io.inputIters)
+
+  when(oBufferLoadValid.rise()) (outValidCounter.increment())
+  io.outValid := outValidCounter.willOverflowIfInc
 
   connect_data_in(tcEntry, io.loadCascadeIn)
   tcEntry.io.shared_exponent_data := io.expCascadeIn
   tcEntry.io.feed_sel <> U"2'd0"
   tcEntry.io.load_buf_sel <> loadBufSel
-  tcEntry.io.load_bb_one <> loadBufCtrl(0)
-  tcEntry.io.load_bb_two <> loadBufCtrl(1)
+  tcEntry.io.load_bb_one <> True
+  tcEntry.io.load_bb_two <> False
   tcEntry.io.cascade_weight_in <> U"88'd0"
   tcEntry.io.side_in_1 <> U"8'd0"
   tcEntry.io.side_in_2 <> U"8'd0"
@@ -120,7 +130,7 @@ class TensorCoreChain(chain_len: Int, out_buf_delay: Int) extends Component {
   }
 
   val oBuffer = Vec(Reg(UInt(24 bits)) init 0, 3)
-  //output buffer writting control
+  //output buffer writing control
   when (oBufferLoadValid) {
     oBuffer(0) := tcAccu.io.bf24_col_1
     oBuffer(1) := tcAccu.io.bf24_col_2
@@ -136,9 +146,7 @@ class TensorCoreChain(chain_len: Int, out_buf_delay: Int) extends Component {
   tcAccu.io.zero_en := False
   tcAccu.io.acc_en := False
 
-  io.res(0) <> tcAccu.io.bf24_col_1
-  io.res(1) <> tcAccu.io.bf24_col_2
-  io.res(2) <> tcAccu.io.bf24_col_3
+  io.res <> oBuffer
 
 }
 

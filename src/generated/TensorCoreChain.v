@@ -1,8 +1,6 @@
 // Generator : SpinalHDL v1.6.0    git head : 73c8d8e2b86b45646e9d0b2e729291f2b65e6be3
 // Component : TensorCoreChain
-// Git hash  : 6bca74ef562bde80f4e7860f23593b4ba24f4515
-
-
+// Git hash  : f80f69ff076a605b2e70b90e5929e34e766fbc99
 
 module TensorCoreChain (
   input      [79:0]   io_dataIn_0,
@@ -13,12 +11,14 @@ module TensorCoreChain (
   input      [7:0]    io_expIn_1,
   input      [7:0]    io_expIn_2,
   input      [7:0]    io_expCascadeIn,
-  input               io_data_valid,
-  input               io_load_valid,
-  output reg          io_load_ready,
+  input               io_dataValid,
+  input               io_loadValid,
+  output reg          io_loadReady,
   output     [23:0]   io_res_0,
   output     [23:0]   io_res_1,
   output     [23:0]   io_res_2,
+  input      [7:0]    io_inputIters,
+  output              io_outValid,
   input               clk,
   input               resetn
 );
@@ -32,8 +32,6 @@ module TensorCoreChain (
   wire       [7:0]    tcEntry_data_in_8;
   wire       [7:0]    tcEntry_data_in_9;
   wire       [7:0]    tcEntry_data_in_10;
-  wire                tcEntry_load_bb_one;
-  wire                tcEntry_load_bb_two;
   wire       [7:0]    tensor_core_1_data_in_1;
   wire       [7:0]    tensor_core_1_data_in_2;
   wire       [7:0]    tensor_core_1_data_in_3;
@@ -106,8 +104,13 @@ module TensorCoreChain (
   wire       [23:0]   tensor_core_3_bf24_col_3;
   wire       [3:0]    _zz_loadCounter_valueNext;
   wire       [0:0]    _zz_loadCounter_valueNext_1;
-  wire       [3:0]    _zz_inputCounter_valueNext;
+  wire       [7:0]    _zz_inputCounter_valueNext;
   wire       [0:0]    _zz_inputCounter_valueNext_1;
+  wire       [7:0]    _zz_outValidCounter_valueNext;
+  wire       [0:0]    _zz_outValidCounter_valueNext_1;
+  reg                 io_loadValid_delay_1;
+  reg                 io_loadValid_delay_2;
+  reg                 loadValidD3t;
   reg                 loadCounter_willIncrement;
   wire                loadCounter_willClear;
   reg        [3:0]    loadCounter_valueNext;
@@ -116,23 +119,33 @@ module TensorCoreChain (
   wire                loadCounter_willOverflow;
   reg        [1:0]    loadBufCtrlReg;
   wire       [1:0]    loadBufCtrl;
+  wire       [7:0]    inputCounter_overflowVal;
   reg                 inputCounter_willIncrement;
   wire                inputCounter_willClear;
-  reg        [3:0]    inputCounter_valueNext;
-  reg        [3:0]    inputCounter_value;
+  reg        [7:0]    inputCounter_valueNext;
+  reg        [7:0]    inputCounter_value;
   wire                inputCounter_willOverflowIfInc;
   wire                inputCounter_willOverflow;
   reg                 loadBufSel;
-  reg                 io_data_valid_delay_1;
-  reg                 io_data_valid_delay_2;
-  reg                 io_data_valid_delay_3;
-  reg                 io_data_valid_delay_4;
-  reg                 io_data_valid_delay_5;
-  reg                 io_data_valid_delay_6;
-  reg                 io_data_valid_delay_7;
-  reg                 io_data_valid_delay_8;
-  reg                 io_data_valid_delay_9;
+  reg                 io_dataValid_delay_1;
+  reg                 io_dataValid_delay_2;
+  reg                 io_dataValid_delay_3;
+  reg                 io_dataValid_delay_4;
+  reg                 io_dataValid_delay_5;
+  reg                 io_dataValid_delay_6;
+  reg                 io_dataValid_delay_7;
+  reg                 io_dataValid_delay_8;
+  reg                 io_dataValid_delay_9;
   reg                 oBufferLoadValid;
+  wire       [7:0]    outValidCounter_overflowVal;
+  reg                 outValidCounter_willIncrement;
+  wire                outValidCounter_willClear;
+  reg        [7:0]    outValidCounter_valueNext;
+  reg        [7:0]    outValidCounter_value;
+  wire                outValidCounter_willOverflowIfInc;
+  wire                outValidCounter_willOverflow;
+  reg                 oBufferLoadValid_regNext;
+  wire                when_TensorCoreChain_l79;
   reg        [79:0]   io_dataIn_1_delay_1;
   reg        [79:0]   io_dataIn_1_delay_2;
   reg        [7:0]    io_expIn_1_delay_1;
@@ -155,7 +168,9 @@ module TensorCoreChain (
   assign _zz_loadCounter_valueNext_1 = loadCounter_willIncrement;
   assign _zz_loadCounter_valueNext = {3'd0, _zz_loadCounter_valueNext_1};
   assign _zz_inputCounter_valueNext_1 = inputCounter_willIncrement;
-  assign _zz_inputCounter_valueNext = {3'd0, _zz_inputCounter_valueNext_1};
+  assign _zz_inputCounter_valueNext = {7'd0, _zz_inputCounter_valueNext_1};
+  assign _zz_outValidCounter_valueNext_1 = outValidCounter_willIncrement;
+  assign _zz_outValidCounter_valueNext = {7'd0, _zz_outValidCounter_valueNext_1};
   tensor_core tcEntry (
     .clk                       (clk                             ), //i
     .data_in_1                 (tcEntry_data_in_1               ), //i
@@ -172,8 +187,8 @@ module TensorCoreChain (
     .side_in_2                 (8'h0                            ), //i
     .shared_exponent_data      (io_expCascadeIn                 ), //i
     .feed_sel                  (2'b00                           ), //i
-    .load_bb_one               (tcEntry_load_bb_one             ), //i
-    .load_bb_two               (tcEntry_load_bb_two             ), //i
+    .load_bb_one               (1'b1                            ), //i
+    .load_bb_two               (1'b0                            ), //i
     .load_buf_sel              (loadBufSel                      ), //i
     .zero_en                   (1'b0                            ), //i
     .acc_en                    (1'b0                            ), //i
@@ -307,13 +322,13 @@ module TensorCoreChain (
   );
   always @(*) begin
     loadCounter_willIncrement = 1'b0;
-    if(io_load_valid) begin
+    if(loadValidD3t) begin
       loadCounter_willIncrement = 1'b1;
     end
   end
 
   assign loadCounter_willClear = 1'b0;
-  assign loadCounter_willOverflowIfInc = (loadCounter_value == 4'b1011);
+  assign loadCounter_willOverflowIfInc = (loadCounter_value == 4'b1000);
   assign loadCounter_willOverflow = (loadCounter_willOverflowIfInc && loadCounter_willIncrement);
   always @(*) begin
     if(loadCounter_willOverflow) begin
@@ -328,34 +343,59 @@ module TensorCoreChain (
 
   always @(*) begin
     if(loadCounter_willOverflow) begin
-      io_load_ready = 1'b1;
+      io_loadReady = 1'b1;
     end else begin
-      io_load_ready = 1'b0;
+      io_loadReady = 1'b0;
     end
   end
 
-  assign loadBufCtrl = (io_load_valid ? loadBufCtrlReg : 2'b00);
+  assign loadBufCtrl = (loadValidD3t ? loadBufCtrlReg : 2'b00);
   always @(*) begin
     inputCounter_willIncrement = 1'b0;
-    if(io_data_valid) begin
+    if(io_dataValid) begin
       inputCounter_willIncrement = 1'b1;
     end
   end
 
   assign inputCounter_willClear = 1'b0;
-  assign inputCounter_willOverflowIfInc = (inputCounter_value == 4'b1011);
+  assign inputCounter_willOverflowIfInc = (inputCounter_overflowVal <= inputCounter_value);
   assign inputCounter_willOverflow = (inputCounter_willOverflowIfInc && inputCounter_willIncrement);
   always @(*) begin
     if(inputCounter_willOverflow) begin
-      inputCounter_valueNext = 4'b0000;
+      inputCounter_valueNext = 8'h0;
     end else begin
       inputCounter_valueNext = (inputCounter_value + _zz_inputCounter_valueNext);
     end
     if(inputCounter_willClear) begin
-      inputCounter_valueNext = 4'b0000;
+      inputCounter_valueNext = 8'h0;
     end
   end
 
+  assign inputCounter_overflowVal = (io_inputIters - 8'h01);
+  always @(*) begin
+    outValidCounter_willIncrement = 1'b0;
+    if(when_TensorCoreChain_l79) begin
+      outValidCounter_willIncrement = 1'b1;
+    end
+  end
+
+  assign outValidCounter_willClear = 1'b0;
+  assign outValidCounter_willOverflowIfInc = (outValidCounter_overflowVal <= outValidCounter_value);
+  assign outValidCounter_willOverflow = (outValidCounter_willOverflowIfInc && outValidCounter_willIncrement);
+  always @(*) begin
+    if(outValidCounter_willOverflow) begin
+      outValidCounter_valueNext = 8'h0;
+    end else begin
+      outValidCounter_valueNext = (outValidCounter_value + _zz_outValidCounter_valueNext);
+    end
+    if(outValidCounter_willClear) begin
+      outValidCounter_valueNext = 8'h0;
+    end
+  end
+
+  assign outValidCounter_overflowVal = (io_inputIters - 8'h01);
+  assign when_TensorCoreChain_l79 = (oBufferLoadValid && (! oBufferLoadValid_regNext));
+  assign io_outValid = outValidCounter_willOverflowIfInc;
   assign tcEntry_data_in_1 = io_loadCascadeIn[7 : 0];
   assign tcEntry_data_in_2 = io_loadCascadeIn[15 : 8];
   assign tcEntry_data_in_3 = io_loadCascadeIn[23 : 16];
@@ -366,8 +406,6 @@ module TensorCoreChain (
   assign tcEntry_data_in_8 = io_loadCascadeIn[63 : 56];
   assign tcEntry_data_in_9 = io_loadCascadeIn[71 : 64];
   assign tcEntry_data_in_10 = io_loadCascadeIn[79 : 72];
-  assign tcEntry_load_bb_one = loadBufCtrl[0];
-  assign tcEntry_load_bb_two = loadBufCtrl[1];
   assign tensor_core_1_data_in_1 = io_dataIn_0[7 : 0];
   assign tensor_core_1_data_in_2 = io_dataIn_0[15 : 8];
   assign tensor_core_1_data_in_3 = io_dataIn_0[23 : 16];
@@ -404,50 +442,24 @@ module TensorCoreChain (
   assign tensor_core_3_data_in_10 = io_dataIn_2_delay_4[79 : 72];
   assign tensor_core_3_load_bb_one = loadBufCtrl[0];
   assign tensor_core_3_load_bb_two = loadBufCtrl[1];
-  assign io_res_0 = tcAccu_bf24_col_1;
-  assign io_res_1 = tcAccu_bf24_col_2;
-  assign io_res_2 = tcAccu_bf24_col_3;
-  always @(posedge clk or negedge resetn) begin
-    if(!resetn) begin
-      loadCounter_value <= 4'b0000;
-      loadBufCtrlReg <= 2'b01;
-      inputCounter_value <= 4'b0000;
-      loadBufSel <= 1'b0;
-      oBuffer_0 <= 24'h0;
-      oBuffer_1 <= 24'h0;
-      oBuffer_2 <= 24'h0;
-    end else begin
-      loadCounter_value <= loadCounter_valueNext;
-      if(loadCounter_willOverflow) begin
-        loadBufCtrlReg <= {loadBufCtrlReg[0 : 0],loadBufCtrlReg[1 : 1]};
-      end
-      inputCounter_value <= inputCounter_valueNext;
-      if(inputCounter_willOverflow) begin
-        loadBufSel <= (! loadBufSel);
-      end
-      if(oBufferLoadValid) begin
-        oBuffer_0 <= tcAccu_bf24_col_1;
-        oBuffer_1 <= tcAccu_bf24_col_2;
-        oBuffer_2 <= tcAccu_bf24_col_3;
-      end else begin
-        oBuffer_0 <= 24'h0;
-        oBuffer_1 <= 24'h0;
-        oBuffer_2 <= 24'h0;
-      end
-    end
-  end
-
+  assign io_res_0 = oBuffer_0;
+  assign io_res_1 = oBuffer_1;
+  assign io_res_2 = oBuffer_2;
   always @(posedge clk) begin
-    io_data_valid_delay_1 <= io_data_valid;
-    io_data_valid_delay_2 <= io_data_valid_delay_1;
-    io_data_valid_delay_3 <= io_data_valid_delay_2;
-    io_data_valid_delay_4 <= io_data_valid_delay_3;
-    io_data_valid_delay_5 <= io_data_valid_delay_4;
-    io_data_valid_delay_6 <= io_data_valid_delay_5;
-    io_data_valid_delay_7 <= io_data_valid_delay_6;
-    io_data_valid_delay_8 <= io_data_valid_delay_7;
-    io_data_valid_delay_9 <= io_data_valid_delay_8;
-    oBufferLoadValid <= io_data_valid_delay_9;
+    io_loadValid_delay_1 <= io_loadValid;
+    io_loadValid_delay_2 <= io_loadValid_delay_1;
+    loadValidD3t <= io_loadValid_delay_2;
+    io_dataValid_delay_1 <= io_dataValid;
+    io_dataValid_delay_2 <= io_dataValid_delay_1;
+    io_dataValid_delay_3 <= io_dataValid_delay_2;
+    io_dataValid_delay_4 <= io_dataValid_delay_3;
+    io_dataValid_delay_5 <= io_dataValid_delay_4;
+    io_dataValid_delay_6 <= io_dataValid_delay_5;
+    io_dataValid_delay_7 <= io_dataValid_delay_6;
+    io_dataValid_delay_8 <= io_dataValid_delay_7;
+    io_dataValid_delay_9 <= io_dataValid_delay_8;
+    oBufferLoadValid <= io_dataValid_delay_9;
+    oBufferLoadValid_regNext <= oBufferLoadValid;
     io_dataIn_1_delay_1 <= io_dataIn_1;
     io_dataIn_1_delay_2 <= io_dataIn_1_delay_1;
     io_expIn_1_delay_1 <= io_expIn_1;
@@ -463,6 +475,38 @@ module TensorCoreChain (
     oBuffer_1_delay_2 <= oBuffer_1_delay_1;
     oBuffer_2_delay_1 <= oBuffer_2;
     oBuffer_2_delay_2 <= oBuffer_2_delay_1;
+  end
+
+  always @(posedge clk or negedge resetn) begin
+    if(!resetn) begin
+      loadCounter_value <= 4'b0000;
+      loadBufCtrlReg <= 2'b01;
+      inputCounter_value <= 8'h0;
+      loadBufSel <= 1'b0;
+      outValidCounter_value <= 8'h0;
+      oBuffer_0 <= 24'h0;
+      oBuffer_1 <= 24'h0;
+      oBuffer_2 <= 24'h0;
+    end else begin
+      loadCounter_value <= loadCounter_valueNext;
+      if(loadCounter_willOverflow) begin
+        loadBufCtrlReg <= {loadBufCtrlReg[0 : 0],loadBufCtrlReg[1 : 1]};
+      end
+      inputCounter_value <= inputCounter_valueNext;
+      if(inputCounter_willOverflow) begin
+        loadBufSel <= (! loadBufSel);
+      end
+      outValidCounter_value <= outValidCounter_valueNext;
+      if(oBufferLoadValid) begin
+        oBuffer_0 <= tcAccu_bf24_col_1;
+        oBuffer_1 <= tcAccu_bf24_col_2;
+        oBuffer_2 <= tcAccu_bf24_col_3;
+      end else begin
+        oBuffer_0 <= 24'h0;
+        oBuffer_1 <= 24'h0;
+        oBuffer_2 <= 24'h0;
+      end
+    end
   end
 
 
