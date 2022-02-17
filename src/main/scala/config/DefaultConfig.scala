@@ -19,5 +19,5 @@ class DefaultConfig {
   var defaultSimConfig = SimConfig.withConfig(SpinalConfig(
     defaultConfigForClockDomains = ClockDomainConfig(
       resetActiveLevel = LOW)
-  )).withWave(3)
+  )).addSimulatorFlag("--x-assign 0 --x-initial 0").withWave(5)
 }

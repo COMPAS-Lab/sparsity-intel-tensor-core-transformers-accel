@@ -12,7 +12,7 @@ module vectTran(clk, reset, vector, vector_rdy, valid_out, outvals, done);
 	integer i, j;
      
     always_ff @(posedge clk) begin
-		if(reset) begin
+		if(reset || vector_rdy == 0) begin
 			valid_out<=0;
 			index<=0;
 			done<=0;

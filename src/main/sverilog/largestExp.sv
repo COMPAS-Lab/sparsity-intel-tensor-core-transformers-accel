@@ -1,25 +1,21 @@
-module largestExp(clk, reset, invals, invals_rdy, valid_out, outvect, outExp, prevModDone);
+module largestExp(clk, reset, invals, invals_rdy, valid_out, outvect, outExp);
 
-	parameter					V=8, P=4, BIT=32, FPM=23;
+	parameter					V=16, P=16, BIT=32, FPM=23, BFPM=4;
 	localparam					EXP=BIT-FPM-1;//-1 since we exclude sign bit
-    localparam					DELAY=$clog2(P)/2;
-	localparam					DONE=(V/P)+DELAY;
-	localparam					LOAD_CLKS=V/P;
-
-    input							clk, reset, invals_rdy, prevModDone;
+	localparam					DELAY=$clog2(P)/2;//how long it takes the comparator tree to finish the comparisons
+	
+    input							clk, reset, invals_rdy;
     input [P-1:0][BIT-1:0]			invals;
-    output logic [P-1:0][BIT-1:0]	outvect;
+    output logic [P-1:0][BFPM+EXP:0]outvect;
     output logic [EXP-1:0]			outExp;
     output logic					valid_out;
     
-    logic [EXP-1:0]					currentLargest;
-    logic [V-1:0] 					index;
     logic [P-1:0][EXP-1:0]			inExps;
+    logic [P-1:0][BFPM-1:0]			inMants;
+    logic [P-1:0]					inSigns;			
     logic [P-1:0][EXP-1:0]			intermmediateExps;
-    logic [V-1:0][BIT-1:0]			FIFOvect;
-    logic [$clog2(V)-1:0]			fifoCNT;
-    logic [$clog2(DONE):0]			cnt;
-    logic							delay_for_exp_bias;//systems wait 1 cycle for exps to be biased
+    logic [((DELAY+1)*V)-1:0][BFPM+EXP:0]		FIFOvect;
+    logic [(DELAY+1+1)-1:0]					valid;
 
 
 	integer i, j, k;
@@ -39,12 +35,15 @@ module largestExp(clk, reset, invals, invals_rdy, valid_out, outvect, outExp, pr
 	    		compLayer #(g, BIT, FPM) c0(.invals(inExps), 
 	    			.outvals(intermmediateExps[index_a(g/2)-1:index_a(g)]));
 	    	end else begin
-	    		if($clog2(P/g)%2==1) begin
-		    		compLayerFF #(g, BIT, FPM) c1ff(.clk(clk), .invals(intermmediateExps[index_a(g)-1:index_a(2*g)]), 
+	    		if($clog2(P/g)%2==1) begin//make a comparator layer with FFs, for every other layer
+		    		compLayerFF #(g, BIT, FPM) c1ff (
+		    		    .clk(clk), .reset(reset),
+		    		    .invals(intermmediateExps[index_a(g)-1:index_a(2*g)]),
 		    			.outvals(intermmediateExps[index_a(g/2)-1:index_a(g)]));//same point as P-2
 		    	end else begin
-		    		compLayer #(g, BIT, FPM) c1(.invals(intermmediateExps[index_a(g)-1:index_a(2*g)]), 
-		    			.outvals(intermmediateExps[index_a(g/2)-1:index_a(g)]));//same point as P-2
+		    		compLayer #(g, BIT, FPM) c1 (
+		    		.invals(intermmediateExps[index_a(g)-1:index_a(2*g)]),
+		    		.outvals(intermmediateExps[index_a(g/2)-1:index_a(g)]));//same point as P-2
 		    	end
 	    	end
 		end 
@@ -52,54 +51,43 @@ module largestExp(clk, reset, invals, invals_rdy, valid_out, outvect, outExp, pr
      
     always_ff @(posedge clk) begin
 		if(reset) begin
-			valid_out<=0;
-			index<=0;
-			outExp<=0;
-			currentLargest<=0;
-			fifoCNT<=0;
-			cnt<=0;
-			delay_for_exp_bias<=0;
-			for(i=0;i<V;i=i+1)
-				FIFOvect[i]<=0;
+			valid <= 0;
+			outExp<=0;//the largest found exp (biased)
+			inMants <= {P{'0}};
+			inExps <= {P{'0}};
+			inSigns <= 0;
+			for(i=0;i<((DELAY+1)*V);i=i+1)
+				FIFOvect[i]<=0;//the vector fifo
 		end else begin
-			if(invals_rdy && !delay_for_exp_bias)
-				delay_for_exp_bias<=1'b1;
-			if(delay_for_exp_bias || cnt!=0) begin
-				if(cnt!=DONE-1) begin
-					cnt<=cnt+1;
-					index<=index+P;
-					if(cnt<LOAD_CLKS) begin
-						for(j=0;j<P;j=j+1) begin//inExps is available 1 clk later than other 2 parts
-							FIFOvect[index+j][FPM-1:0]<=invals[j][FPM-1:0];//outputs a vector, P at a time
-							FIFOvect[index+j][BIT-2:FPM]<=inExps[j];//although is only done after
-							FIFOvect[index+j][BIT-1]<=invals[j][BIT-1];		//looking through all elements
-						end
-					end
-					if(cnt>=DELAY)
-						if(intermmediateExps[P-2]>outExp)//compare previous largest to the new largest
-							outExp<=intermmediateExps[P-2];//last exp from comparison tree
-				end else begin
-					valid_out<=1;
-					index<=0;
-					cnt<=0;
-					delay_for_exp_bias<=1'b0;
-					if(intermmediateExps[P-2]>outExp)//compare previous largest to the new largest
-						outExp<=intermmediateExps[P-2];
-				end
+
+			for(j=0;j<V;j=j+1) begin
+				inMants[j]<=invals[j][FPM-1 -:BFPM];
+				inExps[j]<=invals[j][BIT-2: FPM]-(2**(EXP-1))+1;//subtracts bias of exponent, for 8bit exp, bias=(2^7)-1
+				inSigns[j]<=invals[j][BIT-1];
 			end
 
-			for(k=0;k<P;k=k+1)
-				inExps[k]<=invals[k][BIT-2: FPM]-(2**(EXP-1))+1;//subtracts bias of exponent, for 8bit exp, bias=(2^7)-1
+			for(j=0;j<V;j=j+1) begin//inExps is available 1 clk later than other 2 parts
+				FIFOvect[j][BFPM-1 -:BFPM]<=inMants[j];//outputs a vector, P at a time
+				FIFOvect[j][EXP+BFPM-1 -:EXP]<=inExps[j];//although is only done after
+				FIFOvect[j][BFPM+EXP]<=inSigns[j];		//looking through all elements
+			end
 
-			if(valid_out)
-				fifoCNT<=fifoCNT+P;
+			for(j=V;j<((DELAY+1)*V);j=j+1) begin
+				FIFOvect[j]<=FIFOvect[j-V];
+			end
+
+			valid[0]<=invals_rdy;
+
+			for(j=1;j<(DELAY+1+1);j=j+1)
+				valid[j]<=valid[j-1];
+
+			outExp<=intermmediateExps[P-2];			
 		end
 	end
 
 	always_comb begin
-		//for(k=0;k<P;k=k+1)
-			//inExps[k]=invals[k][BIT-2: FPM]-(2**(EXP-1))+1;//subtracts bias of exponent, for 8bit exp, bias=(2^7)-1
-		outvect=FIFOvect[(fifoCNT) +: P];
+		outvect=FIFOvect[(DELAY*V) +: V];//outputs a portion of the vector fifo per clock
+		valid_out=valid[DELAY+1];
 	end
 
 endmodule
@@ -123,21 +111,25 @@ module compLayer(invals, outvals);//layer of comparators
 
 endmodule
 
-module compLayerFF(clk, invals, outvals);//layer of comparators
+module compLayerFF(clk, reset, invals, outvals);//layer of comparators
 
 	parameter							P=4, BIT=32, FPM=23;
 
-	input								clk;
+	input								clk, reset;
 	input [P-1:0][BIT-FPM-2:0]			invals;
 	output logic [(P/2)-1:0][BIT-FPM-2:0]	outvals;
 	integer i;
 
 	always_ff @(posedge clk) begin
-		for(i=0;i<P;i=i+2) begin
-			if(invals[i]>invals[i+1])
-				outvals[i/2]<=invals[i];
-			else
-				outvals[i/2]<=invals[i+1];
+	    if (reset) begin
+	        outvals <= 0;
+	    end else begin
+            for(i=0;i<P;i=i+2) begin
+                if(invals[i]>invals[i+1])
+                    outvals[i/2]<=invals[i];
+                else
+                    outvals[i/2]<=invals[i+1];
+            end
 		end
 	end
 

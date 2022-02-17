@@ -23,8 +23,8 @@ module bfp_converter(
   localparam                  ENC_WIDTH=$clog2((LONGBFPM+$clog2(V))/2)+2;
 
   input                           clk, rst_n, vector_rdy;
-  input [V*BIT-1:0]               in_vector_flatten;
-  logic [V-1:0][BIT-1:0]          vector;
+  input [P*BIT-1:0]               in_vector_flatten;
+  logic [P-1:0][BIT-1:0]          vector;
 
   logic                           reset;
   logic [P-1:0][BIT-1:0]          outvect;
@@ -45,7 +45,7 @@ module bfp_converter(
   //flattening input and output array
   genvar i;
   generate
-    for (i=0; i<V; i++) begin
+    for (i=0; i<P; i++) begin
       assign vector[i] = in_vector_flatten[BIT*(i+1)-1:BIT*i];
     end 
 
@@ -54,15 +54,12 @@ module bfp_converter(
     end
   endgenerate
 
-  vectTran #(V, P, BIT) v0(.clk(clk), .reset(reset), .vector_rdy(vector_rdy), .vector(vector),
-                           .valid_out(valid_outVT), .outvals(outvalsVT), .done(doneVT));
-
-  largestExp #(V, P, BIT, FPM) l0(.clk(clk), .reset(reset), .invals(outvalsVT),
-                                  .invals_rdy(valid_outVT), .valid_out(valid_outLE), .outvect(outvect),
-                                  .outExp(outExpLE), .prevModDone(doneVT));
+  largestExp #(V, P, BIT, FPM, BFPM) l0(.clk(clk), .reset(reset), .invals(vector),
+                                  .invals_rdy(vector_rdy), .valid_out(valid_outLE), .outvect(outvect),
+                                  .outExp(outExpLE));
 
   mantissaAdj #(V, P, BIT, FPM, BFPM) m0(.clk(clk), .reset(reset), .invals_rdy(valid_outLE), 
                                   .valid_out(valid_out), .vect(outvect), .mants(outMants), .inExp(outExpLE), 
-                                  .done(done), .outExp(outExp));
+                                  .outSigns(done), .outExp(outExp));
 
 endmodule
