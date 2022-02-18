@@ -54,8 +54,8 @@ TensorCoreChain dut (
 );
 
 initial begin
-  $readmemh("./sim/tb/mat_a.mem", mat_a);
-  $readmemh("./sim/tb/mat_b.mem", mat_b);
+  $readmemh("./tb/MAT_A_BFP8.mem", mat_a);
+  $readmemh("./tb/MAT_B_BFP8.mem", mat_b);
   #21 resetn = 1'b1;
   
   @(posedge clk);

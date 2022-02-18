@@ -1,6 +1,8 @@
 // Generator : SpinalHDL v1.6.0    git head : 73c8d8e2b86b45646e9d0b2e729291f2b65e6be3
 // Component : TensorCoreChain
-// Git hash  : f80f69ff076a605b2e70b90e5929e34e766fbc99
+// Git hash  : 0cfd83a29c8332c61ae9b2ecf84511b3e8a28480
+
+
 
 module TensorCoreChain (
   input      [79:0]   io_dataIn_0,
@@ -68,40 +70,40 @@ module TensorCoreChain (
   wire       [7:0]    tensor_core_3_data_in_10;
   wire                tensor_core_3_load_bb_one;
   wire                tensor_core_3_load_bb_two;
-  wire       [31:0]   tcEntry_cascade_data_out_col_1;
-  wire       [31:0]   tcEntry_cascade_data_out_col_2;
-  wire       [31:0]   tcEntry_cascade_data_out_col_3;
-  wire       [87:0]   tcEntry_cascade_weight_out;
   wire       [23:0]   tcEntry_bf24_col_1;
   wire       [23:0]   tcEntry_bf24_col_2;
   wire       [23:0]   tcEntry_bf24_col_3;
+  wire       [87:0]   tcEntry_cascade_weight_out;
+  wire       [31:0]   tcEntry_cascade_data_out_col_1;
+  wire       [31:0]   tcEntry_cascade_data_out_col_2;
+  wire       [31:0]   tcEntry_cascade_data_out_col_3;
   wire       [23:0]   tcAccu_bf24_col_1;
   wire       [23:0]   tcAccu_bf24_col_2;
   wire       [23:0]   tcAccu_bf24_col_3;
   wire       [31:0]   tcAccu_cascade_data_out_col_1;
   wire       [31:0]   tcAccu_cascade_data_out_col_2;
   wire       [31:0]   tcAccu_cascade_data_out_col_3;
-  wire       [31:0]   tensor_core_1_cascade_data_out_col_1;
-  wire       [31:0]   tensor_core_1_cascade_data_out_col_2;
-  wire       [31:0]   tensor_core_1_cascade_data_out_col_3;
-  wire       [87:0]   tensor_core_1_cascade_weight_out;
   wire       [23:0]   tensor_core_1_bf24_col_1;
   wire       [23:0]   tensor_core_1_bf24_col_2;
   wire       [23:0]   tensor_core_1_bf24_col_3;
-  wire       [31:0]   tensor_core_2_cascade_data_out_col_1;
-  wire       [31:0]   tensor_core_2_cascade_data_out_col_2;
-  wire       [31:0]   tensor_core_2_cascade_data_out_col_3;
-  wire       [87:0]   tensor_core_2_cascade_weight_out;
+  wire       [87:0]   tensor_core_1_cascade_weight_out;
+  wire       [31:0]   tensor_core_1_cascade_data_out_col_1;
+  wire       [31:0]   tensor_core_1_cascade_data_out_col_2;
+  wire       [31:0]   tensor_core_1_cascade_data_out_col_3;
   wire       [23:0]   tensor_core_2_bf24_col_1;
   wire       [23:0]   tensor_core_2_bf24_col_2;
   wire       [23:0]   tensor_core_2_bf24_col_3;
-  wire       [31:0]   tensor_core_3_cascade_data_out_col_1;
-  wire       [31:0]   tensor_core_3_cascade_data_out_col_2;
-  wire       [31:0]   tensor_core_3_cascade_data_out_col_3;
-  wire       [87:0]   tensor_core_3_cascade_weight_out;
+  wire       [87:0]   tensor_core_2_cascade_weight_out;
+  wire       [31:0]   tensor_core_2_cascade_data_out_col_1;
+  wire       [31:0]   tensor_core_2_cascade_data_out_col_2;
+  wire       [31:0]   tensor_core_2_cascade_data_out_col_3;
   wire       [23:0]   tensor_core_3_bf24_col_1;
   wire       [23:0]   tensor_core_3_bf24_col_2;
   wire       [23:0]   tensor_core_3_bf24_col_3;
+  wire       [87:0]   tensor_core_3_cascade_weight_out;
+  wire       [31:0]   tensor_core_3_cascade_data_out_col_1;
+  wire       [31:0]   tensor_core_3_cascade_data_out_col_2;
+  wire       [31:0]   tensor_core_3_cascade_data_out_col_3;
   wire       [3:0]    _zz_loadCounter_valueNext;
   wire       [0:0]    _zz_loadCounter_valueNext_1;
   wire       [7:0]    _zz_inputCounter_valueNext;
@@ -171,7 +173,7 @@ module TensorCoreChain (
   assign _zz_inputCounter_valueNext = {7'd0, _zz_inputCounter_valueNext_1};
   assign _zz_outValidCounter_valueNext_1 = outValidCounter_willIncrement;
   assign _zz_outValidCounter_valueNext = {7'd0, _zz_outValidCounter_valueNext_1};
-  tensor_core tcEntry (
+  tensor_core_entry tcEntry (
     .clk                       (clk                             ), //i
     .data_in_1                 (tcEntry_data_in_1               ), //i
     .data_in_2                 (tcEntry_data_in_2               ), //i
@@ -190,21 +192,15 @@ module TensorCoreChain (
     .load_bb_one               (1'b1                            ), //i
     .load_bb_two               (1'b0                            ), //i
     .load_buf_sel              (loadBufSel                      ), //i
-    .zero_en                   (1'b0                            ), //i
-    .acc_en                    (1'b0                            ), //i
-    .cascade_data_in_col_1     (32'h0                           ), //i
-    .cascade_data_in_col_2     (32'h0                           ), //i
-    .cascade_data_in_col_3     (32'h0                           ), //i
-    .cascade_data_out_col_1    (tcEntry_cascade_data_out_col_1  ), //o
-    .cascade_data_out_col_2    (tcEntry_cascade_data_out_col_2  ), //o
-    .cascade_data_out_col_3    (tcEntry_cascade_data_out_col_3  ), //o
-    .cascade_weight_in         (88'h0                           ), //i
-    .cascade_weight_out        (tcEntry_cascade_weight_out      ), //o
     .bf24_col_1                (tcEntry_bf24_col_1              ), //o
     .bf24_col_2                (tcEntry_bf24_col_2              ), //o
-    .bf24_col_3                (tcEntry_bf24_col_3              )  //o
+    .bf24_col_3                (tcEntry_bf24_col_3              ), //o
+    .cascade_weight_out        (tcEntry_cascade_weight_out      ), //o
+    .cascade_data_out_col_1    (tcEntry_cascade_data_out_col_1  ), //o
+    .cascade_data_out_col_2    (tcEntry_cascade_data_out_col_2  ), //o
+    .cascade_data_out_col_3    (tcEntry_cascade_data_out_col_3  )  //o
   );
-  tensor_core_accu_24 tcAccu (
+  tensor_core_accu tcAccu (
     .clk                       (clk                                   ), //i
     .acc_en                    (1'b0                                  ), //i
     .zero_en                   (1'b0                                  ), //i
@@ -236,23 +232,23 @@ module TensorCoreChain (
     .side_in_1                 (8'h0                                  ), //i
     .side_in_2                 (8'h0                                  ), //i
     .shared_exponent_data      (io_expIn_0                            ), //i
-    .feed_sel                  (2'b10                                 ), //i
+    .feed_sel                  (2'b01                                 ), //i
     .load_bb_one               (tensor_core_1_load_bb_one             ), //i
     .load_bb_two               (tensor_core_1_load_bb_two             ), //i
     .load_buf_sel              (loadBufSel                            ), //i
-    .zero_en                   (1'b0                                  ), //i
-    .acc_en                    (1'b0                                  ), //i
-    .cascade_data_in_col_1     (32'h0                                 ), //i
-    .cascade_data_in_col_2     (32'h0                                 ), //i
-    .cascade_data_in_col_3     (32'h0                                 ), //i
-    .cascade_data_out_col_1    (tensor_core_1_cascade_data_out_col_1  ), //o
-    .cascade_data_out_col_2    (tensor_core_1_cascade_data_out_col_2  ), //o
-    .cascade_data_out_col_3    (tensor_core_1_cascade_data_out_col_3  ), //o
-    .cascade_weight_in         (tcEntry_cascade_weight_out            ), //i
-    .cascade_weight_out        (tensor_core_1_cascade_weight_out      ), //o
     .bf24_col_1                (tensor_core_1_bf24_col_1              ), //o
     .bf24_col_2                (tensor_core_1_bf24_col_2              ), //o
-    .bf24_col_3                (tensor_core_1_bf24_col_3              )  //o
+    .bf24_col_3                (tensor_core_1_bf24_col_3              ), //o
+    .acc_en                    (1'b0                                  ), //i
+    .zero_en                   (1'b0                                  ), //i
+    .cascade_weight_in         (tcEntry_cascade_weight_out            ), //i
+    .cascade_weight_out        (tensor_core_1_cascade_weight_out      ), //o
+    .cascade_data_in_col_1     (tcEntry_cascade_data_out_col_1        ), //i
+    .cascade_data_in_col_2     (tcEntry_cascade_data_out_col_2        ), //i
+    .cascade_data_in_col_3     (tcEntry_cascade_data_out_col_3        ), //i
+    .cascade_data_out_col_1    (tensor_core_1_cascade_data_out_col_1  ), //o
+    .cascade_data_out_col_2    (tensor_core_1_cascade_data_out_col_2  ), //o
+    .cascade_data_out_col_3    (tensor_core_1_cascade_data_out_col_3  )  //o
   );
   tensor_core tensor_core_2 (
     .clk                       (clk                                   ), //i
@@ -269,23 +265,23 @@ module TensorCoreChain (
     .side_in_1                 (8'h0                                  ), //i
     .side_in_2                 (8'h0                                  ), //i
     .shared_exponent_data      (io_expIn_1_delay_1                    ), //i
-    .feed_sel                  (2'b10                                 ), //i
+    .feed_sel                  (2'b01                                 ), //i
     .load_bb_one               (tensor_core_2_load_bb_one             ), //i
     .load_bb_two               (tensor_core_2_load_bb_two             ), //i
     .load_buf_sel              (loadBufSel                            ), //i
-    .zero_en                   (1'b0                                  ), //i
+    .bf24_col_1                (tensor_core_2_bf24_col_1              ), //o
+    .bf24_col_2                (tensor_core_2_bf24_col_2              ), //o
+    .bf24_col_3                (tensor_core_2_bf24_col_3              ), //o
     .acc_en                    (1'b0                                  ), //i
+    .zero_en                   (1'b0                                  ), //i
+    .cascade_weight_in         (tensor_core_1_cascade_weight_out      ), //i
+    .cascade_weight_out        (tensor_core_2_cascade_weight_out      ), //o
     .cascade_data_in_col_1     (tensor_core_1_cascade_data_out_col_1  ), //i
     .cascade_data_in_col_2     (tensor_core_1_cascade_data_out_col_2  ), //i
     .cascade_data_in_col_3     (tensor_core_1_cascade_data_out_col_3  ), //i
     .cascade_data_out_col_1    (tensor_core_2_cascade_data_out_col_1  ), //o
     .cascade_data_out_col_2    (tensor_core_2_cascade_data_out_col_2  ), //o
-    .cascade_data_out_col_3    (tensor_core_2_cascade_data_out_col_3  ), //o
-    .cascade_weight_in         (tensor_core_1_cascade_weight_out      ), //i
-    .cascade_weight_out        (tensor_core_2_cascade_weight_out      ), //o
-    .bf24_col_1                (tensor_core_2_bf24_col_1              ), //o
-    .bf24_col_2                (tensor_core_2_bf24_col_2              ), //o
-    .bf24_col_3                (tensor_core_2_bf24_col_3              )  //o
+    .cascade_data_out_col_3    (tensor_core_2_cascade_data_out_col_3  )  //o
   );
   tensor_core tensor_core_3 (
     .clk                       (clk                                   ), //i
@@ -302,23 +298,23 @@ module TensorCoreChain (
     .side_in_1                 (8'h0                                  ), //i
     .side_in_2                 (8'h0                                  ), //i
     .shared_exponent_data      (io_expIn_2_delay_2                    ), //i
-    .feed_sel                  (2'b10                                 ), //i
+    .feed_sel                  (2'b01                                 ), //i
     .load_bb_one               (tensor_core_3_load_bb_one             ), //i
     .load_bb_two               (tensor_core_3_load_bb_two             ), //i
     .load_buf_sel              (loadBufSel                            ), //i
-    .zero_en                   (1'b0                                  ), //i
+    .bf24_col_1                (tensor_core_3_bf24_col_1              ), //o
+    .bf24_col_2                (tensor_core_3_bf24_col_2              ), //o
+    .bf24_col_3                (tensor_core_3_bf24_col_3              ), //o
     .acc_en                    (1'b0                                  ), //i
+    .zero_en                   (1'b0                                  ), //i
+    .cascade_weight_in         (tensor_core_2_cascade_weight_out      ), //i
+    .cascade_weight_out        (tensor_core_3_cascade_weight_out      ), //o
     .cascade_data_in_col_1     (tensor_core_2_cascade_data_out_col_1  ), //i
     .cascade_data_in_col_2     (tensor_core_2_cascade_data_out_col_2  ), //i
     .cascade_data_in_col_3     (tensor_core_2_cascade_data_out_col_3  ), //i
     .cascade_data_out_col_1    (tensor_core_3_cascade_data_out_col_1  ), //o
     .cascade_data_out_col_2    (tensor_core_3_cascade_data_out_col_2  ), //o
-    .cascade_data_out_col_3    (tensor_core_3_cascade_data_out_col_3  ), //o
-    .cascade_weight_in         (tensor_core_2_cascade_weight_out      ), //i
-    .cascade_weight_out        (tensor_core_3_cascade_weight_out      ), //o
-    .bf24_col_1                (tensor_core_3_bf24_col_1              ), //o
-    .bf24_col_2                (tensor_core_3_bf24_col_2              ), //o
-    .bf24_col_3                (tensor_core_3_bf24_col_3              )  //o
+    .cascade_data_out_col_3    (tensor_core_3_cascade_data_out_col_3  )  //o
   );
   always @(*) begin
     loadCounter_willIncrement = 1'b0;

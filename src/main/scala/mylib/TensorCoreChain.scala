@@ -24,24 +24,24 @@ class TensorCoreChain(chain_len: Int, out_buf_delay: Int) extends Component {
   }
 
   // helper function: connect data in ports
-  def connect_data_in(tc: tensor_core, dataIn: UInt): Unit = {
+  def connect_data_in(tcIo: TensorCoreBaseInterface, dataIn: UInt): Unit = {
     if (dataIn.getWidth == 80) {
-      tc.io.data_in_1 := dataIn(7 downto 0)
-      tc.io.data_in_2 := dataIn(15 downto 8)
-      tc.io.data_in_3 := dataIn(23 downto 16)
-      tc.io.data_in_4 := dataIn(31 downto 24)
-      tc.io.data_in_5 := dataIn(39 downto 32)
-      tc.io.data_in_6 := dataIn(47 downto 40)
-      tc.io.data_in_7 := dataIn(55 downto 48)
-      tc.io.data_in_8 := dataIn(63 downto 56)
-      tc.io.data_in_9 := dataIn(71 downto 64)
-      tc.io.data_in_10 := dataIn(79 downto 72)
+      tcIo.data_in_1 := dataIn(7 downto 0)
+      tcIo.data_in_2 := dataIn(15 downto 8)
+      tcIo.data_in_3 := dataIn(23 downto 16)
+      tcIo.data_in_4 := dataIn(31 downto 24)
+      tcIo.data_in_5 := dataIn(39 downto 32)
+      tcIo.data_in_6 := dataIn(47 downto 40)
+      tcIo.data_in_7 := dataIn(55 downto 48)
+      tcIo.data_in_8 := dataIn(63 downto 56)
+      tcIo.data_in_9 := dataIn(71 downto 64)
+      tcIo.data_in_10 := dataIn(79 downto 72)
     }
   }
 
-  val tcEntry = new tensor_core
+  val tcEntry = new tensor_core_entry
   val tcCoreChainElems = new Array[tensor_core](chain_len)
-  val tcAccu = new tensor_core_accu_24
+  val tcAccu = new tensor_core_accu
 
   // loading requires 3 extra cycles, align the valid signal
   // with the first compute core here
@@ -79,23 +79,17 @@ class TensorCoreChain(chain_len: Int, out_buf_delay: Int) extends Component {
   when(oBufferLoadValid.rise()) (outValidCounter.increment())
   io.outValid := outValidCounter.willOverflowIfInc
 
-  connect_data_in(tcEntry, io.loadCascadeIn)
+  connect_data_in(tcEntry.io, io.loadCascadeIn)
   tcEntry.io.shared_exponent_data := io.expCascadeIn
   tcEntry.io.feed_sel <> U"2'd0"
   tcEntry.io.load_buf_sel <> loadBufSel
   tcEntry.io.load_bb_one <> True
   tcEntry.io.load_bb_two <> False
-  tcEntry.io.cascade_weight_in <> U"88'd0"
   tcEntry.io.side_in_1 <> U"8'd0"
   tcEntry.io.side_in_2 <> U"8'd0"
-  tcEntry.io.cascade_data_in_col_1 <> U"32'd0"
-  tcEntry.io.cascade_data_in_col_2 <> U"32'd0"
-  tcEntry.io.cascade_data_in_col_3 <> U"32'd0"
-  tcEntry.io.acc_en <> False
-  tcEntry.io.zero_en <> False
 
   tcCoreChainElems(0) = new tensor_core
-  connect_data_in(tcCoreChainElems(0), io.dataIn(0))
+  connect_data_in(tcCoreChainElems(0).io, io.dataIn(0))
   tcCoreChainElems(0).io.shared_exponent_data <> io.expIn(0)
   tcCoreChainElems(0).io.cascade_weight_in <> tcEntry.io.cascade_weight_out
   tcCoreChainElems(0).io.zero_en <> False
@@ -105,14 +99,15 @@ class TensorCoreChain(chain_len: Int, out_buf_delay: Int) extends Component {
   tcCoreChainElems(0).io.load_bb_two <> loadBufCtrl(1)
   tcCoreChainElems(0).io.side_in_1 <> U"8'd0"
   tcCoreChainElems(0).io.side_in_2 <> U"8'd0"
-  tcCoreChainElems(0).io.cascade_data_in_col_1 <> U"32'd0"
-  tcCoreChainElems(0).io.cascade_data_in_col_2 <> U"32'd0"
-  tcCoreChainElems(0).io.cascade_data_in_col_3 <> U"32'd0"
-  tcCoreChainElems(0).io.feed_sel <> U"2'd2"
+  tcCoreChainElems(0).io.cascade_data_in_col_1 <> tcEntry.io.cascade_data_out_col_1
+  tcCoreChainElems(0).io.cascade_data_in_col_2 <> tcEntry.io.cascade_data_out_col_2
+  tcCoreChainElems(0).io.cascade_data_in_col_3 <> tcEntry.io.cascade_data_out_col_3
+  tcCoreChainElems(0).io.feed_sel <> U"2'd1"
 
   for (i <- 1 until chain_len) {
     tcCoreChainElems(i) = new tensor_core
-    connect_data_in(tcCoreChainElems(i), Delay(io.dataIn(i), i*2))
+    // TODO: suspecious parameter i*2
+    connect_data_in(tcCoreChainElems(i).io, Delay(io.dataIn(i), i*2))
     tcCoreChainElems(i).io.shared_exponent_data <> Delay(io.expIn(i), i)
     tcCoreChainElems(i).io.cascade_data_in_col_1 <> tcCoreChainElems(i-1).io.cascade_data_out_col_1
     tcCoreChainElems(i).io.cascade_data_in_col_2 <> tcCoreChainElems(i-1).io.cascade_data_out_col_2
@@ -123,8 +118,7 @@ class TensorCoreChain(chain_len: Int, out_buf_delay: Int) extends Component {
     tcCoreChainElems(i).io.load_buf_sel <> loadBufSel
     tcCoreChainElems(i).io.load_bb_one <> loadBufCtrl(0)
     tcCoreChainElems(i).io.load_bb_two <> loadBufCtrl(1)
-    // TODO: take care of the feed sel: this is just a modification
-    tcCoreChainElems(i).io.feed_sel := U"2'd2"
+    tcCoreChainElems(i).io.feed_sel := U"2'd1"
     tcCoreChainElems(i).io.side_in_1 <> U"8'd0"
     tcCoreChainElems(i).io.side_in_2 <> U"8'd0"
   }
