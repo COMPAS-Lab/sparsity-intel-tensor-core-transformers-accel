@@ -4,7 +4,7 @@ module bfp_converter(
   clk, rst_n,
   vector_rdy, in_vector_flatten,
   outMants_flatten, outExp,
-  done, valid_out);
+  valid_out);
   //very simple testbench, last 2 modules do not successfully parameterize with V or P
 
   //V is vector length, P is parallelism, BIT is incoming FP size, FPM is mantissa size of FP,
@@ -27,9 +27,9 @@ module bfp_converter(
   logic [P-1:0][BIT-1:0]          vector;
 
   logic                           reset;
-  logic [P-1:0][BIT-1:0]          outvect;
+  logic [P-1:0][BFPM+EXP:0]       outvect;
 
-  logic                           valid_outVT, valid_outLE, doneVT;
+  logic                           valid_outLE;
   logic [P-1:0][BIT-1:0]          outvalsVT;
   logic [EXP-1:0]                 outExpLE;
 
@@ -37,7 +37,6 @@ module bfp_converter(
   output logic [P*(BFPM+2)-1:0]          outMants_flatten;
   output logic [EXP-1:0]                 outExp;
   output logic                           valid_out;
-  output logic                           done;
 
 
 
@@ -59,7 +58,6 @@ module bfp_converter(
                                   .outExp(outExpLE));
 
   mantissaAdj #(V, P, BIT, FPM, BFPM) m0(.clk(clk), .reset(reset), .invals_rdy(valid_outLE), 
-                                  .valid_out(valid_out), .vect(outvect), .mants(outMants), .inExp(outExpLE), 
-                                  .outSigns(done), .outExp(outExp));
+                                  .valid_out(valid_out), .vect(outvect), .mants(outMants), .inExp(outExpLE), .outExp(outExp));
 
 endmodule

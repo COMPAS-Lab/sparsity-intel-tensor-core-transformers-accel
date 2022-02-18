@@ -1,4 +1,4 @@
-module mantissaAdj(clk, reset, invals_rdy, valid_out, mants, vect, inExp, outExp, outSigns);
+module mantissaAdj(clk, reset, invals_rdy, valid_out, mants, vect, inExp, outExp);
 
 	parameter					V=16, P=16, BIT=32, FPM=23, BFPM=4;
 	localparam					EXP=BIT-FPM-1;//-1 since we exclude sign bit
@@ -7,11 +7,11 @@ module mantissaAdj(clk, reset, invals_rdy, valid_out, mants, vect, inExp, outExp
     input [P-1:0][BFPM+EXP:0]		vect;
     input [EXP-1:0]					inExp;
     output logic					valid_out;
-    output logic [P-1:0][BFPM:0]	mants;//mantissas include invisible 1
+    output logic [P-1:0][BFPM+1:0]	mants;//mantissas include invisible 1
     output logic [EXP-1:0]			outExp;
-    output logic [P-1:0]			outSigns;
     
     logic [P-1:0][BFPM:0]			realMantsIn, shiftedMants;//mantissas including invisible 1
+	logic [P-1:0][BFPM+1:0]		signedMants;//signed mantissas
     logic [$clog2(V):0]				cnt;
 
 	integer i, j, k;
@@ -27,8 +27,7 @@ module mantissaAdj(clk, reset, invals_rdy, valid_out, mants, vect, inExp, outExp
 			valid_out<=invals_rdy;
 			outExp<=inExp;
 			for(i=0;i<P;i=i+1) begin//truncate bits that don't fit into new mantissa size
-				mants[i]<=shiftedMants[i];//adjusted mantissas
-				outSigns[i]<=vect[i][BFPM+EXP];//vector of the sign bits
+				mants[i]<=signedMants[i];//adjusted mantissas
 			end
 		end
 	end
@@ -38,6 +37,12 @@ module mantissaAdj(clk, reset, invals_rdy, valid_out, mants, vect, inExp, outExp
 			realMantsIn[k]={1'b1,vect[k][BFPM-1 -:BFPM]};
 		for(j=0;j<P;j=j+1)//right shift mantissas by largest Exp - Exp of operand
 			shiftedMants[j]=(realMantsIn[j] >> (inExp-vect[j][EXP+BFPM-1 -:EXP]));
+		for(j=0;j<P;j=j+1)//2's complement mantissa depending on sign, and extend with sign bit
+            if(vect[j][BFPM+EXP]==1)//need to add a bit when incorporating sign, to get desired represented range
+                signedMants[j]={1'b1,(~shiftedMants[j])+1'b1};
+            else
+                signedMants[j]={1'b0,shiftedMants[j]};
+
 	end
 
 endmodule

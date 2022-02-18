@@ -38,7 +38,10 @@ bin/
 *.vcd
 !tester/src/test/resources/*.vhd
 
-
+# Simulation
 simWorkspace/
 tmp/
 null
+transcript
+*.wlf
+work

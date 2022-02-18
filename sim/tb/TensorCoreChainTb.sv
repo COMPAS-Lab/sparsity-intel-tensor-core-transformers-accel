@@ -26,11 +26,11 @@ logic clk = 0;
 logic resetn = 0;
 
 // Mat A: 3x90, each ceill 8 bitsx10 elems + 1 shared exp 
-logic [3*9-1:0] mat_a [8*11-1:0];
+logic [8*11-1:0] mat_a [3*9-1:0];
 // Mat B: 90x9, each ceill 3x (8bits x 10 elems + 1 shared exp)
-logic [3*9-1:0] mat_b [CHAIN_LEN*(11*8)-1:0];
+logic [CHAIN_LEN*(11*8)-1:0] mat_b [3*9-1:0];
 // res: 3x9 matrix, each 24 bit
-logic [3*9-1:0] res [23:0];
+logic [23:0] res [3*9-1:0];
 
 TensorCoreChain dut (
   .io_dataIn_0 (io_dataIn_0 ),
