@@ -40,26 +40,28 @@ class TensorCoreChain(chain_len: Int, out_buf_delay: Int) extends Component {
   }
 
   val tcEntry = new tensor_core_entry
-  val tcCoreChainElems = new Array[tensor_core](chain_len)
+  val tcStartPoint = new tensor_core_start
+  val tcCoreChainElems = new Array[tensor_core](chain_len-1)
   val tcAccu = new tensor_core_accu
-
+  
   // loading requires 3 extra cycles, align the valid signal
   // with the first compute core here
-  val loadValidD3t = Delay(io.loadValid, 3)
-  val loadCounter = Counter(chain_len*3)
+  val loadValidD3t = Delay(io.loadValid, 3, init=False)
+  // 2 cycle delay valid signal for loading selection
+  val loadValidD2t = Delay(io.loadValid, 2, init=False)
+  val loadCounter, loadSelCounter = Counter(chain_len*3)
   val loadBufCtrlReg = Reg(UInt(2 bits)) init U"2'b01"
   val loadBufCtrl = UInt(2 bits)
-  when(loadValidD3t){
-    loadCounter.increment()
-  }
+  when(loadValidD3t) {loadCounter.increment()}
+  when(loadValidD2t) {loadSelCounter.increment()}
 
-  when(loadCounter.willOverflow) {
-    io.loadReady := True
+
+  when(loadSelCounter.willOverflow) {
     loadBufCtrlReg := loadBufCtrlReg.rotateLeft(1)
-  } .otherwise {
-    io.loadReady := False
   }
-  loadBufCtrl := Mux(loadValidD3t, loadBufCtrlReg, U"2'b00")
+  loadBufCtrl := Mux(loadValidD2t, loadBufCtrlReg, U"2'b00")
+  io.loadReady := loadCounter.willOverflow
+  
   //TODO: may need to change this to a dynamic config counter
   val inputCounter = DynaCounter(8, io.inputIters)
   val loadBufSel = Reg(Bool()) init False
@@ -72,12 +74,14 @@ class TensorCoreChain(chain_len: Int, out_buf_delay: Int) extends Component {
   }
 
   //output buffer ctrl logic.
-  val oBufferLoadValid = Delay(io.dataValid, 4+2*chain_len)
+  // delayed output valid: 4c of dot lat,3c of accu lat and 2*(chain_len-1)
+  // of input delay on the last stage of the chain
+  val oBufferLoadValid = Delay(io.dataValid, 2*(chain_len-1)+4+3-1, init=False)
   //counting the output iterations for output valid
   val outValidCounter = DynaCounter(8, io.inputIters)
 
-  when(oBufferLoadValid.rise()) (outValidCounter.increment())
-  io.outValid := outValidCounter.willOverflowIfInc
+  when(oBufferLoadValid) (outValidCounter.increment())
+  io.outValid := outValidCounter.willOverflow
 
   connect_data_in(tcEntry.io, io.loadCascadeIn)
   tcEntry.io.shared_exponent_data := io.expCascadeIn
@@ -88,31 +92,34 @@ class TensorCoreChain(chain_len: Int, out_buf_delay: Int) extends Component {
   tcEntry.io.side_in_1 <> U"8'd0"
   tcEntry.io.side_in_2 <> U"8'd0"
 
-  tcCoreChainElems(0) = new tensor_core
-  connect_data_in(tcCoreChainElems(0).io, io.dataIn(0))
-  tcCoreChainElems(0).io.shared_exponent_data <> io.expIn(0)
-  tcCoreChainElems(0).io.cascade_weight_in <> tcEntry.io.cascade_weight_out
-  tcCoreChainElems(0).io.zero_en <> False
-  tcCoreChainElems(0).io.acc_en <> False
-  tcCoreChainElems(0).io.load_buf_sel <> loadBufSel
-  tcCoreChainElems(0).io.load_bb_one <> loadBufCtrl(0)
-  tcCoreChainElems(0).io.load_bb_two <> loadBufCtrl(1)
-  tcCoreChainElems(0).io.side_in_1 <> U"8'd0"
-  tcCoreChainElems(0).io.side_in_2 <> U"8'd0"
-  tcCoreChainElems(0).io.cascade_data_in_col_1 <> tcEntry.io.cascade_data_out_col_1
-  tcCoreChainElems(0).io.cascade_data_in_col_2 <> tcEntry.io.cascade_data_out_col_2
-  tcCoreChainElems(0).io.cascade_data_in_col_3 <> tcEntry.io.cascade_data_out_col_3
-  tcCoreChainElems(0).io.feed_sel <> U"2'd1"
+  connect_data_in(tcStartPoint.io, io.dataIn(0))
+  tcStartPoint.io.shared_exponent_data <> io.expIn(0)
+  tcStartPoint.io.cascade_weight_in <> tcEntry.io.cascade_weight_out
+  tcStartPoint.io.load_buf_sel <> loadBufSel
+  tcStartPoint.io.load_bb_one <> loadBufCtrl(0)
+  tcStartPoint.io.load_bb_two <> loadBufCtrl(1)
+  tcStartPoint.io.side_in_1 <> U"8'h0"
+  tcStartPoint.io.side_in_2 <> U"8'h0"
+  tcStartPoint.io.feed_sel <> U"2'd1"
 
-  for (i <- 1 until chain_len) {
+  for (i <- 0 until chain_len-1) {
     tcCoreChainElems(i) = new tensor_core
     // TODO: suspecious parameter i*2
-    connect_data_in(tcCoreChainElems(i).io, Delay(io.dataIn(i), i*2))
-    tcCoreChainElems(i).io.shared_exponent_data <> Delay(io.expIn(i), i)
-    tcCoreChainElems(i).io.cascade_data_in_col_1 <> tcCoreChainElems(i-1).io.cascade_data_out_col_1
-    tcCoreChainElems(i).io.cascade_data_in_col_2 <> tcCoreChainElems(i-1).io.cascade_data_out_col_2
-    tcCoreChainElems(i).io.cascade_data_in_col_3 <> tcCoreChainElems(i-1).io.cascade_data_out_col_3
-    tcCoreChainElems(i).io.cascade_weight_in <> tcCoreChainElems(i-1).io.cascade_weight_out
+	val delayedDataIn = Delay(io.dataIn(i+1), 2*(i+1), init=U(0, io.dataIn(i+1).getWidth bits))
+    connect_data_in(tcCoreChainElems(i).io, delayedDataIn)
+	val delayedExpIn = Delay(io.expIn(i+1), 2*(i+1), init=U(0, io.expIn(i+1).getWidth bits))
+    tcCoreChainElems(i).io.shared_exponent_data <> delayedExpIn
+	if (i == 0) {
+		tcCoreChainElems(i).io.cascade_data_in_col_1 <> tcStartPoint.io.cascade_data_out_col_1
+		tcCoreChainElems(i).io.cascade_data_in_col_2 <> tcStartPoint.io.cascade_data_out_col_2
+		tcCoreChainElems(i).io.cascade_data_in_col_3 <> tcStartPoint.io.cascade_data_out_col_3
+		tcCoreChainElems(i).io.cascade_weight_in <> tcStartPoint.io.cascade_weight_out
+	} else {
+		tcCoreChainElems(i).io.cascade_data_in_col_1 <> tcCoreChainElems(i-1).io.cascade_data_out_col_1
+		tcCoreChainElems(i).io.cascade_data_in_col_2 <> tcCoreChainElems(i-1).io.cascade_data_out_col_2
+		tcCoreChainElems(i).io.cascade_data_in_col_3 <> tcCoreChainElems(i-1).io.cascade_data_out_col_3
+		tcCoreChainElems(i).io.cascade_weight_in <> tcCoreChainElems(i-1).io.cascade_weight_out
+	}
     tcCoreChainElems(i).io.zero_en <> False
     tcCoreChainElems(i).io.acc_en <> False
     tcCoreChainElems(i).io.load_buf_sel <> loadBufSel
@@ -122,31 +129,25 @@ class TensorCoreChain(chain_len: Int, out_buf_delay: Int) extends Component {
     tcCoreChainElems(i).io.side_in_1 <> U"8'd0"
     tcCoreChainElems(i).io.side_in_2 <> U"8'd0"
   }
-
-  val oBuffer = Vec(Reg(UInt(24 bits)) init 0, 3)
-  //output buffer writing control
-  when (oBufferLoadValid) {
-    oBuffer(0) := tcAccu.io.bf24_col_1
-    oBuffer(1) := tcAccu.io.bf24_col_2
-    oBuffer(2) := tcAccu.io.bf24_col_3
-  } otherwise (oBuffer := Vec(U"24'd0", 3))
-
-  tcAccu.io.bf24_a1 := Delay(oBuffer(0), out_buf_delay-1)
-  tcAccu.io.bf24_a2 := Delay(oBuffer(1), out_buf_delay-1)
-  tcAccu.io.bf24_a3 := Delay(oBuffer(2), out_buf_delay-1)
-  tcAccu.io.cascade_data_in_col_1 <> tcCoreChainElems(chain_len-1).io.cascade_data_out_col_1
-  tcAccu.io.cascade_data_in_col_2 <> tcCoreChainElems(chain_len-1).io.cascade_data_out_col_2
-  tcAccu.io.cascade_data_in_col_3 <> tcCoreChainElems(chain_len-1).io.cascade_data_out_col_3
+  
+  tcAccu.io.bf24_a1 := Delay(tcAccu.io.bf24_col_1, out_buf_delay, init=U(0, 24 bits))
+  tcAccu.io.bf24_a2 := Delay(tcAccu.io.bf24_col_2, out_buf_delay, init=U(0, 24 bits))
+  tcAccu.io.bf24_a3 := Delay(tcAccu.io.bf24_col_3, out_buf_delay, init=U(0, 24 bits))
+  tcAccu.io.cascade_data_in_col_1 <> tcCoreChainElems(chain_len-2).io.cascade_data_out_col_1
+  tcAccu.io.cascade_data_in_col_2 <> tcCoreChainElems(chain_len-2).io.cascade_data_out_col_2
+  tcAccu.io.cascade_data_in_col_3 <> tcCoreChainElems(chain_len-2).io.cascade_data_out_col_3
   tcAccu.io.zero_en := False
   tcAccu.io.acc_en := False
 
-  io.res <> oBuffer
+  io.res(0) <> tcAccu.io.bf24_col_1
+  io.res(1) <> tcAccu.io.bf24_col_2 
+  io.res(2) <> tcAccu.io.bf24_col_3
 
 }
 
 object TensorCoreChainGen {
   def main(args: Array[String]): Unit = {
     val gen = new DefaultConfig
-    gen.defaultSpinalConfig.generate(new TensorCoreChain(3, 3)).printPruned()
+    gen.defaultSpinalConfig.generate(new TensorCoreChain(3, 9-3)).printPruned()
   }
 }

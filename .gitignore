@@ -45,3 +45,6 @@ null
 transcript
 *.wlf
 work
+wlf*
+*.ini
+sim/libraries/

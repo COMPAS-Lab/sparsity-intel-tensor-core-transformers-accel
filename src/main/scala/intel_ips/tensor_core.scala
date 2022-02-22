@@ -64,6 +64,19 @@ class tensor_core_entry extends BlackBox {
   mapClockDomain(clock = io.clk)
 }
 
+class tensor_core_start extends BlackBox {
+  class TensorCoreStartIntf extends TensorCoreBaseInterface {
+	val cascade_weight_in = in UInt(88 bits)
+    val cascade_weight_out = out UInt(88 bits)
+    val cascade_data_out_col_1, cascade_data_out_col_2, cascade_data_out_col_3 =
+      out UInt(32 bits)
+  }
+  val io = new TensorCoreStartIntf
+
+  noIoPrefix()
+  mapClockDomain(clock = io.clk)
+}
+
 class tensor_core_accu extends BlackBox {
   val io = new Bundle {
     val clk, acc_en, zero_en = in Bool()

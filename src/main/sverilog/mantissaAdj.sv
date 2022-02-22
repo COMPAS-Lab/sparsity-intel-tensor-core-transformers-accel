@@ -25,7 +25,7 @@ module mantissaAdj(clk, reset, invals_rdy, valid_out, mants, vect, inExp, outExp
 				mants[i]<=0;//the adjusted mantissa vector
 		end else begin
 			valid_out<=invals_rdy;
-			outExp<=inExp;
+			outExp<=inExp+((2**(EXP-1))-1)-'d6;
 			for(i=0;i<P;i=i+1) begin//truncate bits that don't fit into new mantissa size
 				mants[i]<=signedMants[i];//adjusted mantissas
 			end

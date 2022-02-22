@@ -1,0 +1,18 @@
+# system info tensor_core_start on 2022.02.21.09:39:17
+system_info:
+name,value
+DEVICE,1SN21BHU2F53E2VG
+DEVICE_FAMILY,Stratix 10
+GENERATION_ID,0
+#
+#
+# Files generated for tensor_core_start on 2022.02.21.09:39:17
+files:
+filepath,kind,attributes,module,is_top
+sim/tensor_core_start.v,VERILOG,CONTAINS_INLINE_CONFIGURATION,tensor_core_start,true
+dsp_prime_10/sim/tensor_core_start_dsp_prime_10_vpll32q.v,VERILOG,,tensor_core_start_dsp_prime_10_vpll32q,false
+#
+# Map from instance-path to kind of module
+instances:
+instancePath,module
+tensor_core_start.dsp_prime_0,tensor_core_start_dsp_prime_10_vpll32q
