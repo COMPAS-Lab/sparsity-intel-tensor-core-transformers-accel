@@ -1,4 +1,4 @@
-# system info tensor_core_entry on 2022.02.16.11:43:23
+# system info tensor_core_entry on 2022.02.23.10:11:21
 system_info:
 name,value
 DEVICE,1SN21BHU2F53E2VG
@@ -6,7 +6,7 @@ DEVICE_FAMILY,Stratix 10
 GENERATION_ID,0
 #
 #
-# Files generated for tensor_core_entry on 2022.02.16.11:43:23
+# Files generated for tensor_core_entry on 2022.02.23.10:11:21
 files:
 filepath,kind,attributes,module,is_top
 sim/tensor_core_entry.v,VERILOG,CONTAINS_INLINE_CONFIGURATION,tensor_core_entry,true

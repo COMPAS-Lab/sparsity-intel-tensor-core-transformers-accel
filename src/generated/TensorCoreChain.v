@@ -1,6 +1,6 @@
 // Generator : SpinalHDL v1.6.0    git head : 73c8d8e2b86b45646e9d0b2e729291f2b65e6be3
 // Component : TensorCoreChain
-// Git hash  : 6fd8b34a2c7fae710d3a3c5c1cf22656e8ff4b5f
+// Git hash  : db127909416713c25272d1a7a0d9caf1b34d4dbe
 
 
 
@@ -213,7 +213,7 @@ module TensorCoreChain (
     .feed_sel                  (2'b00                           ), //i
     .load_bb_one               (1'b1                            ), //i
     .load_bb_two               (1'b0                            ), //i
-    .load_buf_sel              (loadBufSel                      ), //i
+    .load_buf_sel              (1'b0                            ), //i
     .bf24_col_1                (tcEntry_bf24_col_1              ), //o
     .bf24_col_2                (tcEntry_bf24_col_2              ), //o
     .bf24_col_3                (tcEntry_bf24_col_3              ), //o

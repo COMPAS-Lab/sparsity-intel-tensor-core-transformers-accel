@@ -37,7 +37,7 @@ class TensorCoreBaseInterface extends Bundle {
 
 class tensor_core extends BlackBox {
   class TensorCoreIntf extends TensorCoreBaseInterface {
-    val acc_en, zero_en = in Bool()
+	val acc_en, zero_en = in Bool()
     val cascade_weight_in = in UInt(88 bits)
     val cascade_weight_out = out UInt(88 bits)
     val cascade_data_in_col_1, cascade_data_in_col_2, cascade_data_in_col_3 =

@@ -86,7 +86,7 @@ class TensorCoreChain(chain_len: Int, out_buf_delay: Int) extends Component {
   connect_data_in(tcEntry.io, io.loadCascadeIn)
   tcEntry.io.shared_exponent_data := io.expCascadeIn
   tcEntry.io.feed_sel <> U"2'd0"
-  tcEntry.io.load_buf_sel <> loadBufSel
+  tcEntry.io.load_buf_sel <> False
   tcEntry.io.load_bb_one <> True
   tcEntry.io.load_bb_two <> False
   tcEntry.io.side_in_1 <> U"8'd0"

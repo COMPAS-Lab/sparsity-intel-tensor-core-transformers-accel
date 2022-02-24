@@ -36,21 +36,41 @@ add wave -noupdate /TensorCoreChainTb/io_dataIn_1
 add wave -noupdate /TensorCoreChainTb/io_expIn_1
 add wave -noupdate /TensorCoreChainTb/io_dataIn_2
 add wave -noupdate /TensorCoreChainTb/io_expIn_2
-add wave -noupdate -radix float32 /TensorCoreChainTb/dut/tcAccu/bf24_a1_padded
-add wave -noupdate -radix float32 /TensorCoreChainTb/dut/tcAccu/cascade_data_in_col_1
-add wave -noupdate -radix float32 /TensorCoreChainTb/dut/tcAccu/cascade_data_out_col_1
-add wave -noupdate /TensorCoreChainTb/dut/tcAccu/bf24_col_1
-add wave -noupdate /TensorCoreChainTb/dut/tcAccu/bf24_col_2
-add wave -noupdate /TensorCoreChainTb/dut/tcAccu/bf24_col_3
 add wave -noupdate /TensorCoreChainTb/dut/tensor_core_1/load_buf_sel
 add wave -noupdate /TensorCoreChainTb/io_dataValid
 add wave -noupdate /TensorCoreChainTb/dut/oBufferLoadValid
 add wave -noupdate /TensorCoreChainTb/dut/outValidCounter_value
 add wave -noupdate /TensorCoreChainTb/io_outValid
 add wave -noupdate /TensorCoreChainTb/res
-add wave -noupdate /TensorCoreChainTb/dut/oBuffer_0
-add wave -noupdate /TensorCoreChainTb/dut/oBuffer_1
-add wave -noupdate /TensorCoreChainTb/dut/oBuffer_2
+add wave -noupdate -divider entry
+add wave -noupdate /TensorCoreChainTb/dut/tcEntry/clk
+add wave -noupdate /TensorCoreChainTb/dut/tcEntry/feed_sel
+add wave -noupdate /TensorCoreChainTb/dut/tcEntry/dsp_prime_0/fourteennm_dsp_prime_component/acc_en
+add wave -noupdate /TensorCoreChainTb/dut/tcEntry/dsp_prime_0/fourteennm_dsp_prime_component/zero_en
+add wave -noupdate /TensorCoreChainTb/dut/tcEntry/dsp_prime_0/fourteennm_dsp_prime_component/ena
+add wave -noupdate /TensorCoreChainTb/dut/tcEntry/load_bb_one
+add wave -noupdate /TensorCoreChainTb/dut/tcEntry/load_bb_two
+add wave -noupdate /TensorCoreChainTb/dut/tcEntry/load_buf_sel
+add wave -noupdate /TensorCoreChainTb/dut/tcEntry/data_in_1
+add wave -noupdate /TensorCoreChainTb/dut/tcEntry/data_in_2
+add wave -noupdate /TensorCoreChainTb/dut/tcEntry/data_in_3
+add wave -noupdate /TensorCoreChainTb/dut/tcEntry/data_in_4
+add wave -noupdate /TensorCoreChainTb/dut/tcEntry/data_in_5
+add wave -noupdate /TensorCoreChainTb/dut/tcEntry/data_in_6
+add wave -noupdate /TensorCoreChainTb/dut/tcEntry/data_in_7
+add wave -noupdate /TensorCoreChainTb/dut/tcEntry/data_in_8
+add wave -noupdate /TensorCoreChainTb/dut/tcEntry/data_in_9
+add wave -noupdate /TensorCoreChainTb/dut/tcEntry/data_in_10
+add wave -noupdate /TensorCoreChainTb/dut/tcEntry/side_in_1
+add wave -noupdate /TensorCoreChainTb/dut/tcEntry/side_in_2
+add wave -noupdate /TensorCoreChainTb/dut/tcEntry/cascade_weight_out
+add wave -noupdate /TensorCoreChainTb/dut/tcEntry/cascade_data_out_col_1
+add wave -noupdate /TensorCoreChainTb/dut/tcEntry/cascade_data_out_col_2
+add wave -noupdate /TensorCoreChainTb/dut/tcEntry/cascade_data_out_col_3
+add wave -noupdate /TensorCoreChainTb/dut/tcEntry/shared_exponent_data
+add wave -noupdate /TensorCoreChainTb/dut/tcEntry/bf24_col_1
+add wave -noupdate /TensorCoreChainTb/dut/tcEntry/bf24_col_2
+add wave -noupdate /TensorCoreChainTb/dut/tcEntry/bf24_col_3
 add wave -noupdate -divider tensor2
 add wave -noupdate /TensorCoreChainTb/dut/tensor_core_2/feed_sel
 add wave -noupdate /TensorCoreChainTb/dut/tensor_core_2/load_bb_one
@@ -142,7 +162,7 @@ add wave -noupdate /TensorCoreChainTb/io_res_0_padded
 add wave -noupdate /TensorCoreChainTb/io_res_0_padded
 add wave -noupdate /TensorCoreChainTb/io_res_0_padded001
 TreeUpdate [SetDefaultTree]
-WaveRestoreCursors {{Cursor 1} {263077 ps} 0}
+WaveRestoreCursors {{Cursor 1} {416000 ps} 0}
 quietly wave cursor active 1
 configure wave -namecolwidth 383
 configure wave -valuecolwidth 143
@@ -158,4 +178,4 @@ configure wave -griddelta 40
 configure wave -timeline 0
 configure wave -timelineunits ps
 update
-WaveRestoreZoom {132477 ps} {291529 ps}
+WaveRestoreZoom {192105 ps} {504315 ps}

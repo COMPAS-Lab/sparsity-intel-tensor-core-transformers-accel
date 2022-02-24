@@ -70,6 +70,7 @@ initial begin
   end
 
   @(posedge clk);
+  #1
   {io_loadCascadeIn, io_expCascadeIn} = 88'd0;
   io_loadValid = 1'b0;
 end
@@ -87,6 +88,7 @@ initial begin
   end
 
   @(posedge clk);
+  #1
   {io_dataIn_0, io_expIn_0, io_dataIn_1, io_expIn_1, io_dataIn_2, io_expIn_2} = 264'd0;
   io_dataValid = 1'b0;
 end

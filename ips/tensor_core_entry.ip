@@ -1781,6 +1781,7 @@
       </ipxact:parameters>
     </altera:altera_system_parameters>
     <altera:altera_interface_boundary>
+      <altera:interface_mapping altera:name="acc_en" altera:internal="dsp_prime_0.acc_en"></altera:interface_mapping>
       <altera:interface_mapping altera:name="bf24_col_1" altera:internal="dsp_prime_0.bf24_col_1" altera:type="conduit" altera:dir="end">
         <altera:port_mapping altera:name="bf24_col_1" altera:internal="bf24_col_1"></altera:port_mapping>
       </altera:interface_mapping>
@@ -1856,6 +1857,7 @@
       <altera:interface_mapping altera:name="side_in_2" altera:internal="dsp_prime_0.side_in_2" altera:type="conduit" altera:dir="end">
         <altera:port_mapping altera:name="side_in_2" altera:internal="side_in_2"></altera:port_mapping>
       </altera:interface_mapping>
+      <altera:interface_mapping altera:name="zero_en" altera:internal="dsp_prime_0.zero_en"></altera:interface_mapping>
     </altera:altera_interface_boundary>
     <altera:altera_has_warnings>false</altera:altera_has_warnings>
     <altera:altera_has_errors>false</altera:altera_has_errors>
