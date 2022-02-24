@@ -18,6 +18,7 @@ module bfp_converter_tb;
   logic valid_out;
 
   localparam DAT_ROWS = 81;
+  
   logic [BIT*P-1:0] mat_in [DAT_ROWS-1:0];
   logic [(BFPM+2)*P+8-1:0] mat_res [DAT_ROWS-1:0];
 
