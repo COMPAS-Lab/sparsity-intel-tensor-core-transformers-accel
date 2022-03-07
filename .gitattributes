@@ -1,4 +1,4 @@
 * text=auto
 
-*.npy -text
-*.ip -text
+*.npy -binary
+*.ip -binary
