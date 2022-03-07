@@ -1,6 +1,6 @@
 // Generator : SpinalHDL v1.6.0    git head : 73c8d8e2b86b45646e9d0b2e729291f2b65e6be3
 // Component : TensorCoreChainArray
-// Git hash  : d790d72151525b557ab1457e4f34fd958de16dd6
+// Git hash  : 3e056ff35b72d76d3c5a17858b2bde7127081fbb
 
 
 `define ctrlStateMachine_enumDefinition_binary_sequential_type [2:0]
@@ -140,31 +140,22 @@ module TensorCoreChainArray (
   wire                tensorCoreChain_11_io_outValid;
   wire                colConverters_0_io_outBlk_flatten_valid;
   wire       [87:0]   colConverters_0_io_outBlk_flatten_payload;
-  wire                colConverters_0_io_done;
   wire                colConverters_1_io_outBlk_flatten_valid;
   wire       [87:0]   colConverters_1_io_outBlk_flatten_payload;
-  wire                colConverters_1_io_done;
   wire                colConverters_2_io_outBlk_flatten_valid;
   wire       [87:0]   colConverters_2_io_outBlk_flatten_payload;
-  wire                colConverters_2_io_done;
   wire                bfp_converter_wrapper_9_io_outBlk_flatten_valid;
   wire       [87:0]   bfp_converter_wrapper_9_io_outBlk_flatten_payload;
-  wire                bfp_converter_wrapper_9_io_done;
   wire                bfp_converter_wrapper_10_io_outBlk_flatten_valid;
   wire       [87:0]   bfp_converter_wrapper_10_io_outBlk_flatten_payload;
-  wire                bfp_converter_wrapper_10_io_done;
   wire                bfp_converter_wrapper_11_io_outBlk_flatten_valid;
   wire       [87:0]   bfp_converter_wrapper_11_io_outBlk_flatten_payload;
-  wire                bfp_converter_wrapper_11_io_done;
   wire                bfp_converter_wrapper_12_io_outBlk_flatten_valid;
   wire       [87:0]   bfp_converter_wrapper_12_io_outBlk_flatten_payload;
-  wire                bfp_converter_wrapper_12_io_done;
   wire                bfp_converter_wrapper_13_io_outBlk_flatten_valid;
   wire       [87:0]   bfp_converter_wrapper_13_io_outBlk_flatten_payload;
-  wire                bfp_converter_wrapper_13_io_done;
   wire                bfp_converter_wrapper_14_io_outBlk_flatten_valid;
   wire       [87:0]   bfp_converter_wrapper_14_io_outBlk_flatten_payload;
-  wire                bfp_converter_wrapper_14_io_done;
   wire       [3:0]    _zz_rowBufferRdCounter_valueNext;
   wire       [0:0]    _zz_rowBufferRdCounter_valueNext_1;
   wire       [3:0]    _zz_colBufferRdCounter_valueNext;
@@ -633,7 +624,6 @@ module TensorCoreChainArray (
     .io_in_vector_flatten_payload    (io_matALoad_0_payload                      ), //i
     .io_outBlk_flatten_valid         (colConverters_0_io_outBlk_flatten_valid    ), //o
     .io_outBlk_flatten_payload       (colConverters_0_io_outBlk_flatten_payload  ), //o
-    .io_done                         (colConverters_0_io_done                    ), //o
     .resetn                          (resetn                                     ), //i
     .clk                             (clk                                        )  //i
   );
@@ -642,7 +632,6 @@ module TensorCoreChainArray (
     .io_in_vector_flatten_payload    (io_matALoad_1_payload                      ), //i
     .io_outBlk_flatten_valid         (colConverters_1_io_outBlk_flatten_valid    ), //o
     .io_outBlk_flatten_payload       (colConverters_1_io_outBlk_flatten_payload  ), //o
-    .io_done                         (colConverters_1_io_done                    ), //o
     .resetn                          (resetn                                     ), //i
     .clk                             (clk                                        )  //i
   );
@@ -651,7 +640,6 @@ module TensorCoreChainArray (
     .io_in_vector_flatten_payload    (io_matALoad_2_payload                      ), //i
     .io_outBlk_flatten_valid         (colConverters_2_io_outBlk_flatten_valid    ), //o
     .io_outBlk_flatten_payload       (colConverters_2_io_outBlk_flatten_payload  ), //o
-    .io_done                         (colConverters_2_io_done                    ), //o
     .resetn                          (resetn                                     ), //i
     .clk                             (clk                                        )  //i
   );
@@ -660,7 +648,6 @@ module TensorCoreChainArray (
     .io_in_vector_flatten_payload    (io_matBLoad_0_0_payload                            ), //i
     .io_outBlk_flatten_valid         (bfp_converter_wrapper_9_io_outBlk_flatten_valid    ), //o
     .io_outBlk_flatten_payload       (bfp_converter_wrapper_9_io_outBlk_flatten_payload  ), //o
-    .io_done                         (bfp_converter_wrapper_9_io_done                    ), //o
     .resetn                          (resetn                                             ), //i
     .clk                             (clk                                                )  //i
   );
@@ -669,7 +656,6 @@ module TensorCoreChainArray (
     .io_in_vector_flatten_payload    (io_matBLoad_0_1_payload                             ), //i
     .io_outBlk_flatten_valid         (bfp_converter_wrapper_10_io_outBlk_flatten_valid    ), //o
     .io_outBlk_flatten_payload       (bfp_converter_wrapper_10_io_outBlk_flatten_payload  ), //o
-    .io_done                         (bfp_converter_wrapper_10_io_done                    ), //o
     .resetn                          (resetn                                              ), //i
     .clk                             (clk                                                 )  //i
   );
@@ -678,7 +664,6 @@ module TensorCoreChainArray (
     .io_in_vector_flatten_payload    (io_matBLoad_0_2_payload                             ), //i
     .io_outBlk_flatten_valid         (bfp_converter_wrapper_11_io_outBlk_flatten_valid    ), //o
     .io_outBlk_flatten_payload       (bfp_converter_wrapper_11_io_outBlk_flatten_payload  ), //o
-    .io_done                         (bfp_converter_wrapper_11_io_done                    ), //o
     .resetn                          (resetn                                              ), //i
     .clk                             (clk                                                 )  //i
   );
@@ -687,7 +672,6 @@ module TensorCoreChainArray (
     .io_in_vector_flatten_payload    (io_matBLoad_1_0_payload                             ), //i
     .io_outBlk_flatten_valid         (bfp_converter_wrapper_12_io_outBlk_flatten_valid    ), //o
     .io_outBlk_flatten_payload       (bfp_converter_wrapper_12_io_outBlk_flatten_payload  ), //o
-    .io_done                         (bfp_converter_wrapper_12_io_done                    ), //o
     .resetn                          (resetn                                              ), //i
     .clk                             (clk                                                 )  //i
   );
@@ -696,7 +680,6 @@ module TensorCoreChainArray (
     .io_in_vector_flatten_payload    (io_matBLoad_1_1_payload                             ), //i
     .io_outBlk_flatten_valid         (bfp_converter_wrapper_13_io_outBlk_flatten_valid    ), //o
     .io_outBlk_flatten_payload       (bfp_converter_wrapper_13_io_outBlk_flatten_payload  ), //o
-    .io_done                         (bfp_converter_wrapper_13_io_done                    ), //o
     .resetn                          (resetn                                              ), //i
     .clk                             (clk                                                 )  //i
   );
@@ -705,7 +688,6 @@ module TensorCoreChainArray (
     .io_in_vector_flatten_payload    (io_matBLoad_1_2_payload                             ), //i
     .io_outBlk_flatten_valid         (bfp_converter_wrapper_14_io_outBlk_flatten_valid    ), //o
     .io_outBlk_flatten_payload       (bfp_converter_wrapper_14_io_outBlk_flatten_payload  ), //o
-    .io_done                         (bfp_converter_wrapper_14_io_done                    ), //o
     .resetn                          (resetn                                              ), //i
     .clk                             (clk                                                 )  //i
   );
@@ -1363,13 +1345,11 @@ module bfp_converter_wrapper (
   input      [319:0]  io_in_vector_flatten_payload,
   output              io_outBlk_flatten_valid,
   output     [87:0]   io_outBlk_flatten_payload,
-  output              io_done,
   input               resetn,
   input               clk
 );
   wire       [79:0]   core_outMants_flatten;
   wire       [7:0]    core_outExp;
-  wire                core_done;
   wire                core_valid_out;
 
   bfp_converter #(
@@ -1385,10 +1365,8 @@ module bfp_converter_wrapper (
     .in_vector_flatten    (io_in_vector_flatten_payload  ), //i
     .outMants_flatten     (core_outMants_flatten         ), //o
     .outExp               (core_outExp                   ), //o
-    .done                 (core_done                     ), //o
     .valid_out            (core_valid_out                )  //o
   );
-  assign io_done = core_done;
   assign io_outBlk_flatten_valid = core_valid_out;
   assign io_outBlk_flatten_payload = {core_outMants_flatten,core_outExp};
 

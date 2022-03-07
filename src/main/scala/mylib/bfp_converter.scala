@@ -17,7 +17,7 @@ class bfp_converter(vector_len: Int, block_size: Int, bitwidth: Int,
     val in_vector_flatten = in UInt(vector_len * bitwidth bits)
     val outMants_flatten = out UInt(block_size * bfpmWidth bits)
     val outExp = out UInt(bitwidth-fpmWidth-1 bits)
-    val done, valid_out = out Bool()
+    val valid_out = out Bool()
   }
 
   noIoPrefix()
@@ -34,13 +34,11 @@ case class bfp_converter_wrapper(vector_len: Int, block_size: Int, bitwidth: Int
   val io = new Bundle {
     val in_vector_flatten = slave Flow(UInt(vector_len * bitwidth bits))
     val outBlk_flatten = master Flow(UInt(block_size * bfpmWidth + bitwidth - fpmWidth - 1 bits))
-    val done = out Bool()
   }
 
     val core = new bfp_converter(vector_len, block_size, bitwidth, fpmWidth, bfpmWidth)
     core.io.in_vector_flatten <> io.in_vector_flatten.payload
     core.io.vector_rdy <> io.in_vector_flatten.valid
-    core.io.done <> io.done
     io.outBlk_flatten.valid := core.io.valid_out
     io.outBlk_flatten.payload := core.io.outMants_flatten @@ core.io.outExp
 }
