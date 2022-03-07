@@ -1,7 +1,6 @@
 package mylib
 
 import spinal.core._
-import spinal.core.fiber.Handle
 import spinal.lib._
 
 class bfp_converter(vector_len: Int, block_size: Int, bitwidth: Int,
@@ -30,22 +29,18 @@ class bfp_converter(vector_len: Int, block_size: Int, bitwidth: Int,
   addRTLPath("./src/main/sverilog/mantissaAdj.sv")
 }
 
-class bfp_converter_wrapper(vector_len: Int, block_size: Int, bitwidth: Int,
+case class bfp_converter_wrapper(vector_len: Int, block_size: Int, bitwidth: Int,
                             fpmWidth: Int, bfpmWidth: Int) extends Component {
   val io = new Bundle {
-    val vector_rdy = in Bool()
-    val in_vector_flatten = in UInt(vector_len * bitwidth bits)
-    val outMants_flatten = out UInt(block_size * bfpmWidth bits)
-    val outExp = out UInt(bitwidth-fpmWidth-1 bits)
-    val done, valid_out = out Bool()
+    val in_vector_flatten = slave Flow(UInt(vector_len * bitwidth bits))
+    val outBlk_flatten = master Flow(UInt(block_size * bfpmWidth + bitwidth - fpmWidth - 1 bits))
+    val done = out Bool()
   }
 
     val core = new bfp_converter(vector_len, block_size, bitwidth, fpmWidth, bfpmWidth)
-    core.io.in_vector_flatten <> io.in_vector_flatten
-    core.io.vector_rdy <> io.vector_rdy
+    core.io.in_vector_flatten <> io.in_vector_flatten.payload
+    core.io.vector_rdy <> io.in_vector_flatten.valid
     core.io.done <> io.done
-    core.io.outMants_flatten <> io.outMants_flatten
-    core.io.outExp <> io.outExp
-    core.io.valid_out <> io.valid_out
-
+    io.outBlk_flatten.valid := core.io.valid_out
+    io.outBlk_flatten.payload := core.io.outMants_flatten @@ core.io.outExp
 }

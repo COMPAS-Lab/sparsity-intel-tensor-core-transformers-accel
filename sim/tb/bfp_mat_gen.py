@@ -2,6 +2,7 @@ import numpy as np
 import struct
 import codecs
 import argparse
+import math
 
 def float_to_hex(f: float):
 	# Courtesy of https://stackoverflow.com/a/23624284
@@ -14,58 +15,65 @@ def hex_to_float(x: str):
 def mat_a_gen(size: tuple, chain_len: int, compute_iter: int):
     matA = np.random.uniform(low=1.0, high=2.0, size=size).astype('f')
     np.save("mat_a_fp32.npy", matA)
+    
+    # blocking the matrix A for tensor core array test
+    aBlocks = np.split(matA, math.ceil(matA.shape[0]/3), axis=0)
+    for idx, aBlock in enumerate(aBlocks):
+        # prepare mat a
+        hexMatARes = []
+        # each iteration, the chain finishes 3x(chain_lenx10) elements in A
+        chunkedMatA = aBlock.reshape(3,compute_iter*chain_len,10)
+        # send each group of A iteratively
+        for currFinishedCol in np.arange(0, chunkedMatA.shape[1], chain_len, dtype=int):
+            # fill the chain reversely, so A's first column is in the first
+            # tensor core, and last column the last tensor core
+            for colIdx in np.arange(2, -1, -1,dtype=int):
+                # load 3 banks of the cache for each tensor core
+                for r in range(0, 3):
+                    # print("assembling chunk r{} c{}".format(r, colIdx+currFinishedCol))
+                    tempRes = list(map(float_to_hex, chunkedMatA[r][colIdx + currFinishedCol]))
+                    tempRes = "".join(tempRes)
+                    # print("res len", len(tempRes))
+                    hexMatARes.append(tempRes)
 
-    # prepare mat a
-    hexMatARes = []
-    # each iteration, the chain finishes 3x(chain_lenx10) elements in A
-    chunkedMatA = matA.reshape(3,compute_iter*chain_len,10)
-    # send each group of A iteratively
-    for currFinishedCol in np.arange(0, chunkedMatA.shape[1], chain_len, dtype=int):
-        # fill the chain reversely, so A's first column is in the first
-        # tensor core, and last column the last tensor core
-        for colIdx in np.arange(2, -1, -1,dtype=int):
-            # load 3 banks of the cache for each tensor core
-            for r in range(0, 3):
-                # print("assembling chunk r{} c{}".format(r, colIdx+currFinishedCol))
-                tempRes = list(map(float_to_hex, chunkedMatA[r][colIdx + currFinishedCol]))
-                tempRes = "".join(tempRes)
-                # print("res len", len(tempRes))
-                hexMatARes.append(tempRes)
-
-    with open("MAT_A_FP32.mem", "w+", encoding='utf-8') as f:
-        for i in hexMatARes:
-            f.write(i + "\n")
-        print("{} lines written to A.".format(len(hexMatARes)))
+        fname = "MAT_A_FP32_{}.mem".format(idx) if len(aBlock) > 1 else "MAT_A_FP32.mem"
+        with open(fname, "w+", encoding='utf-8') as f:
+            for i in hexMatARes:
+                f.write(i + "\n")
+            print("{} lines written to A.".format(len(hexMatARes)))
     
     return matA
 
 def mat_b_gen(size: tuple, chain_len: int, compute_iter: int):
     matB = np.random.uniform(low=1.0, high=2.0, size=size).astype('f')
     np.save("mat_b_fp32.npy", matB)
+    
+    bBlocks = np.split(matB, math.ceil(matB.shape[1]/(3*chain_len)), axis=1)
+    for idx, bBlock in enumerate(bBlocks):
+        # prepare mat b
+        hexMatBRes = []
+        # as B is fed along the column axis, transpose B first
+        # each iteration, the chain finishes nx10 elements, 
+        # where n >= chain load latency.
+        chunkedBTrans = np.transpose(bBlock).reshape(bBlock.shape[1],chain_len*compute_iter,10)
+        # B is divided into chain_lenxcompute_iter blocks, each compute_iter
+        # contains (chain_lenx10)x(chain_lenx3) elements
+        for col in range(0,compute_iter):
+            # each iteration, the chain consumes chain_lenx3 original cols to 
+            # hide the load latency
+            for row in range(0, chain_len*3):
+                # each block of an original col contains chain_lenx10 elements
+                for sub_col in range(0, chain_len):
+                    # print("assembling B chunk r{} c{}".format(col*chain_len+sub_col, row))
+                    tempRes = list(map(float_to_hex, chunkedBTrans[row][col*chain_len+sub_col]))
+                    tempRes = "".join(tempRes)
+                    hexMatBRes.append(tempRes)
 
-    # prepare mat b
-    hexMatBRes = []
-    # as B is fed along the column axis, transpose B first
-    # each iteration, the chain finishes nx10 elements, 
-    # where n >= chain load latency.
-    chunkedBTrans = np.transpose(matB).reshape(matB.shape[1],chain_len*compute_iter,10)
-    # B is divided into chain_lenxcompute_iter blocks, each compute_iter
-    # contains (chain_lenx10)x(chain_lenx3) elements
-    for col in range(0,compute_iter):
-        # each iteration, the chain consumes chain_lenx3 original cols to 
-        # hide the load latency
-        for row in range(0, chain_len*3):
-            # each block of an original col contains chain_lenx10 elements
-            for sub_col in range(0, chain_len):
-                # print("assembling B chunk r{} c{}".format(col*chain_len+sub_col, row))
-                tempRes = list(map(float_to_hex, chunkedBTrans[row][col*chain_len+sub_col]))
-                tempRes = "".join(tempRes)
-                hexMatBRes.append(tempRes)
-
-    with open("MAT_B_FP32.mem", "w+", encoding="utf-8") as f:
-        for i in hexMatBRes:
-            f.write(i + "\n")
-        print("{} lines written to B.".format(len(hexMatBRes)))
+        fname = "MAT_B_FP32_{}.mem".format(idx) if len(bBlocks) > 1 else "MAT_B_FP32.mem"
+        with open(fname, "w+", encoding="utf-8") as f:
+            for i in hexMatBRes:
+                f.write(i + "\n")
+            print("{} lines written to B.".format(len(hexMatBRes)))
 
     return matB
 
@@ -93,9 +101,9 @@ def main(args: dict):
     if args['inputs_gen']:
         chain_len = int(args['chain_len'])
         compute_iter = int(args['compute_iter'])
-        matA = mat_a_gen((3, chain_len*10*compute_iter), \
+        matA = mat_a_gen((9, chain_len*10*compute_iter), \
                             chain_len, compute_iter)
-        matB = mat_b_gen((chain_len*10*compute_iter, 3*chain_len), 
+        matB = mat_b_gen((chain_len*10*compute_iter, 3*chain_len*2), 
                             chain_len, compute_iter)
         res = np.matmul(matA, matB)
         np.save("mult_a_b_fp32_res.npy", res)

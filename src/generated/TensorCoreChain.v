@@ -1,6 +1,6 @@
 // Generator : SpinalHDL v1.6.0    git head : 73c8d8e2b86b45646e9d0b2e729291f2b65e6be3
 // Component : TensorCoreChain
-// Git hash  : db127909416713c25272d1a7a0d9caf1b34d4dbe
+// Git hash  : d790d72151525b557ab1457e4f34fd958de16dd6
 
 
 
@@ -14,11 +14,12 @@ module TensorCoreChain (
   input      [7:0]    io_expIn_2,
   input      [7:0]    io_expCascadeIn,
   input               io_dataValid,
+  output              io_dataIterReady,
   input               io_loadValid,
   output              io_loadReady,
-  output     [23:0]   io_res_0,
-  output     [23:0]   io_res_1,
-  output     [23:0]   io_res_2,
+  output     [31:0]   io_res_0,
+  output     [31:0]   io_res_1,
+  output     [31:0]   io_res_2,
   input      [7:0]    io_inputIters,
   output              io_outValid,
   input               clk,
@@ -399,6 +400,7 @@ module TensorCoreChain (
   end
 
   assign inputCounter_overflowVal = (io_inputIters - 8'h01);
+  assign io_dataIterReady = inputCounter_willOverflow;
   always @(*) begin
     outValidCounter_willIncrement = 1'b0;
     if(oBufferLoadValid) begin
@@ -468,9 +470,9 @@ module TensorCoreChain (
   assign tensor_core_2_data_in_10 = io_dataIn_2_delay_4[79 : 72];
   assign tensor_core_2_load_bb_one = loadBufCtrl[0];
   assign tensor_core_2_load_bb_two = loadBufCtrl[1];
-  assign io_res_0 = tcAccu_bf24_col_1;
-  assign io_res_1 = tcAccu_bf24_col_2;
-  assign io_res_2 = tcAccu_bf24_col_3;
+  assign io_res_0 = {tcAccu_bf24_col_1,8'h0};
+  assign io_res_1 = {tcAccu_bf24_col_2,8'h0};
+  assign io_res_2 = {tcAccu_bf24_col_3,8'h0};
   always @(posedge clk or negedge resetn) begin
     if(!resetn) begin
       io_loadValid_delay_1 <= 1'b0;

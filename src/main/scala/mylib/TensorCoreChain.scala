@@ -8,7 +8,7 @@ import intel_ips._
 import util._
 
 class TensorCoreChain(chain_len: Int, out_buf_delay: Int) extends Component {
-  val io = new Bundle{
+  val io = new Bundle {
     val dataIn = in Vec(UInt(80 bits), chain_len)
     val loadCascadeIn = in UInt(80 bits)
     val expIn = in Vec(UInt(8 bits), chain_len)
@@ -16,9 +16,10 @@ class TensorCoreChain(chain_len: Int, out_buf_delay: Int) extends Component {
     //data valid and data in should be 1 clock earlier than
     //the first loading because of data load reg and load_buf_sel reg
     val dataValid = in Bool()
+    val dataIterReady = out Bool()
     val loadValid = in Bool()
     val loadReady = out Bool()
-    val res = out Vec(UInt(24 bits), 3)
+    val res = out Vec(UInt(32 bits), 3)
     val inputIters = in UInt(8 bits)
     val outValid = out Bool()
   }
@@ -62,7 +63,6 @@ class TensorCoreChain(chain_len: Int, out_buf_delay: Int) extends Component {
   loadBufCtrl := Mux(loadValidD2t, loadBufCtrlReg, U"2'b00")
   io.loadReady := loadCounter.willOverflow
   
-  //TODO: may need to change this to a dynamic config counter
   val inputCounter = DynaCounter(8, io.inputIters)
   val loadBufSel = Reg(Bool()) init False
   when(io.dataValid) {
@@ -72,6 +72,7 @@ class TensorCoreChain(chain_len: Int, out_buf_delay: Int) extends Component {
   when(inputCounter.willOverflow) {
     loadBufSel := !loadBufSel
   }
+  io.dataIterReady := inputCounter.willOverflow
 
   //output buffer ctrl logic.
   // delayed output valid: 4c of dot lat,3c of accu lat and 2*(chain_len-1)
@@ -104,7 +105,7 @@ class TensorCoreChain(chain_len: Int, out_buf_delay: Int) extends Component {
 
   for (i <- 0 until chain_len-1) {
     tcCoreChainElems(i) = new tensor_core
-    // TODO: suspecious parameter i*2
+
 	val delayedDataIn = Delay(io.dataIn(i+1), 2*(i+1), init=U(0, io.dataIn(i+1).getWidth bits))
     connect_data_in(tcCoreChainElems(i).io, delayedDataIn)
 	val delayedExpIn = Delay(io.expIn(i+1), 2*(i+1), init=U(0, io.expIn(i+1).getWidth bits))
@@ -139,9 +140,9 @@ class TensorCoreChain(chain_len: Int, out_buf_delay: Int) extends Component {
   tcAccu.io.zero_en := False
   tcAccu.io.acc_en := False
 
-  io.res(0) <> tcAccu.io.bf24_col_1
-  io.res(1) <> tcAccu.io.bf24_col_2 
-  io.res(2) <> tcAccu.io.bf24_col_3
+  io.res(0) <> tcAccu.io.bf24_col_1 @@ U"8'd0"
+  io.res(1) <> tcAccu.io.bf24_col_2 @@ U"8'd0"
+  io.res(2) <> tcAccu.io.bf24_col_3 @@ U"8'd0"
 
 }
 
