@@ -22,12 +22,12 @@ class TensorCoreChainArray(array_col: Int, array_row: Int, chain_len: Int,
   val matARows = 9.0
   val matBCols = 18.0
 
-  val matBColsPerRowBuffer = (matBCols / array_row).ceil.toInt
+  val matBColsPerRowBuffer = (matBCols / array_row).ceil.toInt * (matACols / (chain_len * 10.0)).ceil.toInt
   val rowBufferRdCounter = Counter(matBColsPerRowBuffer)
   // each mat A blk has the size of 3 x matACols
   val matABlksInColBuf = ((matARows / 3.0).ceil / array_col).ceil.toInt
   // how many iters to read each blk of mat A
-  val matABlkCols = (matACols / (10.0 * chain_len)).ceil.toInt
+  val matABlkCols = (matACols / 10.0).ceil.toInt
   // total number of counter to read mat A
   val colBufferRdCounter = Counter(matABlksInColBuf * matABlkCols * 3)
 
@@ -39,8 +39,10 @@ class TensorCoreChainArray(array_col: Int, array_row: Int, chain_len: Int,
     tensorArray(r)(c) = new TensorCoreChain(chain_len, out_buf_delay = matBColsPerRowBuffer - 3)
   }
 
-  val colMem = Array.fill(array_col)(Mem(UInt(8*11 bits), col_buf_max_depth))
-  val rowMem = Array.fill(array_row)(Mem(UInt(8*11*chain_len bits), row_buf_max_depth))
+  val colMem = Array.fill(array_col)(
+				Mem(UInt(8*11 bits), col_buf_max_depth) init (Array.fill(col_buf_max_depth)(U(0, 8*11 bits))))
+  val rowMem = Array.fill(array_row)(
+				Mem(UInt(8*11*chain_len bits), row_buf_max_depth) init (Array.fill(row_buf_max_depth)(U(0, 8*11*chain_len bits))))
 
   // row connection
   for(r <- 0 until array_row; c <- 0 until array_col) {
@@ -97,10 +99,11 @@ class TensorCoreChainArray(array_col: Int, array_row: Int, chain_len: Int,
     loadRdy := tensorArray(0)(0).io.loadReady
     dataInIterReady := tensorArray(0)(0).io.dataIterReady
     resOutValid := tensorArray(0)(0).io.outValid
+	val loadFinish, dataInFinish = Reg(Bool()) init False
 
     val loadIterCounter, computeIterCounter =
           DynaCounter(computeItersReg.getWidth, computeItersReg)
-    val resValidCounter = DynaCounter(computeItersReg.getWidth, computeItersReg-1)
+    val resValidCounter = DynaCounter(computeItersReg.getWidth, computeItersReg)
 
     val sIdle: State = new State with EntryPoint {
       onEntry {
@@ -111,6 +114,8 @@ class TensorCoreChainArray(array_col: Int, array_row: Int, chain_len: Int,
         resValidCounter.clear()
         tensorLoadValid := False
         tensorDataValid := False
+		loadFinish := False
+		dataInFinish := False
       }
       whenIsActive{
         when(io.calEn) {
@@ -122,8 +127,8 @@ class TensorCoreChainArray(array_col: Int, array_row: Int, chain_len: Int,
 
     val sPreLoad: State = new State {
       onEntry{
-        colBufferRdCounter.increment()
-        tensorLoadValid := True
+		colBufferRdCounter.increment()
+		tensorLoadValid := True
         loadIterCounter.clear()
       }
       whenIsActive{
@@ -139,11 +144,30 @@ class TensorCoreChainArray(array_col: Int, array_row: Int, chain_len: Int,
       onEntry {
         tensorDataValid := True
         rowBufferRdCounter.increment()
-      }
+      } 
       whenIsActive {
+		when (dataInFinish === False) {
+		  rowBufferRdCounter.increment()
+		} otherwise {
+		  rowBufferRdCounter.clear()
+		  tensorDataValid := False
+		}
+		when(rowBufferRdCounter.willOverflow) {
+		  dataInFinish := True
+		}
+		
+		when (loadFinish === False) {
+		  colBufferRdCounter.increment()
+		} otherwise {
+		  colBufferRdCounter.clear()
+		  tensorLoadValid := False
+		}
+        when(colBufferRdCounter.willOverflow) {
+		  loadFinish := True
+		}
+		
         when(resOutValid) (resValidCounter.increment())
         when(loadRdy) (loadIterCounter.increment())
-        when(loadIterCounter.willOverflow) (tensorLoadValid := False)
         when(dataInIterReady) (computeIterCounter.increment())
         when(computeIterCounter.willOverflow) {
           goto(sWriteRes)

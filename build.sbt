@@ -14,7 +14,7 @@ lazy val mylib = (project in file("."))
   )
 
 //exclude files under development
-unmanagedSources / excludeFilter := "TensorCoreChainArray.scala" || "TensorCoreChainSim.scala"
+unmanagedSources / excludeFilter := "TensorCoreChainSim.scala"
 
 fork := true
 

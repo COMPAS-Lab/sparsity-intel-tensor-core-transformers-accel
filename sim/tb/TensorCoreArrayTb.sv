@@ -33,7 +33,7 @@ logic [95:0]   io_res_payload_0_2;
 logic [95:0]   io_res_payload_1_0;
 logic [95:0]   io_res_payload_1_1;
 logic [95:0]   io_res_payload_1_2;
-logic          clk;
+logic          clk=1;
 logic          resetn=0;
 
 // Mat A: 9x90, each ceil 8 bitsx10 elems + 1 shared exp 
@@ -89,7 +89,7 @@ end
 initial begin
   $readmemh("./tb/MAT_B_FP32_0.mem", mat_b0);
   $readmemh("./tb/MAT_B_FP32_1.mem", mat_b1);
-  io_computeIters = 8'd9;
+  io_computeIters = 8'd3;
   io_matBLoad_0_0_valid = '0;
   io_matBLoad_0_0_payload = '0;
   io_matBLoad_0_1_valid = '0;
@@ -102,6 +102,10 @@ initial begin
   io_matBLoad_1_1_payload = '0;
   io_matBLoad_1_2_valid = '0;
   io_matBLoad_1_2_payload = '0;
+  
+  for (j=0; j<5; j++) begin
+	@(posedge clk);
+  end
 
   for (j=0; j<3*9; j++) begin
     @(posedge clk);
@@ -135,7 +139,8 @@ initial begin
 end
 
 initial begin
-  for(k=0; k<100; k++) begin
+  io_calEn = 1'b0;
+  for(k=0; k<50; k++) begin
     @(posedge clk);
   end
 

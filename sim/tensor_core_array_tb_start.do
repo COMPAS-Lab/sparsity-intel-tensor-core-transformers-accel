@@ -22,7 +22,7 @@ view signals
 view structure
 view wave
 
-# do tcchain_tb_add_wave.do
+do tcarray_tb_add_wave.do
 
 log -r *
 
