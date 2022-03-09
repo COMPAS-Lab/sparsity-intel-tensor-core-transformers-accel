@@ -61,7 +61,7 @@ initial begin
   io_matALoad_0_valid = 0;
   io_matALoad_1_valid = 0;
   io_matALoad_2_valid = 0;
-  #21 resetn = 1'b1;
+  #201 resetn = 1'b1;
   
   @(posedge clk);
   for (i = 0; i < 3*9; i++) begin
@@ -103,7 +103,8 @@ initial begin
   io_matBLoad_1_2_valid = '0;
   io_matBLoad_1_2_payload = '0;
   
-  for (j=0; j<5; j++) begin
+  wait(resetn)
+  for (j=0; j<3; j++) begin
 	@(posedge clk);
   end
 
@@ -140,7 +141,7 @@ end
 
 initial begin
   io_calEn = 1'b0;
-  for(k=0; k<50; k++) begin
+  for(k=0; k<60; k++) begin
     @(posedge clk);
   end
 

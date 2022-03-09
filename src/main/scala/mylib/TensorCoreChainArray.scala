@@ -36,7 +36,7 @@ class TensorCoreChainArray(array_col: Int, array_row: Int, chain_len: Int,
 
   val tensorArray = Array.ofDim[TensorCoreChain](array_row, array_col)
   for(r <- 0 until array_row; c <- 0 until array_col) {
-    tensorArray(r)(c) = new TensorCoreChain(chain_len, out_buf_delay = matBColsPerRowBuffer - 3)
+    tensorArray(r)(c) = new TensorCoreChain(chain_len, out_buf_delay = (matBCols / array_row).ceil.toInt - 3)
   }
 
   val colMem = Array.fill(array_col)(

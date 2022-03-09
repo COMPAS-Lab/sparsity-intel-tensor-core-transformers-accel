@@ -1,6 +1,6 @@
 // Generator : SpinalHDL v1.6.0    git head : 73c8d8e2b86b45646e9d0b2e729291f2b65e6be3
 // Component : TensorCoreChainArray
-// Git hash  : 719716d98b6c74b09a89cd6e127f31a58c8aa3ad
+// Git hash  : 2099ba605d2731add77adb74f5d95aadce8af730
 
 
 `define ctrlStateMachine_enumDefinition_binary_sequential_type [2:0]
@@ -1633,72 +1633,18 @@ module TensorCoreChain (
   reg        [23:0]   tcAccu_bf24_col_1_delay_4;
   reg        [23:0]   tcAccu_bf24_col_1_delay_5;
   reg        [23:0]   tcAccu_bf24_col_1_delay_6;
-  reg        [23:0]   tcAccu_bf24_col_1_delay_7;
-  reg        [23:0]   tcAccu_bf24_col_1_delay_8;
-  reg        [23:0]   tcAccu_bf24_col_1_delay_9;
-  reg        [23:0]   tcAccu_bf24_col_1_delay_10;
-  reg        [23:0]   tcAccu_bf24_col_1_delay_11;
-  reg        [23:0]   tcAccu_bf24_col_1_delay_12;
-  reg        [23:0]   tcAccu_bf24_col_1_delay_13;
-  reg        [23:0]   tcAccu_bf24_col_1_delay_14;
-  reg        [23:0]   tcAccu_bf24_col_1_delay_15;
-  reg        [23:0]   tcAccu_bf24_col_1_delay_16;
-  reg        [23:0]   tcAccu_bf24_col_1_delay_17;
-  reg        [23:0]   tcAccu_bf24_col_1_delay_18;
-  reg        [23:0]   tcAccu_bf24_col_1_delay_19;
-  reg        [23:0]   tcAccu_bf24_col_1_delay_20;
-  reg        [23:0]   tcAccu_bf24_col_1_delay_21;
-  reg        [23:0]   tcAccu_bf24_col_1_delay_22;
-  reg        [23:0]   tcAccu_bf24_col_1_delay_23;
-  reg        [23:0]   tcAccu_bf24_col_1_delay_24;
   reg        [23:0]   tcAccu_bf24_col_2_delay_1;
   reg        [23:0]   tcAccu_bf24_col_2_delay_2;
   reg        [23:0]   tcAccu_bf24_col_2_delay_3;
   reg        [23:0]   tcAccu_bf24_col_2_delay_4;
   reg        [23:0]   tcAccu_bf24_col_2_delay_5;
   reg        [23:0]   tcAccu_bf24_col_2_delay_6;
-  reg        [23:0]   tcAccu_bf24_col_2_delay_7;
-  reg        [23:0]   tcAccu_bf24_col_2_delay_8;
-  reg        [23:0]   tcAccu_bf24_col_2_delay_9;
-  reg        [23:0]   tcAccu_bf24_col_2_delay_10;
-  reg        [23:0]   tcAccu_bf24_col_2_delay_11;
-  reg        [23:0]   tcAccu_bf24_col_2_delay_12;
-  reg        [23:0]   tcAccu_bf24_col_2_delay_13;
-  reg        [23:0]   tcAccu_bf24_col_2_delay_14;
-  reg        [23:0]   tcAccu_bf24_col_2_delay_15;
-  reg        [23:0]   tcAccu_bf24_col_2_delay_16;
-  reg        [23:0]   tcAccu_bf24_col_2_delay_17;
-  reg        [23:0]   tcAccu_bf24_col_2_delay_18;
-  reg        [23:0]   tcAccu_bf24_col_2_delay_19;
-  reg        [23:0]   tcAccu_bf24_col_2_delay_20;
-  reg        [23:0]   tcAccu_bf24_col_2_delay_21;
-  reg        [23:0]   tcAccu_bf24_col_2_delay_22;
-  reg        [23:0]   tcAccu_bf24_col_2_delay_23;
-  reg        [23:0]   tcAccu_bf24_col_2_delay_24;
   reg        [23:0]   tcAccu_bf24_col_3_delay_1;
   reg        [23:0]   tcAccu_bf24_col_3_delay_2;
   reg        [23:0]   tcAccu_bf24_col_3_delay_3;
   reg        [23:0]   tcAccu_bf24_col_3_delay_4;
   reg        [23:0]   tcAccu_bf24_col_3_delay_5;
   reg        [23:0]   tcAccu_bf24_col_3_delay_6;
-  reg        [23:0]   tcAccu_bf24_col_3_delay_7;
-  reg        [23:0]   tcAccu_bf24_col_3_delay_8;
-  reg        [23:0]   tcAccu_bf24_col_3_delay_9;
-  reg        [23:0]   tcAccu_bf24_col_3_delay_10;
-  reg        [23:0]   tcAccu_bf24_col_3_delay_11;
-  reg        [23:0]   tcAccu_bf24_col_3_delay_12;
-  reg        [23:0]   tcAccu_bf24_col_3_delay_13;
-  reg        [23:0]   tcAccu_bf24_col_3_delay_14;
-  reg        [23:0]   tcAccu_bf24_col_3_delay_15;
-  reg        [23:0]   tcAccu_bf24_col_3_delay_16;
-  reg        [23:0]   tcAccu_bf24_col_3_delay_17;
-  reg        [23:0]   tcAccu_bf24_col_3_delay_18;
-  reg        [23:0]   tcAccu_bf24_col_3_delay_19;
-  reg        [23:0]   tcAccu_bf24_col_3_delay_20;
-  reg        [23:0]   tcAccu_bf24_col_3_delay_21;
-  reg        [23:0]   tcAccu_bf24_col_3_delay_22;
-  reg        [23:0]   tcAccu_bf24_col_3_delay_23;
-  reg        [23:0]   tcAccu_bf24_col_3_delay_24;
 
   assign _zz_loadCounter_valueNext_1 = loadCounter_willIncrement;
   assign _zz_loadCounter_valueNext = {3'd0, _zz_loadCounter_valueNext_1};
@@ -1767,9 +1713,9 @@ module TensorCoreChain (
     .clk                       (clk                                   ), //i
     .acc_en                    (1'b0                                  ), //i
     .zero_en                   (1'b0                                  ), //i
-    .bf24_a1                   (tcAccu_bf24_col_1_delay_24            ), //i
-    .bf24_a2                   (tcAccu_bf24_col_2_delay_24            ), //i
-    .bf24_a3                   (tcAccu_bf24_col_3_delay_24            ), //i
+    .bf24_a1                   (tcAccu_bf24_col_1_delay_6             ), //i
+    .bf24_a2                   (tcAccu_bf24_col_2_delay_6             ), //i
+    .bf24_a3                   (tcAccu_bf24_col_3_delay_6             ), //i
     .cascade_data_in_col_1     (tensor_core_2_cascade_data_out_col_1  ), //i
     .cascade_data_in_col_2     (tensor_core_2_cascade_data_out_col_2  ), //i
     .cascade_data_in_col_3     (tensor_core_2_cascade_data_out_col_3  ), //i
@@ -2026,72 +1972,18 @@ module TensorCoreChain (
       tcAccu_bf24_col_1_delay_4 <= 24'h0;
       tcAccu_bf24_col_1_delay_5 <= 24'h0;
       tcAccu_bf24_col_1_delay_6 <= 24'h0;
-      tcAccu_bf24_col_1_delay_7 <= 24'h0;
-      tcAccu_bf24_col_1_delay_8 <= 24'h0;
-      tcAccu_bf24_col_1_delay_9 <= 24'h0;
-      tcAccu_bf24_col_1_delay_10 <= 24'h0;
-      tcAccu_bf24_col_1_delay_11 <= 24'h0;
-      tcAccu_bf24_col_1_delay_12 <= 24'h0;
-      tcAccu_bf24_col_1_delay_13 <= 24'h0;
-      tcAccu_bf24_col_1_delay_14 <= 24'h0;
-      tcAccu_bf24_col_1_delay_15 <= 24'h0;
-      tcAccu_bf24_col_1_delay_16 <= 24'h0;
-      tcAccu_bf24_col_1_delay_17 <= 24'h0;
-      tcAccu_bf24_col_1_delay_18 <= 24'h0;
-      tcAccu_bf24_col_1_delay_19 <= 24'h0;
-      tcAccu_bf24_col_1_delay_20 <= 24'h0;
-      tcAccu_bf24_col_1_delay_21 <= 24'h0;
-      tcAccu_bf24_col_1_delay_22 <= 24'h0;
-      tcAccu_bf24_col_1_delay_23 <= 24'h0;
-      tcAccu_bf24_col_1_delay_24 <= 24'h0;
       tcAccu_bf24_col_2_delay_1 <= 24'h0;
       tcAccu_bf24_col_2_delay_2 <= 24'h0;
       tcAccu_bf24_col_2_delay_3 <= 24'h0;
       tcAccu_bf24_col_2_delay_4 <= 24'h0;
       tcAccu_bf24_col_2_delay_5 <= 24'h0;
       tcAccu_bf24_col_2_delay_6 <= 24'h0;
-      tcAccu_bf24_col_2_delay_7 <= 24'h0;
-      tcAccu_bf24_col_2_delay_8 <= 24'h0;
-      tcAccu_bf24_col_2_delay_9 <= 24'h0;
-      tcAccu_bf24_col_2_delay_10 <= 24'h0;
-      tcAccu_bf24_col_2_delay_11 <= 24'h0;
-      tcAccu_bf24_col_2_delay_12 <= 24'h0;
-      tcAccu_bf24_col_2_delay_13 <= 24'h0;
-      tcAccu_bf24_col_2_delay_14 <= 24'h0;
-      tcAccu_bf24_col_2_delay_15 <= 24'h0;
-      tcAccu_bf24_col_2_delay_16 <= 24'h0;
-      tcAccu_bf24_col_2_delay_17 <= 24'h0;
-      tcAccu_bf24_col_2_delay_18 <= 24'h0;
-      tcAccu_bf24_col_2_delay_19 <= 24'h0;
-      tcAccu_bf24_col_2_delay_20 <= 24'h0;
-      tcAccu_bf24_col_2_delay_21 <= 24'h0;
-      tcAccu_bf24_col_2_delay_22 <= 24'h0;
-      tcAccu_bf24_col_2_delay_23 <= 24'h0;
-      tcAccu_bf24_col_2_delay_24 <= 24'h0;
       tcAccu_bf24_col_3_delay_1 <= 24'h0;
       tcAccu_bf24_col_3_delay_2 <= 24'h0;
       tcAccu_bf24_col_3_delay_3 <= 24'h0;
       tcAccu_bf24_col_3_delay_4 <= 24'h0;
       tcAccu_bf24_col_3_delay_5 <= 24'h0;
       tcAccu_bf24_col_3_delay_6 <= 24'h0;
-      tcAccu_bf24_col_3_delay_7 <= 24'h0;
-      tcAccu_bf24_col_3_delay_8 <= 24'h0;
-      tcAccu_bf24_col_3_delay_9 <= 24'h0;
-      tcAccu_bf24_col_3_delay_10 <= 24'h0;
-      tcAccu_bf24_col_3_delay_11 <= 24'h0;
-      tcAccu_bf24_col_3_delay_12 <= 24'h0;
-      tcAccu_bf24_col_3_delay_13 <= 24'h0;
-      tcAccu_bf24_col_3_delay_14 <= 24'h0;
-      tcAccu_bf24_col_3_delay_15 <= 24'h0;
-      tcAccu_bf24_col_3_delay_16 <= 24'h0;
-      tcAccu_bf24_col_3_delay_17 <= 24'h0;
-      tcAccu_bf24_col_3_delay_18 <= 24'h0;
-      tcAccu_bf24_col_3_delay_19 <= 24'h0;
-      tcAccu_bf24_col_3_delay_20 <= 24'h0;
-      tcAccu_bf24_col_3_delay_21 <= 24'h0;
-      tcAccu_bf24_col_3_delay_22 <= 24'h0;
-      tcAccu_bf24_col_3_delay_23 <= 24'h0;
-      tcAccu_bf24_col_3_delay_24 <= 24'h0;
     end else begin
       io_loadValid_delay_1 <= io_loadValid;
       io_loadValid_delay_2 <= io_loadValid_delay_1;
@@ -2136,72 +2028,18 @@ module TensorCoreChain (
       tcAccu_bf24_col_1_delay_4 <= tcAccu_bf24_col_1_delay_3;
       tcAccu_bf24_col_1_delay_5 <= tcAccu_bf24_col_1_delay_4;
       tcAccu_bf24_col_1_delay_6 <= tcAccu_bf24_col_1_delay_5;
-      tcAccu_bf24_col_1_delay_7 <= tcAccu_bf24_col_1_delay_6;
-      tcAccu_bf24_col_1_delay_8 <= tcAccu_bf24_col_1_delay_7;
-      tcAccu_bf24_col_1_delay_9 <= tcAccu_bf24_col_1_delay_8;
-      tcAccu_bf24_col_1_delay_10 <= tcAccu_bf24_col_1_delay_9;
-      tcAccu_bf24_col_1_delay_11 <= tcAccu_bf24_col_1_delay_10;
-      tcAccu_bf24_col_1_delay_12 <= tcAccu_bf24_col_1_delay_11;
-      tcAccu_bf24_col_1_delay_13 <= tcAccu_bf24_col_1_delay_12;
-      tcAccu_bf24_col_1_delay_14 <= tcAccu_bf24_col_1_delay_13;
-      tcAccu_bf24_col_1_delay_15 <= tcAccu_bf24_col_1_delay_14;
-      tcAccu_bf24_col_1_delay_16 <= tcAccu_bf24_col_1_delay_15;
-      tcAccu_bf24_col_1_delay_17 <= tcAccu_bf24_col_1_delay_16;
-      tcAccu_bf24_col_1_delay_18 <= tcAccu_bf24_col_1_delay_17;
-      tcAccu_bf24_col_1_delay_19 <= tcAccu_bf24_col_1_delay_18;
-      tcAccu_bf24_col_1_delay_20 <= tcAccu_bf24_col_1_delay_19;
-      tcAccu_bf24_col_1_delay_21 <= tcAccu_bf24_col_1_delay_20;
-      tcAccu_bf24_col_1_delay_22 <= tcAccu_bf24_col_1_delay_21;
-      tcAccu_bf24_col_1_delay_23 <= tcAccu_bf24_col_1_delay_22;
-      tcAccu_bf24_col_1_delay_24 <= tcAccu_bf24_col_1_delay_23;
       tcAccu_bf24_col_2_delay_1 <= tcAccu_bf24_col_2;
       tcAccu_bf24_col_2_delay_2 <= tcAccu_bf24_col_2_delay_1;
       tcAccu_bf24_col_2_delay_3 <= tcAccu_bf24_col_2_delay_2;
       tcAccu_bf24_col_2_delay_4 <= tcAccu_bf24_col_2_delay_3;
       tcAccu_bf24_col_2_delay_5 <= tcAccu_bf24_col_2_delay_4;
       tcAccu_bf24_col_2_delay_6 <= tcAccu_bf24_col_2_delay_5;
-      tcAccu_bf24_col_2_delay_7 <= tcAccu_bf24_col_2_delay_6;
-      tcAccu_bf24_col_2_delay_8 <= tcAccu_bf24_col_2_delay_7;
-      tcAccu_bf24_col_2_delay_9 <= tcAccu_bf24_col_2_delay_8;
-      tcAccu_bf24_col_2_delay_10 <= tcAccu_bf24_col_2_delay_9;
-      tcAccu_bf24_col_2_delay_11 <= tcAccu_bf24_col_2_delay_10;
-      tcAccu_bf24_col_2_delay_12 <= tcAccu_bf24_col_2_delay_11;
-      tcAccu_bf24_col_2_delay_13 <= tcAccu_bf24_col_2_delay_12;
-      tcAccu_bf24_col_2_delay_14 <= tcAccu_bf24_col_2_delay_13;
-      tcAccu_bf24_col_2_delay_15 <= tcAccu_bf24_col_2_delay_14;
-      tcAccu_bf24_col_2_delay_16 <= tcAccu_bf24_col_2_delay_15;
-      tcAccu_bf24_col_2_delay_17 <= tcAccu_bf24_col_2_delay_16;
-      tcAccu_bf24_col_2_delay_18 <= tcAccu_bf24_col_2_delay_17;
-      tcAccu_bf24_col_2_delay_19 <= tcAccu_bf24_col_2_delay_18;
-      tcAccu_bf24_col_2_delay_20 <= tcAccu_bf24_col_2_delay_19;
-      tcAccu_bf24_col_2_delay_21 <= tcAccu_bf24_col_2_delay_20;
-      tcAccu_bf24_col_2_delay_22 <= tcAccu_bf24_col_2_delay_21;
-      tcAccu_bf24_col_2_delay_23 <= tcAccu_bf24_col_2_delay_22;
-      tcAccu_bf24_col_2_delay_24 <= tcAccu_bf24_col_2_delay_23;
       tcAccu_bf24_col_3_delay_1 <= tcAccu_bf24_col_3;
       tcAccu_bf24_col_3_delay_2 <= tcAccu_bf24_col_3_delay_1;
       tcAccu_bf24_col_3_delay_3 <= tcAccu_bf24_col_3_delay_2;
       tcAccu_bf24_col_3_delay_4 <= tcAccu_bf24_col_3_delay_3;
       tcAccu_bf24_col_3_delay_5 <= tcAccu_bf24_col_3_delay_4;
       tcAccu_bf24_col_3_delay_6 <= tcAccu_bf24_col_3_delay_5;
-      tcAccu_bf24_col_3_delay_7 <= tcAccu_bf24_col_3_delay_6;
-      tcAccu_bf24_col_3_delay_8 <= tcAccu_bf24_col_3_delay_7;
-      tcAccu_bf24_col_3_delay_9 <= tcAccu_bf24_col_3_delay_8;
-      tcAccu_bf24_col_3_delay_10 <= tcAccu_bf24_col_3_delay_9;
-      tcAccu_bf24_col_3_delay_11 <= tcAccu_bf24_col_3_delay_10;
-      tcAccu_bf24_col_3_delay_12 <= tcAccu_bf24_col_3_delay_11;
-      tcAccu_bf24_col_3_delay_13 <= tcAccu_bf24_col_3_delay_12;
-      tcAccu_bf24_col_3_delay_14 <= tcAccu_bf24_col_3_delay_13;
-      tcAccu_bf24_col_3_delay_15 <= tcAccu_bf24_col_3_delay_14;
-      tcAccu_bf24_col_3_delay_16 <= tcAccu_bf24_col_3_delay_15;
-      tcAccu_bf24_col_3_delay_17 <= tcAccu_bf24_col_3_delay_16;
-      tcAccu_bf24_col_3_delay_18 <= tcAccu_bf24_col_3_delay_17;
-      tcAccu_bf24_col_3_delay_19 <= tcAccu_bf24_col_3_delay_18;
-      tcAccu_bf24_col_3_delay_20 <= tcAccu_bf24_col_3_delay_19;
-      tcAccu_bf24_col_3_delay_21 <= tcAccu_bf24_col_3_delay_20;
-      tcAccu_bf24_col_3_delay_22 <= tcAccu_bf24_col_3_delay_21;
-      tcAccu_bf24_col_3_delay_23 <= tcAccu_bf24_col_3_delay_22;
-      tcAccu_bf24_col_3_delay_24 <= tcAccu_bf24_col_3_delay_23;
     end
   end
 
