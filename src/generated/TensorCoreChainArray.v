@@ -1,6 +1,6 @@
 // Generator : SpinalHDL v1.6.0    git head : 73c8d8e2b86b45646e9d0b2e729291f2b65e6be3
 // Component : TensorCoreChainArray
-// Git hash  : 2099ba605d2731add77adb74f5d95aadce8af730
+// Git hash  : 881147072bed14878f6fb47e2a96dc4068bb63e9
 
 
 `define ctrlStateMachine_enumDefinition_binary_sequential_type [2:0]
@@ -888,14 +888,14 @@ module TensorCoreChainArray (
   assign _zz_io_dataIn_2 = _zz_io_dataIn_0_1[263 : 176];
   assign _zz_io_loadCascadeIn = {4'd0, colBufferRdCounter_value};
   assign _zz_io_loadCascadeIn_1 = _zz_colMem_0_port0;
-  assign tensorCoreChain_6_io_dataIn_0 = _zz_io_dataIn_0_2[87 : 8];
-  assign tensorCoreChain_6_io_expIn_0 = _zz_io_dataIn_0_2[7 : 0];
-  assign tensorCoreChain_6_io_dataIn_1 = _zz_io_dataIn_1[87 : 8];
-  assign tensorCoreChain_6_io_expIn_1 = _zz_io_dataIn_1[7 : 0];
-  assign tensorCoreChain_6_io_dataIn_2 = _zz_io_dataIn_2[87 : 8];
-  assign tensorCoreChain_6_io_expIn_2 = _zz_io_dataIn_2[7 : 0];
-  assign tensorCoreChain_6_io_loadCascadeIn = _zz_io_loadCascadeIn_1[87 : 8];
-  assign tensorCoreChain_6_io_expCascadeIn = _zz_io_loadCascadeIn_1[7 : 0];
+  assign tensorCoreChain_6_io_dataIn_0 = (tensorDataValid ? _zz_io_dataIn_0_2[87 : 8] : 80'h0);
+  assign tensorCoreChain_6_io_expIn_0 = (tensorDataValid ? _zz_io_dataIn_0_2[7 : 0] : 8'h0);
+  assign tensorCoreChain_6_io_dataIn_1 = (tensorDataValid ? _zz_io_dataIn_1[87 : 8] : 80'h0);
+  assign tensorCoreChain_6_io_expIn_1 = (tensorDataValid ? _zz_io_dataIn_1[7 : 0] : 8'h0);
+  assign tensorCoreChain_6_io_dataIn_2 = (tensorDataValid ? _zz_io_dataIn_2[87 : 8] : 80'h0);
+  assign tensorCoreChain_6_io_expIn_2 = (tensorDataValid ? _zz_io_dataIn_2[7 : 0] : 8'h0);
+  assign tensorCoreChain_6_io_loadCascadeIn = (tensorLoadValid ? _zz_io_loadCascadeIn_1[87 : 8] : 80'h0);
+  assign tensorCoreChain_6_io_expCascadeIn = (tensorLoadValid ? _zz_io_loadCascadeIn_1[7 : 0] : 8'h0);
   assign io_res_payload_0_0 = {tensorCoreChain_6_io_res_2,{tensorCoreChain_6_io_res_1,tensorCoreChain_6_io_res_0}};
   assign _zz_io_dataIn_0_3 = {4'd0, rowBufferRdCounter_value};
   assign _zz_io_dataIn_0_4 = _zz_rowMem_0_port1;
@@ -904,14 +904,14 @@ module TensorCoreChainArray (
   assign _zz_io_dataIn_2_1 = _zz_io_dataIn_0_4[263 : 176];
   assign _zz_io_loadCascadeIn_2 = {4'd0, colBufferRdCounter_value};
   assign _zz_io_loadCascadeIn_3 = _zz_colMem_1_port0;
-  assign tensorCoreChain_7_io_dataIn_0 = _zz_io_dataIn_0_5[87 : 8];
-  assign tensorCoreChain_7_io_expIn_0 = _zz_io_dataIn_0_5[7 : 0];
-  assign tensorCoreChain_7_io_dataIn_1 = _zz_io_dataIn_1_1[87 : 8];
-  assign tensorCoreChain_7_io_expIn_1 = _zz_io_dataIn_1_1[7 : 0];
-  assign tensorCoreChain_7_io_dataIn_2 = _zz_io_dataIn_2_1[87 : 8];
-  assign tensorCoreChain_7_io_expIn_2 = _zz_io_dataIn_2_1[7 : 0];
-  assign tensorCoreChain_7_io_loadCascadeIn = _zz_io_loadCascadeIn_3[87 : 8];
-  assign tensorCoreChain_7_io_expCascadeIn = _zz_io_loadCascadeIn_3[7 : 0];
+  assign tensorCoreChain_7_io_dataIn_0 = (tensorDataValid ? _zz_io_dataIn_0_5[87 : 8] : 80'h0);
+  assign tensorCoreChain_7_io_expIn_0 = (tensorDataValid ? _zz_io_dataIn_0_5[7 : 0] : 8'h0);
+  assign tensorCoreChain_7_io_dataIn_1 = (tensorDataValid ? _zz_io_dataIn_1_1[87 : 8] : 80'h0);
+  assign tensorCoreChain_7_io_expIn_1 = (tensorDataValid ? _zz_io_dataIn_1_1[7 : 0] : 8'h0);
+  assign tensorCoreChain_7_io_dataIn_2 = (tensorDataValid ? _zz_io_dataIn_2_1[87 : 8] : 80'h0);
+  assign tensorCoreChain_7_io_expIn_2 = (tensorDataValid ? _zz_io_dataIn_2_1[7 : 0] : 8'h0);
+  assign tensorCoreChain_7_io_loadCascadeIn = (tensorLoadValid ? _zz_io_loadCascadeIn_3[87 : 8] : 80'h0);
+  assign tensorCoreChain_7_io_expCascadeIn = (tensorLoadValid ? _zz_io_loadCascadeIn_3[7 : 0] : 8'h0);
   assign io_res_payload_0_1 = {tensorCoreChain_7_io_res_2,{tensorCoreChain_7_io_res_1,tensorCoreChain_7_io_res_0}};
   assign _zz_io_dataIn_0_6 = {4'd0, rowBufferRdCounter_value};
   assign _zz_io_dataIn_0_7 = _zz_rowMem_0_port2;
@@ -920,14 +920,14 @@ module TensorCoreChainArray (
   assign _zz_io_dataIn_2_2 = _zz_io_dataIn_0_7[263 : 176];
   assign _zz_io_loadCascadeIn_4 = {4'd0, colBufferRdCounter_value};
   assign _zz_io_loadCascadeIn_5 = _zz_colMem_2_port0;
-  assign tensorCoreChain_8_io_dataIn_0 = _zz_io_dataIn_0_8[87 : 8];
-  assign tensorCoreChain_8_io_expIn_0 = _zz_io_dataIn_0_8[7 : 0];
-  assign tensorCoreChain_8_io_dataIn_1 = _zz_io_dataIn_1_2[87 : 8];
-  assign tensorCoreChain_8_io_expIn_1 = _zz_io_dataIn_1_2[7 : 0];
-  assign tensorCoreChain_8_io_dataIn_2 = _zz_io_dataIn_2_2[87 : 8];
-  assign tensorCoreChain_8_io_expIn_2 = _zz_io_dataIn_2_2[7 : 0];
-  assign tensorCoreChain_8_io_loadCascadeIn = _zz_io_loadCascadeIn_5[87 : 8];
-  assign tensorCoreChain_8_io_expCascadeIn = _zz_io_loadCascadeIn_5[7 : 0];
+  assign tensorCoreChain_8_io_dataIn_0 = (tensorDataValid ? _zz_io_dataIn_0_8[87 : 8] : 80'h0);
+  assign tensorCoreChain_8_io_expIn_0 = (tensorDataValid ? _zz_io_dataIn_0_8[7 : 0] : 8'h0);
+  assign tensorCoreChain_8_io_dataIn_1 = (tensorDataValid ? _zz_io_dataIn_1_2[87 : 8] : 80'h0);
+  assign tensorCoreChain_8_io_expIn_1 = (tensorDataValid ? _zz_io_dataIn_1_2[7 : 0] : 8'h0);
+  assign tensorCoreChain_8_io_dataIn_2 = (tensorDataValid ? _zz_io_dataIn_2_2[87 : 8] : 80'h0);
+  assign tensorCoreChain_8_io_expIn_2 = (tensorDataValid ? _zz_io_dataIn_2_2[7 : 0] : 8'h0);
+  assign tensorCoreChain_8_io_loadCascadeIn = (tensorLoadValid ? _zz_io_loadCascadeIn_5[87 : 8] : 80'h0);
+  assign tensorCoreChain_8_io_expCascadeIn = (tensorLoadValid ? _zz_io_loadCascadeIn_5[7 : 0] : 8'h0);
   assign io_res_payload_0_2 = {tensorCoreChain_8_io_res_2,{tensorCoreChain_8_io_res_1,tensorCoreChain_8_io_res_0}};
   assign _zz_io_dataIn_0_9 = {4'd0, rowBufferRdCounter_value};
   assign _zz_io_dataIn_0_10 = _zz_rowMem_1_port0;
@@ -936,14 +936,14 @@ module TensorCoreChainArray (
   assign _zz_io_dataIn_2_3 = _zz_io_dataIn_0_10[263 : 176];
   assign _zz_io_loadCascadeIn_6 = {4'd0, colBufferRdCounter_value};
   assign _zz_io_loadCascadeIn_7 = _zz_colMem_0_port1;
-  assign tensorCoreChain_9_io_dataIn_0 = _zz_io_dataIn_0_11[87 : 8];
-  assign tensorCoreChain_9_io_expIn_0 = _zz_io_dataIn_0_11[7 : 0];
-  assign tensorCoreChain_9_io_dataIn_1 = _zz_io_dataIn_1_3[87 : 8];
-  assign tensorCoreChain_9_io_expIn_1 = _zz_io_dataIn_1_3[7 : 0];
-  assign tensorCoreChain_9_io_dataIn_2 = _zz_io_dataIn_2_3[87 : 8];
-  assign tensorCoreChain_9_io_expIn_2 = _zz_io_dataIn_2_3[7 : 0];
-  assign tensorCoreChain_9_io_loadCascadeIn = _zz_io_loadCascadeIn_7[87 : 8];
-  assign tensorCoreChain_9_io_expCascadeIn = _zz_io_loadCascadeIn_7[7 : 0];
+  assign tensorCoreChain_9_io_dataIn_0 = (tensorDataValid ? _zz_io_dataIn_0_11[87 : 8] : 80'h0);
+  assign tensorCoreChain_9_io_expIn_0 = (tensorDataValid ? _zz_io_dataIn_0_11[7 : 0] : 8'h0);
+  assign tensorCoreChain_9_io_dataIn_1 = (tensorDataValid ? _zz_io_dataIn_1_3[87 : 8] : 80'h0);
+  assign tensorCoreChain_9_io_expIn_1 = (tensorDataValid ? _zz_io_dataIn_1_3[7 : 0] : 8'h0);
+  assign tensorCoreChain_9_io_dataIn_2 = (tensorDataValid ? _zz_io_dataIn_2_3[87 : 8] : 80'h0);
+  assign tensorCoreChain_9_io_expIn_2 = (tensorDataValid ? _zz_io_dataIn_2_3[7 : 0] : 8'h0);
+  assign tensorCoreChain_9_io_loadCascadeIn = (tensorLoadValid ? _zz_io_loadCascadeIn_7[87 : 8] : 80'h0);
+  assign tensorCoreChain_9_io_expCascadeIn = (tensorLoadValid ? _zz_io_loadCascadeIn_7[7 : 0] : 8'h0);
   assign io_res_payload_1_0 = {tensorCoreChain_9_io_res_2,{tensorCoreChain_9_io_res_1,tensorCoreChain_9_io_res_0}};
   assign _zz_io_dataIn_0_12 = {4'd0, rowBufferRdCounter_value};
   assign _zz_io_dataIn_0_13 = _zz_rowMem_1_port1;
@@ -952,14 +952,14 @@ module TensorCoreChainArray (
   assign _zz_io_dataIn_2_4 = _zz_io_dataIn_0_13[263 : 176];
   assign _zz_io_loadCascadeIn_8 = {4'd0, colBufferRdCounter_value};
   assign _zz_io_loadCascadeIn_9 = _zz_colMem_1_port1;
-  assign tensorCoreChain_10_io_dataIn_0 = _zz_io_dataIn_0_14[87 : 8];
-  assign tensorCoreChain_10_io_expIn_0 = _zz_io_dataIn_0_14[7 : 0];
-  assign tensorCoreChain_10_io_dataIn_1 = _zz_io_dataIn_1_4[87 : 8];
-  assign tensorCoreChain_10_io_expIn_1 = _zz_io_dataIn_1_4[7 : 0];
-  assign tensorCoreChain_10_io_dataIn_2 = _zz_io_dataIn_2_4[87 : 8];
-  assign tensorCoreChain_10_io_expIn_2 = _zz_io_dataIn_2_4[7 : 0];
-  assign tensorCoreChain_10_io_loadCascadeIn = _zz_io_loadCascadeIn_9[87 : 8];
-  assign tensorCoreChain_10_io_expCascadeIn = _zz_io_loadCascadeIn_9[7 : 0];
+  assign tensorCoreChain_10_io_dataIn_0 = (tensorDataValid ? _zz_io_dataIn_0_14[87 : 8] : 80'h0);
+  assign tensorCoreChain_10_io_expIn_0 = (tensorDataValid ? _zz_io_dataIn_0_14[7 : 0] : 8'h0);
+  assign tensorCoreChain_10_io_dataIn_1 = (tensorDataValid ? _zz_io_dataIn_1_4[87 : 8] : 80'h0);
+  assign tensorCoreChain_10_io_expIn_1 = (tensorDataValid ? _zz_io_dataIn_1_4[7 : 0] : 8'h0);
+  assign tensorCoreChain_10_io_dataIn_2 = (tensorDataValid ? _zz_io_dataIn_2_4[87 : 8] : 80'h0);
+  assign tensorCoreChain_10_io_expIn_2 = (tensorDataValid ? _zz_io_dataIn_2_4[7 : 0] : 8'h0);
+  assign tensorCoreChain_10_io_loadCascadeIn = (tensorLoadValid ? _zz_io_loadCascadeIn_9[87 : 8] : 80'h0);
+  assign tensorCoreChain_10_io_expCascadeIn = (tensorLoadValid ? _zz_io_loadCascadeIn_9[7 : 0] : 8'h0);
   assign io_res_payload_1_1 = {tensorCoreChain_10_io_res_2,{tensorCoreChain_10_io_res_1,tensorCoreChain_10_io_res_0}};
   assign _zz_io_dataIn_0_15 = {4'd0, rowBufferRdCounter_value};
   assign _zz_io_dataIn_0_16 = _zz_rowMem_1_port2;
@@ -968,14 +968,14 @@ module TensorCoreChainArray (
   assign _zz_io_dataIn_2_5 = _zz_io_dataIn_0_16[263 : 176];
   assign _zz_io_loadCascadeIn_10 = {4'd0, colBufferRdCounter_value};
   assign _zz_io_loadCascadeIn_11 = _zz_colMem_2_port1;
-  assign tensorCoreChain_11_io_dataIn_0 = _zz_io_dataIn_0_17[87 : 8];
-  assign tensorCoreChain_11_io_expIn_0 = _zz_io_dataIn_0_17[7 : 0];
-  assign tensorCoreChain_11_io_dataIn_1 = _zz_io_dataIn_1_5[87 : 8];
-  assign tensorCoreChain_11_io_expIn_1 = _zz_io_dataIn_1_5[7 : 0];
-  assign tensorCoreChain_11_io_dataIn_2 = _zz_io_dataIn_2_5[87 : 8];
-  assign tensorCoreChain_11_io_expIn_2 = _zz_io_dataIn_2_5[7 : 0];
-  assign tensorCoreChain_11_io_loadCascadeIn = _zz_io_loadCascadeIn_11[87 : 8];
-  assign tensorCoreChain_11_io_expCascadeIn = _zz_io_loadCascadeIn_11[7 : 0];
+  assign tensorCoreChain_11_io_dataIn_0 = (tensorDataValid ? _zz_io_dataIn_0_17[87 : 8] : 80'h0);
+  assign tensorCoreChain_11_io_expIn_0 = (tensorDataValid ? _zz_io_dataIn_0_17[7 : 0] : 8'h0);
+  assign tensorCoreChain_11_io_dataIn_1 = (tensorDataValid ? _zz_io_dataIn_1_5[87 : 8] : 80'h0);
+  assign tensorCoreChain_11_io_expIn_1 = (tensorDataValid ? _zz_io_dataIn_1_5[7 : 0] : 8'h0);
+  assign tensorCoreChain_11_io_dataIn_2 = (tensorDataValid ? _zz_io_dataIn_2_5[87 : 8] : 80'h0);
+  assign tensorCoreChain_11_io_expIn_2 = (tensorDataValid ? _zz_io_dataIn_2_5[7 : 0] : 8'h0);
+  assign tensorCoreChain_11_io_loadCascadeIn = (tensorLoadValid ? _zz_io_loadCascadeIn_11[87 : 8] : 80'h0);
+  assign tensorCoreChain_11_io_expCascadeIn = (tensorLoadValid ? _zz_io_loadCascadeIn_11[7 : 0] : 8'h0);
   assign io_res_payload_1_2 = {tensorCoreChain_11_io_res_2,{tensorCoreChain_11_io_res_1,tensorCoreChain_11_io_res_0}};
   always @(*) begin
     _zz_6 = 1'b0;

@@ -50,11 +50,11 @@ class TensorCoreChainArray(array_col: Int, array_row: Int, chain_len: Int,
                                 .subdivideIn(chain_len slices)
     val colMemOut = colMem(c).readSync(colBufferRdCounter.resize(colMem(c).addressWidth))
     for (tcId <- 0 until chain_len) {
-      tensorArray(r)(c).io.dataIn(tcId) := rowMemOut(tcId)(87 downto 8)
-      tensorArray(r)(c).io.expIn(tcId) := rowMemOut(tcId)(7 downto 0)
+      tensorArray(r)(c).io.dataIn(tcId) := Mux(tensorDataValid, rowMemOut(tcId)(87 downto 8), U"80'd0")
+      tensorArray(r)(c).io.expIn(tcId) := Mux(tensorDataValid, rowMemOut(tcId)(7 downto 0), U"8'd0")
     }
-    tensorArray(r)(c).io.loadCascadeIn := colMemOut(87 downto 8)
-    tensorArray(r)(c).io.expCascadeIn := colMemOut(7 downto 0)
+    tensorArray(r)(c).io.loadCascadeIn := Mux(tensorLoadValid, colMemOut(87 downto 8), U"80'd0")
+    tensorArray(r)(c).io.expCascadeIn := Mux(tensorLoadValid, colMemOut(7 downto 0), U"8'd0")
     tensorArray(r)(c).io.loadValid := tensorLoadValid
     tensorArray(r)(c).io.dataValid := tensorDataValid
     tensorArray(r)(c).io.inputIters := U"8'd9"
