@@ -1,3 +1,4 @@
+from typing import final
 import numpy as np
 import struct
 import codecs
@@ -77,21 +78,45 @@ def mat_b_gen(size: tuple, chain_len: int, compute_iter: int):
 
     return matB
 
-def check_outputs(sim_out_fname: str):
-    sim_out = []
+def check_outputs(sim_out_fname: str, ori_fname, num_tc_rows: int, num_tc_cols: int):
+    num_tcchaines = num_tc_rows * num_tc_cols
+    # each list of sim_out stores the results from one tc chain
+    sim_out = [[] for i in range(num_tcchaines)]
+
+    lines = []
     with open(sim_out_fname, "r", encoding="utf-8") as f:
         lines = f.readlines()
-        sim_out = [hex_to_float(l[0:-1]) for l in lines if "//" not in l]
-        sim_out = np.array(sim_out)
+        # skip comments
+        lines = lines[3:]
 
-    original = np.load("mult_a_b_fp32_res.npy")
-    sim_out_shape = (original.shape[1], original.shape[0])
-    # reshape to be the same as original
-    sim_out = sim_out.reshape(sim_out_shape).transpose()
-    # revert along y axis
-    sim_out = sim_out[::-1,:]
+    line_num = len(lines)
 
-    err = np.divide(np.abs(np.subtract(sim_out, original)), original)
+    if line_num % num_tcchaines != 0:
+        raise Exception("invalid output mem file")
+
+    for line_idx,elem in enumerate(lines):
+        fp32_strs = [elem[l:l+8] for l in range(0, len(elem), 8)]
+        sim_out[line_idx % num_tcchaines] += [hex_to_float(sub_l) for sub_l in fp32_strs[:-1]]
+
+    # sim_out = [hex_to_float(l[0:-1]) for l in lines if "//" not in l]
+    # sim_out = np.array(sim_out)
+    
+    original = np.load(ori_fname)
+
+    final_res = []    
+    for block in sim_out:
+        reshaped_blk = np.array(block).reshape(-1, 3).transpose()
+        reshaped_blk = reshaped_blk[::-1,:]
+        final_res.append(reshaped_blk)
+
+    block_size = final_res[0].shape
+    final_res = np.concatenate(final_res, axis=1)
+    # remember: tensor core rows corresponds to res matrix cols,
+    #  and tensor core cols for res matrix rows
+    final_res = final_res.reshape(-1, block_size[1]*num_tc_rows)
+    print(final_res)
+
+    err = np.divide(np.abs(np.subtract(final_res, original)), original)
     
     print("max err: ", np.max(err))
     print("min err: ", np.min(err))
@@ -110,7 +135,8 @@ def main(args: dict):
 
     if args['outputs-translate']:
         fname = str(args['outputs-translate'])
-        check_outputs(fname)
+        correct_res_filename = str(args['correct_res'])
+        check_outputs(fname, correct_res_filename, 2, 3)
 
     if args['view-npy']:
         fname = str(args['view-npy'])
@@ -129,10 +155,15 @@ if __name__ == "__main__":
                                 action="store", dest="outputs-translate")
     arg_parser.add_argument("-v", "--view-npy", help="view numpy file", \
                                 action="store", dest="view-npy")
+    arg_parser.add_argument("-cr", "--correct-res", help="path of the correct results", \
+                                action="store", dest="correct_res")
     
     args = vars(arg_parser.parse_args())
 
     if args['inputs_gen'] and (args['chain_len'] is None or args['compute_iter'] is None):
         arg_parser.error("inputs generation requires a chain length AND a compute iteration!")
+
+    if args['outputs-translate'] and args['correct_res'] is None:
+        arg_parser.error("must specify correct result to compare to.")
 
     main(args)
