@@ -1,6 +1,6 @@
 // Generator : SpinalHDL v1.6.0    git head : 73c8d8e2b86b45646e9d0b2e729291f2b65e6be3
 // Component : TensorCoreChainArray
-// Git hash  : 881147072bed14878f6fb47e2a96dc4068bb63e9
+// Git hash  : 80996c892034c401e0fecb28659ab31014f74916
 
 
 `define ctrlStateMachine_enumDefinition_binary_sequential_type [2:0]
@@ -138,24 +138,24 @@ module TensorCoreChainArray (
   wire       [31:0]   tensorCoreChain_11_io_res_1;
   wire       [31:0]   tensorCoreChain_11_io_res_2;
   wire                tensorCoreChain_11_io_outValid;
-  wire                colConverters_0_io_outBlk_flatten_valid;
-  wire       [87:0]   colConverters_0_io_outBlk_flatten_payload;
-  wire                colConverters_1_io_outBlk_flatten_valid;
-  wire       [87:0]   colConverters_1_io_outBlk_flatten_payload;
-  wire                colConverters_2_io_outBlk_flatten_valid;
-  wire       [87:0]   colConverters_2_io_outBlk_flatten_payload;
-  wire                bfp_converter_wrapper_9_io_outBlk_flatten_valid;
-  wire       [87:0]   bfp_converter_wrapper_9_io_outBlk_flatten_payload;
-  wire                bfp_converter_wrapper_10_io_outBlk_flatten_valid;
-  wire       [87:0]   bfp_converter_wrapper_10_io_outBlk_flatten_payload;
-  wire                bfp_converter_wrapper_11_io_outBlk_flatten_valid;
-  wire       [87:0]   bfp_converter_wrapper_11_io_outBlk_flatten_payload;
-  wire                bfp_converter_wrapper_12_io_outBlk_flatten_valid;
-  wire       [87:0]   bfp_converter_wrapper_12_io_outBlk_flatten_payload;
-  wire                bfp_converter_wrapper_13_io_outBlk_flatten_valid;
-  wire       [87:0]   bfp_converter_wrapper_13_io_outBlk_flatten_payload;
-  wire                bfp_converter_wrapper_14_io_outBlk_flatten_valid;
-  wire       [87:0]   bfp_converter_wrapper_14_io_outBlk_flatten_payload;
+  wire                colConverters_0_io_dataOut_valid;
+  wire       [87:0]   colConverters_0_io_dataOut_payload;
+  wire                colConverters_1_io_dataOut_valid;
+  wire       [87:0]   colConverters_1_io_dataOut_payload;
+  wire                colConverters_2_io_dataOut_valid;
+  wire       [87:0]   colConverters_2_io_dataOut_payload;
+  wire                fixedBfpConverter_9_io_dataOut_valid;
+  wire       [87:0]   fixedBfpConverter_9_io_dataOut_payload;
+  wire                fixedBfpConverter_10_io_dataOut_valid;
+  wire       [87:0]   fixedBfpConverter_10_io_dataOut_payload;
+  wire                fixedBfpConverter_11_io_dataOut_valid;
+  wire       [87:0]   fixedBfpConverter_11_io_dataOut_payload;
+  wire                fixedBfpConverter_12_io_dataOut_valid;
+  wire       [87:0]   fixedBfpConverter_12_io_dataOut_payload;
+  wire                fixedBfpConverter_13_io_dataOut_valid;
+  wire       [87:0]   fixedBfpConverter_13_io_dataOut_payload;
+  wire                fixedBfpConverter_14_io_dataOut_valid;
+  wire       [87:0]   fixedBfpConverter_14_io_dataOut_payload;
   wire       [4:0]    _zz_rowBufferRdCounter_valueNext;
   wire       [0:0]    _zz_rowBufferRdCounter_valueNext_1;
   wire       [4:0]    _zz_colBufferRdCounter_valueNext;
@@ -378,13 +378,13 @@ module TensorCoreChainArray (
   assign _zz_ctrlStateMachine_resValidCounter_valueNext = {7'd0, _zz_ctrlStateMachine_resValidCounter_valueNext_1};
   assign _zz__zz_io_loadCascadeIn_1 = 1'b1;
   assign _zz__zz_io_loadCascadeIn_7 = 1'b1;
-  assign _zz_colMem_0_port_3 = colConverters_0_io_outBlk_flatten_payload;
+  assign _zz_colMem_0_port_3 = colConverters_0_io_dataOut_payload;
   assign _zz__zz_io_loadCascadeIn_3 = 1'b1;
   assign _zz__zz_io_loadCascadeIn_9 = 1'b1;
-  assign _zz_colMem_1_port_3 = colConverters_1_io_outBlk_flatten_payload;
+  assign _zz_colMem_1_port_3 = colConverters_1_io_dataOut_payload;
   assign _zz__zz_io_loadCascadeIn_5 = 1'b1;
   assign _zz__zz_io_loadCascadeIn_11 = 1'b1;
-  assign _zz_colMem_2_port_3 = colConverters_2_io_outBlk_flatten_payload;
+  assign _zz_colMem_2_port_3 = colConverters_2_io_dataOut_payload;
   assign _zz__zz_io_dataIn_0_1 = 1'b1;
   assign _zz__zz_io_dataIn_0_4 = 1'b1;
   assign _zz__zz_io_dataIn_0_7 = 1'b1;
@@ -636,77 +636,77 @@ module TensorCoreChainArray (
     .clk                 (clk                                  ), //i
     .resetn              (resetn                               )  //i
   );
-  bfp_converter_wrapper colConverters_0 (
-    .io_in_vector_flatten_valid      (io_matALoad_0_valid                        ), //i
-    .io_in_vector_flatten_payload    (io_matALoad_0_payload                      ), //i
-    .io_outBlk_flatten_valid         (colConverters_0_io_outBlk_flatten_valid    ), //o
-    .io_outBlk_flatten_payload       (colConverters_0_io_outBlk_flatten_payload  ), //o
-    .resetn                          (resetn                                     ), //i
-    .clk                             (clk                                        )  //i
+  FixedBfpConverter colConverters_0 (
+    .io_dataIn_valid       (io_matALoad_0_valid                 ), //i
+    .io_dataIn_payload     (io_matALoad_0_payload               ), //i
+    .io_dataOut_valid      (colConverters_0_io_dataOut_valid    ), //o
+    .io_dataOut_payload    (colConverters_0_io_dataOut_payload  ), //o
+    .clk                   (clk                                 ), //i
+    .resetn                (resetn                              )  //i
   );
-  bfp_converter_wrapper colConverters_1 (
-    .io_in_vector_flatten_valid      (io_matALoad_1_valid                        ), //i
-    .io_in_vector_flatten_payload    (io_matALoad_1_payload                      ), //i
-    .io_outBlk_flatten_valid         (colConverters_1_io_outBlk_flatten_valid    ), //o
-    .io_outBlk_flatten_payload       (colConverters_1_io_outBlk_flatten_payload  ), //o
-    .resetn                          (resetn                                     ), //i
-    .clk                             (clk                                        )  //i
+  FixedBfpConverter colConverters_1 (
+    .io_dataIn_valid       (io_matALoad_1_valid                 ), //i
+    .io_dataIn_payload     (io_matALoad_1_payload               ), //i
+    .io_dataOut_valid      (colConverters_1_io_dataOut_valid    ), //o
+    .io_dataOut_payload    (colConverters_1_io_dataOut_payload  ), //o
+    .clk                   (clk                                 ), //i
+    .resetn                (resetn                              )  //i
   );
-  bfp_converter_wrapper colConverters_2 (
-    .io_in_vector_flatten_valid      (io_matALoad_2_valid                        ), //i
-    .io_in_vector_flatten_payload    (io_matALoad_2_payload                      ), //i
-    .io_outBlk_flatten_valid         (colConverters_2_io_outBlk_flatten_valid    ), //o
-    .io_outBlk_flatten_payload       (colConverters_2_io_outBlk_flatten_payload  ), //o
-    .resetn                          (resetn                                     ), //i
-    .clk                             (clk                                        )  //i
+  FixedBfpConverter colConverters_2 (
+    .io_dataIn_valid       (io_matALoad_2_valid                 ), //i
+    .io_dataIn_payload     (io_matALoad_2_payload               ), //i
+    .io_dataOut_valid      (colConverters_2_io_dataOut_valid    ), //o
+    .io_dataOut_payload    (colConverters_2_io_dataOut_payload  ), //o
+    .clk                   (clk                                 ), //i
+    .resetn                (resetn                              )  //i
   );
-  bfp_converter_wrapper bfp_converter_wrapper_9 (
-    .io_in_vector_flatten_valid      (io_matBLoad_0_0_valid                              ), //i
-    .io_in_vector_flatten_payload    (io_matBLoad_0_0_payload                            ), //i
-    .io_outBlk_flatten_valid         (bfp_converter_wrapper_9_io_outBlk_flatten_valid    ), //o
-    .io_outBlk_flatten_payload       (bfp_converter_wrapper_9_io_outBlk_flatten_payload  ), //o
-    .resetn                          (resetn                                             ), //i
-    .clk                             (clk                                                )  //i
+  FixedBfpConverter fixedBfpConverter_9 (
+    .io_dataIn_valid       (io_matBLoad_0_0_valid                   ), //i
+    .io_dataIn_payload     (io_matBLoad_0_0_payload                 ), //i
+    .io_dataOut_valid      (fixedBfpConverter_9_io_dataOut_valid    ), //o
+    .io_dataOut_payload    (fixedBfpConverter_9_io_dataOut_payload  ), //o
+    .clk                   (clk                                     ), //i
+    .resetn                (resetn                                  )  //i
   );
-  bfp_converter_wrapper bfp_converter_wrapper_10 (
-    .io_in_vector_flatten_valid      (io_matBLoad_0_1_valid                               ), //i
-    .io_in_vector_flatten_payload    (io_matBLoad_0_1_payload                             ), //i
-    .io_outBlk_flatten_valid         (bfp_converter_wrapper_10_io_outBlk_flatten_valid    ), //o
-    .io_outBlk_flatten_payload       (bfp_converter_wrapper_10_io_outBlk_flatten_payload  ), //o
-    .resetn                          (resetn                                              ), //i
-    .clk                             (clk                                                 )  //i
+  FixedBfpConverter fixedBfpConverter_10 (
+    .io_dataIn_valid       (io_matBLoad_0_1_valid                    ), //i
+    .io_dataIn_payload     (io_matBLoad_0_1_payload                  ), //i
+    .io_dataOut_valid      (fixedBfpConverter_10_io_dataOut_valid    ), //o
+    .io_dataOut_payload    (fixedBfpConverter_10_io_dataOut_payload  ), //o
+    .clk                   (clk                                      ), //i
+    .resetn                (resetn                                   )  //i
   );
-  bfp_converter_wrapper bfp_converter_wrapper_11 (
-    .io_in_vector_flatten_valid      (io_matBLoad_0_2_valid                               ), //i
-    .io_in_vector_flatten_payload    (io_matBLoad_0_2_payload                             ), //i
-    .io_outBlk_flatten_valid         (bfp_converter_wrapper_11_io_outBlk_flatten_valid    ), //o
-    .io_outBlk_flatten_payload       (bfp_converter_wrapper_11_io_outBlk_flatten_payload  ), //o
-    .resetn                          (resetn                                              ), //i
-    .clk                             (clk                                                 )  //i
+  FixedBfpConverter fixedBfpConverter_11 (
+    .io_dataIn_valid       (io_matBLoad_0_2_valid                    ), //i
+    .io_dataIn_payload     (io_matBLoad_0_2_payload                  ), //i
+    .io_dataOut_valid      (fixedBfpConverter_11_io_dataOut_valid    ), //o
+    .io_dataOut_payload    (fixedBfpConverter_11_io_dataOut_payload  ), //o
+    .clk                   (clk                                      ), //i
+    .resetn                (resetn                                   )  //i
   );
-  bfp_converter_wrapper bfp_converter_wrapper_12 (
-    .io_in_vector_flatten_valid      (io_matBLoad_1_0_valid                               ), //i
-    .io_in_vector_flatten_payload    (io_matBLoad_1_0_payload                             ), //i
-    .io_outBlk_flatten_valid         (bfp_converter_wrapper_12_io_outBlk_flatten_valid    ), //o
-    .io_outBlk_flatten_payload       (bfp_converter_wrapper_12_io_outBlk_flatten_payload  ), //o
-    .resetn                          (resetn                                              ), //i
-    .clk                             (clk                                                 )  //i
+  FixedBfpConverter fixedBfpConverter_12 (
+    .io_dataIn_valid       (io_matBLoad_1_0_valid                    ), //i
+    .io_dataIn_payload     (io_matBLoad_1_0_payload                  ), //i
+    .io_dataOut_valid      (fixedBfpConverter_12_io_dataOut_valid    ), //o
+    .io_dataOut_payload    (fixedBfpConverter_12_io_dataOut_payload  ), //o
+    .clk                   (clk                                      ), //i
+    .resetn                (resetn                                   )  //i
   );
-  bfp_converter_wrapper bfp_converter_wrapper_13 (
-    .io_in_vector_flatten_valid      (io_matBLoad_1_1_valid                               ), //i
-    .io_in_vector_flatten_payload    (io_matBLoad_1_1_payload                             ), //i
-    .io_outBlk_flatten_valid         (bfp_converter_wrapper_13_io_outBlk_flatten_valid    ), //o
-    .io_outBlk_flatten_payload       (bfp_converter_wrapper_13_io_outBlk_flatten_payload  ), //o
-    .resetn                          (resetn                                              ), //i
-    .clk                             (clk                                                 )  //i
+  FixedBfpConverter fixedBfpConverter_13 (
+    .io_dataIn_valid       (io_matBLoad_1_1_valid                    ), //i
+    .io_dataIn_payload     (io_matBLoad_1_1_payload                  ), //i
+    .io_dataOut_valid      (fixedBfpConverter_13_io_dataOut_valid    ), //o
+    .io_dataOut_payload    (fixedBfpConverter_13_io_dataOut_payload  ), //o
+    .clk                   (clk                                      ), //i
+    .resetn                (resetn                                   )  //i
   );
-  bfp_converter_wrapper bfp_converter_wrapper_14 (
-    .io_in_vector_flatten_valid      (io_matBLoad_1_2_valid                               ), //i
-    .io_in_vector_flatten_payload    (io_matBLoad_1_2_payload                             ), //i
-    .io_outBlk_flatten_valid         (bfp_converter_wrapper_14_io_outBlk_flatten_valid    ), //o
-    .io_outBlk_flatten_payload       (bfp_converter_wrapper_14_io_outBlk_flatten_payload  ), //o
-    .resetn                          (resetn                                              ), //i
-    .clk                             (clk                                                 )  //i
+  FixedBfpConverter fixedBfpConverter_14 (
+    .io_dataIn_valid       (io_matBLoad_1_2_valid                    ), //i
+    .io_dataIn_payload     (io_matBLoad_1_2_payload                  ), //i
+    .io_dataOut_valid      (fixedBfpConverter_14_io_dataOut_valid    ), //o
+    .io_dataOut_payload    (fixedBfpConverter_14_io_dataOut_payload  ), //o
+    .clk                   (clk                                      ), //i
+    .resetn                (resetn                                   )  //i
   );
   `ifndef SYNTHESIS
   always @(*) begin
@@ -733,35 +733,35 @@ module TensorCoreChainArray (
 
   always @(*) begin
     _zz_1 = 1'b0;
-    if(bfp_converter_wrapper_12_io_outBlk_flatten_valid) begin
+    if(fixedBfpConverter_12_io_dataOut_valid) begin
       _zz_1 = 1'b1;
     end
   end
 
   always @(*) begin
     _zz_2 = 1'b0;
-    if(bfp_converter_wrapper_9_io_outBlk_flatten_valid) begin
+    if(fixedBfpConverter_9_io_dataOut_valid) begin
       _zz_2 = 1'b1;
     end
   end
 
   always @(*) begin
     _zz_3 = 1'b0;
-    if(colConverters_2_io_outBlk_flatten_valid) begin
+    if(colConverters_2_io_dataOut_valid) begin
       _zz_3 = 1'b1;
     end
   end
 
   always @(*) begin
     _zz_4 = 1'b0;
-    if(colConverters_1_io_outBlk_flatten_valid) begin
+    if(colConverters_1_io_dataOut_valid) begin
       _zz_4 = 1'b1;
     end
   end
 
   always @(*) begin
     _zz_5 = 1'b0;
-    if(colConverters_0_io_outBlk_flatten_valid) begin
+    if(colConverters_0_io_dataOut_valid) begin
       _zz_5 = 1'b1;
     end
   end
@@ -979,14 +979,14 @@ module TensorCoreChainArray (
   assign io_res_payload_1_2 = {tensorCoreChain_11_io_res_2,{tensorCoreChain_11_io_res_1,tensorCoreChain_11_io_res_0}};
   always @(*) begin
     _zz_6 = 1'b0;
-    if(colConverters_0_io_outBlk_flatten_valid) begin
+    if(colConverters_0_io_dataOut_valid) begin
       _zz_6 = 1'b1;
     end
   end
 
   always @(*) begin
     _zz_7 = 1'b0;
-    if(!colConverters_0_io_outBlk_flatten_valid) begin
+    if(!colConverters_0_io_dataOut_valid) begin
       _zz_7 = 1'b1;
     end
   end
@@ -1006,14 +1006,14 @@ module TensorCoreChainArray (
 
   always @(*) begin
     _zz_12 = 1'b0;
-    if(colConverters_1_io_outBlk_flatten_valid) begin
+    if(colConverters_1_io_dataOut_valid) begin
       _zz_12 = 1'b1;
     end
   end
 
   always @(*) begin
     _zz_13 = 1'b0;
-    if(!colConverters_1_io_outBlk_flatten_valid) begin
+    if(!colConverters_1_io_dataOut_valid) begin
       _zz_13 = 1'b1;
     end
   end
@@ -1033,14 +1033,14 @@ module TensorCoreChainArray (
 
   always @(*) begin
     _zz_18 = 1'b0;
-    if(colConverters_2_io_outBlk_flatten_valid) begin
+    if(colConverters_2_io_dataOut_valid) begin
       _zz_18 = 1'b1;
     end
   end
 
   always @(*) begin
     _zz_19 = 1'b0;
-    if(!colConverters_2_io_outBlk_flatten_valid) begin
+    if(!colConverters_2_io_dataOut_valid) begin
       _zz_19 = 1'b1;
     end
   end
@@ -1060,14 +1060,14 @@ module TensorCoreChainArray (
 
   always @(*) begin
     _zz_24 = 1'b0;
-    if(bfp_converter_wrapper_9_io_outBlk_flatten_valid) begin
+    if(fixedBfpConverter_9_io_dataOut_valid) begin
       _zz_24 = 1'b1;
     end
   end
 
   always @(*) begin
     _zz_25 = 1'b0;
-    if(!bfp_converter_wrapper_9_io_outBlk_flatten_valid) begin
+    if(!fixedBfpConverter_9_io_dataOut_valid) begin
       _zz_25 = 1'b1;
     end
   end
@@ -1086,21 +1086,21 @@ module TensorCoreChainArray (
   end
 
   always @(*) begin
-    _zz_30[87 : 0] = bfp_converter_wrapper_9_io_outBlk_flatten_payload;
-    _zz_30[175 : 88] = bfp_converter_wrapper_10_io_outBlk_flatten_payload;
-    _zz_30[263 : 176] = bfp_converter_wrapper_11_io_outBlk_flatten_payload;
+    _zz_30[87 : 0] = fixedBfpConverter_9_io_dataOut_payload;
+    _zz_30[175 : 88] = fixedBfpConverter_10_io_dataOut_payload;
+    _zz_30[263 : 176] = fixedBfpConverter_11_io_dataOut_payload;
   end
 
   always @(*) begin
     _zz_31 = 1'b0;
-    if(bfp_converter_wrapper_12_io_outBlk_flatten_valid) begin
+    if(fixedBfpConverter_12_io_dataOut_valid) begin
       _zz_31 = 1'b1;
     end
   end
 
   always @(*) begin
     _zz_32 = 1'b0;
-    if(!bfp_converter_wrapper_12_io_outBlk_flatten_valid) begin
+    if(!fixedBfpConverter_12_io_dataOut_valid) begin
       _zz_32 = 1'b1;
     end
   end
@@ -1119,9 +1119,9 @@ module TensorCoreChainArray (
   end
 
   always @(*) begin
-    _zz_37[87 : 0] = bfp_converter_wrapper_12_io_outBlk_flatten_payload;
-    _zz_37[175 : 88] = bfp_converter_wrapper_13_io_outBlk_flatten_payload;
-    _zz_37[263 : 176] = bfp_converter_wrapper_14_io_outBlk_flatten_payload;
+    _zz_37[87 : 0] = fixedBfpConverter_12_io_dataOut_payload;
+    _zz_37[175 : 88] = fixedBfpConverter_13_io_dataOut_payload;
+    _zz_37[263 : 176] = fixedBfpConverter_14_io_dataOut_payload;
   end
 
   always @(*) begin
@@ -1404,51 +1404,731 @@ module TensorCoreChainArray (
 
 endmodule
 
-//bfp_converter_wrapper replaced by bfp_converter_wrapper
+//FixedBfpConverter replaced by FixedBfpConverter
 
-//bfp_converter_wrapper replaced by bfp_converter_wrapper
+//FixedBfpConverter replaced by FixedBfpConverter
 
-//bfp_converter_wrapper replaced by bfp_converter_wrapper
+//FixedBfpConverter replaced by FixedBfpConverter
 
-//bfp_converter_wrapper replaced by bfp_converter_wrapper
+//FixedBfpConverter replaced by FixedBfpConverter
 
-//bfp_converter_wrapper replaced by bfp_converter_wrapper
+//FixedBfpConverter replaced by FixedBfpConverter
 
-//bfp_converter_wrapper replaced by bfp_converter_wrapper
+//FixedBfpConverter replaced by FixedBfpConverter
 
-//bfp_converter_wrapper replaced by bfp_converter_wrapper
+//FixedBfpConverter replaced by FixedBfpConverter
 
-//bfp_converter_wrapper replaced by bfp_converter_wrapper
+//FixedBfpConverter replaced by FixedBfpConverter
 
-module bfp_converter_wrapper (
-  input               io_in_vector_flatten_valid,
-  input      [319:0]  io_in_vector_flatten_payload,
-  output              io_outBlk_flatten_valid,
-  output     [87:0]   io_outBlk_flatten_payload,
-  input               resetn,
-  input               clk
+module FixedBfpConverter (
+  input               io_dataIn_valid,
+  input      [319:0]  io_dataIn_payload,
+  output              io_dataOut_valid,
+  output     [87:0]   io_dataOut_payload,
+  input               clk,
+  input               resetn
 );
-  wire       [79:0]   core_outMants_flatten;
-  wire       [7:0]    core_outExp;
-  wire                core_valid_out;
+  wire       [7:0]    _zz__zz_resMants_0;
+  wire       [9:0]    _zz_resMants_0_1;
+  wire       [9:0]    _zz_resMants_0_2;
+  wire       [8:0]    _zz_resMants_0_3;
+  wire       [9:0]    _zz_resMants_0_4;
+  wire       [7:0]    _zz__zz_resMants_1;
+  wire       [9:0]    _zz_resMants_1_1;
+  wire       [9:0]    _zz_resMants_1_2;
+  wire       [8:0]    _zz_resMants_1_3;
+  wire       [9:0]    _zz_resMants_1_4;
+  wire       [7:0]    _zz__zz_resMants_2;
+  wire       [9:0]    _zz_resMants_2_1;
+  wire       [9:0]    _zz_resMants_2_2;
+  wire       [8:0]    _zz_resMants_2_3;
+  wire       [9:0]    _zz_resMants_2_4;
+  wire       [7:0]    _zz__zz_resMants_3;
+  wire       [9:0]    _zz_resMants_3_1;
+  wire       [9:0]    _zz_resMants_3_2;
+  wire       [8:0]    _zz_resMants_3_3;
+  wire       [9:0]    _zz_resMants_3_4;
+  wire       [7:0]    _zz__zz_resMants_4;
+  wire       [9:0]    _zz_resMants_4_1;
+  wire       [9:0]    _zz_resMants_4_2;
+  wire       [8:0]    _zz_resMants_4_3;
+  wire       [9:0]    _zz_resMants_4_4;
+  wire       [7:0]    _zz__zz_resMants_5;
+  wire       [9:0]    _zz_resMants_5_1;
+  wire       [9:0]    _zz_resMants_5_2;
+  wire       [8:0]    _zz_resMants_5_3;
+  wire       [9:0]    _zz_resMants_5_4;
+  wire       [7:0]    _zz__zz_resMants_6;
+  wire       [9:0]    _zz_resMants_6_1;
+  wire       [9:0]    _zz_resMants_6_2;
+  wire       [8:0]    _zz_resMants_6_3;
+  wire       [9:0]    _zz_resMants_6_4;
+  wire       [7:0]    _zz__zz_resMants_7;
+  wire       [9:0]    _zz_resMants_7_1;
+  wire       [9:0]    _zz_resMants_7_2;
+  wire       [8:0]    _zz_resMants_7_3;
+  wire       [9:0]    _zz_resMants_7_4;
+  wire       [7:0]    _zz__zz_resMants_8;
+  wire       [9:0]    _zz_resMants_8_1;
+  wire       [9:0]    _zz_resMants_8_2;
+  wire       [8:0]    _zz_resMants_8_3;
+  wire       [9:0]    _zz_resMants_8_4;
+  wire       [7:0]    _zz__zz_resMants_9;
+  wire       [9:0]    _zz_resMants_9_1;
+  wire       [9:0]    _zz_resMants_9_2;
+  wire       [8:0]    _zz_resMants_9_3;
+  wire       [9:0]    _zz_resMants_9_4;
+  wire       [7:0]    _zz_resExp;
+  wire       [7:0]    _zz_io_dataOut_payload;
+  wire       [7:0]    _zz_io_dataOut_payload_1;
+  wire                dataIn_0_signBit;
+  wire       [22:0]   dataIn_0_mantissa;
+  wire       [7:0]    dataIn_0_exp;
+  wire                dataIn_1_signBit;
+  wire       [22:0]   dataIn_1_mantissa;
+  wire       [7:0]    dataIn_1_exp;
+  wire                dataIn_2_signBit;
+  wire       [22:0]   dataIn_2_mantissa;
+  wire       [7:0]    dataIn_2_exp;
+  wire                dataIn_3_signBit;
+  wire       [22:0]   dataIn_3_mantissa;
+  wire       [7:0]    dataIn_3_exp;
+  wire                dataIn_4_signBit;
+  wire       [22:0]   dataIn_4_mantissa;
+  wire       [7:0]    dataIn_4_exp;
+  wire                dataIn_5_signBit;
+  wire       [22:0]   dataIn_5_mantissa;
+  wire       [7:0]    dataIn_5_exp;
+  wire                dataIn_6_signBit;
+  wire       [22:0]   dataIn_6_mantissa;
+  wire       [7:0]    dataIn_6_exp;
+  wire                dataIn_7_signBit;
+  wire       [22:0]   dataIn_7_mantissa;
+  wire       [7:0]    dataIn_7_exp;
+  wire                dataIn_8_signBit;
+  wire       [22:0]   dataIn_8_mantissa;
+  wire       [7:0]    dataIn_8_exp;
+  wire                dataIn_9_signBit;
+  wire       [22:0]   dataIn_9_mantissa;
+  wire       [7:0]    dataIn_9_exp;
+  wire       [31:0]   dataVec_0;
+  wire       [31:0]   dataVec_1;
+  wire       [31:0]   dataVec_2;
+  wire       [31:0]   dataVec_3;
+  wire       [31:0]   dataVec_4;
+  wire       [31:0]   dataVec_5;
+  wire       [31:0]   dataVec_6;
+  wire       [31:0]   dataVec_7;
+  wire       [31:0]   dataVec_8;
+  wire       [31:0]   dataVec_9;
+  wire       [7:0]    exceptionalCompRes;
+  reg        [7:0]    _zz_exceptionalCompRes;
+  reg        [7:0]    _zz_exceptionalCompRes_1;
+  reg        [7:0]    _zz_exceptionalCompRes_2;
+  reg        [7:0]    intermediateCompRes_0;
+  reg        [7:0]    intermediateCompRes_1;
+  reg        [7:0]    intermediateCompRes_2;
+  reg        [7:0]    intermediateCompRes_3;
+  reg        [7:0]    intermediateCompRes_4;
+  reg        [7:0]    intermediateCompRes_5;
+  reg        [7:0]    intermediateCompRes_6;
+  reg        [7:0]    largestExp;
+  wire                voidData_signBit;
+  wire       [22:0]   voidData_mantissa;
+  wire       [7:0]    voidData_exp;
+  reg                 dataIn_delay_1_0_signBit;
+  reg        [22:0]   dataIn_delay_1_0_mantissa;
+  reg        [7:0]    dataIn_delay_1_0_exp;
+  reg                 dataIn_delay_1_1_signBit;
+  reg        [22:0]   dataIn_delay_1_1_mantissa;
+  reg        [7:0]    dataIn_delay_1_1_exp;
+  reg                 dataIn_delay_1_2_signBit;
+  reg        [22:0]   dataIn_delay_1_2_mantissa;
+  reg        [7:0]    dataIn_delay_1_2_exp;
+  reg                 dataIn_delay_1_3_signBit;
+  reg        [22:0]   dataIn_delay_1_3_mantissa;
+  reg        [7:0]    dataIn_delay_1_3_exp;
+  reg                 dataIn_delay_1_4_signBit;
+  reg        [22:0]   dataIn_delay_1_4_mantissa;
+  reg        [7:0]    dataIn_delay_1_4_exp;
+  reg                 dataIn_delay_1_5_signBit;
+  reg        [22:0]   dataIn_delay_1_5_mantissa;
+  reg        [7:0]    dataIn_delay_1_5_exp;
+  reg                 dataIn_delay_1_6_signBit;
+  reg        [22:0]   dataIn_delay_1_6_mantissa;
+  reg        [7:0]    dataIn_delay_1_6_exp;
+  reg                 dataIn_delay_1_7_signBit;
+  reg        [22:0]   dataIn_delay_1_7_mantissa;
+  reg        [7:0]    dataIn_delay_1_7_exp;
+  reg                 dataIn_delay_1_8_signBit;
+  reg        [22:0]   dataIn_delay_1_8_mantissa;
+  reg        [7:0]    dataIn_delay_1_8_exp;
+  reg                 dataIn_delay_1_9_signBit;
+  reg        [22:0]   dataIn_delay_1_9_mantissa;
+  reg        [7:0]    dataIn_delay_1_9_exp;
+  reg                 dataIn_delay_2_0_signBit;
+  reg        [22:0]   dataIn_delay_2_0_mantissa;
+  reg        [7:0]    dataIn_delay_2_0_exp;
+  reg                 dataIn_delay_2_1_signBit;
+  reg        [22:0]   dataIn_delay_2_1_mantissa;
+  reg        [7:0]    dataIn_delay_2_1_exp;
+  reg                 dataIn_delay_2_2_signBit;
+  reg        [22:0]   dataIn_delay_2_2_mantissa;
+  reg        [7:0]    dataIn_delay_2_2_exp;
+  reg                 dataIn_delay_2_3_signBit;
+  reg        [22:0]   dataIn_delay_2_3_mantissa;
+  reg        [7:0]    dataIn_delay_2_3_exp;
+  reg                 dataIn_delay_2_4_signBit;
+  reg        [22:0]   dataIn_delay_2_4_mantissa;
+  reg        [7:0]    dataIn_delay_2_4_exp;
+  reg                 dataIn_delay_2_5_signBit;
+  reg        [22:0]   dataIn_delay_2_5_mantissa;
+  reg        [7:0]    dataIn_delay_2_5_exp;
+  reg                 dataIn_delay_2_6_signBit;
+  reg        [22:0]   dataIn_delay_2_6_mantissa;
+  reg        [7:0]    dataIn_delay_2_6_exp;
+  reg                 dataIn_delay_2_7_signBit;
+  reg        [22:0]   dataIn_delay_2_7_mantissa;
+  reg        [7:0]    dataIn_delay_2_7_exp;
+  reg                 dataIn_delay_2_8_signBit;
+  reg        [22:0]   dataIn_delay_2_8_mantissa;
+  reg        [7:0]    dataIn_delay_2_8_exp;
+  reg                 dataIn_delay_2_9_signBit;
+  reg        [22:0]   dataIn_delay_2_9_mantissa;
+  reg        [7:0]    dataIn_delay_2_9_exp;
+  reg                 dataIn_delay_3_0_signBit;
+  reg        [22:0]   dataIn_delay_3_0_mantissa;
+  reg        [7:0]    dataIn_delay_3_0_exp;
+  reg                 dataIn_delay_3_1_signBit;
+  reg        [22:0]   dataIn_delay_3_1_mantissa;
+  reg        [7:0]    dataIn_delay_3_1_exp;
+  reg                 dataIn_delay_3_2_signBit;
+  reg        [22:0]   dataIn_delay_3_2_mantissa;
+  reg        [7:0]    dataIn_delay_3_2_exp;
+  reg                 dataIn_delay_3_3_signBit;
+  reg        [22:0]   dataIn_delay_3_3_mantissa;
+  reg        [7:0]    dataIn_delay_3_3_exp;
+  reg                 dataIn_delay_3_4_signBit;
+  reg        [22:0]   dataIn_delay_3_4_mantissa;
+  reg        [7:0]    dataIn_delay_3_4_exp;
+  reg                 dataIn_delay_3_5_signBit;
+  reg        [22:0]   dataIn_delay_3_5_mantissa;
+  reg        [7:0]    dataIn_delay_3_5_exp;
+  reg                 dataIn_delay_3_6_signBit;
+  reg        [22:0]   dataIn_delay_3_6_mantissa;
+  reg        [7:0]    dataIn_delay_3_6_exp;
+  reg                 dataIn_delay_3_7_signBit;
+  reg        [22:0]   dataIn_delay_3_7_mantissa;
+  reg        [7:0]    dataIn_delay_3_7_exp;
+  reg                 dataIn_delay_3_8_signBit;
+  reg        [22:0]   dataIn_delay_3_8_mantissa;
+  reg        [7:0]    dataIn_delay_3_8_exp;
+  reg                 dataIn_delay_3_9_signBit;
+  reg        [22:0]   dataIn_delay_3_9_mantissa;
+  reg        [7:0]    dataIn_delay_3_9_exp;
+  reg                 delayedData_0_signBit;
+  reg        [22:0]   delayedData_0_mantissa;
+  reg        [7:0]    delayedData_0_exp;
+  reg                 delayedData_1_signBit;
+  reg        [22:0]   delayedData_1_mantissa;
+  reg        [7:0]    delayedData_1_exp;
+  reg                 delayedData_2_signBit;
+  reg        [22:0]   delayedData_2_mantissa;
+  reg        [7:0]    delayedData_2_exp;
+  reg                 delayedData_3_signBit;
+  reg        [22:0]   delayedData_3_mantissa;
+  reg        [7:0]    delayedData_3_exp;
+  reg                 delayedData_4_signBit;
+  reg        [22:0]   delayedData_4_mantissa;
+  reg        [7:0]    delayedData_4_exp;
+  reg                 delayedData_5_signBit;
+  reg        [22:0]   delayedData_5_mantissa;
+  reg        [7:0]    delayedData_5_exp;
+  reg                 delayedData_6_signBit;
+  reg        [22:0]   delayedData_6_mantissa;
+  reg        [7:0]    delayedData_6_exp;
+  reg                 delayedData_7_signBit;
+  reg        [22:0]   delayedData_7_mantissa;
+  reg        [7:0]    delayedData_7_exp;
+  reg                 delayedData_8_signBit;
+  reg        [22:0]   delayedData_8_mantissa;
+  reg        [7:0]    delayedData_8_exp;
+  reg                 delayedData_9_signBit;
+  reg        [22:0]   delayedData_9_mantissa;
+  reg        [7:0]    delayedData_9_exp;
+  reg        [7:0]    resMants_0;
+  reg        [7:0]    resMants_1;
+  reg        [7:0]    resMants_2;
+  reg        [7:0]    resMants_3;
+  reg        [7:0]    resMants_4;
+  reg        [7:0]    resMants_5;
+  reg        [7:0]    resMants_6;
+  reg        [7:0]    resMants_7;
+  reg        [7:0]    resMants_8;
+  reg        [7:0]    resMants_9;
+  reg        [7:0]    resExp;
+  wire       [8:0]    _zz_resMants_0;
+  wire       [8:0]    _zz_resMants_1;
+  wire       [8:0]    _zz_resMants_2;
+  wire       [8:0]    _zz_resMants_3;
+  wire       [8:0]    _zz_resMants_4;
+  wire       [8:0]    _zz_resMants_5;
+  wire       [8:0]    _zz_resMants_6;
+  wire       [8:0]    _zz_resMants_7;
+  wire       [8:0]    _zz_resMants_8;
+  wire       [8:0]    _zz_resMants_9;
+  reg                 io_dataIn_valid_delay_1;
+  reg                 io_dataIn_valid_delay_2;
+  reg                 io_dataIn_valid_delay_3;
+  reg                 io_dataIn_valid_delay_4;
+  reg                 io_dataIn_valid_delay_5;
 
-  bfp_converter #(
-    .V(10),
-    .P(10),
-    .BIT(32),
-    .FPM(23),
-    .BFPM(6) 
-  ) core (
-    .clk                  (clk                           ), //i
-    .rst_n                (resetn                        ), //i
-    .vector_rdy           (io_in_vector_flatten_valid    ), //i
-    .in_vector_flatten    (io_in_vector_flatten_payload  ), //i
-    .outMants_flatten     (core_outMants_flatten         ), //o
-    .outExp               (core_outExp                   ), //o
-    .valid_out            (core_valid_out                )  //o
-  );
-  assign io_outBlk_flatten_valid = core_valid_out;
-  assign io_outBlk_flatten_payload = {core_outMants_flatten,core_outExp};
+  assign _zz__zz_resMants_0 = (largestExp - delayedData_0_exp);
+  assign _zz_resMants_0_1 = ({1'b1,(~ _zz_resMants_0)} + _zz_resMants_0_2);
+  assign _zz_resMants_0_3 = 9'h001;
+  assign _zz_resMants_0_2 = {1'd0, _zz_resMants_0_3};
+  assign _zz_resMants_0_4 = {1'b0,_zz_resMants_0};
+  assign _zz__zz_resMants_1 = (largestExp - delayedData_1_exp);
+  assign _zz_resMants_1_1 = ({1'b1,(~ _zz_resMants_1)} + _zz_resMants_1_2);
+  assign _zz_resMants_1_3 = 9'h001;
+  assign _zz_resMants_1_2 = {1'd0, _zz_resMants_1_3};
+  assign _zz_resMants_1_4 = {1'b0,_zz_resMants_1};
+  assign _zz__zz_resMants_2 = (largestExp - delayedData_2_exp);
+  assign _zz_resMants_2_1 = ({1'b1,(~ _zz_resMants_2)} + _zz_resMants_2_2);
+  assign _zz_resMants_2_3 = 9'h001;
+  assign _zz_resMants_2_2 = {1'd0, _zz_resMants_2_3};
+  assign _zz_resMants_2_4 = {1'b0,_zz_resMants_2};
+  assign _zz__zz_resMants_3 = (largestExp - delayedData_3_exp);
+  assign _zz_resMants_3_1 = ({1'b1,(~ _zz_resMants_3)} + _zz_resMants_3_2);
+  assign _zz_resMants_3_3 = 9'h001;
+  assign _zz_resMants_3_2 = {1'd0, _zz_resMants_3_3};
+  assign _zz_resMants_3_4 = {1'b0,_zz_resMants_3};
+  assign _zz__zz_resMants_4 = (largestExp - delayedData_4_exp);
+  assign _zz_resMants_4_1 = ({1'b1,(~ _zz_resMants_4)} + _zz_resMants_4_2);
+  assign _zz_resMants_4_3 = 9'h001;
+  assign _zz_resMants_4_2 = {1'd0, _zz_resMants_4_3};
+  assign _zz_resMants_4_4 = {1'b0,_zz_resMants_4};
+  assign _zz__zz_resMants_5 = (largestExp - delayedData_5_exp);
+  assign _zz_resMants_5_1 = ({1'b1,(~ _zz_resMants_5)} + _zz_resMants_5_2);
+  assign _zz_resMants_5_3 = 9'h001;
+  assign _zz_resMants_5_2 = {1'd0, _zz_resMants_5_3};
+  assign _zz_resMants_5_4 = {1'b0,_zz_resMants_5};
+  assign _zz__zz_resMants_6 = (largestExp - delayedData_6_exp);
+  assign _zz_resMants_6_1 = ({1'b1,(~ _zz_resMants_6)} + _zz_resMants_6_2);
+  assign _zz_resMants_6_3 = 9'h001;
+  assign _zz_resMants_6_2 = {1'd0, _zz_resMants_6_3};
+  assign _zz_resMants_6_4 = {1'b0,_zz_resMants_6};
+  assign _zz__zz_resMants_7 = (largestExp - delayedData_7_exp);
+  assign _zz_resMants_7_1 = ({1'b1,(~ _zz_resMants_7)} + _zz_resMants_7_2);
+  assign _zz_resMants_7_3 = 9'h001;
+  assign _zz_resMants_7_2 = {1'd0, _zz_resMants_7_3};
+  assign _zz_resMants_7_4 = {1'b0,_zz_resMants_7};
+  assign _zz__zz_resMants_8 = (largestExp - delayedData_8_exp);
+  assign _zz_resMants_8_1 = ({1'b1,(~ _zz_resMants_8)} + _zz_resMants_8_2);
+  assign _zz_resMants_8_3 = 9'h001;
+  assign _zz_resMants_8_2 = {1'd0, _zz_resMants_8_3};
+  assign _zz_resMants_8_4 = {1'b0,_zz_resMants_8};
+  assign _zz__zz_resMants_9 = (largestExp - delayedData_9_exp);
+  assign _zz_resMants_9_1 = ({1'b1,(~ _zz_resMants_9)} + _zz_resMants_9_2);
+  assign _zz_resMants_9_3 = 9'h001;
+  assign _zz_resMants_9_2 = {1'd0, _zz_resMants_9_3};
+  assign _zz_resMants_9_4 = {1'b0,_zz_resMants_9};
+  assign _zz_resExp = (largestExp + 8'h7f);
+  assign _zz_io_dataOut_payload = resMants_1;
+  assign _zz_io_dataOut_payload_1 = resMants_0;
+  assign dataVec_0 = io_dataIn_payload[31 : 0];
+  assign dataVec_1 = io_dataIn_payload[63 : 32];
+  assign dataVec_2 = io_dataIn_payload[95 : 64];
+  assign dataVec_3 = io_dataIn_payload[127 : 96];
+  assign dataVec_4 = io_dataIn_payload[159 : 128];
+  assign dataVec_5 = io_dataIn_payload[191 : 160];
+  assign dataVec_6 = io_dataIn_payload[223 : 192];
+  assign dataVec_7 = io_dataIn_payload[255 : 224];
+  assign dataVec_8 = io_dataIn_payload[287 : 256];
+  assign dataVec_9 = io_dataIn_payload[319 : 288];
+  assign dataIn_0_signBit = dataVec_0[31];
+  assign dataIn_0_exp = dataVec_0[30 : 23];
+  assign dataIn_0_mantissa = dataVec_0[22 : 0];
+  assign dataIn_1_signBit = dataVec_1[31];
+  assign dataIn_1_exp = dataVec_1[30 : 23];
+  assign dataIn_1_mantissa = dataVec_1[22 : 0];
+  assign dataIn_2_signBit = dataVec_2[31];
+  assign dataIn_2_exp = dataVec_2[30 : 23];
+  assign dataIn_2_mantissa = dataVec_2[22 : 0];
+  assign dataIn_3_signBit = dataVec_3[31];
+  assign dataIn_3_exp = dataVec_3[30 : 23];
+  assign dataIn_3_mantissa = dataVec_3[22 : 0];
+  assign dataIn_4_signBit = dataVec_4[31];
+  assign dataIn_4_exp = dataVec_4[30 : 23];
+  assign dataIn_4_mantissa = dataVec_4[22 : 0];
+  assign dataIn_5_signBit = dataVec_5[31];
+  assign dataIn_5_exp = dataVec_5[30 : 23];
+  assign dataIn_5_mantissa = dataVec_5[22 : 0];
+  assign dataIn_6_signBit = dataVec_6[31];
+  assign dataIn_6_exp = dataVec_6[30 : 23];
+  assign dataIn_6_mantissa = dataVec_6[22 : 0];
+  assign dataIn_7_signBit = dataVec_7[31];
+  assign dataIn_7_exp = dataVec_7[30 : 23];
+  assign dataIn_7_mantissa = dataVec_7[22 : 0];
+  assign dataIn_8_signBit = dataVec_8[31];
+  assign dataIn_8_exp = dataVec_8[30 : 23];
+  assign dataIn_8_mantissa = dataVec_8[22 : 0];
+  assign dataIn_9_signBit = dataVec_9[31];
+  assign dataIn_9_exp = dataVec_9[30 : 23];
+  assign dataIn_9_mantissa = dataVec_9[22 : 0];
+  assign exceptionalCompRes = _zz_exceptionalCompRes_2;
+  assign voidData_signBit = 1'b0;
+  assign voidData_mantissa = 23'h0;
+  assign voidData_exp = 8'h0;
+  assign _zz_resMants_0 = ({1'b1,delayedData_0_mantissa[22 : 15]} >>> _zz__zz_resMants_0);
+  assign _zz_resMants_1 = ({1'b1,delayedData_1_mantissa[22 : 15]} >>> _zz__zz_resMants_1);
+  assign _zz_resMants_2 = ({1'b1,delayedData_2_mantissa[22 : 15]} >>> _zz__zz_resMants_2);
+  assign _zz_resMants_3 = ({1'b1,delayedData_3_mantissa[22 : 15]} >>> _zz__zz_resMants_3);
+  assign _zz_resMants_4 = ({1'b1,delayedData_4_mantissa[22 : 15]} >>> _zz__zz_resMants_4);
+  assign _zz_resMants_5 = ({1'b1,delayedData_5_mantissa[22 : 15]} >>> _zz__zz_resMants_5);
+  assign _zz_resMants_6 = ({1'b1,delayedData_6_mantissa[22 : 15]} >>> _zz__zz_resMants_6);
+  assign _zz_resMants_7 = ({1'b1,delayedData_7_mantissa[22 : 15]} >>> _zz__zz_resMants_7);
+  assign _zz_resMants_8 = ({1'b1,delayedData_8_mantissa[22 : 15]} >>> _zz__zz_resMants_8);
+  assign _zz_resMants_9 = ({1'b1,delayedData_9_mantissa[22 : 15]} >>> _zz__zz_resMants_9);
+  assign io_dataOut_payload = {{resMants_9,{resMants_8,{resMants_7,{resMants_6,{resMants_5,{resMants_4,{resMants_3,{resMants_2,{_zz_io_dataOut_payload,_zz_io_dataOut_payload_1}}}}}}}}},resExp};
+  assign io_dataOut_valid = io_dataIn_valid_delay_5;
+  always @(posedge clk) begin
+    _zz_exceptionalCompRes <= ((dataIn_9_exp <= dataIn_8_exp) ? dataIn_8_exp : dataIn_9_exp);
+    _zz_exceptionalCompRes_1 <= _zz_exceptionalCompRes;
+    io_dataIn_valid_delay_1 <= io_dataIn_valid;
+    io_dataIn_valid_delay_2 <= io_dataIn_valid_delay_1;
+    io_dataIn_valid_delay_3 <= io_dataIn_valid_delay_2;
+    io_dataIn_valid_delay_4 <= io_dataIn_valid_delay_3;
+  end
+
+  always @(posedge clk or negedge resetn) begin
+    if(!resetn) begin
+      _zz_exceptionalCompRes_2 <= 8'h0;
+      intermediateCompRes_0 <= 8'h0;
+      intermediateCompRes_1 <= 8'h0;
+      intermediateCompRes_2 <= 8'h0;
+      intermediateCompRes_3 <= 8'h0;
+      intermediateCompRes_4 <= 8'h0;
+      intermediateCompRes_5 <= 8'h0;
+      intermediateCompRes_6 <= 8'h0;
+      largestExp <= 8'h0;
+      dataIn_delay_1_0_signBit <= voidData_signBit;
+      dataIn_delay_1_0_mantissa <= voidData_mantissa;
+      dataIn_delay_1_0_exp <= voidData_exp;
+      dataIn_delay_1_1_signBit <= voidData_signBit;
+      dataIn_delay_1_1_mantissa <= voidData_mantissa;
+      dataIn_delay_1_1_exp <= voidData_exp;
+      dataIn_delay_1_2_signBit <= voidData_signBit;
+      dataIn_delay_1_2_mantissa <= voidData_mantissa;
+      dataIn_delay_1_2_exp <= voidData_exp;
+      dataIn_delay_1_3_signBit <= voidData_signBit;
+      dataIn_delay_1_3_mantissa <= voidData_mantissa;
+      dataIn_delay_1_3_exp <= voidData_exp;
+      dataIn_delay_1_4_signBit <= voidData_signBit;
+      dataIn_delay_1_4_mantissa <= voidData_mantissa;
+      dataIn_delay_1_4_exp <= voidData_exp;
+      dataIn_delay_1_5_signBit <= voidData_signBit;
+      dataIn_delay_1_5_mantissa <= voidData_mantissa;
+      dataIn_delay_1_5_exp <= voidData_exp;
+      dataIn_delay_1_6_signBit <= voidData_signBit;
+      dataIn_delay_1_6_mantissa <= voidData_mantissa;
+      dataIn_delay_1_6_exp <= voidData_exp;
+      dataIn_delay_1_7_signBit <= voidData_signBit;
+      dataIn_delay_1_7_mantissa <= voidData_mantissa;
+      dataIn_delay_1_7_exp <= voidData_exp;
+      dataIn_delay_1_8_signBit <= voidData_signBit;
+      dataIn_delay_1_8_mantissa <= voidData_mantissa;
+      dataIn_delay_1_8_exp <= voidData_exp;
+      dataIn_delay_1_9_signBit <= voidData_signBit;
+      dataIn_delay_1_9_mantissa <= voidData_mantissa;
+      dataIn_delay_1_9_exp <= voidData_exp;
+      dataIn_delay_2_0_signBit <= voidData_signBit;
+      dataIn_delay_2_0_mantissa <= voidData_mantissa;
+      dataIn_delay_2_0_exp <= voidData_exp;
+      dataIn_delay_2_1_signBit <= voidData_signBit;
+      dataIn_delay_2_1_mantissa <= voidData_mantissa;
+      dataIn_delay_2_1_exp <= voidData_exp;
+      dataIn_delay_2_2_signBit <= voidData_signBit;
+      dataIn_delay_2_2_mantissa <= voidData_mantissa;
+      dataIn_delay_2_2_exp <= voidData_exp;
+      dataIn_delay_2_3_signBit <= voidData_signBit;
+      dataIn_delay_2_3_mantissa <= voidData_mantissa;
+      dataIn_delay_2_3_exp <= voidData_exp;
+      dataIn_delay_2_4_signBit <= voidData_signBit;
+      dataIn_delay_2_4_mantissa <= voidData_mantissa;
+      dataIn_delay_2_4_exp <= voidData_exp;
+      dataIn_delay_2_5_signBit <= voidData_signBit;
+      dataIn_delay_2_5_mantissa <= voidData_mantissa;
+      dataIn_delay_2_5_exp <= voidData_exp;
+      dataIn_delay_2_6_signBit <= voidData_signBit;
+      dataIn_delay_2_6_mantissa <= voidData_mantissa;
+      dataIn_delay_2_6_exp <= voidData_exp;
+      dataIn_delay_2_7_signBit <= voidData_signBit;
+      dataIn_delay_2_7_mantissa <= voidData_mantissa;
+      dataIn_delay_2_7_exp <= voidData_exp;
+      dataIn_delay_2_8_signBit <= voidData_signBit;
+      dataIn_delay_2_8_mantissa <= voidData_mantissa;
+      dataIn_delay_2_8_exp <= voidData_exp;
+      dataIn_delay_2_9_signBit <= voidData_signBit;
+      dataIn_delay_2_9_mantissa <= voidData_mantissa;
+      dataIn_delay_2_9_exp <= voidData_exp;
+      dataIn_delay_3_0_signBit <= voidData_signBit;
+      dataIn_delay_3_0_mantissa <= voidData_mantissa;
+      dataIn_delay_3_0_exp <= voidData_exp;
+      dataIn_delay_3_1_signBit <= voidData_signBit;
+      dataIn_delay_3_1_mantissa <= voidData_mantissa;
+      dataIn_delay_3_1_exp <= voidData_exp;
+      dataIn_delay_3_2_signBit <= voidData_signBit;
+      dataIn_delay_3_2_mantissa <= voidData_mantissa;
+      dataIn_delay_3_2_exp <= voidData_exp;
+      dataIn_delay_3_3_signBit <= voidData_signBit;
+      dataIn_delay_3_3_mantissa <= voidData_mantissa;
+      dataIn_delay_3_3_exp <= voidData_exp;
+      dataIn_delay_3_4_signBit <= voidData_signBit;
+      dataIn_delay_3_4_mantissa <= voidData_mantissa;
+      dataIn_delay_3_4_exp <= voidData_exp;
+      dataIn_delay_3_5_signBit <= voidData_signBit;
+      dataIn_delay_3_5_mantissa <= voidData_mantissa;
+      dataIn_delay_3_5_exp <= voidData_exp;
+      dataIn_delay_3_6_signBit <= voidData_signBit;
+      dataIn_delay_3_6_mantissa <= voidData_mantissa;
+      dataIn_delay_3_6_exp <= voidData_exp;
+      dataIn_delay_3_7_signBit <= voidData_signBit;
+      dataIn_delay_3_7_mantissa <= voidData_mantissa;
+      dataIn_delay_3_7_exp <= voidData_exp;
+      dataIn_delay_3_8_signBit <= voidData_signBit;
+      dataIn_delay_3_8_mantissa <= voidData_mantissa;
+      dataIn_delay_3_8_exp <= voidData_exp;
+      dataIn_delay_3_9_signBit <= voidData_signBit;
+      dataIn_delay_3_9_mantissa <= voidData_mantissa;
+      dataIn_delay_3_9_exp <= voidData_exp;
+      delayedData_0_signBit <= voidData_signBit;
+      delayedData_0_mantissa <= voidData_mantissa;
+      delayedData_0_exp <= voidData_exp;
+      delayedData_1_signBit <= voidData_signBit;
+      delayedData_1_mantissa <= voidData_mantissa;
+      delayedData_1_exp <= voidData_exp;
+      delayedData_2_signBit <= voidData_signBit;
+      delayedData_2_mantissa <= voidData_mantissa;
+      delayedData_2_exp <= voidData_exp;
+      delayedData_3_signBit <= voidData_signBit;
+      delayedData_3_mantissa <= voidData_mantissa;
+      delayedData_3_exp <= voidData_exp;
+      delayedData_4_signBit <= voidData_signBit;
+      delayedData_4_mantissa <= voidData_mantissa;
+      delayedData_4_exp <= voidData_exp;
+      delayedData_5_signBit <= voidData_signBit;
+      delayedData_5_mantissa <= voidData_mantissa;
+      delayedData_5_exp <= voidData_exp;
+      delayedData_6_signBit <= voidData_signBit;
+      delayedData_6_mantissa <= voidData_mantissa;
+      delayedData_6_exp <= voidData_exp;
+      delayedData_7_signBit <= voidData_signBit;
+      delayedData_7_mantissa <= voidData_mantissa;
+      delayedData_7_exp <= voidData_exp;
+      delayedData_8_signBit <= voidData_signBit;
+      delayedData_8_mantissa <= voidData_mantissa;
+      delayedData_8_exp <= voidData_exp;
+      delayedData_9_signBit <= voidData_signBit;
+      delayedData_9_mantissa <= voidData_mantissa;
+      delayedData_9_exp <= voidData_exp;
+      resMants_0 <= 8'h0;
+      resMants_1 <= 8'h0;
+      resMants_2 <= 8'h0;
+      resMants_3 <= 8'h0;
+      resMants_4 <= 8'h0;
+      resMants_5 <= 8'h0;
+      resMants_6 <= 8'h0;
+      resMants_7 <= 8'h0;
+      resMants_8 <= 8'h0;
+      resMants_9 <= 8'h0;
+      resExp <= 8'h0;
+      io_dataIn_valid_delay_5 <= 1'b0;
+    end else begin
+      _zz_exceptionalCompRes_2 <= _zz_exceptionalCompRes_1;
+      intermediateCompRes_0 <= ((dataIn_1_exp <= dataIn_0_exp) ? dataIn_0_exp : dataIn_1_exp);
+      intermediateCompRes_1 <= ((dataIn_3_exp <= dataIn_2_exp) ? dataIn_2_exp : dataIn_3_exp);
+      intermediateCompRes_2 <= ((dataIn_5_exp <= dataIn_4_exp) ? dataIn_4_exp : dataIn_5_exp);
+      intermediateCompRes_3 <= ((dataIn_7_exp <= dataIn_6_exp) ? dataIn_6_exp : dataIn_7_exp);
+      intermediateCompRes_4 <= ((intermediateCompRes_1 <= intermediateCompRes_0) ? intermediateCompRes_0 : intermediateCompRes_1);
+      intermediateCompRes_5 <= ((intermediateCompRes_3 <= intermediateCompRes_2) ? intermediateCompRes_2 : intermediateCompRes_3);
+      intermediateCompRes_6 <= ((intermediateCompRes_5 <= intermediateCompRes_4) ? intermediateCompRes_4 : intermediateCompRes_5);
+      largestExp <= ((exceptionalCompRes <= intermediateCompRes_6) ? intermediateCompRes_6 : exceptionalCompRes);
+      dataIn_delay_1_0_signBit <= dataIn_0_signBit;
+      dataIn_delay_1_0_mantissa <= dataIn_0_mantissa;
+      dataIn_delay_1_0_exp <= dataIn_0_exp;
+      dataIn_delay_1_1_signBit <= dataIn_1_signBit;
+      dataIn_delay_1_1_mantissa <= dataIn_1_mantissa;
+      dataIn_delay_1_1_exp <= dataIn_1_exp;
+      dataIn_delay_1_2_signBit <= dataIn_2_signBit;
+      dataIn_delay_1_2_mantissa <= dataIn_2_mantissa;
+      dataIn_delay_1_2_exp <= dataIn_2_exp;
+      dataIn_delay_1_3_signBit <= dataIn_3_signBit;
+      dataIn_delay_1_3_mantissa <= dataIn_3_mantissa;
+      dataIn_delay_1_3_exp <= dataIn_3_exp;
+      dataIn_delay_1_4_signBit <= dataIn_4_signBit;
+      dataIn_delay_1_4_mantissa <= dataIn_4_mantissa;
+      dataIn_delay_1_4_exp <= dataIn_4_exp;
+      dataIn_delay_1_5_signBit <= dataIn_5_signBit;
+      dataIn_delay_1_5_mantissa <= dataIn_5_mantissa;
+      dataIn_delay_1_5_exp <= dataIn_5_exp;
+      dataIn_delay_1_6_signBit <= dataIn_6_signBit;
+      dataIn_delay_1_6_mantissa <= dataIn_6_mantissa;
+      dataIn_delay_1_6_exp <= dataIn_6_exp;
+      dataIn_delay_1_7_signBit <= dataIn_7_signBit;
+      dataIn_delay_1_7_mantissa <= dataIn_7_mantissa;
+      dataIn_delay_1_7_exp <= dataIn_7_exp;
+      dataIn_delay_1_8_signBit <= dataIn_8_signBit;
+      dataIn_delay_1_8_mantissa <= dataIn_8_mantissa;
+      dataIn_delay_1_8_exp <= dataIn_8_exp;
+      dataIn_delay_1_9_signBit <= dataIn_9_signBit;
+      dataIn_delay_1_9_mantissa <= dataIn_9_mantissa;
+      dataIn_delay_1_9_exp <= dataIn_9_exp;
+      dataIn_delay_2_0_signBit <= dataIn_delay_1_0_signBit;
+      dataIn_delay_2_0_mantissa <= dataIn_delay_1_0_mantissa;
+      dataIn_delay_2_0_exp <= dataIn_delay_1_0_exp;
+      dataIn_delay_2_1_signBit <= dataIn_delay_1_1_signBit;
+      dataIn_delay_2_1_mantissa <= dataIn_delay_1_1_mantissa;
+      dataIn_delay_2_1_exp <= dataIn_delay_1_1_exp;
+      dataIn_delay_2_2_signBit <= dataIn_delay_1_2_signBit;
+      dataIn_delay_2_2_mantissa <= dataIn_delay_1_2_mantissa;
+      dataIn_delay_2_2_exp <= dataIn_delay_1_2_exp;
+      dataIn_delay_2_3_signBit <= dataIn_delay_1_3_signBit;
+      dataIn_delay_2_3_mantissa <= dataIn_delay_1_3_mantissa;
+      dataIn_delay_2_3_exp <= dataIn_delay_1_3_exp;
+      dataIn_delay_2_4_signBit <= dataIn_delay_1_4_signBit;
+      dataIn_delay_2_4_mantissa <= dataIn_delay_1_4_mantissa;
+      dataIn_delay_2_4_exp <= dataIn_delay_1_4_exp;
+      dataIn_delay_2_5_signBit <= dataIn_delay_1_5_signBit;
+      dataIn_delay_2_5_mantissa <= dataIn_delay_1_5_mantissa;
+      dataIn_delay_2_5_exp <= dataIn_delay_1_5_exp;
+      dataIn_delay_2_6_signBit <= dataIn_delay_1_6_signBit;
+      dataIn_delay_2_6_mantissa <= dataIn_delay_1_6_mantissa;
+      dataIn_delay_2_6_exp <= dataIn_delay_1_6_exp;
+      dataIn_delay_2_7_signBit <= dataIn_delay_1_7_signBit;
+      dataIn_delay_2_7_mantissa <= dataIn_delay_1_7_mantissa;
+      dataIn_delay_2_7_exp <= dataIn_delay_1_7_exp;
+      dataIn_delay_2_8_signBit <= dataIn_delay_1_8_signBit;
+      dataIn_delay_2_8_mantissa <= dataIn_delay_1_8_mantissa;
+      dataIn_delay_2_8_exp <= dataIn_delay_1_8_exp;
+      dataIn_delay_2_9_signBit <= dataIn_delay_1_9_signBit;
+      dataIn_delay_2_9_mantissa <= dataIn_delay_1_9_mantissa;
+      dataIn_delay_2_9_exp <= dataIn_delay_1_9_exp;
+      dataIn_delay_3_0_signBit <= dataIn_delay_2_0_signBit;
+      dataIn_delay_3_0_mantissa <= dataIn_delay_2_0_mantissa;
+      dataIn_delay_3_0_exp <= dataIn_delay_2_0_exp;
+      dataIn_delay_3_1_signBit <= dataIn_delay_2_1_signBit;
+      dataIn_delay_3_1_mantissa <= dataIn_delay_2_1_mantissa;
+      dataIn_delay_3_1_exp <= dataIn_delay_2_1_exp;
+      dataIn_delay_3_2_signBit <= dataIn_delay_2_2_signBit;
+      dataIn_delay_3_2_mantissa <= dataIn_delay_2_2_mantissa;
+      dataIn_delay_3_2_exp <= dataIn_delay_2_2_exp;
+      dataIn_delay_3_3_signBit <= dataIn_delay_2_3_signBit;
+      dataIn_delay_3_3_mantissa <= dataIn_delay_2_3_mantissa;
+      dataIn_delay_3_3_exp <= dataIn_delay_2_3_exp;
+      dataIn_delay_3_4_signBit <= dataIn_delay_2_4_signBit;
+      dataIn_delay_3_4_mantissa <= dataIn_delay_2_4_mantissa;
+      dataIn_delay_3_4_exp <= dataIn_delay_2_4_exp;
+      dataIn_delay_3_5_signBit <= dataIn_delay_2_5_signBit;
+      dataIn_delay_3_5_mantissa <= dataIn_delay_2_5_mantissa;
+      dataIn_delay_3_5_exp <= dataIn_delay_2_5_exp;
+      dataIn_delay_3_6_signBit <= dataIn_delay_2_6_signBit;
+      dataIn_delay_3_6_mantissa <= dataIn_delay_2_6_mantissa;
+      dataIn_delay_3_6_exp <= dataIn_delay_2_6_exp;
+      dataIn_delay_3_7_signBit <= dataIn_delay_2_7_signBit;
+      dataIn_delay_3_7_mantissa <= dataIn_delay_2_7_mantissa;
+      dataIn_delay_3_7_exp <= dataIn_delay_2_7_exp;
+      dataIn_delay_3_8_signBit <= dataIn_delay_2_8_signBit;
+      dataIn_delay_3_8_mantissa <= dataIn_delay_2_8_mantissa;
+      dataIn_delay_3_8_exp <= dataIn_delay_2_8_exp;
+      dataIn_delay_3_9_signBit <= dataIn_delay_2_9_signBit;
+      dataIn_delay_3_9_mantissa <= dataIn_delay_2_9_mantissa;
+      dataIn_delay_3_9_exp <= dataIn_delay_2_9_exp;
+      delayedData_0_signBit <= dataIn_delay_3_0_signBit;
+      delayedData_0_mantissa <= dataIn_delay_3_0_mantissa;
+      delayedData_0_exp <= dataIn_delay_3_0_exp;
+      delayedData_1_signBit <= dataIn_delay_3_1_signBit;
+      delayedData_1_mantissa <= dataIn_delay_3_1_mantissa;
+      delayedData_1_exp <= dataIn_delay_3_1_exp;
+      delayedData_2_signBit <= dataIn_delay_3_2_signBit;
+      delayedData_2_mantissa <= dataIn_delay_3_2_mantissa;
+      delayedData_2_exp <= dataIn_delay_3_2_exp;
+      delayedData_3_signBit <= dataIn_delay_3_3_signBit;
+      delayedData_3_mantissa <= dataIn_delay_3_3_mantissa;
+      delayedData_3_exp <= dataIn_delay_3_3_exp;
+      delayedData_4_signBit <= dataIn_delay_3_4_signBit;
+      delayedData_4_mantissa <= dataIn_delay_3_4_mantissa;
+      delayedData_4_exp <= dataIn_delay_3_4_exp;
+      delayedData_5_signBit <= dataIn_delay_3_5_signBit;
+      delayedData_5_mantissa <= dataIn_delay_3_5_mantissa;
+      delayedData_5_exp <= dataIn_delay_3_5_exp;
+      delayedData_6_signBit <= dataIn_delay_3_6_signBit;
+      delayedData_6_mantissa <= dataIn_delay_3_6_mantissa;
+      delayedData_6_exp <= dataIn_delay_3_6_exp;
+      delayedData_7_signBit <= dataIn_delay_3_7_signBit;
+      delayedData_7_mantissa <= dataIn_delay_3_7_mantissa;
+      delayedData_7_exp <= dataIn_delay_3_7_exp;
+      delayedData_8_signBit <= dataIn_delay_3_8_signBit;
+      delayedData_8_mantissa <= dataIn_delay_3_8_mantissa;
+      delayedData_8_exp <= dataIn_delay_3_8_exp;
+      delayedData_9_signBit <= dataIn_delay_3_9_signBit;
+      delayedData_9_mantissa <= dataIn_delay_3_9_mantissa;
+      delayedData_9_exp <= dataIn_delay_3_9_exp;
+      if(delayedData_0_signBit) begin
+        resMants_0 <= _zz_resMants_0_1[9 : 2];
+      end else begin
+        resMants_0 <= _zz_resMants_0_4[9 : 2];
+      end
+      if(delayedData_1_signBit) begin
+        resMants_1 <= _zz_resMants_1_1[9 : 2];
+      end else begin
+        resMants_1 <= _zz_resMants_1_4[9 : 2];
+      end
+      if(delayedData_2_signBit) begin
+        resMants_2 <= _zz_resMants_2_1[9 : 2];
+      end else begin
+        resMants_2 <= _zz_resMants_2_4[9 : 2];
+      end
+      if(delayedData_3_signBit) begin
+        resMants_3 <= _zz_resMants_3_1[9 : 2];
+      end else begin
+        resMants_3 <= _zz_resMants_3_4[9 : 2];
+      end
+      if(delayedData_4_signBit) begin
+        resMants_4 <= _zz_resMants_4_1[9 : 2];
+      end else begin
+        resMants_4 <= _zz_resMants_4_4[9 : 2];
+      end
+      if(delayedData_5_signBit) begin
+        resMants_5 <= _zz_resMants_5_1[9 : 2];
+      end else begin
+        resMants_5 <= _zz_resMants_5_4[9 : 2];
+      end
+      if(delayedData_6_signBit) begin
+        resMants_6 <= _zz_resMants_6_1[9 : 2];
+      end else begin
+        resMants_6 <= _zz_resMants_6_4[9 : 2];
+      end
+      if(delayedData_7_signBit) begin
+        resMants_7 <= _zz_resMants_7_1[9 : 2];
+      end else begin
+        resMants_7 <= _zz_resMants_7_4[9 : 2];
+      end
+      if(delayedData_8_signBit) begin
+        resMants_8 <= _zz_resMants_8_1[9 : 2];
+      end else begin
+        resMants_8 <= _zz_resMants_8_4[9 : 2];
+      end
+      if(delayedData_9_signBit) begin
+        resMants_9 <= _zz_resMants_9_1[9 : 2];
+      end else begin
+        resMants_9 <= _zz_resMants_9_4[9 : 2];
+      end
+      resExp <= (_zz_resExp - 8'h06);
+      io_dataIn_valid_delay_5 <= io_dataIn_valid_delay_4;
+    end
+  end
+
 
 endmodule
 

@@ -62,17 +62,17 @@ class TensorCoreChainArray(array_col: Int, array_row: Int, chain_len: Int,
   }
 
   //bfp converters
-  val colConverters = Array.fill(array_col)(bfp_converter_wrapper(10, 10, 32, 23, 8))
-  val rowConverters = Array.ofDim[bfp_converter_wrapper](array_row, chain_len)
+  val colConverters = Array.fill(array_col)(new FixedBfpConverter())
+  val rowConverters = Array.ofDim[FixedBfpConverter](array_row, chain_len)
 
   //buffer load
   for(c <- 0 until array_col) {
-    colConverters(c).io.in_vector_flatten <> io.matALoad(c)
+    colConverters(c).io.dataIn <> io.matALoad(c)
     val colBufferWrCounter = Counter(matABlksInColBuf * matABlkCols * 3)
-    when(colConverters(c).io.outBlk_flatten.fire) {
+    when(colConverters(c).io.dataOut.fire) {
       colBufferWrCounter.increment()
       colMem(c)(colBufferWrCounter.resize(colMem(c).addressWidth)) :=
-          colConverters(c).io.outBlk_flatten.payload
+          colConverters(c).io.dataOut.payload
     } otherwise(colBufferWrCounter.clear())
   }
   for(r <- 0 until array_row) {
@@ -80,13 +80,13 @@ class TensorCoreChainArray(array_col: Int, array_row: Int, chain_len: Int,
     val blkDataWidth = 8*11
     val rowMemWrDataFlatten = UInt(blkDataWidth*chain_len bits)
     for(tcId <- 0 until chain_len) {
-      rowConverters(r)(tcId) = bfp_converter_wrapper(10, 10, 32, 23, 8)
-      rowConverters(r)(tcId).io.in_vector_flatten <> io.matBLoad(r)(tcId)
+      rowConverters(r)(tcId) = new FixedBfpConverter
+      rowConverters(r)(tcId).io.dataIn <> io.matBLoad(r)(tcId)
       rowMemWrDataFlatten((tcId+1)*blkDataWidth-1 downto tcId*blkDataWidth) :=
-        rowConverters(r)(tcId).io.outBlk_flatten.payload
+        rowConverters(r)(tcId).io.dataOut.payload
     }
 
-    when(rowConverters(r)(0).io.outBlk_flatten.fire) {
+    when(rowConverters(r)(0).io.dataOut.fire) {
       rowBufferWrCounter.increment()
       rowMem(r)(rowBufferWrCounter.resize(rowMem(r).addressWidth)) := rowMemWrDataFlatten
     } otherwise(rowBufferWrCounter.clear())
