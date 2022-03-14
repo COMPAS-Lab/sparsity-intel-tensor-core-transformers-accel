@@ -1,6 +1,6 @@
 // Generator : SpinalHDL v1.6.0    git head : 73c8d8e2b86b45646e9d0b2e729291f2b65e6be3
 // Component : TensorCoreChainArray
-// Git hash  : 80996c892034c401e0fecb28659ab31014f74916
+// Git hash  : c910d7887e7c33b537cb7e0357338478c0d3d5f3
 
 
 `define ctrlStateMachine_enumDefinition_binary_sequential_type [2:0]
@@ -1478,7 +1478,6 @@ module FixedBfpConverter (
   wire       [9:0]    _zz_resMants_9_2;
   wire       [8:0]    _zz_resMants_9_3;
   wire       [9:0]    _zz_resMants_9_4;
-  wire       [7:0]    _zz_resExp;
   wire       [7:0]    _zz_io_dataOut_payload;
   wire       [7:0]    _zz_io_dataOut_payload_1;
   wire                dataIn_0_signBit;
@@ -1733,7 +1732,6 @@ module FixedBfpConverter (
   assign _zz_resMants_9_3 = 9'h001;
   assign _zz_resMants_9_2 = {1'd0, _zz_resMants_9_3};
   assign _zz_resMants_9_4 = {1'b0,_zz_resMants_9};
-  assign _zz_resExp = (largestExp + 8'h7f);
   assign _zz_io_dataOut_payload = resMants_1;
   assign _zz_io_dataOut_payload_1 = resMants_0;
   assign dataVec_0 = io_dataIn_payload[31 : 0];
@@ -2124,7 +2122,7 @@ module FixedBfpConverter (
       end else begin
         resMants_9 <= _zz_resMants_9_4[9 : 2];
       end
-      resExp <= (_zz_resExp - 8'h06);
+      resExp <= (largestExp - 8'h06);
       io_dataIn_valid_delay_5 <= io_dataIn_valid_delay_4;
     end
   end

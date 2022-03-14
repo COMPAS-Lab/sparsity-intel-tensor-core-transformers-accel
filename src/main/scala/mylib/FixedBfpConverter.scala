@@ -86,7 +86,7 @@ class FixedBfpConverter extends Component {
     }
   }
 
-  resExp := largestExp + U"8'd127" - U"8'd6"
+  resExp := largestExp - U"8'd6"
   io.dataOut.payload := resMants.as(UInt(80 bits)) @@ resExp
   io.dataOut.valid := Delay(io.dataIn.valid, 5) init False
 }

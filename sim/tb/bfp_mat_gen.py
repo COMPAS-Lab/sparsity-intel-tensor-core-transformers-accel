@@ -1,4 +1,5 @@
 from typing import final
+from zoneinfo import reset_tzpath
 import numpy as np
 import struct
 import codecs
@@ -14,7 +15,9 @@ def hex_to_float(x: str):
     return struct.unpack('!f', codecs.decode(x,'hex'))[0]
 
 def mat_a_gen(size: tuple, chain_len: int, compute_iter: int):
-    matA = np.random.uniform(low=1.0, high=2.0, size=size).astype('f')
+    # matA = np.random.uniform(low=1.0, high=15.0, size=size).astype('f')
+    matA = np.array(list(range(size[0]*size[1]))) / 100.0
+    matA = matA.reshape(size)
     np.save("mat_a_fp32.npy", matA)
     
     # blocking the matrix A for tensor core array test
@@ -46,7 +49,9 @@ def mat_a_gen(size: tuple, chain_len: int, compute_iter: int):
     return matA
 
 def mat_b_gen(size: tuple, chain_len: int, compute_iter: int):
-    matB = np.random.uniform(low=1.0, high=2.0, size=size).astype('f')
+    # matB = np.random.uniform(low=1.0, high=15.0, size=size).astype('f')
+    matB = np.array(list(range(size[0]*size[1]))) / 100.0
+    matB = matB.reshape(size)
     np.save("mat_b_fp32.npy", matB)
     
     bBlocks = np.split(matB, math.ceil(matB.shape[1]/(3*chain_len)), axis=1)
@@ -103,17 +108,20 @@ def check_outputs(sim_out_fname: str, ori_fname, num_tc_rows: int, num_tc_cols: 
     
     original = np.load(ori_fname)
 
-    final_res = []    
+    final_res = []
     for block in sim_out:
         reshaped_blk = np.array(block).reshape(-1, 3).transpose()
-        reshaped_blk = reshaped_blk[::-1,:]
+        # reshaped_blk = reshaped_blk[::-1,:]
         final_res.append(reshaped_blk)
 
-    block_size = final_res[0].shape
-    final_res = np.concatenate(final_res, axis=1)
-    # remember: tensor core rows corresponds to res matrix cols,
-    #  and tensor core cols for res matrix rows
-    final_res = final_res.reshape(-1, block_size[1]*num_tc_rows)
+    swapped_final_res = []
+    for i in range(num_tc_cols):
+        temp_row_blk = []
+        for j in range(num_tc_rows):
+            temp_row_blk.append(final_res[i+j*num_tc_cols])
+        swapped_final_res.append(np.concatenate(temp_row_blk, axis=1))
+
+    final_res = np.concatenate(swapped_final_res, axis=0)
     print(final_res)
 
     err = np.divide(np.abs(np.subtract(final_res, original)), original)
