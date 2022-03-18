@@ -7,7 +7,7 @@ import config._
 import intel_ips._
 import util._
 
-class TensorCoreChain(chain_len: Int, out_buf_delay: Int) extends Component {
+class TensorCoreChain(chain_len: Int, out_buf_delay: Int, output_width: Int) extends Component {
   val io = new Bundle {
     val dataIn = in Vec(UInt(80 bits), chain_len)
     val loadCascadeIn = in UInt(80 bits)
@@ -19,7 +19,7 @@ class TensorCoreChain(chain_len: Int, out_buf_delay: Int) extends Component {
     val dataIterReady = out Bool()
     val loadValid = in Bool()
     val loadReady = out Bool()
-    val res = out Vec(UInt(32 bits), 3)
+    val res = out Vec(UInt(output_width bits), 3)
     val inputIters = in UInt(8 bits)
     val outValid = out Bool()
   }
@@ -140,15 +140,20 @@ class TensorCoreChain(chain_len: Int, out_buf_delay: Int) extends Component {
   tcAccu.io.zero_en := False
   tcAccu.io.acc_en := False
 
-  io.res(0) <> tcAccu.io.bf24_col_1 @@ U"8'd0"
-  io.res(1) <> tcAccu.io.bf24_col_2 @@ U"8'd0"
-  io.res(2) <> tcAccu.io.bf24_col_3 @@ U"8'd0"
-
+  if (output_width > 24) {
+    io.res(0) <> tcAccu.io.bf24_col_1 @@ U"8'd0"
+    io.res(1) <> tcAccu.io.bf24_col_2 @@ U"8'd0"
+    io.res(2) <> tcAccu.io.bf24_col_3 @@ U"8'd0"
+  } else {
+    io.res(0) <> tcAccu.io.bf24_col_1
+    io.res(1) <> tcAccu.io.bf24_col_2
+    io.res(2) <> tcAccu.io.bf24_col_3
+  }
 }
 
 object TensorCoreChainGen {
   def main(args: Array[String]): Unit = {
     val gen = new DefaultConfig
-    gen.defaultSpinalConfig.generate(new TensorCoreChain(3, 9-3)).printPruned()
+    gen.defaultSpinalConfig.generate(new TensorCoreChain(3, 9-3, 32)).printPruned()
   }
 }

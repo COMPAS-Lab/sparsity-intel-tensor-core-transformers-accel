@@ -9,13 +9,13 @@ import intel_ips._
 import util._
 
 class TensorCoreChainArray(array_col: Int, array_row: Int, chain_len: Int,
-                           col_buf_max_depth: Int, row_buf_max_depth: Int) extends Component {
+                           col_buf_max_depth: Int, row_buf_max_depth: Int, output_width: Int) extends Component {
   val io = new Bundle {
     val matALoad = Vec(slave Flow(UInt(32*10 bits)), array_col)
     val matBLoad = Vec(Vec(slave Flow(UInt(32*10 bits)), chain_len), array_row)
     val calEn = in Bool()
     val computeIters = in UInt(8 bits)
-    val res = master Flow(Vec(Vec((UInt(32*3 bits)), array_col), array_row))
+    val res = master Flow(Vec(Vec((UInt(output_width*3 bits)), array_col), array_row))
   }
 
   val matACols = 90.0
@@ -36,31 +36,13 @@ class TensorCoreChainArray(array_col: Int, array_row: Int, chain_len: Int,
 
   val tensorArray = Array.ofDim[TensorCoreChain](array_row, array_col)
   for(r <- 0 until array_row; c <- 0 until array_col) {
-    tensorArray(r)(c) = new TensorCoreChain(chain_len, out_buf_delay = (matBCols / array_row).ceil.toInt - 3)
+    tensorArray(r)(c) = new TensorCoreChain(chain_len, out_buf_delay = (matBCols / array_row).ceil.toInt - 3, output_width = output_width)
   }
 
+  //input buffers
   val colMem = Array.fill(array_col)(
 				Mem(UInt(8*11 bits), col_buf_max_depth) init (Array.fill(col_buf_max_depth)(U(0, 8*11 bits))))
-  val rowMem = Array.fill(array_row)(
-				Mem(UInt(8*11*chain_len bits), row_buf_max_depth) init (Array.fill(row_buf_max_depth)(U(0, 8*11*chain_len bits))))
-
-  // row connection
-  for(r <- 0 until array_row; c <- 0 until array_col) {
-    val rowMemOut: Vec[UInt] = rowMem(r).readSync(rowBufferRdCounter.resize(rowMem(r).addressWidth))
-                                .subdivideIn(chain_len slices)
-    val colMemOut = colMem(c).readSync(colBufferRdCounter.resize(colMem(c).addressWidth))
-    for (tcId <- 0 until chain_len) {
-      tensorArray(r)(c).io.dataIn(tcId) := Mux(tensorDataValid, rowMemOut(tcId)(87 downto 8), U"80'd0")
-      tensorArray(r)(c).io.expIn(tcId) := Mux(tensorDataValid, rowMemOut(tcId)(7 downto 0), U"8'd0")
-    }
-    tensorArray(r)(c).io.loadCascadeIn := Mux(tensorLoadValid, colMemOut(87 downto 8), U"80'd0")
-    tensorArray(r)(c).io.expCascadeIn := Mux(tensorLoadValid, colMemOut(7 downto 0), U"8'd0")
-    tensorArray(r)(c).io.loadValid := tensorLoadValid
-    tensorArray(r)(c).io.dataValid := tensorDataValid
-    tensorArray(r)(c).io.inputIters := U"8'd9"
-    io.res.payload(r)(c) := tensorArray(r)(c).io.res.as(UInt(32*3 bits))
-  }
-
+  val rowMem = Array.ofDim[Mem[UInt]](array_row, chain_len)
   //bfp converters
   val colConverters = Array.fill(array_col)(new FixedBfpConverter())
   val rowConverters = Array.ofDim[FixedBfpConverter](array_row, chain_len)
@@ -76,21 +58,36 @@ class TensorCoreChainArray(array_col: Int, array_row: Int, chain_len: Int,
     } otherwise(colBufferWrCounter.clear())
   }
   for(r <- 0 until array_row) {
-    val rowBufferWrCounter = Counter(matBColsPerRowBuffer)
-    val blkDataWidth = 8*11
-    val rowMemWrDataFlatten = UInt(blkDataWidth*chain_len bits)
     for(tcId <- 0 until chain_len) {
+      val rowBufferWrCounter = Counter(matBColsPerRowBuffer)
+
       rowConverters(r)(tcId) = new FixedBfpConverter
       rowConverters(r)(tcId).io.dataIn <> io.matBLoad(r)(tcId)
-      rowMemWrDataFlatten((tcId+1)*blkDataWidth-1 downto tcId*blkDataWidth) :=
-        rowConverters(r)(tcId).io.dataOut.payload
-    }
 
-    when(rowConverters(r)(0).io.dataOut.fire) {
-      rowBufferWrCounter.increment()
-      rowMem(r)(rowBufferWrCounter.resize(rowMem(r).addressWidth)) := rowMemWrDataFlatten
-    } otherwise(rowBufferWrCounter.clear())
+      rowMem(r)(tcId) = Mem(UInt(8*11 bits), row_buf_max_depth) init (Array.fill(row_buf_max_depth)(U(0, 8*11 bits)))
+      when(rowConverters(r)(tcId).io.dataOut.fire) {
+        rowBufferWrCounter.increment()
+        rowMem(r)(tcId)(rowBufferWrCounter.resize(rowMem(r)(tcId).addressWidth)) := rowConverters(r)(tcId).io.dataOut.payload
+      } otherwise(rowBufferWrCounter.clear())
+    }
   }
+
+  // row connection
+  for(r <- 0 until array_row; c <- 0 until array_col) {
+    val rowMemOut: Vec[UInt] = Vec(for (memElem <- rowMem(r)) yield memElem.readSync(rowBufferRdCounter.resize(memElem.addressWidth)))
+    val colMemOut = colMem(c).readSync(colBufferRdCounter.resize(colMem(c).addressWidth))
+    for (tcId <- 0 until chain_len) {
+      tensorArray(r)(c).io.dataIn(tcId) := Mux(tensorDataValid, rowMemOut(tcId)(87 downto 8), U"80'd0")
+      tensorArray(r)(c).io.expIn(tcId) := Mux(tensorDataValid, rowMemOut(tcId)(7 downto 0), U"8'd0")
+    }
+    tensorArray(r)(c).io.loadCascadeIn := Mux(tensorLoadValid, colMemOut(87 downto 8), U"80'd0")
+    tensorArray(r)(c).io.expCascadeIn := Mux(tensorLoadValid, colMemOut(7 downto 0), U"8'd0")
+    tensorArray(r)(c).io.loadValid := tensorLoadValid
+    tensorArray(r)(c).io.dataValid := tensorDataValid
+    tensorArray(r)(c).io.inputIters := U"8'd9"
+    io.res.payload(r)(c) := tensorArray(r)(c).io.res.as(UInt(output_width*3 bits))
+  }
+
 
   io.res.valid := False
   // compute control path
@@ -194,8 +191,9 @@ object TensorCoreArrayGen {
       array_col = 3,
       array_row = 2,
       chain_len = 3,
-      col_buf_max_depth = 512,
-      row_buf_max_depth = 512
+      col_buf_max_depth = 128,
+      row_buf_max_depth = 128,
+      output_width = 32
     )).printPruned()
   }
 }

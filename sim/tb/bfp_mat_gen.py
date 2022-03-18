@@ -102,16 +102,12 @@ def check_outputs(sim_out_fname: str, ori_fname, num_tc_rows: int, num_tc_cols: 
     for line_idx,elem in enumerate(lines):
         fp32_strs = [elem[l:l+8] for l in range(0, len(elem), 8)]
         sim_out[line_idx % num_tcchaines] += [hex_to_float(sub_l) for sub_l in fp32_strs[:-1]]
-
-    # sim_out = [hex_to_float(l[0:-1]) for l in lines if "//" not in l]
-    # sim_out = np.array(sim_out)
     
     original = np.load(ori_fname)
 
     final_res = []
     for block in sim_out:
         reshaped_blk = np.array(block).reshape(-1, 3).transpose()
-        # reshaped_blk = reshaped_blk[::-1,:]
         final_res.append(reshaped_blk)
 
     swapped_final_res = []

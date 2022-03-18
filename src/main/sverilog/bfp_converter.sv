@@ -44,11 +44,11 @@ module bfp_converter(
   //flattening input and output array
   genvar i;
   generate
-    for (i=0; i<P; i++) begin
+    for (i=0; i<P; i++) begin: IN_FLATTEN
       assign vector[i] = in_vector_flatten[BIT*(i+1)-1:BIT*i];
     end 
 
-    for (i=0; i<P; i++) begin
+    for (i=0; i<P; i++) begin: OUT_PACK
       assign outMants_flatten[(BFPM+2)*(i+1)-1:(BFPM+2)*i] = outMants[i];
     end
   endgenerate

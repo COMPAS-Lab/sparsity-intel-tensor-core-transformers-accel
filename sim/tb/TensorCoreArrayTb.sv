@@ -68,20 +68,38 @@ initial begin
     @(posedge clk);
 	#1
     io_matALoad_0_payload = mat_a0[i];
-    io_matALoad_1_payload = mat_a1[i];
-    io_matALoad_2_payload = mat_a2[i];
     io_matALoad_0_valid = 1;
-    io_matALoad_1_valid = 1;
-    io_matALoad_2_valid = 1;
   end
 
   @(posedge clk);
   #1
   io_matALoad_0_payload = 320'd0;
-  io_matALoad_1_payload = 320'd0;
-  io_matALoad_2_payload = 320'd0;
   io_matALoad_0_valid = 0;
+
+  @(posedge clk);
+  for (i = 0; i < 3*9; i++) begin
+    @(posedge clk);
+	#1
+    io_matALoad_1_payload = mat_a1[i];
+    io_matALoad_1_valid = 1;
+  end
+
+  @(posedge clk);
+  #1
+  io_matALoad_1_payload = 320'd0;
   io_matALoad_1_valid = 0;
+
+  @(posedge clk);
+  for (i = 0; i < 3*9; i++) begin
+    @(posedge clk);
+	#1
+    io_matALoad_2_payload = mat_a2[i];
+    io_matALoad_2_valid = 1;
+  end
+
+  @(posedge clk);
+  #1
+  io_matALoad_2_payload = 320'd0;
   io_matALoad_2_valid = 0;
   
 end
@@ -111,37 +129,85 @@ initial begin
   for (j=0; j<3*9; j++) begin
     @(posedge clk);
 	#1
-    {io_matBLoad_0_0_payload, io_matBLoad_0_1_payload, io_matBLoad_0_2_payload} = 
-      {mat_b0[j*3], mat_b0[j*3+1], mat_b0[j*3+2]};
-    {io_matBLoad_1_0_payload, io_matBLoad_1_1_payload, io_matBLoad_1_2_payload} = 
-      {mat_b1[j*3], mat_b1[j*3+1], mat_b1[j*3+2]};
+    io_matBLoad_0_0_payload = mat_b0[j*3];
     io_matBLoad_0_0_valid = 1'b1;
-    io_matBLoad_0_1_valid = 1'b1;
-    io_matBLoad_0_2_valid = 1'b1;
-    io_matBLoad_1_0_valid = 1'b1;
-    io_matBLoad_1_1_valid = 1'b1;
-    io_matBLoad_1_2_valid = 1'b1;
   end
 
   @(posedge clk);
   #1
   io_matBLoad_0_0_valid = '0;
   io_matBLoad_0_0_payload = '0;
+
+  // b01
+  for (j=0; j<3*9; j++) begin
+    @(posedge clk);
+	#1
+    io_matBLoad_0_1_payload = mat_b0[j*3+1];
+    io_matBLoad_0_1_valid = 1'b1;
+  end
+
+  @(posedge clk);
+  #1
   io_matBLoad_0_1_valid = '0;
   io_matBLoad_0_1_payload = '0;
+
+  // b02
+  for (j=0; j<3*9; j++) begin
+    @(posedge clk);
+	#1
+    io_matBLoad_0_2_payload = mat_b0[j*3+2];
+    io_matBLoad_0_2_valid = 1'b1;
+  end
+
+  @(posedge clk);
+  #1
   io_matBLoad_0_2_valid = '0;
   io_matBLoad_0_2_payload = '0;
+
+  //b10
+  for (j=0; j<3*9; j++) begin
+    @(posedge clk);
+	#1
+    io_matBLoad_1_0_payload = mat_b1[j*3];
+    io_matBLoad_1_0_valid = 1'b1;
+  end
+
+  @(posedge clk);
+  #1
   io_matBLoad_1_0_valid = '0;
   io_matBLoad_1_0_payload = '0;
+
+  //b11
+  for (j=0; j<3*9; j++) begin
+    @(posedge clk);
+	#1
+    io_matBLoad_1_1_payload = mat_b1[j*3+1];
+    io_matBLoad_1_1_valid = 1'b1;
+  end
+
+  @(posedge clk);
+  #1
   io_matBLoad_1_1_valid = '0;
   io_matBLoad_1_1_payload = '0;
+
+  //b12
+  for (j=0; j<3*9; j++) begin
+    @(posedge clk);
+	#1
+    io_matBLoad_1_2_payload = mat_b0[j*3+2];
+    io_matBLoad_1_2_valid = 1'b1;
+  end
+
+  @(posedge clk);
+  #1
   io_matBLoad_1_2_valid = '0;
   io_matBLoad_1_2_payload = '0;
+  
 end
 
 initial begin
   io_calEn = 1'b0;
-  for(k=0; k<60; k++) begin
+  for(k=0; k<500; k++) begin
     @(posedge clk);
   end
 
