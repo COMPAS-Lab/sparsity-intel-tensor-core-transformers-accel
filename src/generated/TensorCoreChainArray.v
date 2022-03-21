@@ -1,6 +1,6 @@
 // Generator : SpinalHDL v1.6.0    git head : 73c8d8e2b86b45646e9d0b2e729291f2b65e6be3
 // Component : TensorCoreChainArray
-// Git hash  : b7b0fe1342b1f7066115c6e00287afe9239c775b
+// Git hash  : 6f9c1b02e2b8d388323e92288787fa71c443e2b8
 
 
 `define ctrlStateMachine_enumDefinition_binary_sequential_type [2:0]
@@ -33,12 +33,12 @@ module TensorCoreChainArray (
   input               io_calEn,
   input      [7:0]    io_computeIters,
   output reg          io_res_valid,
-  output     [95:0]   io_res_payload_0_0,
-  output     [95:0]   io_res_payload_0_1,
-  output     [95:0]   io_res_payload_0_2,
-  output     [95:0]   io_res_payload_1_0,
-  output     [95:0]   io_res_payload_1_1,
-  output     [95:0]   io_res_payload_1_2,
+  output     [71:0]   io_res_payload_0_0,
+  output     [71:0]   io_res_payload_0_1,
+  output     [71:0]   io_res_payload_0_2,
+  output     [71:0]   io_res_payload_1_0,
+  output     [71:0]   io_res_payload_1_1,
+  output     [71:0]   io_res_payload_1_2,
   input               clk,
   input               resetn
 );
@@ -116,39 +116,39 @@ module TensorCoreChainArray (
   reg        [87:0]   _zz__zz_69_port3;
   wire                tensorCoreChain_6_io_dataIterReady;
   wire                tensorCoreChain_6_io_loadReady;
-  wire       [31:0]   tensorCoreChain_6_io_res_0;
-  wire       [31:0]   tensorCoreChain_6_io_res_1;
-  wire       [31:0]   tensorCoreChain_6_io_res_2;
+  wire       [23:0]   tensorCoreChain_6_io_res_0;
+  wire       [23:0]   tensorCoreChain_6_io_res_1;
+  wire       [23:0]   tensorCoreChain_6_io_res_2;
   wire                tensorCoreChain_6_io_outValid;
   wire                tensorCoreChain_7_io_dataIterReady;
   wire                tensorCoreChain_7_io_loadReady;
-  wire       [31:0]   tensorCoreChain_7_io_res_0;
-  wire       [31:0]   tensorCoreChain_7_io_res_1;
-  wire       [31:0]   tensorCoreChain_7_io_res_2;
+  wire       [23:0]   tensorCoreChain_7_io_res_0;
+  wire       [23:0]   tensorCoreChain_7_io_res_1;
+  wire       [23:0]   tensorCoreChain_7_io_res_2;
   wire                tensorCoreChain_7_io_outValid;
   wire                tensorCoreChain_8_io_dataIterReady;
   wire                tensorCoreChain_8_io_loadReady;
-  wire       [31:0]   tensorCoreChain_8_io_res_0;
-  wire       [31:0]   tensorCoreChain_8_io_res_1;
-  wire       [31:0]   tensorCoreChain_8_io_res_2;
+  wire       [23:0]   tensorCoreChain_8_io_res_0;
+  wire       [23:0]   tensorCoreChain_8_io_res_1;
+  wire       [23:0]   tensorCoreChain_8_io_res_2;
   wire                tensorCoreChain_8_io_outValid;
   wire                tensorCoreChain_9_io_dataIterReady;
   wire                tensorCoreChain_9_io_loadReady;
-  wire       [31:0]   tensorCoreChain_9_io_res_0;
-  wire       [31:0]   tensorCoreChain_9_io_res_1;
-  wire       [31:0]   tensorCoreChain_9_io_res_2;
+  wire       [23:0]   tensorCoreChain_9_io_res_0;
+  wire       [23:0]   tensorCoreChain_9_io_res_1;
+  wire       [23:0]   tensorCoreChain_9_io_res_2;
   wire                tensorCoreChain_9_io_outValid;
   wire                tensorCoreChain_10_io_dataIterReady;
   wire                tensorCoreChain_10_io_loadReady;
-  wire       [31:0]   tensorCoreChain_10_io_res_0;
-  wire       [31:0]   tensorCoreChain_10_io_res_1;
-  wire       [31:0]   tensorCoreChain_10_io_res_2;
+  wire       [23:0]   tensorCoreChain_10_io_res_0;
+  wire       [23:0]   tensorCoreChain_10_io_res_1;
+  wire       [23:0]   tensorCoreChain_10_io_res_2;
   wire                tensorCoreChain_10_io_outValid;
   wire                tensorCoreChain_11_io_dataIterReady;
   wire                tensorCoreChain_11_io_loadReady;
-  wire       [31:0]   tensorCoreChain_11_io_res_0;
-  wire       [31:0]   tensorCoreChain_11_io_res_1;
-  wire       [31:0]   tensorCoreChain_11_io_res_2;
+  wire       [23:0]   tensorCoreChain_11_io_res_0;
+  wire       [23:0]   tensorCoreChain_11_io_res_1;
+  wire       [23:0]   tensorCoreChain_11_io_res_2;
   wire                tensorCoreChain_11_io_outValid;
   wire                colConverters_0_io_dataOut_valid;
   wire       [87:0]   colConverters_0_io_dataOut_payload;
@@ -2515,9 +2515,9 @@ module TensorCoreChain (
   output              io_dataIterReady,
   input               io_loadValid,
   output              io_loadReady,
-  output     [31:0]   io_res_0,
-  output     [31:0]   io_res_1,
-  output     [31:0]   io_res_2,
+  output     [23:0]   io_res_0,
+  output     [23:0]   io_res_1,
+  output     [23:0]   io_res_2,
   input      [7:0]    io_inputIters,
   output              io_outValid,
   input               clk,
@@ -2968,9 +2968,9 @@ module TensorCoreChain (
   assign tensor_core_2_data_in_10 = io_dataIn_2_delay_4[79 : 72];
   assign tensor_core_2_load_bb_one = loadBufCtrl[0];
   assign tensor_core_2_load_bb_two = loadBufCtrl[1];
-  assign io_res_0 = {tcAccu_bf24_col_1,8'h0};
-  assign io_res_1 = {tcAccu_bf24_col_2,8'h0};
-  assign io_res_2 = {tcAccu_bf24_col_3,8'h0};
+  assign io_res_0 = tcAccu_bf24_col_1;
+  assign io_res_1 = tcAccu_bf24_col_2;
+  assign io_res_2 = tcAccu_bf24_col_3;
   always @(posedge clk or negedge resetn) begin
     if(!resetn) begin
       io_loadValid_delay_1 <= 1'b0;

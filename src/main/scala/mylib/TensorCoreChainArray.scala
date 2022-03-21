@@ -193,7 +193,7 @@ object TensorCoreArrayGen {
       chain_len = 3,
       col_buf_max_depth = 128,
       row_buf_max_depth = 128,
-      output_width = 32
+      output_width = 24
     )).printPruned()
   }
 }
