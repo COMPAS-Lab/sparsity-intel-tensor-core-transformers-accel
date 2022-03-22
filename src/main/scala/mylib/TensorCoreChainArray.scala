@@ -42,7 +42,8 @@ class TensorCoreChainArray(array_col: Int, array_row: Int, chain_len: Int,
   //input buffers
   val colMem = Array.fill(array_col)(
 				Mem(UInt(8*11 bits), col_buf_max_depth) init (Array.fill(col_buf_max_depth)(U(0, 8*11 bits))))
-  val rowMem = Array.ofDim[Mem[UInt]](array_row, chain_len)
+  val rowMem = Array.fill(array_row*chain_len)(
+        Mem(UInt(8*11 bits), col_buf_max_depth) init (Array.fill(col_buf_max_depth)(U(0, 8*11 bits))))
   //bfp converters
   val colConverters = Array.fill(array_col)(new FixedBfpConverter())
   val rowConverters = Array.ofDim[FixedBfpConverter](array_row, chain_len)
@@ -64,17 +65,20 @@ class TensorCoreChainArray(array_col: Int, array_row: Int, chain_len: Int,
       rowConverters(r)(tcId) = new FixedBfpConverter
       rowConverters(r)(tcId).io.dataIn <> io.matBLoad(r)(tcId)
 
-      rowMem(r)(tcId) = Mem(UInt(8*11 bits), row_buf_max_depth) init (Array.fill(row_buf_max_depth)(U(0, 8*11 bits)))
       when(rowConverters(r)(tcId).io.dataOut.fire) {
         rowBufferWrCounter.increment()
-        rowMem(r)(tcId)(rowBufferWrCounter.resize(rowMem(r)(tcId).addressWidth)) := rowConverters(r)(tcId).io.dataOut.payload
+        rowMem(r*chain_len + tcId)(rowBufferWrCounter.resize(rowMem(r*chain_len+tcId).addressWidth)) :=
+            rowConverters(r)(tcId).io.dataOut.payload
       } otherwise(rowBufferWrCounter.clear())
     }
   }
 
   // row connection
   for(r <- 0 until array_row; c <- 0 until array_col) {
-    val rowMemOut: Vec[UInt] = Vec(for (memElem <- rowMem(r)) yield memElem.readSync(rowBufferRdCounter.resize(memElem.addressWidth)))
+    val rowMemOut: Vec[UInt] = Vec(
+      for (cl <- 0 until chain_len)
+        yield rowMem(r*chain_len + cl).readSync(rowBufferRdCounter.resize(rowMem(r*chain_len + cl).addressWidth))
+      )
     val colMemOut = colMem(c).readSync(colBufferRdCounter.resize(colMem(c).addressWidth))
     for (tcId <- 0 until chain_len) {
       tensorArray(r)(c).io.dataIn(tcId) := Mux(tensorDataValid, rowMemOut(tcId)(87 downto 8), U"80'd0")

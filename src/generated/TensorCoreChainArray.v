@@ -1,6 +1,6 @@
 // Generator : SpinalHDL v1.6.0    git head : 73c8d8e2b86b45646e9d0b2e729291f2b65e6be3
 // Component : TensorCoreChainArray
-// Git hash  : 6f9c1b02e2b8d388323e92288787fa71c443e2b8
+// Git hash  : f58805f7015de47cfabdf418c2cbda1552083143
 
 
 `define ctrlStateMachine_enumDefinition_binary_sequential_type [2:0]
@@ -96,24 +96,24 @@ module TensorCoreChainArray (
   reg        [87:0]   _zz_colMem_1_port2;
   reg        [87:0]   _zz_colMem_2_port1;
   reg        [87:0]   _zz_colMem_2_port2;
-  reg        [87:0]   _zz__zz_34_port1;
-  reg        [87:0]   _zz__zz_34_port2;
-  reg        [87:0]   _zz__zz_34_port3;
-  reg        [87:0]   _zz__zz_41_port1;
-  reg        [87:0]   _zz__zz_41_port2;
-  reg        [87:0]   _zz__zz_41_port3;
-  reg        [87:0]   _zz__zz_48_port1;
-  reg        [87:0]   _zz__zz_48_port2;
-  reg        [87:0]   _zz__zz_48_port3;
-  reg        [87:0]   _zz__zz_55_port1;
-  reg        [87:0]   _zz__zz_55_port2;
-  reg        [87:0]   _zz__zz_55_port3;
-  reg        [87:0]   _zz__zz_62_port1;
-  reg        [87:0]   _zz__zz_62_port2;
-  reg        [87:0]   _zz__zz_62_port3;
-  reg        [87:0]   _zz__zz_69_port1;
-  reg        [87:0]   _zz__zz_69_port2;
-  reg        [87:0]   _zz__zz_69_port3;
+  reg        [87:0]   _zz_rowMem_0_port1;
+  reg        [87:0]   _zz_rowMem_0_port2;
+  reg        [87:0]   _zz_rowMem_0_port3;
+  reg        [87:0]   _zz_rowMem_1_port1;
+  reg        [87:0]   _zz_rowMem_1_port2;
+  reg        [87:0]   _zz_rowMem_1_port3;
+  reg        [87:0]   _zz_rowMem_2_port1;
+  reg        [87:0]   _zz_rowMem_2_port2;
+  reg        [87:0]   _zz_rowMem_2_port3;
+  reg        [87:0]   _zz_rowMem_3_port1;
+  reg        [87:0]   _zz_rowMem_3_port2;
+  reg        [87:0]   _zz_rowMem_3_port3;
+  reg        [87:0]   _zz_rowMem_4_port1;
+  reg        [87:0]   _zz_rowMem_4_port2;
+  reg        [87:0]   _zz_rowMem_4_port3;
+  reg        [87:0]   _zz_rowMem_5_port1;
+  reg        [87:0]   _zz_rowMem_5_port2;
+  reg        [87:0]   _zz_rowMem_5_port3;
   wire                tensorCoreChain_6_io_dataIterReady;
   wire                tensorCoreChain_6_io_loadReady;
   wire       [23:0]   tensorCoreChain_6_io_res_0;
@@ -186,73 +186,73 @@ module TensorCoreChainArray (
   wire       [87:0]   _zz_colMem_2_port_1;
   wire       [4:0]    _zz__zz_30;
   wire       [0:0]    _zz__zz_30_1;
-  wire       [6:0]    _zz__zz_34_port;
-  wire       [87:0]   _zz__zz_34_port_1;
-  wire       [4:0]    _zz__zz_37;
-  wire       [0:0]    _zz__zz_37_1;
-  wire       [6:0]    _zz__zz_41_port;
-  wire       [87:0]   _zz__zz_41_port_1;
-  wire       [4:0]    _zz__zz_44;
-  wire       [0:0]    _zz__zz_44_1;
-  wire       [6:0]    _zz__zz_48_port;
-  wire       [87:0]   _zz__zz_48_port_1;
-  wire       [4:0]    _zz__zz_51;
-  wire       [0:0]    _zz__zz_51_1;
-  wire       [6:0]    _zz__zz_55_port;
-  wire       [87:0]   _zz__zz_55_port_1;
-  wire       [4:0]    _zz__zz_58;
-  wire       [0:0]    _zz__zz_58_1;
-  wire       [6:0]    _zz__zz_62_port;
-  wire       [87:0]   _zz__zz_62_port_1;
-  wire       [4:0]    _zz__zz_65;
-  wire       [0:0]    _zz__zz_65_1;
-  wire       [6:0]    _zz__zz_69_port;
-  wire       [87:0]   _zz__zz_69_port_1;
-  wire                _zz__zz_34_port_2;
+  wire       [6:0]    _zz_rowMem_0_port;
+  wire       [87:0]   _zz_rowMem_0_port_1;
+  wire       [4:0]    _zz__zz_36;
+  wire       [0:0]    _zz__zz_36_1;
+  wire       [6:0]    _zz_rowMem_1_port;
+  wire       [87:0]   _zz_rowMem_1_port_1;
+  wire       [4:0]    _zz__zz_42;
+  wire       [0:0]    _zz__zz_42_1;
+  wire       [6:0]    _zz_rowMem_2_port;
+  wire       [87:0]   _zz_rowMem_2_port_1;
+  wire       [4:0]    _zz__zz_48;
+  wire       [0:0]    _zz__zz_48_1;
+  wire       [6:0]    _zz_rowMem_3_port;
+  wire       [87:0]   _zz_rowMem_3_port_1;
+  wire       [4:0]    _zz__zz_54;
+  wire       [0:0]    _zz__zz_54_1;
+  wire       [6:0]    _zz_rowMem_4_port;
+  wire       [87:0]   _zz_rowMem_4_port_1;
+  wire       [4:0]    _zz__zz_60;
+  wire       [0:0]    _zz__zz_60_1;
+  wire       [6:0]    _zz_rowMem_5_port;
+  wire       [87:0]   _zz_rowMem_5_port_1;
+  wire                _zz_rowMem_0_port_2;
   wire                _zz__zz_io_dataIn_0_1;
-  wire                _zz__zz_41_port_2;
+  wire                _zz_rowMem_1_port_2;
   wire                _zz__zz_io_dataIn_1_1;
-  wire                _zz__zz_48_port_2;
+  wire                _zz_rowMem_2_port_2;
   wire                _zz__zz_io_dataIn_2_1;
   wire                _zz_colMem_0_port_2;
   wire                _zz__zz_io_loadCascadeIn_1;
-  wire                _zz__zz_34_port_3;
+  wire                _zz_rowMem_0_port_3;
   wire                _zz__zz_io_dataIn_0_3;
-  wire                _zz__zz_41_port_3;
+  wire                _zz_rowMem_1_port_3;
   wire                _zz__zz_io_dataIn_1_3;
-  wire                _zz__zz_48_port_3;
+  wire                _zz_rowMem_2_port_3;
   wire                _zz__zz_io_dataIn_2_3;
   wire                _zz_colMem_1_port_2;
   wire                _zz__zz_io_loadCascadeIn_3;
-  wire                _zz__zz_34_port_4;
+  wire                _zz_rowMem_0_port_4;
   wire                _zz__zz_io_dataIn_0_5;
-  wire                _zz__zz_41_port_4;
+  wire                _zz_rowMem_1_port_4;
   wire                _zz__zz_io_dataIn_1_5;
-  wire                _zz__zz_48_port_4;
+  wire                _zz_rowMem_2_port_4;
   wire                _zz__zz_io_dataIn_2_5;
   wire                _zz_colMem_2_port_2;
   wire                _zz__zz_io_loadCascadeIn_5;
-  wire                _zz__zz_55_port_2;
+  wire                _zz_rowMem_3_port_2;
   wire                _zz__zz_io_dataIn_0_7;
-  wire                _zz__zz_62_port_2;
+  wire                _zz_rowMem_4_port_2;
   wire                _zz__zz_io_dataIn_1_7;
-  wire                _zz__zz_69_port_2;
+  wire                _zz_rowMem_5_port_2;
   wire                _zz__zz_io_dataIn_2_7;
   wire                _zz_colMem_0_port_3;
   wire                _zz__zz_io_loadCascadeIn_7;
-  wire                _zz__zz_55_port_3;
+  wire                _zz_rowMem_3_port_3;
   wire                _zz__zz_io_dataIn_0_9;
-  wire                _zz__zz_62_port_3;
+  wire                _zz_rowMem_4_port_3;
   wire                _zz__zz_io_dataIn_1_9;
-  wire                _zz__zz_69_port_3;
+  wire                _zz_rowMem_5_port_3;
   wire                _zz__zz_io_dataIn_2_9;
   wire                _zz_colMem_1_port_3;
   wire                _zz__zz_io_loadCascadeIn_9;
-  wire                _zz__zz_55_port_4;
+  wire                _zz_rowMem_3_port_4;
   wire                _zz__zz_io_dataIn_0_11;
-  wire                _zz__zz_62_port_4;
+  wire                _zz_rowMem_4_port_4;
   wire                _zz__zz_io_dataIn_1_11;
-  wire                _zz__zz_69_port_4;
+  wire                _zz_rowMem_5_port_4;
   wire                _zz__zz_io_dataIn_2_11;
   wire                _zz_colMem_2_port_3;
   wire                _zz__zz_io_loadCascadeIn_11;
@@ -310,36 +310,36 @@ module TensorCoreChainArray (
   reg        [4:0]    _zz_31;
   wire                _zz_32;
   wire                _zz_33;
+  reg                 _zz_34;
   reg                 _zz_35;
-  reg                 _zz_36;
+  reg        [4:0]    _zz_36;
   reg        [4:0]    _zz_37;
-  reg        [4:0]    _zz_38;
+  wire                _zz_38;
   wire                _zz_39;
-  wire                _zz_40;
-  reg                 _zz_42;
-  reg                 _zz_43;
-  reg        [4:0]    _zz_44;
-  reg        [4:0]    _zz_45;
-  wire                _zz_46;
-  wire                _zz_47;
-  reg                 _zz_49;
-  reg                 _zz_50;
-  reg        [4:0]    _zz_51;
-  reg        [4:0]    _zz_52;
-  wire                _zz_53;
-  wire                _zz_54;
-  reg                 _zz_56;
-  reg                 _zz_57;
-  reg        [4:0]    _zz_58;
-  reg        [4:0]    _zz_59;
-  wire                _zz_60;
-  wire                _zz_61;
-  reg                 _zz_63;
-  reg                 _zz_64;
-  reg        [4:0]    _zz_65;
-  reg        [4:0]    _zz_66;
-  wire                _zz_67;
-  wire                _zz_68;
+  reg                 _zz_40;
+  reg                 _zz_41;
+  reg        [4:0]    _zz_42;
+  reg        [4:0]    _zz_43;
+  wire                _zz_44;
+  wire                _zz_45;
+  reg                 _zz_46;
+  reg                 _zz_47;
+  reg        [4:0]    _zz_48;
+  reg        [4:0]    _zz_49;
+  wire                _zz_50;
+  wire                _zz_51;
+  reg                 _zz_52;
+  reg                 _zz_53;
+  reg        [4:0]    _zz_54;
+  reg        [4:0]    _zz_55;
+  wire                _zz_56;
+  wire                _zz_57;
+  reg                 _zz_58;
+  reg                 _zz_59;
+  reg        [4:0]    _zz_60;
+  reg        [4:0]    _zz_61;
+  wire                _zz_62;
+  wire                _zz_63;
   wire       [6:0]    _zz_io_dataIn_0;
   wire       [87:0]   _zz_io_dataIn_0_1;
   wire       [6:0]    _zz_io_dataIn_1;
@@ -419,8 +419,8 @@ module TensorCoreChainArray (
   wire                ctrlStateMachine_resValidCounter_willOverflow;
   reg        `ctrlStateMachine_enumDefinition_binary_sequential_type ctrlStateMachine_stateReg;
   reg        `ctrlStateMachine_enumDefinition_binary_sequential_type ctrlStateMachine_stateNext;
-  wire                when_TensorCoreChainArray_l146;
-  wire                when_TensorCoreChainArray_l156;
+  wire                when_TensorCoreChainArray_l150;
+  wire                when_TensorCoreChainArray_l160;
   wire                when_StateMachine_l230;
   wire                when_StateMachine_l230_1;
   wire                when_StateMachine_l230_2;
@@ -432,12 +432,12 @@ module TensorCoreChainArray (
   reg [87:0] colMem_0 [0:127];
   reg [87:0] colMem_1 [0:127];
   reg [87:0] colMem_2 [0:127];
-  reg [87:0] _zz_34 [0:127];
-  reg [87:0] _zz_41 [0:127];
-  reg [87:0] _zz_48 [0:127];
-  reg [87:0] _zz_55 [0:127];
-  reg [87:0] _zz_62 [0:127];
-  reg [87:0] _zz_69 [0:127];
+  reg [87:0] rowMem_0 [0:127];
+  reg [87:0] rowMem_1 [0:127];
+  reg [87:0] rowMem_2 [0:127];
+  reg [87:0] rowMem_3 [0:127];
+  reg [87:0] rowMem_4 [0:127];
+  reg [87:0] rowMem_5 [0:127];
 
   assign _zz_rowBufferRdCounter_valueNext_1 = rowBufferRdCounter_willIncrement;
   assign _zz_rowBufferRdCounter_valueNext = {4'd0, _zz_rowBufferRdCounter_valueNext_1};
@@ -454,22 +454,22 @@ module TensorCoreChainArray (
   assign _zz_colMem_2_port = {2'd0, _zz_25};
   assign _zz__zz_30_1 = _zz_28;
   assign _zz__zz_30 = {4'd0, _zz__zz_30_1};
-  assign _zz__zz_34_port = {2'd0, _zz_31};
-  assign _zz__zz_37_1 = _zz_35;
-  assign _zz__zz_37 = {4'd0, _zz__zz_37_1};
-  assign _zz__zz_41_port = {2'd0, _zz_38};
-  assign _zz__zz_44_1 = _zz_42;
-  assign _zz__zz_44 = {4'd0, _zz__zz_44_1};
-  assign _zz__zz_48_port = {2'd0, _zz_45};
-  assign _zz__zz_51_1 = _zz_49;
-  assign _zz__zz_51 = {4'd0, _zz__zz_51_1};
-  assign _zz__zz_55_port = {2'd0, _zz_52};
-  assign _zz__zz_58_1 = _zz_56;
-  assign _zz__zz_58 = {4'd0, _zz__zz_58_1};
-  assign _zz__zz_62_port = {2'd0, _zz_59};
-  assign _zz__zz_65_1 = _zz_63;
-  assign _zz__zz_65 = {4'd0, _zz__zz_65_1};
-  assign _zz__zz_69_port = {2'd0, _zz_66};
+  assign _zz_rowMem_0_port = {2'd0, _zz_31};
+  assign _zz__zz_36_1 = _zz_34;
+  assign _zz__zz_36 = {4'd0, _zz__zz_36_1};
+  assign _zz_rowMem_1_port = {2'd0, _zz_37};
+  assign _zz__zz_42_1 = _zz_40;
+  assign _zz__zz_42 = {4'd0, _zz__zz_42_1};
+  assign _zz_rowMem_2_port = {2'd0, _zz_43};
+  assign _zz__zz_48_1 = _zz_46;
+  assign _zz__zz_48 = {4'd0, _zz__zz_48_1};
+  assign _zz_rowMem_3_port = {2'd0, _zz_49};
+  assign _zz__zz_54_1 = _zz_52;
+  assign _zz__zz_54 = {4'd0, _zz__zz_54_1};
+  assign _zz_rowMem_4_port = {2'd0, _zz_55};
+  assign _zz__zz_60_1 = _zz_58;
+  assign _zz__zz_60 = {4'd0, _zz__zz_60_1};
+  assign _zz_rowMem_5_port = {2'd0, _zz_61};
   assign _zz_ctrlStateMachine_loadIterCounter_valueNext_1 = ctrlStateMachine_loadIterCounter_willIncrement;
   assign _zz_ctrlStateMachine_loadIterCounter_valueNext = {7'd0, _zz_ctrlStateMachine_loadIterCounter_valueNext_1};
   assign _zz_ctrlStateMachine_computeIterCounter_valueNext_1 = ctrlStateMachine_computeIterCounter_willIncrement;
@@ -485,27 +485,27 @@ module TensorCoreChainArray (
   assign _zz_colMem_2_port_1 = colConverters_2_io_dataOut_payload;
   assign _zz__zz_io_loadCascadeIn_5 = 1'b1;
   assign _zz__zz_io_loadCascadeIn_11 = 1'b1;
-  assign _zz__zz_34_port_1 = fixedBfpConverter_9_io_dataOut_payload;
+  assign _zz_rowMem_0_port_1 = fixedBfpConverter_9_io_dataOut_payload;
   assign _zz__zz_io_dataIn_0_1 = 1'b1;
   assign _zz__zz_io_dataIn_0_3 = 1'b1;
   assign _zz__zz_io_dataIn_0_5 = 1'b1;
-  assign _zz__zz_41_port_1 = fixedBfpConverter_10_io_dataOut_payload;
+  assign _zz_rowMem_1_port_1 = fixedBfpConverter_10_io_dataOut_payload;
   assign _zz__zz_io_dataIn_1_1 = 1'b1;
   assign _zz__zz_io_dataIn_1_3 = 1'b1;
   assign _zz__zz_io_dataIn_1_5 = 1'b1;
-  assign _zz__zz_48_port_1 = fixedBfpConverter_11_io_dataOut_payload;
+  assign _zz_rowMem_2_port_1 = fixedBfpConverter_11_io_dataOut_payload;
   assign _zz__zz_io_dataIn_2_1 = 1'b1;
   assign _zz__zz_io_dataIn_2_3 = 1'b1;
   assign _zz__zz_io_dataIn_2_5 = 1'b1;
-  assign _zz__zz_55_port_1 = fixedBfpConverter_12_io_dataOut_payload;
+  assign _zz_rowMem_3_port_1 = fixedBfpConverter_12_io_dataOut_payload;
   assign _zz__zz_io_dataIn_0_7 = 1'b1;
   assign _zz__zz_io_dataIn_0_9 = 1'b1;
   assign _zz__zz_io_dataIn_0_11 = 1'b1;
-  assign _zz__zz_62_port_1 = fixedBfpConverter_13_io_dataOut_payload;
+  assign _zz_rowMem_4_port_1 = fixedBfpConverter_13_io_dataOut_payload;
   assign _zz__zz_io_dataIn_1_7 = 1'b1;
   assign _zz__zz_io_dataIn_1_9 = 1'b1;
   assign _zz__zz_io_dataIn_1_11 = 1'b1;
-  assign _zz__zz_69_port_1 = fixedBfpConverter_14_io_dataOut_payload;
+  assign _zz_rowMem_5_port_1 = fixedBfpConverter_14_io_dataOut_payload;
   assign _zz__zz_io_dataIn_2_7 = 1'b1;
   assign _zz__zz_io_dataIn_2_9 = 1'b1;
   assign _zz__zz_io_dataIn_2_11 = 1'b1;
@@ -573,164 +573,164 @@ module TensorCoreChainArray (
   end
 
   initial begin
-    $readmemb("TensorCoreChainArray.v_toplevel__zz_34.bin",_zz_34);
+    $readmemb("TensorCoreChainArray.v_toplevel_rowMem_0.bin",rowMem_0);
   end
   always @(posedge clk) begin
     if(_zz_6) begin
-      _zz_34[_zz__zz_34_port] <= _zz__zz_34_port_1;
+      rowMem_0[_zz_rowMem_0_port] <= _zz_rowMem_0_port_1;
     end
   end
 
   always @(posedge clk) begin
     if(_zz__zz_io_dataIn_0_1) begin
-      _zz__zz_34_port1 <= _zz_34[_zz_io_dataIn_0];
+      _zz_rowMem_0_port1 <= rowMem_0[_zz_io_dataIn_0];
     end
   end
 
   always @(posedge clk) begin
     if(_zz__zz_io_dataIn_0_3) begin
-      _zz__zz_34_port2 <= _zz_34[_zz_io_dataIn_0_2];
+      _zz_rowMem_0_port2 <= rowMem_0[_zz_io_dataIn_0_2];
     end
   end
 
   always @(posedge clk) begin
     if(_zz__zz_io_dataIn_0_5) begin
-      _zz__zz_34_port3 <= _zz_34[_zz_io_dataIn_0_4];
+      _zz_rowMem_0_port3 <= rowMem_0[_zz_io_dataIn_0_4];
     end
   end
 
   initial begin
-    $readmemb("TensorCoreChainArray.v_toplevel__zz_41.bin",_zz_41);
+    $readmemb("TensorCoreChainArray.v_toplevel_rowMem_1.bin",rowMem_1);
   end
   always @(posedge clk) begin
     if(_zz_5) begin
-      _zz_41[_zz__zz_41_port] <= _zz__zz_41_port_1;
+      rowMem_1[_zz_rowMem_1_port] <= _zz_rowMem_1_port_1;
     end
   end
 
   always @(posedge clk) begin
     if(_zz__zz_io_dataIn_1_1) begin
-      _zz__zz_41_port1 <= _zz_41[_zz_io_dataIn_1];
+      _zz_rowMem_1_port1 <= rowMem_1[_zz_io_dataIn_1];
     end
   end
 
   always @(posedge clk) begin
     if(_zz__zz_io_dataIn_1_3) begin
-      _zz__zz_41_port2 <= _zz_41[_zz_io_dataIn_1_2];
+      _zz_rowMem_1_port2 <= rowMem_1[_zz_io_dataIn_1_2];
     end
   end
 
   always @(posedge clk) begin
     if(_zz__zz_io_dataIn_1_5) begin
-      _zz__zz_41_port3 <= _zz_41[_zz_io_dataIn_1_4];
+      _zz_rowMem_1_port3 <= rowMem_1[_zz_io_dataIn_1_4];
     end
   end
 
   initial begin
-    $readmemb("TensorCoreChainArray.v_toplevel__zz_48.bin",_zz_48);
+    $readmemb("TensorCoreChainArray.v_toplevel_rowMem_2.bin",rowMem_2);
   end
   always @(posedge clk) begin
     if(_zz_4) begin
-      _zz_48[_zz__zz_48_port] <= _zz__zz_48_port_1;
+      rowMem_2[_zz_rowMem_2_port] <= _zz_rowMem_2_port_1;
     end
   end
 
   always @(posedge clk) begin
     if(_zz__zz_io_dataIn_2_1) begin
-      _zz__zz_48_port1 <= _zz_48[_zz_io_dataIn_2];
+      _zz_rowMem_2_port1 <= rowMem_2[_zz_io_dataIn_2];
     end
   end
 
   always @(posedge clk) begin
     if(_zz__zz_io_dataIn_2_3) begin
-      _zz__zz_48_port2 <= _zz_48[_zz_io_dataIn_2_2];
+      _zz_rowMem_2_port2 <= rowMem_2[_zz_io_dataIn_2_2];
     end
   end
 
   always @(posedge clk) begin
     if(_zz__zz_io_dataIn_2_5) begin
-      _zz__zz_48_port3 <= _zz_48[_zz_io_dataIn_2_4];
+      _zz_rowMem_2_port3 <= rowMem_2[_zz_io_dataIn_2_4];
     end
   end
 
   initial begin
-    $readmemb("TensorCoreChainArray.v_toplevel__zz_55.bin",_zz_55);
+    $readmemb("TensorCoreChainArray.v_toplevel_rowMem_3.bin",rowMem_3);
   end
   always @(posedge clk) begin
     if(_zz_3) begin
-      _zz_55[_zz__zz_55_port] <= _zz__zz_55_port_1;
+      rowMem_3[_zz_rowMem_3_port] <= _zz_rowMem_3_port_1;
     end
   end
 
   always @(posedge clk) begin
     if(_zz__zz_io_dataIn_0_7) begin
-      _zz__zz_55_port1 <= _zz_55[_zz_io_dataIn_0_6];
+      _zz_rowMem_3_port1 <= rowMem_3[_zz_io_dataIn_0_6];
     end
   end
 
   always @(posedge clk) begin
     if(_zz__zz_io_dataIn_0_9) begin
-      _zz__zz_55_port2 <= _zz_55[_zz_io_dataIn_0_8];
+      _zz_rowMem_3_port2 <= rowMem_3[_zz_io_dataIn_0_8];
     end
   end
 
   always @(posedge clk) begin
     if(_zz__zz_io_dataIn_0_11) begin
-      _zz__zz_55_port3 <= _zz_55[_zz_io_dataIn_0_10];
+      _zz_rowMem_3_port3 <= rowMem_3[_zz_io_dataIn_0_10];
     end
   end
 
   initial begin
-    $readmemb("TensorCoreChainArray.v_toplevel__zz_62.bin",_zz_62);
+    $readmemb("TensorCoreChainArray.v_toplevel_rowMem_4.bin",rowMem_4);
   end
   always @(posedge clk) begin
     if(_zz_2) begin
-      _zz_62[_zz__zz_62_port] <= _zz__zz_62_port_1;
+      rowMem_4[_zz_rowMem_4_port] <= _zz_rowMem_4_port_1;
     end
   end
 
   always @(posedge clk) begin
     if(_zz__zz_io_dataIn_1_7) begin
-      _zz__zz_62_port1 <= _zz_62[_zz_io_dataIn_1_6];
+      _zz_rowMem_4_port1 <= rowMem_4[_zz_io_dataIn_1_6];
     end
   end
 
   always @(posedge clk) begin
     if(_zz__zz_io_dataIn_1_9) begin
-      _zz__zz_62_port2 <= _zz_62[_zz_io_dataIn_1_8];
+      _zz_rowMem_4_port2 <= rowMem_4[_zz_io_dataIn_1_8];
     end
   end
 
   always @(posedge clk) begin
     if(_zz__zz_io_dataIn_1_11) begin
-      _zz__zz_62_port3 <= _zz_62[_zz_io_dataIn_1_10];
+      _zz_rowMem_4_port3 <= rowMem_4[_zz_io_dataIn_1_10];
     end
   end
 
   initial begin
-    $readmemb("TensorCoreChainArray.v_toplevel__zz_69.bin",_zz_69);
+    $readmemb("TensorCoreChainArray.v_toplevel_rowMem_5.bin",rowMem_5);
   end
   always @(posedge clk) begin
     if(_zz_1) begin
-      _zz_69[_zz__zz_69_port] <= _zz__zz_69_port_1;
+      rowMem_5[_zz_rowMem_5_port] <= _zz_rowMem_5_port_1;
     end
   end
 
   always @(posedge clk) begin
     if(_zz__zz_io_dataIn_2_7) begin
-      _zz__zz_69_port1 <= _zz_69[_zz_io_dataIn_2_6];
+      _zz_rowMem_5_port1 <= rowMem_5[_zz_io_dataIn_2_6];
     end
   end
 
   always @(posedge clk) begin
     if(_zz__zz_io_dataIn_2_9) begin
-      _zz__zz_69_port2 <= _zz_69[_zz_io_dataIn_2_8];
+      _zz_rowMem_5_port2 <= rowMem_5[_zz_io_dataIn_2_8];
     end
   end
 
   always @(posedge clk) begin
     if(_zz__zz_io_dataIn_2_11) begin
-      _zz__zz_69_port3 <= _zz_69[_zz_io_dataIn_2_10];
+      _zz_rowMem_5_port3 <= rowMem_5[_zz_io_dataIn_2_10];
     end
   end
 
@@ -1026,7 +1026,7 @@ module TensorCoreChainArray (
       `ctrlStateMachine_enumDefinition_binary_sequential_ctrlStateMachine_sPreLoad : begin
       end
       `ctrlStateMachine_enumDefinition_binary_sequential_ctrlStateMachine_sCompute : begin
-        if(when_TensorCoreChainArray_l146) begin
+        if(when_TensorCoreChainArray_l150) begin
           rowBufferRdCounter_willIncrement = 1'b1;
         end
       end
@@ -1048,7 +1048,7 @@ module TensorCoreChainArray (
       `ctrlStateMachine_enumDefinition_binary_sequential_ctrlStateMachine_sPreLoad : begin
       end
       `ctrlStateMachine_enumDefinition_binary_sequential_ctrlStateMachine_sCompute : begin
-        if(!when_TensorCoreChainArray_l146) begin
+        if(!when_TensorCoreChainArray_l150) begin
           rowBufferRdCounter_willClear = 1'b1;
         end
       end
@@ -1084,7 +1084,7 @@ module TensorCoreChainArray (
         colBufferRdCounter_willIncrement = 1'b1;
       end
       `ctrlStateMachine_enumDefinition_binary_sequential_ctrlStateMachine_sCompute : begin
-        if(when_TensorCoreChainArray_l156) begin
+        if(when_TensorCoreChainArray_l160) begin
           colBufferRdCounter_willIncrement = 1'b1;
         end
       end
@@ -1106,7 +1106,7 @@ module TensorCoreChainArray (
       `ctrlStateMachine_enumDefinition_binary_sequential_ctrlStateMachine_sPreLoad : begin
       end
       `ctrlStateMachine_enumDefinition_binary_sequential_ctrlStateMachine_sCompute : begin
-        if(!when_TensorCoreChainArray_l156) begin
+        if(!when_TensorCoreChainArray_l160) begin
           colBufferRdCounter_willClear = 1'b1;
         end
       end
@@ -1242,146 +1242,146 @@ module TensorCoreChainArray (
   end
 
   always @(*) begin
-    _zz_35 = 1'b0;
+    _zz_34 = 1'b0;
     if(fixedBfpConverter_10_io_dataOut_valid) begin
+      _zz_34 = 1'b1;
+    end
+  end
+
+  always @(*) begin
+    _zz_35 = 1'b0;
+    if(!fixedBfpConverter_10_io_dataOut_valid) begin
       _zz_35 = 1'b1;
     end
   end
 
+  assign _zz_38 = (_zz_37 == 5'h1a);
+  assign _zz_39 = (_zz_38 && _zz_34);
   always @(*) begin
-    _zz_36 = 1'b0;
-    if(!fixedBfpConverter_10_io_dataOut_valid) begin
-      _zz_36 = 1'b1;
-    end
-  end
-
-  assign _zz_39 = (_zz_38 == 5'h1a);
-  assign _zz_40 = (_zz_39 && _zz_35);
-  always @(*) begin
-    if(_zz_40) begin
-      _zz_37 = 5'h0;
+    if(_zz_39) begin
+      _zz_36 = 5'h0;
     end else begin
-      _zz_37 = (_zz_38 + _zz__zz_37);
+      _zz_36 = (_zz_37 + _zz__zz_36);
     end
-    if(_zz_36) begin
-      _zz_37 = 5'h0;
+    if(_zz_35) begin
+      _zz_36 = 5'h0;
     end
   end
 
   always @(*) begin
-    _zz_42 = 1'b0;
+    _zz_40 = 1'b0;
     if(fixedBfpConverter_11_io_dataOut_valid) begin
-      _zz_42 = 1'b1;
+      _zz_40 = 1'b1;
     end
   end
 
   always @(*) begin
-    _zz_43 = 1'b0;
+    _zz_41 = 1'b0;
     if(!fixedBfpConverter_11_io_dataOut_valid) begin
-      _zz_43 = 1'b1;
+      _zz_41 = 1'b1;
     end
   end
 
-  assign _zz_46 = (_zz_45 == 5'h1a);
-  assign _zz_47 = (_zz_46 && _zz_42);
+  assign _zz_44 = (_zz_43 == 5'h1a);
+  assign _zz_45 = (_zz_44 && _zz_40);
   always @(*) begin
-    if(_zz_47) begin
-      _zz_44 = 5'h0;
+    if(_zz_45) begin
+      _zz_42 = 5'h0;
     end else begin
-      _zz_44 = (_zz_45 + _zz__zz_44);
+      _zz_42 = (_zz_43 + _zz__zz_42);
     end
-    if(_zz_43) begin
-      _zz_44 = 5'h0;
+    if(_zz_41) begin
+      _zz_42 = 5'h0;
     end
   end
 
   always @(*) begin
-    _zz_49 = 1'b0;
+    _zz_46 = 1'b0;
     if(fixedBfpConverter_12_io_dataOut_valid) begin
-      _zz_49 = 1'b1;
+      _zz_46 = 1'b1;
     end
   end
 
   always @(*) begin
-    _zz_50 = 1'b0;
+    _zz_47 = 1'b0;
     if(!fixedBfpConverter_12_io_dataOut_valid) begin
-      _zz_50 = 1'b1;
+      _zz_47 = 1'b1;
     end
   end
 
-  assign _zz_53 = (_zz_52 == 5'h1a);
-  assign _zz_54 = (_zz_53 && _zz_49);
+  assign _zz_50 = (_zz_49 == 5'h1a);
+  assign _zz_51 = (_zz_50 && _zz_46);
   always @(*) begin
-    if(_zz_54) begin
-      _zz_51 = 5'h0;
+    if(_zz_51) begin
+      _zz_48 = 5'h0;
     end else begin
-      _zz_51 = (_zz_52 + _zz__zz_51);
+      _zz_48 = (_zz_49 + _zz__zz_48);
     end
-    if(_zz_50) begin
-      _zz_51 = 5'h0;
+    if(_zz_47) begin
+      _zz_48 = 5'h0;
     end
   end
 
   always @(*) begin
-    _zz_56 = 1'b0;
+    _zz_52 = 1'b0;
     if(fixedBfpConverter_13_io_dataOut_valid) begin
-      _zz_56 = 1'b1;
+      _zz_52 = 1'b1;
     end
   end
 
   always @(*) begin
-    _zz_57 = 1'b0;
+    _zz_53 = 1'b0;
     if(!fixedBfpConverter_13_io_dataOut_valid) begin
-      _zz_57 = 1'b1;
+      _zz_53 = 1'b1;
     end
   end
 
-  assign _zz_60 = (_zz_59 == 5'h1a);
-  assign _zz_61 = (_zz_60 && _zz_56);
+  assign _zz_56 = (_zz_55 == 5'h1a);
+  assign _zz_57 = (_zz_56 && _zz_52);
   always @(*) begin
-    if(_zz_61) begin
-      _zz_58 = 5'h0;
-    end else begin
-      _zz_58 = (_zz_59 + _zz__zz_58);
-    end
     if(_zz_57) begin
-      _zz_58 = 5'h0;
-    end
-  end
-
-  always @(*) begin
-    _zz_63 = 1'b0;
-    if(fixedBfpConverter_14_io_dataOut_valid) begin
-      _zz_63 = 1'b1;
-    end
-  end
-
-  always @(*) begin
-    _zz_64 = 1'b0;
-    if(!fixedBfpConverter_14_io_dataOut_valid) begin
-      _zz_64 = 1'b1;
-    end
-  end
-
-  assign _zz_67 = (_zz_66 == 5'h1a);
-  assign _zz_68 = (_zz_67 && _zz_63);
-  always @(*) begin
-    if(_zz_68) begin
-      _zz_65 = 5'h0;
+      _zz_54 = 5'h0;
     end else begin
-      _zz_65 = (_zz_66 + _zz__zz_65);
+      _zz_54 = (_zz_55 + _zz__zz_54);
     end
-    if(_zz_64) begin
-      _zz_65 = 5'h0;
+    if(_zz_53) begin
+      _zz_54 = 5'h0;
+    end
+  end
+
+  always @(*) begin
+    _zz_58 = 1'b0;
+    if(fixedBfpConverter_14_io_dataOut_valid) begin
+      _zz_58 = 1'b1;
+    end
+  end
+
+  always @(*) begin
+    _zz_59 = 1'b0;
+    if(!fixedBfpConverter_14_io_dataOut_valid) begin
+      _zz_59 = 1'b1;
+    end
+  end
+
+  assign _zz_62 = (_zz_61 == 5'h1a);
+  assign _zz_63 = (_zz_62 && _zz_58);
+  always @(*) begin
+    if(_zz_63) begin
+      _zz_60 = 5'h0;
+    end else begin
+      _zz_60 = (_zz_61 + _zz__zz_60);
+    end
+    if(_zz_59) begin
+      _zz_60 = 5'h0;
     end
   end
 
   assign _zz_io_dataIn_0 = {2'd0, rowBufferRdCounter_value};
-  assign _zz_io_dataIn_0_1 = _zz__zz_34_port1;
+  assign _zz_io_dataIn_0_1 = _zz_rowMem_0_port1;
   assign _zz_io_dataIn_1 = {2'd0, rowBufferRdCounter_value};
-  assign _zz_io_dataIn_1_1 = _zz__zz_41_port1;
+  assign _zz_io_dataIn_1_1 = _zz_rowMem_1_port1;
   assign _zz_io_dataIn_2 = {2'd0, rowBufferRdCounter_value};
-  assign _zz_io_dataIn_2_1 = _zz__zz_48_port1;
+  assign _zz_io_dataIn_2_1 = _zz_rowMem_2_port1;
   assign _zz_io_loadCascadeIn = {2'd0, colBufferRdCounter_value};
   assign _zz_io_loadCascadeIn_1 = _zz_colMem_0_port1;
   assign tensorCoreChain_6_io_dataIn_0 = (tensorDataValid ? _zz_io_dataIn_0_1[87 : 8] : 80'h0);
@@ -1394,11 +1394,11 @@ module TensorCoreChainArray (
   assign tensorCoreChain_6_io_expCascadeIn = (tensorLoadValid ? _zz_io_loadCascadeIn_1[7 : 0] : 8'h0);
   assign io_res_payload_0_0 = {tensorCoreChain_6_io_res_2,{tensorCoreChain_6_io_res_1,tensorCoreChain_6_io_res_0}};
   assign _zz_io_dataIn_0_2 = {2'd0, rowBufferRdCounter_value};
-  assign _zz_io_dataIn_0_3 = _zz__zz_34_port2;
+  assign _zz_io_dataIn_0_3 = _zz_rowMem_0_port2;
   assign _zz_io_dataIn_1_2 = {2'd0, rowBufferRdCounter_value};
-  assign _zz_io_dataIn_1_3 = _zz__zz_41_port2;
+  assign _zz_io_dataIn_1_3 = _zz_rowMem_1_port2;
   assign _zz_io_dataIn_2_2 = {2'd0, rowBufferRdCounter_value};
-  assign _zz_io_dataIn_2_3 = _zz__zz_48_port2;
+  assign _zz_io_dataIn_2_3 = _zz_rowMem_2_port2;
   assign _zz_io_loadCascadeIn_2 = {2'd0, colBufferRdCounter_value};
   assign _zz_io_loadCascadeIn_3 = _zz_colMem_1_port1;
   assign tensorCoreChain_7_io_dataIn_0 = (tensorDataValid ? _zz_io_dataIn_0_3[87 : 8] : 80'h0);
@@ -1411,11 +1411,11 @@ module TensorCoreChainArray (
   assign tensorCoreChain_7_io_expCascadeIn = (tensorLoadValid ? _zz_io_loadCascadeIn_3[7 : 0] : 8'h0);
   assign io_res_payload_0_1 = {tensorCoreChain_7_io_res_2,{tensorCoreChain_7_io_res_1,tensorCoreChain_7_io_res_0}};
   assign _zz_io_dataIn_0_4 = {2'd0, rowBufferRdCounter_value};
-  assign _zz_io_dataIn_0_5 = _zz__zz_34_port3;
+  assign _zz_io_dataIn_0_5 = _zz_rowMem_0_port3;
   assign _zz_io_dataIn_1_4 = {2'd0, rowBufferRdCounter_value};
-  assign _zz_io_dataIn_1_5 = _zz__zz_41_port3;
+  assign _zz_io_dataIn_1_5 = _zz_rowMem_1_port3;
   assign _zz_io_dataIn_2_4 = {2'd0, rowBufferRdCounter_value};
-  assign _zz_io_dataIn_2_5 = _zz__zz_48_port3;
+  assign _zz_io_dataIn_2_5 = _zz_rowMem_2_port3;
   assign _zz_io_loadCascadeIn_4 = {2'd0, colBufferRdCounter_value};
   assign _zz_io_loadCascadeIn_5 = _zz_colMem_2_port1;
   assign tensorCoreChain_8_io_dataIn_0 = (tensorDataValid ? _zz_io_dataIn_0_5[87 : 8] : 80'h0);
@@ -1428,11 +1428,11 @@ module TensorCoreChainArray (
   assign tensorCoreChain_8_io_expCascadeIn = (tensorLoadValid ? _zz_io_loadCascadeIn_5[7 : 0] : 8'h0);
   assign io_res_payload_0_2 = {tensorCoreChain_8_io_res_2,{tensorCoreChain_8_io_res_1,tensorCoreChain_8_io_res_0}};
   assign _zz_io_dataIn_0_6 = {2'd0, rowBufferRdCounter_value};
-  assign _zz_io_dataIn_0_7 = _zz__zz_55_port1;
+  assign _zz_io_dataIn_0_7 = _zz_rowMem_3_port1;
   assign _zz_io_dataIn_1_6 = {2'd0, rowBufferRdCounter_value};
-  assign _zz_io_dataIn_1_7 = _zz__zz_62_port1;
+  assign _zz_io_dataIn_1_7 = _zz_rowMem_4_port1;
   assign _zz_io_dataIn_2_6 = {2'd0, rowBufferRdCounter_value};
-  assign _zz_io_dataIn_2_7 = _zz__zz_69_port1;
+  assign _zz_io_dataIn_2_7 = _zz_rowMem_5_port1;
   assign _zz_io_loadCascadeIn_6 = {2'd0, colBufferRdCounter_value};
   assign _zz_io_loadCascadeIn_7 = _zz_colMem_0_port2;
   assign tensorCoreChain_9_io_dataIn_0 = (tensorDataValid ? _zz_io_dataIn_0_7[87 : 8] : 80'h0);
@@ -1445,11 +1445,11 @@ module TensorCoreChainArray (
   assign tensorCoreChain_9_io_expCascadeIn = (tensorLoadValid ? _zz_io_loadCascadeIn_7[7 : 0] : 8'h0);
   assign io_res_payload_1_0 = {tensorCoreChain_9_io_res_2,{tensorCoreChain_9_io_res_1,tensorCoreChain_9_io_res_0}};
   assign _zz_io_dataIn_0_8 = {2'd0, rowBufferRdCounter_value};
-  assign _zz_io_dataIn_0_9 = _zz__zz_55_port2;
+  assign _zz_io_dataIn_0_9 = _zz_rowMem_3_port2;
   assign _zz_io_dataIn_1_8 = {2'd0, rowBufferRdCounter_value};
-  assign _zz_io_dataIn_1_9 = _zz__zz_62_port2;
+  assign _zz_io_dataIn_1_9 = _zz_rowMem_4_port2;
   assign _zz_io_dataIn_2_8 = {2'd0, rowBufferRdCounter_value};
-  assign _zz_io_dataIn_2_9 = _zz__zz_69_port2;
+  assign _zz_io_dataIn_2_9 = _zz_rowMem_5_port2;
   assign _zz_io_loadCascadeIn_8 = {2'd0, colBufferRdCounter_value};
   assign _zz_io_loadCascadeIn_9 = _zz_colMem_1_port2;
   assign tensorCoreChain_10_io_dataIn_0 = (tensorDataValid ? _zz_io_dataIn_0_9[87 : 8] : 80'h0);
@@ -1462,11 +1462,11 @@ module TensorCoreChainArray (
   assign tensorCoreChain_10_io_expCascadeIn = (tensorLoadValid ? _zz_io_loadCascadeIn_9[7 : 0] : 8'h0);
   assign io_res_payload_1_1 = {tensorCoreChain_10_io_res_2,{tensorCoreChain_10_io_res_1,tensorCoreChain_10_io_res_0}};
   assign _zz_io_dataIn_0_10 = {2'd0, rowBufferRdCounter_value};
-  assign _zz_io_dataIn_0_11 = _zz__zz_55_port3;
+  assign _zz_io_dataIn_0_11 = _zz_rowMem_3_port3;
   assign _zz_io_dataIn_1_10 = {2'd0, rowBufferRdCounter_value};
-  assign _zz_io_dataIn_1_11 = _zz__zz_62_port3;
+  assign _zz_io_dataIn_1_11 = _zz_rowMem_4_port3;
   assign _zz_io_dataIn_2_10 = {2'd0, rowBufferRdCounter_value};
-  assign _zz_io_dataIn_2_11 = _zz__zz_69_port3;
+  assign _zz_io_dataIn_2_11 = _zz_rowMem_5_port3;
   assign _zz_io_loadCascadeIn_10 = {2'd0, colBufferRdCounter_value};
   assign _zz_io_loadCascadeIn_11 = _zz_colMem_2_port2;
   assign tensorCoreChain_11_io_dataIn_0 = (tensorDataValid ? _zz_io_dataIn_0_11[87 : 8] : 80'h0);
@@ -1677,8 +1677,8 @@ module TensorCoreChainArray (
     end
   end
 
-  assign when_TensorCoreChainArray_l146 = (ctrlStateMachine_dataInFinish == 1'b0);
-  assign when_TensorCoreChainArray_l156 = (ctrlStateMachine_loadFinish == 1'b0);
+  assign when_TensorCoreChainArray_l150 = (ctrlStateMachine_dataInFinish == 1'b0);
+  assign when_TensorCoreChainArray_l160 = (ctrlStateMachine_loadFinish == 1'b0);
   assign when_StateMachine_l230 = ((! (ctrlStateMachine_stateReg == `ctrlStateMachine_enumDefinition_binary_sequential_ctrlStateMachine_sIdle)) && (ctrlStateMachine_stateNext == `ctrlStateMachine_enumDefinition_binary_sequential_ctrlStateMachine_sIdle));
   assign when_StateMachine_l230_1 = ((! (ctrlStateMachine_stateReg == `ctrlStateMachine_enumDefinition_binary_sequential_ctrlStateMachine_sPreLoad)) && (ctrlStateMachine_stateNext == `ctrlStateMachine_enumDefinition_binary_sequential_ctrlStateMachine_sPreLoad));
   assign when_StateMachine_l230_2 = ((! (ctrlStateMachine_stateReg == `ctrlStateMachine_enumDefinition_binary_sequential_ctrlStateMachine_sCompute)) && (ctrlStateMachine_stateNext == `ctrlStateMachine_enumDefinition_binary_sequential_ctrlStateMachine_sCompute));
@@ -1693,11 +1693,11 @@ module TensorCoreChainArray (
       _zz_19 <= 5'h0;
       _zz_25 <= 5'h0;
       _zz_31 <= 5'h0;
-      _zz_38 <= 5'h0;
-      _zz_45 <= 5'h0;
-      _zz_52 <= 5'h0;
-      _zz_59 <= 5'h0;
-      _zz_66 <= 5'h0;
+      _zz_37 <= 5'h0;
+      _zz_43 <= 5'h0;
+      _zz_49 <= 5'h0;
+      _zz_55 <= 5'h0;
+      _zz_61 <= 5'h0;
       ctrlStateMachine_loadFinish <= 1'b0;
       ctrlStateMachine_dataInFinish <= 1'b0;
       ctrlStateMachine_loadIterCounter_value <= 8'h0;
@@ -1711,11 +1711,11 @@ module TensorCoreChainArray (
       _zz_19 <= _zz_18;
       _zz_25 <= _zz_24;
       _zz_31 <= _zz_30;
-      _zz_38 <= _zz_37;
-      _zz_45 <= _zz_44;
-      _zz_52 <= _zz_51;
-      _zz_59 <= _zz_58;
-      _zz_66 <= _zz_65;
+      _zz_37 <= _zz_36;
+      _zz_43 <= _zz_42;
+      _zz_49 <= _zz_48;
+      _zz_55 <= _zz_54;
+      _zz_61 <= _zz_60;
       ctrlStateMachine_loadIterCounter_value <= ctrlStateMachine_loadIterCounter_valueNext;
       ctrlStateMachine_computeIterCounter_value <= ctrlStateMachine_computeIterCounter_valueNext;
       ctrlStateMachine_resValidCounter_value <= ctrlStateMachine_resValidCounter_valueNext;
@@ -1729,13 +1729,13 @@ module TensorCoreChainArray (
         `ctrlStateMachine_enumDefinition_binary_sequential_ctrlStateMachine_sPreLoad : begin
         end
         `ctrlStateMachine_enumDefinition_binary_sequential_ctrlStateMachine_sCompute : begin
-          if(!when_TensorCoreChainArray_l146) begin
+          if(!when_TensorCoreChainArray_l150) begin
             tensorDataValid <= 1'b0;
           end
           if(rowBufferRdCounter_willOverflow) begin
             ctrlStateMachine_dataInFinish <= 1'b1;
           end
-          if(!when_TensorCoreChainArray_l156) begin
+          if(!when_TensorCoreChainArray_l160) begin
             tensorLoadValid <= 1'b0;
           end
           if(colBufferRdCounter_willOverflow) begin
