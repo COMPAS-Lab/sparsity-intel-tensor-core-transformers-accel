@@ -1,6 +1,6 @@
 // Generator : SpinalHDL v1.6.0    git head : 73c8d8e2b86b45646e9d0b2e729291f2b65e6be3
 // Component : TensorCoreChainArray
-// Git hash  : f58805f7015de47cfabdf418c2cbda1552083143
+// Git hash  : 4572f4a68637574e8b698fdd19c97bd78aaf73d4
 
 
 `define ctrlStateMachine_enumDefinition_binary_sequential_type [2:0]
@@ -32,13 +32,9 @@ module TensorCoreChainArray (
   input      [319:0]  io_matBLoad_1_2_payload,
   input               io_calEn,
   input      [7:0]    io_computeIters,
-  output reg          io_res_valid,
-  output     [71:0]   io_res_payload_0_0,
-  output     [71:0]   io_res_payload_0_1,
-  output     [71:0]   io_res_payload_0_2,
-  output     [71:0]   io_res_payload_1_0,
-  output     [71:0]   io_res_payload_1_1,
-  output     [71:0]   io_res_payload_1_2,
+  output              io_res_valid,
+  input               io_res_ready,
+  output     [431:0]  io_res_payload,
   input               clk,
   input               resetn
 );
@@ -168,6 +164,11 @@ module TensorCoreChainArray (
   wire       [87:0]   fixedBfpConverter_13_io_dataOut_payload;
   wire                fixedBfpConverter_14_io_dataOut_valid;
   wire       [87:0]   fixedBfpConverter_14_io_dataOut_payload;
+  wire                outputBuffer_io_push_ready;
+  wire                outputBuffer_io_pop_valid;
+  wire       [431:0]  outputBuffer_io_pop_payload;
+  wire       [7:0]    outputBuffer_io_occupancy;
+  wire       [7:0]    outputBuffer_io_availability;
   wire       [4:0]    _zz_rowBufferRdCounter_valueNext;
   wire       [0:0]    _zz_rowBufferRdCounter_valueNext_1;
   wire       [4:0]    _zz_colBufferRdCounter_valueNext;
@@ -286,6 +287,17 @@ module TensorCoreChainArray (
   reg                 tensorLoadValid;
   reg                 tensorDataValid;
   reg        [7:0]    computeItersReg;
+  reg                 io_calEn_delay_1;
+  reg                 calEnDelay;
+  reg        [7:0]    io_computeIters_delay_1;
+  reg        [7:0]    computeItersDelay;
+  reg                 tcArrayRes_valid;
+  wire       [71:0]   tcArrayRes_payload_0;
+  wire       [71:0]   tcArrayRes_payload_1;
+  wire       [71:0]   tcArrayRes_payload_2;
+  wire       [71:0]   tcArrayRes_payload_3;
+  wire       [71:0]   tcArrayRes_payload_4;
+  wire       [71:0]   tcArrayRes_payload_5;
   reg                 _zz_10;
   reg                 _zz_11;
   reg        [4:0]    _zz_12;
@@ -417,10 +429,13 @@ module TensorCoreChainArray (
   reg        [7:0]    ctrlStateMachine_resValidCounter_value;
   wire                ctrlStateMachine_resValidCounter_willOverflowIfInc;
   wire                ctrlStateMachine_resValidCounter_willOverflow;
+  wire                bufferIf_valid;
+  wire                bufferIf_ready;
+  wire       [431:0]  bufferIf_payload;
   reg        `ctrlStateMachine_enumDefinition_binary_sequential_type ctrlStateMachine_stateReg;
   reg        `ctrlStateMachine_enumDefinition_binary_sequential_type ctrlStateMachine_stateNext;
-  wire                when_TensorCoreChainArray_l150;
-  wire                when_TensorCoreChainArray_l160;
+  wire                when_TensorCoreChainArray_l155;
+  wire                when_TensorCoreChainArray_l165;
   wire                when_StateMachine_l230;
   wire                when_StateMachine_l230_1;
   wire                when_StateMachine_l230_2;
@@ -932,6 +947,19 @@ module TensorCoreChainArray (
     .clk                   (clk                                      ), //i
     .resetn                (resetn                                   )  //i
   );
+  StreamFifo outputBuffer (
+    .io_push_valid      (bufferIf_valid                ), //i
+    .io_push_ready      (outputBuffer_io_push_ready    ), //o
+    .io_push_payload    (bufferIf_payload              ), //i
+    .io_pop_valid       (outputBuffer_io_pop_valid     ), //o
+    .io_pop_ready       (io_res_ready                  ), //i
+    .io_pop_payload     (outputBuffer_io_pop_payload   ), //o
+    .io_flush           (1'b0                          ), //i
+    .io_occupancy       (outputBuffer_io_occupancy     ), //o
+    .io_availability    (outputBuffer_io_availability  ), //o
+    .clk                (clk                           ), //i
+    .resetn             (resetn                        )  //i
+  );
   `ifndef SYNTHESIS
   always @(*) begin
     case(ctrlStateMachine_stateReg)
@@ -1026,7 +1054,7 @@ module TensorCoreChainArray (
       `ctrlStateMachine_enumDefinition_binary_sequential_ctrlStateMachine_sPreLoad : begin
       end
       `ctrlStateMachine_enumDefinition_binary_sequential_ctrlStateMachine_sCompute : begin
-        if(when_TensorCoreChainArray_l150) begin
+        if(when_TensorCoreChainArray_l155) begin
           rowBufferRdCounter_willIncrement = 1'b1;
         end
       end
@@ -1048,7 +1076,7 @@ module TensorCoreChainArray (
       `ctrlStateMachine_enumDefinition_binary_sequential_ctrlStateMachine_sPreLoad : begin
       end
       `ctrlStateMachine_enumDefinition_binary_sequential_ctrlStateMachine_sCompute : begin
-        if(!when_TensorCoreChainArray_l150) begin
+        if(!when_TensorCoreChainArray_l155) begin
           rowBufferRdCounter_willClear = 1'b1;
         end
       end
@@ -1084,7 +1112,7 @@ module TensorCoreChainArray (
         colBufferRdCounter_willIncrement = 1'b1;
       end
       `ctrlStateMachine_enumDefinition_binary_sequential_ctrlStateMachine_sCompute : begin
-        if(when_TensorCoreChainArray_l160) begin
+        if(when_TensorCoreChainArray_l165) begin
           colBufferRdCounter_willIncrement = 1'b1;
         end
       end
@@ -1106,7 +1134,7 @@ module TensorCoreChainArray (
       `ctrlStateMachine_enumDefinition_binary_sequential_ctrlStateMachine_sPreLoad : begin
       end
       `ctrlStateMachine_enumDefinition_binary_sequential_ctrlStateMachine_sCompute : begin
-        if(!when_TensorCoreChainArray_l160) begin
+        if(!when_TensorCoreChainArray_l165) begin
           colBufferRdCounter_willClear = 1'b1;
         end
       end
@@ -1392,7 +1420,7 @@ module TensorCoreChainArray (
   assign tensorCoreChain_6_io_expIn_2 = (tensorDataValid ? _zz_io_dataIn_2_1[7 : 0] : 8'h0);
   assign tensorCoreChain_6_io_loadCascadeIn = (tensorLoadValid ? _zz_io_loadCascadeIn_1[87 : 8] : 80'h0);
   assign tensorCoreChain_6_io_expCascadeIn = (tensorLoadValid ? _zz_io_loadCascadeIn_1[7 : 0] : 8'h0);
-  assign io_res_payload_0_0 = {tensorCoreChain_6_io_res_2,{tensorCoreChain_6_io_res_1,tensorCoreChain_6_io_res_0}};
+  assign tcArrayRes_payload_0 = {tensorCoreChain_6_io_res_2,{tensorCoreChain_6_io_res_1,tensorCoreChain_6_io_res_0}};
   assign _zz_io_dataIn_0_2 = {2'd0, rowBufferRdCounter_value};
   assign _zz_io_dataIn_0_3 = _zz_rowMem_0_port2;
   assign _zz_io_dataIn_1_2 = {2'd0, rowBufferRdCounter_value};
@@ -1409,7 +1437,7 @@ module TensorCoreChainArray (
   assign tensorCoreChain_7_io_expIn_2 = (tensorDataValid ? _zz_io_dataIn_2_3[7 : 0] : 8'h0);
   assign tensorCoreChain_7_io_loadCascadeIn = (tensorLoadValid ? _zz_io_loadCascadeIn_3[87 : 8] : 80'h0);
   assign tensorCoreChain_7_io_expCascadeIn = (tensorLoadValid ? _zz_io_loadCascadeIn_3[7 : 0] : 8'h0);
-  assign io_res_payload_0_1 = {tensorCoreChain_7_io_res_2,{tensorCoreChain_7_io_res_1,tensorCoreChain_7_io_res_0}};
+  assign tcArrayRes_payload_1 = {tensorCoreChain_7_io_res_2,{tensorCoreChain_7_io_res_1,tensorCoreChain_7_io_res_0}};
   assign _zz_io_dataIn_0_4 = {2'd0, rowBufferRdCounter_value};
   assign _zz_io_dataIn_0_5 = _zz_rowMem_0_port3;
   assign _zz_io_dataIn_1_4 = {2'd0, rowBufferRdCounter_value};
@@ -1426,7 +1454,7 @@ module TensorCoreChainArray (
   assign tensorCoreChain_8_io_expIn_2 = (tensorDataValid ? _zz_io_dataIn_2_5[7 : 0] : 8'h0);
   assign tensorCoreChain_8_io_loadCascadeIn = (tensorLoadValid ? _zz_io_loadCascadeIn_5[87 : 8] : 80'h0);
   assign tensorCoreChain_8_io_expCascadeIn = (tensorLoadValid ? _zz_io_loadCascadeIn_5[7 : 0] : 8'h0);
-  assign io_res_payload_0_2 = {tensorCoreChain_8_io_res_2,{tensorCoreChain_8_io_res_1,tensorCoreChain_8_io_res_0}};
+  assign tcArrayRes_payload_2 = {tensorCoreChain_8_io_res_2,{tensorCoreChain_8_io_res_1,tensorCoreChain_8_io_res_0}};
   assign _zz_io_dataIn_0_6 = {2'd0, rowBufferRdCounter_value};
   assign _zz_io_dataIn_0_7 = _zz_rowMem_3_port1;
   assign _zz_io_dataIn_1_6 = {2'd0, rowBufferRdCounter_value};
@@ -1443,7 +1471,7 @@ module TensorCoreChainArray (
   assign tensorCoreChain_9_io_expIn_2 = (tensorDataValid ? _zz_io_dataIn_2_7[7 : 0] : 8'h0);
   assign tensorCoreChain_9_io_loadCascadeIn = (tensorLoadValid ? _zz_io_loadCascadeIn_7[87 : 8] : 80'h0);
   assign tensorCoreChain_9_io_expCascadeIn = (tensorLoadValid ? _zz_io_loadCascadeIn_7[7 : 0] : 8'h0);
-  assign io_res_payload_1_0 = {tensorCoreChain_9_io_res_2,{tensorCoreChain_9_io_res_1,tensorCoreChain_9_io_res_0}};
+  assign tcArrayRes_payload_3 = {tensorCoreChain_9_io_res_2,{tensorCoreChain_9_io_res_1,tensorCoreChain_9_io_res_0}};
   assign _zz_io_dataIn_0_8 = {2'd0, rowBufferRdCounter_value};
   assign _zz_io_dataIn_0_9 = _zz_rowMem_3_port2;
   assign _zz_io_dataIn_1_8 = {2'd0, rowBufferRdCounter_value};
@@ -1460,7 +1488,7 @@ module TensorCoreChainArray (
   assign tensorCoreChain_10_io_expIn_2 = (tensorDataValid ? _zz_io_dataIn_2_9[7 : 0] : 8'h0);
   assign tensorCoreChain_10_io_loadCascadeIn = (tensorLoadValid ? _zz_io_loadCascadeIn_9[87 : 8] : 80'h0);
   assign tensorCoreChain_10_io_expCascadeIn = (tensorLoadValid ? _zz_io_loadCascadeIn_9[7 : 0] : 8'h0);
-  assign io_res_payload_1_1 = {tensorCoreChain_10_io_res_2,{tensorCoreChain_10_io_res_1,tensorCoreChain_10_io_res_0}};
+  assign tcArrayRes_payload_4 = {tensorCoreChain_10_io_res_2,{tensorCoreChain_10_io_res_1,tensorCoreChain_10_io_res_0}};
   assign _zz_io_dataIn_0_10 = {2'd0, rowBufferRdCounter_value};
   assign _zz_io_dataIn_0_11 = _zz_rowMem_3_port3;
   assign _zz_io_dataIn_1_10 = {2'd0, rowBufferRdCounter_value};
@@ -1477,9 +1505,9 @@ module TensorCoreChainArray (
   assign tensorCoreChain_11_io_expIn_2 = (tensorDataValid ? _zz_io_dataIn_2_11[7 : 0] : 8'h0);
   assign tensorCoreChain_11_io_loadCascadeIn = (tensorLoadValid ? _zz_io_loadCascadeIn_11[87 : 8] : 80'h0);
   assign tensorCoreChain_11_io_expCascadeIn = (tensorLoadValid ? _zz_io_loadCascadeIn_11[7 : 0] : 8'h0);
-  assign io_res_payload_1_2 = {tensorCoreChain_11_io_res_2,{tensorCoreChain_11_io_res_1,tensorCoreChain_11_io_res_0}};
+  assign tcArrayRes_payload_5 = {tensorCoreChain_11_io_res_2,{tensorCoreChain_11_io_res_1,tensorCoreChain_11_io_res_0}};
   always @(*) begin
-    io_res_valid = 1'b0;
+    tcArrayRes_valid = 1'b0;
     case(ctrlStateMachine_stateReg)
       `ctrlStateMachine_enumDefinition_binary_sequential_ctrlStateMachine_sIdle : begin
       end
@@ -1488,7 +1516,7 @@ module TensorCoreChainArray (
       `ctrlStateMachine_enumDefinition_binary_sequential_ctrlStateMachine_sCompute : begin
       end
       `ctrlStateMachine_enumDefinition_binary_sequential_ctrlStateMachine_sWriteRes : begin
-        io_res_valid = ctrlStateMachine_resValidCounter_willOverflowIfInc;
+        tcArrayRes_valid = ctrlStateMachine_resValidCounter_willOverflowIfInc;
       end
       default : begin
       end
@@ -1643,11 +1671,16 @@ module TensorCoreChainArray (
   end
 
   assign ctrlStateMachine_resValidCounter_overflowVal = (computeItersReg - 8'h01);
+  assign bufferIf_ready = outputBuffer_io_push_ready;
+  assign io_res_valid = outputBuffer_io_pop_valid;
+  assign io_res_payload = outputBuffer_io_pop_payload;
+  assign bufferIf_valid = (tcArrayRes_valid && bufferIf_ready);
+  assign bufferIf_payload = {tcArrayRes_payload_5,{tcArrayRes_payload_4,{tcArrayRes_payload_3,{tcArrayRes_payload_2,{tcArrayRes_payload_1,tcArrayRes_payload_0}}}}};
   always @(*) begin
     ctrlStateMachine_stateNext = ctrlStateMachine_stateReg;
     case(ctrlStateMachine_stateReg)
       `ctrlStateMachine_enumDefinition_binary_sequential_ctrlStateMachine_sIdle : begin
-        if(io_calEn) begin
+        if(calEnDelay) begin
           ctrlStateMachine_stateNext = `ctrlStateMachine_enumDefinition_binary_sequential_ctrlStateMachine_sPreLoad;
         end
       end
@@ -1677,8 +1710,8 @@ module TensorCoreChainArray (
     end
   end
 
-  assign when_TensorCoreChainArray_l150 = (ctrlStateMachine_dataInFinish == 1'b0);
-  assign when_TensorCoreChainArray_l160 = (ctrlStateMachine_loadFinish == 1'b0);
+  assign when_TensorCoreChainArray_l155 = (ctrlStateMachine_dataInFinish == 1'b0);
+  assign when_TensorCoreChainArray_l165 = (ctrlStateMachine_loadFinish == 1'b0);
   assign when_StateMachine_l230 = ((! (ctrlStateMachine_stateReg == `ctrlStateMachine_enumDefinition_binary_sequential_ctrlStateMachine_sIdle)) && (ctrlStateMachine_stateNext == `ctrlStateMachine_enumDefinition_binary_sequential_ctrlStateMachine_sIdle));
   assign when_StateMachine_l230_1 = ((! (ctrlStateMachine_stateReg == `ctrlStateMachine_enumDefinition_binary_sequential_ctrlStateMachine_sPreLoad)) && (ctrlStateMachine_stateNext == `ctrlStateMachine_enumDefinition_binary_sequential_ctrlStateMachine_sPreLoad));
   assign when_StateMachine_l230_2 = ((! (ctrlStateMachine_stateReg == `ctrlStateMachine_enumDefinition_binary_sequential_ctrlStateMachine_sCompute)) && (ctrlStateMachine_stateNext == `ctrlStateMachine_enumDefinition_binary_sequential_ctrlStateMachine_sCompute));
@@ -1689,6 +1722,8 @@ module TensorCoreChainArray (
       tensorLoadValid <= 1'b0;
       tensorDataValid <= 1'b0;
       computeItersReg <= 8'h0;
+      calEnDelay <= 1'b0;
+      computeItersDelay <= 8'h0;
       _zz_13 <= 5'h0;
       _zz_19 <= 5'h0;
       _zz_25 <= 5'h0;
@@ -1707,6 +1742,8 @@ module TensorCoreChainArray (
     end else begin
       rowBufferRdCounter_value <= rowBufferRdCounter_valueNext;
       colBufferRdCounter_value <= colBufferRdCounter_valueNext;
+      calEnDelay <= io_calEn_delay_1;
+      computeItersDelay <= io_computeIters_delay_1;
       _zz_13 <= _zz_12;
       _zz_19 <= _zz_18;
       _zz_25 <= _zz_24;
@@ -1722,20 +1759,20 @@ module TensorCoreChainArray (
       ctrlStateMachine_stateReg <= ctrlStateMachine_stateNext;
       case(ctrlStateMachine_stateReg)
         `ctrlStateMachine_enumDefinition_binary_sequential_ctrlStateMachine_sIdle : begin
-          if(io_calEn) begin
-            computeItersReg <= io_computeIters;
+          if(calEnDelay) begin
+            computeItersReg <= computeItersReg;
           end
         end
         `ctrlStateMachine_enumDefinition_binary_sequential_ctrlStateMachine_sPreLoad : begin
         end
         `ctrlStateMachine_enumDefinition_binary_sequential_ctrlStateMachine_sCompute : begin
-          if(!when_TensorCoreChainArray_l150) begin
+          if(!when_TensorCoreChainArray_l155) begin
             tensorDataValid <= 1'b0;
           end
           if(rowBufferRdCounter_willOverflow) begin
             ctrlStateMachine_dataInFinish <= 1'b1;
           end
-          if(!when_TensorCoreChainArray_l160) begin
+          if(!when_TensorCoreChainArray_l165) begin
             tensorLoadValid <= 1'b0;
           end
           if(colBufferRdCounter_willOverflow) begin
@@ -1759,6 +1796,163 @@ module TensorCoreChainArray (
       end
       if(when_StateMachine_l230_2) begin
         tensorDataValid <= 1'b1;
+      end
+    end
+  end
+
+  always @(posedge clk) begin
+    io_calEn_delay_1 <= io_calEn;
+    io_computeIters_delay_1 <= io_computeIters;
+  end
+
+
+endmodule
+
+module StreamFifo (
+  input               io_push_valid,
+  output              io_push_ready,
+  input      [431:0]  io_push_payload,
+  output              io_pop_valid,
+  input               io_pop_ready,
+  output     [431:0]  io_pop_payload,
+  input               io_flush,
+  output     [7:0]    io_occupancy,
+  output     [7:0]    io_availability,
+  input               clk,
+  input               resetn
+);
+  reg        [431:0]  _zz_logic_ram_port0;
+  wire       [6:0]    _zz_logic_pushPtr_valueNext;
+  wire       [0:0]    _zz_logic_pushPtr_valueNext_1;
+  wire       [6:0]    _zz_logic_popPtr_valueNext;
+  wire       [0:0]    _zz_logic_popPtr_valueNext_1;
+  wire                _zz_logic_ram_port;
+  wire                _zz_io_pop_payload;
+  wire       [431:0]  _zz_logic_ram_port_1;
+  wire       [6:0]    _zz_io_availability;
+  reg                 _zz_1;
+  reg                 logic_pushPtr_willIncrement;
+  reg                 logic_pushPtr_willClear;
+  reg        [6:0]    logic_pushPtr_valueNext;
+  reg        [6:0]    logic_pushPtr_value;
+  wire                logic_pushPtr_willOverflowIfInc;
+  wire                logic_pushPtr_willOverflow;
+  reg                 logic_popPtr_willIncrement;
+  reg                 logic_popPtr_willClear;
+  reg        [6:0]    logic_popPtr_valueNext;
+  reg        [6:0]    logic_popPtr_value;
+  wire                logic_popPtr_willOverflowIfInc;
+  wire                logic_popPtr_willOverflow;
+  wire                logic_ptrMatch;
+  reg                 logic_risingOccupancy;
+  wire                logic_pushing;
+  wire                logic_popping;
+  wire                logic_empty;
+  wire                logic_full;
+  reg                 _zz_io_pop_valid;
+  wire                when_Stream_l933;
+  wire       [6:0]    logic_ptrDif;
+  reg [431:0] logic_ram [0:127];
+
+  assign _zz_logic_pushPtr_valueNext_1 = logic_pushPtr_willIncrement;
+  assign _zz_logic_pushPtr_valueNext = {6'd0, _zz_logic_pushPtr_valueNext_1};
+  assign _zz_logic_popPtr_valueNext_1 = logic_popPtr_willIncrement;
+  assign _zz_logic_popPtr_valueNext = {6'd0, _zz_logic_popPtr_valueNext_1};
+  assign _zz_io_availability = (logic_popPtr_value - logic_pushPtr_value);
+  assign _zz_io_pop_payload = 1'b1;
+  assign _zz_logic_ram_port_1 = io_push_payload;
+  always @(posedge clk) begin
+    if(_zz_io_pop_payload) begin
+      _zz_logic_ram_port0 <= logic_ram[logic_popPtr_valueNext];
+    end
+  end
+
+  always @(posedge clk) begin
+    if(_zz_1) begin
+      logic_ram[logic_pushPtr_value] <= _zz_logic_ram_port_1;
+    end
+  end
+
+  always @(*) begin
+    _zz_1 = 1'b0;
+    if(logic_pushing) begin
+      _zz_1 = 1'b1;
+    end
+  end
+
+  always @(*) begin
+    logic_pushPtr_willIncrement = 1'b0;
+    if(logic_pushing) begin
+      logic_pushPtr_willIncrement = 1'b1;
+    end
+  end
+
+  always @(*) begin
+    logic_pushPtr_willClear = 1'b0;
+    if(io_flush) begin
+      logic_pushPtr_willClear = 1'b1;
+    end
+  end
+
+  assign logic_pushPtr_willOverflowIfInc = (logic_pushPtr_value == 7'h7f);
+  assign logic_pushPtr_willOverflow = (logic_pushPtr_willOverflowIfInc && logic_pushPtr_willIncrement);
+  always @(*) begin
+    logic_pushPtr_valueNext = (logic_pushPtr_value + _zz_logic_pushPtr_valueNext);
+    if(logic_pushPtr_willClear) begin
+      logic_pushPtr_valueNext = 7'h0;
+    end
+  end
+
+  always @(*) begin
+    logic_popPtr_willIncrement = 1'b0;
+    if(logic_popping) begin
+      logic_popPtr_willIncrement = 1'b1;
+    end
+  end
+
+  always @(*) begin
+    logic_popPtr_willClear = 1'b0;
+    if(io_flush) begin
+      logic_popPtr_willClear = 1'b1;
+    end
+  end
+
+  assign logic_popPtr_willOverflowIfInc = (logic_popPtr_value == 7'h7f);
+  assign logic_popPtr_willOverflow = (logic_popPtr_willOverflowIfInc && logic_popPtr_willIncrement);
+  always @(*) begin
+    logic_popPtr_valueNext = (logic_popPtr_value + _zz_logic_popPtr_valueNext);
+    if(logic_popPtr_willClear) begin
+      logic_popPtr_valueNext = 7'h0;
+    end
+  end
+
+  assign logic_ptrMatch = (logic_pushPtr_value == logic_popPtr_value);
+  assign logic_pushing = (io_push_valid && io_push_ready);
+  assign logic_popping = (io_pop_valid && io_pop_ready);
+  assign logic_empty = (logic_ptrMatch && (! logic_risingOccupancy));
+  assign logic_full = (logic_ptrMatch && logic_risingOccupancy);
+  assign io_push_ready = (! logic_full);
+  assign io_pop_valid = ((! logic_empty) && (! (_zz_io_pop_valid && (! logic_full))));
+  assign io_pop_payload = _zz_logic_ram_port0;
+  assign when_Stream_l933 = (logic_pushing != logic_popping);
+  assign logic_ptrDif = (logic_pushPtr_value - logic_popPtr_value);
+  assign io_occupancy = {(logic_risingOccupancy && logic_ptrMatch),logic_ptrDif};
+  assign io_availability = {((! logic_risingOccupancy) && logic_ptrMatch),_zz_io_availability};
+  always @(posedge clk or negedge resetn) begin
+    if(!resetn) begin
+      logic_pushPtr_value <= 7'h0;
+      logic_popPtr_value <= 7'h0;
+      logic_risingOccupancy <= 1'b0;
+      _zz_io_pop_valid <= 1'b0;
+    end else begin
+      logic_pushPtr_value <= logic_pushPtr_valueNext;
+      logic_popPtr_value <= logic_popPtr_valueNext;
+      _zz_io_pop_valid <= (logic_popPtr_valueNext == logic_pushPtr_value);
+      if(when_Stream_l933) begin
+        logic_risingOccupancy <= logic_pushing;
+      end
+      if(io_flush) begin
+        logic_risingOccupancy <= 1'b0;
       end
     end
   end
