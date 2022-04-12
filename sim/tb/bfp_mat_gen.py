@@ -1,10 +1,9 @@
-from typing import final
-from zoneinfo import reset_tzpath
 import numpy as np
 import struct
 import codecs
 import argparse
 import math
+import itertools
 
 def float_to_hex(f: float):
 	# Courtesy of https://stackoverflow.com/a/23624284
@@ -100,7 +99,7 @@ def check_outputs(sim_out_fname: str, ori_fname, num_tc_rows: int, num_tc_cols: 
         raise Exception("invalid output mem file")
 
     for line_idx,elem in enumerate(lines):
-        fp32_strs = [elem[l:l+8] for l in range(0, len(elem), 8)]
+        fp32_strs = [elem[l:l+6] + "00" for l in range(0, len(elem), 6)]
         sim_out[line_idx % num_tcchaines] += [hex_to_float(sub_l) for sub_l in fp32_strs[:-1]]
     
     original = np.load(ori_fname)
@@ -126,6 +125,39 @@ def check_outputs(sim_out_fname: str, ori_fname, num_tc_rows: int, num_tc_cols: 
     print("min err: ", np.min(err))
     print("average err: ", np.mean(err))
 
+def prepare_single_input_files(input_path: str):
+    mat_a_files = [input_path + "MAT_A_FP32_{idx}.mem".format(idx=i) for i in range(3)]
+    mat_b_files = [input_path + "MAT_B_FP32_{idx}.mem".format(idx=i) for i in range(2)]
+
+    # import A file
+    mat_data = []
+    for fname in mat_a_files:
+        with open(fname, "r", encoding="utf-8") as f:
+            lines = f.readlines()
+            mat_data += lines
+
+    # import B file
+    for fname in mat_b_files:
+        with open(fname, "r", encoding="utf-8") as f:
+            lines = f.readlines()
+            for b_idx, r_idx in itertools.product(range(3), range(len(lines)//3)):
+                mat_data.append(lines[r_idx*3+b_idx])
+
+    # split into upper and lower mem files
+    upper_mat_data, lower_mat_data = [], []
+    for dat in mat_data:
+        upper_dw_4bit = (320-256)//4
+        upper_mat_data.append("0"*(256//4 - upper_dw_4bit) + dat[0:upper_dw_4bit] + "\n")
+        lower_mat_data.append(dat[upper_dw_4bit:-1] + "\n")
+
+    with open(input_path+"onchip_mem_lower_str.mem", "w", encoding="utf-8") as f:
+        f.writelines(lower_mat_data)
+
+    with open(input_path+"onchip_mem_upper_str.mem", "w", encoding="utf-8") as f:
+        f.writelines(upper_mat_data)
+
+    pass
+
 def main(args: dict):
     if args['inputs_gen']:
         chain_len = int(args['chain_len'])
@@ -146,6 +178,10 @@ def main(args: dict):
         fname = str(args['view-npy'])
         res = np.load(fname)
         print(res)
+
+    if args['create-binary']:
+        path = str(args['create-binary'])
+        prepare_single_input_files(path)
   
 if __name__ == "__main__":
     arg_parser = argparse.ArgumentParser()
@@ -161,6 +197,8 @@ if __name__ == "__main__":
                                 action="store", dest="view-npy")
     arg_parser.add_argument("-cr", "--correct-res", help="path of the correct results", \
                                 action="store", dest="correct_res")
+    arg_parser.add_argument("-cb", "--create-binary", help="create binary file for on-chip test", \
+                                action="store", dest="create-binary")
     
     args = vars(arg_parser.parse_args())
 

@@ -2,5 +2,11 @@
 <preferences>
  <debug showDebugMenu="0" />
  <window width="1100" height="800" x="0" y="0" />
- <generation path="" simulation="VERILOG" />
+ <generation
+   path=""
+   block_symbol_file="0"
+   documentation="0"
+   simulation="VERILOG"
+   greybox="0"
+   ipxact="1" />
 </preferences>

@@ -6,6 +6,10 @@ proc get_design_libraries {} {
   dict set libraries tensor_core_entry 1
   dict set libraries tensor_core       1
   dict set libraries tensor_core_start 1
+  dict set libraries ram_2port_2020 1
+  dict set libraries in_buffer 1
+  dict set libraries fifo_1910 1
+  dict set libraries out_fifo  1
   return $libraries
 }
 
@@ -29,6 +33,10 @@ proc get_design_files {USER_DEFINED_COMPILE_OPTIONS USER_DEFINED_VERILOG_COMPILE
   lappend design_files "vlog $USER_DEFINED_VERILOG_COMPILE_OPTIONS $USER_DEFINED_COMPILE_OPTIONS  \"[normalize_path "$QSYS_SIMDIR/../ips/tensor_core/sim/tensor_core.v"]\"  -work tensor_core" 
   lappend design_files "vlog $USER_DEFINED_VERILOG_COMPILE_OPTIONS $USER_DEFINED_COMPILE_OPTIONS  \"[normalize_path "$QSYS_SIMDIR/../ips/tensor_core_start/dsp_prime_10/sim/tensor_core_start_dsp_prime_10_vpll32q.v"]\"  -work dsp_prime_10"            
   lappend design_files "vlog $USER_DEFINED_VERILOG_COMPILE_OPTIONS $USER_DEFINED_COMPILE_OPTIONS  \"[normalize_path "$QSYS_SIMDIR/../ips/tensor_core_start/sim/tensor_core_start.v"]\"  -work tensor_core_start"   
+  lappend design_files "vlog $USER_DEFINED_VERILOG_COMPILE_OPTIONS $USER_DEFINED_COMPILE_OPTIONS  \"[normalize_path "$QSYS_SIMDIR/../ips/in_buffer/ram_2port_2020/sim/in_buffer_ram_2port_2020_um36i7a.v"]\"  -work ram_2port_2020"
+  lappend design_files "vlog $USER_DEFINED_VERILOG_COMPILE_OPTIONS $USER_DEFINED_COMPILE_OPTIONS  \"[normalize_path "$QSYS_SIMDIR/../ips/in_buffer/sim/in_buffer.v"]\"  -work in_buffer"  
+  lappend design_files "vlog $USER_DEFINED_VERILOG_COMPILE_OPTIONS $USER_DEFINED_COMPILE_OPTIONS  \"[normalize_path "$QSYS_SIMDIR/../ips/out_fifo/fifo_1910/sim/out_fifo_fifo_1910_tv5nx3y.v"]\"  -work fifo_1910"
+  lappend design_files "vlog $USER_DEFINED_VERILOG_COMPILE_OPTIONS $USER_DEFINED_COMPILE_OPTIONS  \"[normalize_path "$QSYS_SIMDIR/../ips/out_fifo/sim/out_fifo.v"]\"  -work out_fifo"                                      
   return $design_files
 }
 

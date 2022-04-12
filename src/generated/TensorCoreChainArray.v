@@ -1,6 +1,6 @@
 // Generator : SpinalHDL v1.6.0    git head : 73c8d8e2b86b45646e9d0b2e729291f2b65e6be3
 // Component : TensorCoreChainArray
-// Git hash  : 4572f4a68637574e8b698fdd19c97bd78aaf73d4
+// Git hash  : 53eff90a3519d23f96b4893b53d9481a3fc7b3d9
 
 
 `define ctrlStateMachine_enumDefinition_binary_sequential_type [2:0]
@@ -86,30 +86,35 @@ module TensorCoreChainArray (
   wire       [7:0]    tensorCoreChain_11_io_expIn_1;
   wire       [7:0]    tensorCoreChain_11_io_expIn_2;
   wire       [7:0]    tensorCoreChain_11_io_expCascadeIn;
-  reg        [87:0]   _zz_colMem_0_port1;
-  reg        [87:0]   _zz_colMem_0_port2;
-  reg        [87:0]   _zz_colMem_1_port1;
-  reg        [87:0]   _zz_colMem_1_port2;
-  reg        [87:0]   _zz_colMem_2_port1;
-  reg        [87:0]   _zz_colMem_2_port2;
-  reg        [87:0]   _zz_rowMem_0_port1;
-  reg        [87:0]   _zz_rowMem_0_port2;
-  reg        [87:0]   _zz_rowMem_0_port3;
-  reg        [87:0]   _zz_rowMem_1_port1;
-  reg        [87:0]   _zz_rowMem_1_port2;
-  reg        [87:0]   _zz_rowMem_1_port3;
-  reg        [87:0]   _zz_rowMem_2_port1;
-  reg        [87:0]   _zz_rowMem_2_port2;
-  reg        [87:0]   _zz_rowMem_2_port3;
-  reg        [87:0]   _zz_rowMem_3_port1;
-  reg        [87:0]   _zz_rowMem_3_port2;
-  reg        [87:0]   _zz_rowMem_3_port3;
-  reg        [87:0]   _zz_rowMem_4_port1;
-  reg        [87:0]   _zz_rowMem_4_port2;
-  reg        [87:0]   _zz_rowMem_4_port3;
-  reg        [87:0]   _zz_rowMem_5_port1;
-  reg        [87:0]   _zz_rowMem_5_port2;
-  reg        [87:0]   _zz_rowMem_5_port3;
+  reg                 colMem_0_wren;
+  wire       [6:0]    colMem_0_rdaddress;
+  wire       [6:0]    colMem_0_wraddress;
+  reg                 colMem_1_wren;
+  wire       [6:0]    colMem_1_rdaddress;
+  wire       [6:0]    colMem_1_wraddress;
+  reg                 colMem_2_wren;
+  wire       [6:0]    colMem_2_rdaddress;
+  wire       [6:0]    colMem_2_wraddress;
+  reg                 rowMem_0_wren;
+  wire       [6:0]    rowMem_0_rdaddress;
+  wire       [6:0]    rowMem_0_wraddress;
+  reg                 rowMem_1_wren;
+  wire       [6:0]    rowMem_1_rdaddress;
+  wire       [6:0]    rowMem_1_wraddress;
+  reg                 rowMem_2_wren;
+  wire       [6:0]    rowMem_2_rdaddress;
+  wire       [6:0]    rowMem_2_wraddress;
+  reg                 rowMem_3_wren;
+  wire       [6:0]    rowMem_3_rdaddress;
+  wire       [6:0]    rowMem_3_wraddress;
+  reg                 rowMem_4_wren;
+  wire       [6:0]    rowMem_4_rdaddress;
+  wire       [6:0]    rowMem_4_wraddress;
+  reg                 rowMem_5_wren;
+  wire       [6:0]    rowMem_5_rdaddress;
+  wire       [6:0]    rowMem_5_wraddress;
+  wire                outputBuffer_wrreq;
+  wire       [431:0]  outputBuffer_data;
   wire                tensorCoreChain_6_io_dataIterReady;
   wire                tensorCoreChain_6_io_loadReady;
   wire       [23:0]   tensorCoreChain_6_io_res_0;
@@ -146,6 +151,15 @@ module TensorCoreChainArray (
   wire       [23:0]   tensorCoreChain_11_io_res_1;
   wire       [23:0]   tensorCoreChain_11_io_res_2;
   wire                tensorCoreChain_11_io_outValid;
+  wire       [87:0]   colMem_0_q;
+  wire       [87:0]   colMem_1_q;
+  wire       [87:0]   colMem_2_q;
+  wire       [87:0]   rowMem_0_q;
+  wire       [87:0]   rowMem_1_q;
+  wire       [87:0]   rowMem_2_q;
+  wire       [87:0]   rowMem_3_q;
+  wire       [87:0]   rowMem_4_q;
+  wire       [87:0]   rowMem_5_q;
   wire                colConverters_0_io_dataOut_valid;
   wire       [87:0]   colConverters_0_io_dataOut_payload;
   wire                colConverters_1_io_dataOut_valid;
@@ -164,114 +178,37 @@ module TensorCoreChainArray (
   wire       [87:0]   fixedBfpConverter_13_io_dataOut_payload;
   wire                fixedBfpConverter_14_io_dataOut_valid;
   wire       [87:0]   fixedBfpConverter_14_io_dataOut_payload;
-  wire                outputBuffer_io_push_ready;
-  wire                outputBuffer_io_pop_valid;
-  wire       [431:0]  outputBuffer_io_pop_payload;
-  wire       [7:0]    outputBuffer_io_occupancy;
-  wire       [7:0]    outputBuffer_io_availability;
+  wire                outputBuffer_full;
+  wire                outputBuffer_empty;
+  wire       [431:0]  outputBuffer_q;
   wire       [4:0]    _zz_rowBufferRdCounter_valueNext;
   wire       [0:0]    _zz_rowBufferRdCounter_valueNext_1;
   wire       [4:0]    _zz_colBufferRdCounter_valueNext;
   wire       [0:0]    _zz_colBufferRdCounter_valueNext_1;
-  wire       [4:0]    _zz__zz_12;
-  wire       [0:0]    _zz__zz_12_1;
-  wire       [6:0]    _zz_colMem_0_port;
-  wire       [87:0]   _zz_colMem_0_port_1;
-  wire       [4:0]    _zz__zz_18;
-  wire       [0:0]    _zz__zz_18_1;
-  wire       [6:0]    _zz_colMem_1_port;
-  wire       [87:0]   _zz_colMem_1_port_1;
-  wire       [4:0]    _zz__zz_24;
-  wire       [0:0]    _zz__zz_24_1;
-  wire       [6:0]    _zz_colMem_2_port;
-  wire       [87:0]   _zz_colMem_2_port_1;
-  wire       [4:0]    _zz__zz_30;
-  wire       [0:0]    _zz__zz_30_1;
-  wire       [6:0]    _zz_rowMem_0_port;
-  wire       [87:0]   _zz_rowMem_0_port_1;
-  wire       [4:0]    _zz__zz_36;
-  wire       [0:0]    _zz__zz_36_1;
-  wire       [6:0]    _zz_rowMem_1_port;
-  wire       [87:0]   _zz_rowMem_1_port_1;
-  wire       [4:0]    _zz__zz_42;
-  wire       [0:0]    _zz__zz_42_1;
-  wire       [6:0]    _zz_rowMem_2_port;
-  wire       [87:0]   _zz_rowMem_2_port_1;
-  wire       [4:0]    _zz__zz_48;
-  wire       [0:0]    _zz__zz_48_1;
-  wire       [6:0]    _zz_rowMem_3_port;
-  wire       [87:0]   _zz_rowMem_3_port_1;
-  wire       [4:0]    _zz__zz_54;
-  wire       [0:0]    _zz__zz_54_1;
-  wire       [6:0]    _zz_rowMem_4_port;
-  wire       [87:0]   _zz_rowMem_4_port_1;
-  wire       [4:0]    _zz__zz_60;
-  wire       [0:0]    _zz__zz_60_1;
-  wire       [6:0]    _zz_rowMem_5_port;
-  wire       [87:0]   _zz_rowMem_5_port_1;
-  wire                _zz_rowMem_0_port_2;
-  wire                _zz__zz_io_dataIn_0_1;
-  wire                _zz_rowMem_1_port_2;
-  wire                _zz__zz_io_dataIn_1_1;
-  wire                _zz_rowMem_2_port_2;
-  wire                _zz__zz_io_dataIn_2_1;
-  wire                _zz_colMem_0_port_2;
-  wire                _zz__zz_io_loadCascadeIn_1;
-  wire                _zz_rowMem_0_port_3;
-  wire                _zz__zz_io_dataIn_0_3;
-  wire                _zz_rowMem_1_port_3;
-  wire                _zz__zz_io_dataIn_1_3;
-  wire                _zz_rowMem_2_port_3;
-  wire                _zz__zz_io_dataIn_2_3;
-  wire                _zz_colMem_1_port_2;
-  wire                _zz__zz_io_loadCascadeIn_3;
-  wire                _zz_rowMem_0_port_4;
-  wire                _zz__zz_io_dataIn_0_5;
-  wire                _zz_rowMem_1_port_4;
-  wire                _zz__zz_io_dataIn_1_5;
-  wire                _zz_rowMem_2_port_4;
-  wire                _zz__zz_io_dataIn_2_5;
-  wire                _zz_colMem_2_port_2;
-  wire                _zz__zz_io_loadCascadeIn_5;
-  wire                _zz_rowMem_3_port_2;
-  wire                _zz__zz_io_dataIn_0_7;
-  wire                _zz_rowMem_4_port_2;
-  wire                _zz__zz_io_dataIn_1_7;
-  wire                _zz_rowMem_5_port_2;
-  wire                _zz__zz_io_dataIn_2_7;
-  wire                _zz_colMem_0_port_3;
-  wire                _zz__zz_io_loadCascadeIn_7;
-  wire                _zz_rowMem_3_port_3;
-  wire                _zz__zz_io_dataIn_0_9;
-  wire                _zz_rowMem_4_port_3;
-  wire                _zz__zz_io_dataIn_1_9;
-  wire                _zz_rowMem_5_port_3;
-  wire                _zz__zz_io_dataIn_2_9;
-  wire                _zz_colMem_1_port_3;
-  wire                _zz__zz_io_loadCascadeIn_9;
-  wire                _zz_rowMem_3_port_4;
-  wire                _zz__zz_io_dataIn_0_11;
-  wire                _zz_rowMem_4_port_4;
-  wire                _zz__zz_io_dataIn_1_11;
-  wire                _zz_rowMem_5_port_4;
-  wire                _zz__zz_io_dataIn_2_11;
-  wire                _zz_colMem_2_port_3;
-  wire                _zz__zz_io_loadCascadeIn_11;
+  wire       [4:0]    _zz__zz_wraddress_1;
+  wire       [0:0]    _zz__zz_wraddress_1_1;
+  wire       [4:0]    _zz__zz_wraddress_4;
+  wire       [0:0]    _zz__zz_wraddress_4_1;
+  wire       [4:0]    _zz__zz_wraddress_7;
+  wire       [0:0]    _zz__zz_wraddress_7_1;
+  wire       [4:0]    _zz__zz_wraddress_10;
+  wire       [0:0]    _zz__zz_wraddress_10_1;
+  wire       [4:0]    _zz__zz_wraddress_13;
+  wire       [0:0]    _zz__zz_wraddress_13_1;
+  wire       [4:0]    _zz__zz_wraddress_16;
+  wire       [0:0]    _zz__zz_wraddress_16_1;
+  wire       [4:0]    _zz__zz_wraddress_19;
+  wire       [0:0]    _zz__zz_wraddress_19_1;
+  wire       [4:0]    _zz__zz_wraddress_22;
+  wire       [0:0]    _zz__zz_wraddress_22_1;
+  wire       [4:0]    _zz__zz_wraddress_25;
+  wire       [0:0]    _zz__zz_wraddress_25_1;
   wire       [7:0]    _zz_ctrlStateMachine_loadIterCounter_valueNext;
   wire       [0:0]    _zz_ctrlStateMachine_loadIterCounter_valueNext_1;
   wire       [7:0]    _zz_ctrlStateMachine_computeIterCounter_valueNext;
   wire       [0:0]    _zz_ctrlStateMachine_computeIterCounter_valueNext_1;
   wire       [7:0]    _zz_ctrlStateMachine_resValidCounter_valueNext;
   wire       [0:0]    _zz_ctrlStateMachine_resValidCounter_valueNext_1;
-  reg                 _zz_1;
-  reg                 _zz_2;
-  reg                 _zz_3;
-  reg                 _zz_4;
-  reg                 _zz_5;
-  reg                 _zz_6;
-  reg                 _zz_7;
-  reg                 _zz_8;
-  reg                 _zz_9;
   reg                 rowBufferRdCounter_willIncrement;
   reg                 rowBufferRdCounter_willClear;
   reg        [4:0]    rowBufferRdCounter_valueNext;
@@ -298,108 +235,90 @@ module TensorCoreChainArray (
   wire       [71:0]   tcArrayRes_payload_3;
   wire       [71:0]   tcArrayRes_payload_4;
   wire       [71:0]   tcArrayRes_payload_5;
+  reg                 _zz_wraddress;
+  reg                 _zz_1;
+  reg        [4:0]    _zz_wraddress_1;
+  reg        [4:0]    _zz_wraddress_2;
+  wire                _zz_2;
+  wire                _zz_3;
+  reg                 _zz_wraddress_3;
+  reg                 _zz_4;
+  reg        [4:0]    _zz_wraddress_4;
+  reg        [4:0]    _zz_wraddress_5;
+  wire                _zz_5;
+  wire                _zz_6;
+  reg                 _zz_wraddress_6;
+  reg                 _zz_7;
+  reg        [4:0]    _zz_wraddress_7;
+  reg        [4:0]    _zz_wraddress_8;
+  wire                _zz_8;
+  wire                _zz_9;
+  reg                 _zz_wraddress_9;
   reg                 _zz_10;
-  reg                 _zz_11;
-  reg        [4:0]    _zz_12;
-  reg        [4:0]    _zz_13;
+  reg        [4:0]    _zz_wraddress_10;
+  reg        [4:0]    _zz_wraddress_11;
+  wire                _zz_11;
+  wire                _zz_12;
+  reg                 _zz_wraddress_12;
+  reg                 _zz_13;
+  reg        [4:0]    _zz_wraddress_13;
+  reg        [4:0]    _zz_wraddress_14;
   wire                _zz_14;
   wire                _zz_15;
+  reg                 _zz_wraddress_15;
   reg                 _zz_16;
-  reg                 _zz_17;
-  reg        [4:0]    _zz_18;
-  reg        [4:0]    _zz_19;
+  reg        [4:0]    _zz_wraddress_16;
+  reg        [4:0]    _zz_wraddress_17;
+  wire                _zz_17;
+  wire                _zz_18;
+  reg                 _zz_wraddress_18;
+  reg                 _zz_19;
+  reg        [4:0]    _zz_wraddress_19;
+  reg        [4:0]    _zz_wraddress_20;
   wire                _zz_20;
   wire                _zz_21;
+  reg                 _zz_wraddress_21;
   reg                 _zz_22;
-  reg                 _zz_23;
-  reg        [4:0]    _zz_24;
-  reg        [4:0]    _zz_25;
+  reg        [4:0]    _zz_wraddress_22;
+  reg        [4:0]    _zz_wraddress_23;
+  wire                _zz_23;
+  wire                _zz_24;
+  reg                 _zz_wraddress_24;
+  reg                 _zz_25;
+  reg        [4:0]    _zz_wraddress_25;
+  reg        [4:0]    _zz_wraddress_26;
   wire                _zz_26;
   wire                _zz_27;
-  reg                 _zz_28;
-  reg                 _zz_29;
-  reg        [4:0]    _zz_30;
-  reg        [4:0]    _zz_31;
-  wire                _zz_32;
-  wire                _zz_33;
-  reg                 _zz_34;
-  reg                 _zz_35;
-  reg        [4:0]    _zz_36;
-  reg        [4:0]    _zz_37;
-  wire                _zz_38;
-  wire                _zz_39;
-  reg                 _zz_40;
-  reg                 _zz_41;
-  reg        [4:0]    _zz_42;
-  reg        [4:0]    _zz_43;
-  wire                _zz_44;
-  wire                _zz_45;
-  reg                 _zz_46;
-  reg                 _zz_47;
-  reg        [4:0]    _zz_48;
-  reg        [4:0]    _zz_49;
-  wire                _zz_50;
-  wire                _zz_51;
-  reg                 _zz_52;
-  reg                 _zz_53;
-  reg        [4:0]    _zz_54;
-  reg        [4:0]    _zz_55;
-  wire                _zz_56;
-  wire                _zz_57;
-  reg                 _zz_58;
-  reg                 _zz_59;
-  reg        [4:0]    _zz_60;
-  reg        [4:0]    _zz_61;
-  wire                _zz_62;
-  wire                _zz_63;
-  wire       [6:0]    _zz_io_dataIn_0;
+  wire       [87:0]   _zz_io_dataIn_0;
+  wire       [87:0]   _zz_io_dataIn_1;
+  wire       [87:0]   _zz_io_dataIn_2;
+  reg                 tensorLoadValid_delay_1;
+  reg                 tensorDataValid_delay_1;
   wire       [87:0]   _zz_io_dataIn_0_1;
-  wire       [6:0]    _zz_io_dataIn_1;
   wire       [87:0]   _zz_io_dataIn_1_1;
-  wire       [6:0]    _zz_io_dataIn_2;
   wire       [87:0]   _zz_io_dataIn_2_1;
-  wire       [6:0]    _zz_io_loadCascadeIn;
-  wire       [87:0]   _zz_io_loadCascadeIn_1;
-  wire       [6:0]    _zz_io_dataIn_0_2;
+  reg                 tensorLoadValid_delay_1_1;
+  reg                 tensorDataValid_delay_1_1;
+  wire       [87:0]   _zz_io_dataIn_0_2;
+  wire       [87:0]   _zz_io_dataIn_1_2;
+  wire       [87:0]   _zz_io_dataIn_2_2;
+  reg                 tensorLoadValid_delay_1_2;
+  reg                 tensorDataValid_delay_1_2;
   wire       [87:0]   _zz_io_dataIn_0_3;
-  wire       [6:0]    _zz_io_dataIn_1_2;
   wire       [87:0]   _zz_io_dataIn_1_3;
-  wire       [6:0]    _zz_io_dataIn_2_2;
   wire       [87:0]   _zz_io_dataIn_2_3;
-  wire       [6:0]    _zz_io_loadCascadeIn_2;
-  wire       [87:0]   _zz_io_loadCascadeIn_3;
-  wire       [6:0]    _zz_io_dataIn_0_4;
+  reg                 tensorLoadValid_delay_1_3;
+  reg                 tensorDataValid_delay_1_3;
+  wire       [87:0]   _zz_io_dataIn_0_4;
+  wire       [87:0]   _zz_io_dataIn_1_4;
+  wire       [87:0]   _zz_io_dataIn_2_4;
+  reg                 tensorLoadValid_delay_1_4;
+  reg                 tensorDataValid_delay_1_4;
   wire       [87:0]   _zz_io_dataIn_0_5;
-  wire       [6:0]    _zz_io_dataIn_1_4;
   wire       [87:0]   _zz_io_dataIn_1_5;
-  wire       [6:0]    _zz_io_dataIn_2_4;
   wire       [87:0]   _zz_io_dataIn_2_5;
-  wire       [6:0]    _zz_io_loadCascadeIn_4;
-  wire       [87:0]   _zz_io_loadCascadeIn_5;
-  wire       [6:0]    _zz_io_dataIn_0_6;
-  wire       [87:0]   _zz_io_dataIn_0_7;
-  wire       [6:0]    _zz_io_dataIn_1_6;
-  wire       [87:0]   _zz_io_dataIn_1_7;
-  wire       [6:0]    _zz_io_dataIn_2_6;
-  wire       [87:0]   _zz_io_dataIn_2_7;
-  wire       [6:0]    _zz_io_loadCascadeIn_6;
-  wire       [87:0]   _zz_io_loadCascadeIn_7;
-  wire       [6:0]    _zz_io_dataIn_0_8;
-  wire       [87:0]   _zz_io_dataIn_0_9;
-  wire       [6:0]    _zz_io_dataIn_1_8;
-  wire       [87:0]   _zz_io_dataIn_1_9;
-  wire       [6:0]    _zz_io_dataIn_2_8;
-  wire       [87:0]   _zz_io_dataIn_2_9;
-  wire       [6:0]    _zz_io_loadCascadeIn_8;
-  wire       [87:0]   _zz_io_loadCascadeIn_9;
-  wire       [6:0]    _zz_io_dataIn_0_10;
-  wire       [87:0]   _zz_io_dataIn_0_11;
-  wire       [6:0]    _zz_io_dataIn_1_10;
-  wire       [87:0]   _zz_io_dataIn_1_11;
-  wire       [6:0]    _zz_io_dataIn_2_10;
-  wire       [87:0]   _zz_io_dataIn_2_11;
-  wire       [6:0]    _zz_io_loadCascadeIn_10;
-  wire       [87:0]   _zz_io_loadCascadeIn_11;
+  reg                 tensorLoadValid_delay_1_5;
+  reg                 tensorDataValid_delay_1_5;
   wire                ctrlStateMachine_wantExit;
   reg                 ctrlStateMachine_wantStart;
   wire                ctrlStateMachine_wantKill;
@@ -429,13 +348,10 @@ module TensorCoreChainArray (
   reg        [7:0]    ctrlStateMachine_resValidCounter_value;
   wire                ctrlStateMachine_resValidCounter_willOverflowIfInc;
   wire                ctrlStateMachine_resValidCounter_willOverflow;
-  wire                bufferIf_valid;
-  wire                bufferIf_ready;
-  wire       [431:0]  bufferIf_payload;
   reg        `ctrlStateMachine_enumDefinition_binary_sequential_type ctrlStateMachine_stateReg;
   reg        `ctrlStateMachine_enumDefinition_binary_sequential_type ctrlStateMachine_stateNext;
-  wire                when_TensorCoreChainArray_l155;
-  wire                when_TensorCoreChainArray_l165;
+  wire                when_TensorCoreChainArray_l164;
+  wire                when_TensorCoreChainArray_l174;
   wire                when_StateMachine_l230;
   wire                when_StateMachine_l230_1;
   wire                when_StateMachine_l230_2;
@@ -444,311 +360,35 @@ module TensorCoreChainArray (
   reg [207:0] ctrlStateMachine_stateNext_string;
   `endif
 
-  reg [87:0] colMem_0 [0:127];
-  reg [87:0] colMem_1 [0:127];
-  reg [87:0] colMem_2 [0:127];
-  reg [87:0] rowMem_0 [0:127];
-  reg [87:0] rowMem_1 [0:127];
-  reg [87:0] rowMem_2 [0:127];
-  reg [87:0] rowMem_3 [0:127];
-  reg [87:0] rowMem_4 [0:127];
-  reg [87:0] rowMem_5 [0:127];
 
   assign _zz_rowBufferRdCounter_valueNext_1 = rowBufferRdCounter_willIncrement;
   assign _zz_rowBufferRdCounter_valueNext = {4'd0, _zz_rowBufferRdCounter_valueNext_1};
   assign _zz_colBufferRdCounter_valueNext_1 = colBufferRdCounter_willIncrement;
   assign _zz_colBufferRdCounter_valueNext = {4'd0, _zz_colBufferRdCounter_valueNext_1};
-  assign _zz__zz_12_1 = _zz_10;
-  assign _zz__zz_12 = {4'd0, _zz__zz_12_1};
-  assign _zz_colMem_0_port = {2'd0, _zz_13};
-  assign _zz__zz_18_1 = _zz_16;
-  assign _zz__zz_18 = {4'd0, _zz__zz_18_1};
-  assign _zz_colMem_1_port = {2'd0, _zz_19};
-  assign _zz__zz_24_1 = _zz_22;
-  assign _zz__zz_24 = {4'd0, _zz__zz_24_1};
-  assign _zz_colMem_2_port = {2'd0, _zz_25};
-  assign _zz__zz_30_1 = _zz_28;
-  assign _zz__zz_30 = {4'd0, _zz__zz_30_1};
-  assign _zz_rowMem_0_port = {2'd0, _zz_31};
-  assign _zz__zz_36_1 = _zz_34;
-  assign _zz__zz_36 = {4'd0, _zz__zz_36_1};
-  assign _zz_rowMem_1_port = {2'd0, _zz_37};
-  assign _zz__zz_42_1 = _zz_40;
-  assign _zz__zz_42 = {4'd0, _zz__zz_42_1};
-  assign _zz_rowMem_2_port = {2'd0, _zz_43};
-  assign _zz__zz_48_1 = _zz_46;
-  assign _zz__zz_48 = {4'd0, _zz__zz_48_1};
-  assign _zz_rowMem_3_port = {2'd0, _zz_49};
-  assign _zz__zz_54_1 = _zz_52;
-  assign _zz__zz_54 = {4'd0, _zz__zz_54_1};
-  assign _zz_rowMem_4_port = {2'd0, _zz_55};
-  assign _zz__zz_60_1 = _zz_58;
-  assign _zz__zz_60 = {4'd0, _zz__zz_60_1};
-  assign _zz_rowMem_5_port = {2'd0, _zz_61};
+  assign _zz__zz_wraddress_1_1 = _zz_wraddress;
+  assign _zz__zz_wraddress_1 = {4'd0, _zz__zz_wraddress_1_1};
+  assign _zz__zz_wraddress_4_1 = _zz_wraddress_3;
+  assign _zz__zz_wraddress_4 = {4'd0, _zz__zz_wraddress_4_1};
+  assign _zz__zz_wraddress_7_1 = _zz_wraddress_6;
+  assign _zz__zz_wraddress_7 = {4'd0, _zz__zz_wraddress_7_1};
+  assign _zz__zz_wraddress_10_1 = _zz_wraddress_9;
+  assign _zz__zz_wraddress_10 = {4'd0, _zz__zz_wraddress_10_1};
+  assign _zz__zz_wraddress_13_1 = _zz_wraddress_12;
+  assign _zz__zz_wraddress_13 = {4'd0, _zz__zz_wraddress_13_1};
+  assign _zz__zz_wraddress_16_1 = _zz_wraddress_15;
+  assign _zz__zz_wraddress_16 = {4'd0, _zz__zz_wraddress_16_1};
+  assign _zz__zz_wraddress_19_1 = _zz_wraddress_18;
+  assign _zz__zz_wraddress_19 = {4'd0, _zz__zz_wraddress_19_1};
+  assign _zz__zz_wraddress_22_1 = _zz_wraddress_21;
+  assign _zz__zz_wraddress_22 = {4'd0, _zz__zz_wraddress_22_1};
+  assign _zz__zz_wraddress_25_1 = _zz_wraddress_24;
+  assign _zz__zz_wraddress_25 = {4'd0, _zz__zz_wraddress_25_1};
   assign _zz_ctrlStateMachine_loadIterCounter_valueNext_1 = ctrlStateMachine_loadIterCounter_willIncrement;
   assign _zz_ctrlStateMachine_loadIterCounter_valueNext = {7'd0, _zz_ctrlStateMachine_loadIterCounter_valueNext_1};
   assign _zz_ctrlStateMachine_computeIterCounter_valueNext_1 = ctrlStateMachine_computeIterCounter_willIncrement;
   assign _zz_ctrlStateMachine_computeIterCounter_valueNext = {7'd0, _zz_ctrlStateMachine_computeIterCounter_valueNext_1};
   assign _zz_ctrlStateMachine_resValidCounter_valueNext_1 = ctrlStateMachine_resValidCounter_willIncrement;
   assign _zz_ctrlStateMachine_resValidCounter_valueNext = {7'd0, _zz_ctrlStateMachine_resValidCounter_valueNext_1};
-  assign _zz_colMem_0_port_1 = colConverters_0_io_dataOut_payload;
-  assign _zz__zz_io_loadCascadeIn_1 = 1'b1;
-  assign _zz__zz_io_loadCascadeIn_7 = 1'b1;
-  assign _zz_colMem_1_port_1 = colConverters_1_io_dataOut_payload;
-  assign _zz__zz_io_loadCascadeIn_3 = 1'b1;
-  assign _zz__zz_io_loadCascadeIn_9 = 1'b1;
-  assign _zz_colMem_2_port_1 = colConverters_2_io_dataOut_payload;
-  assign _zz__zz_io_loadCascadeIn_5 = 1'b1;
-  assign _zz__zz_io_loadCascadeIn_11 = 1'b1;
-  assign _zz_rowMem_0_port_1 = fixedBfpConverter_9_io_dataOut_payload;
-  assign _zz__zz_io_dataIn_0_1 = 1'b1;
-  assign _zz__zz_io_dataIn_0_3 = 1'b1;
-  assign _zz__zz_io_dataIn_0_5 = 1'b1;
-  assign _zz_rowMem_1_port_1 = fixedBfpConverter_10_io_dataOut_payload;
-  assign _zz__zz_io_dataIn_1_1 = 1'b1;
-  assign _zz__zz_io_dataIn_1_3 = 1'b1;
-  assign _zz__zz_io_dataIn_1_5 = 1'b1;
-  assign _zz_rowMem_2_port_1 = fixedBfpConverter_11_io_dataOut_payload;
-  assign _zz__zz_io_dataIn_2_1 = 1'b1;
-  assign _zz__zz_io_dataIn_2_3 = 1'b1;
-  assign _zz__zz_io_dataIn_2_5 = 1'b1;
-  assign _zz_rowMem_3_port_1 = fixedBfpConverter_12_io_dataOut_payload;
-  assign _zz__zz_io_dataIn_0_7 = 1'b1;
-  assign _zz__zz_io_dataIn_0_9 = 1'b1;
-  assign _zz__zz_io_dataIn_0_11 = 1'b1;
-  assign _zz_rowMem_4_port_1 = fixedBfpConverter_13_io_dataOut_payload;
-  assign _zz__zz_io_dataIn_1_7 = 1'b1;
-  assign _zz__zz_io_dataIn_1_9 = 1'b1;
-  assign _zz__zz_io_dataIn_1_11 = 1'b1;
-  assign _zz_rowMem_5_port_1 = fixedBfpConverter_14_io_dataOut_payload;
-  assign _zz__zz_io_dataIn_2_7 = 1'b1;
-  assign _zz__zz_io_dataIn_2_9 = 1'b1;
-  assign _zz__zz_io_dataIn_2_11 = 1'b1;
-  initial begin
-    $readmemb("TensorCoreChainArray.v_toplevel_colMem_0.bin",colMem_0);
-  end
-  always @(posedge clk) begin
-    if(_zz_9) begin
-      colMem_0[_zz_colMem_0_port] <= _zz_colMem_0_port_1;
-    end
-  end
-
-  always @(posedge clk) begin
-    if(_zz__zz_io_loadCascadeIn_1) begin
-      _zz_colMem_0_port1 <= colMem_0[_zz_io_loadCascadeIn];
-    end
-  end
-
-  always @(posedge clk) begin
-    if(_zz__zz_io_loadCascadeIn_7) begin
-      _zz_colMem_0_port2 <= colMem_0[_zz_io_loadCascadeIn_6];
-    end
-  end
-
-  initial begin
-    $readmemb("TensorCoreChainArray.v_toplevel_colMem_1.bin",colMem_1);
-  end
-  always @(posedge clk) begin
-    if(_zz_8) begin
-      colMem_1[_zz_colMem_1_port] <= _zz_colMem_1_port_1;
-    end
-  end
-
-  always @(posedge clk) begin
-    if(_zz__zz_io_loadCascadeIn_3) begin
-      _zz_colMem_1_port1 <= colMem_1[_zz_io_loadCascadeIn_2];
-    end
-  end
-
-  always @(posedge clk) begin
-    if(_zz__zz_io_loadCascadeIn_9) begin
-      _zz_colMem_1_port2 <= colMem_1[_zz_io_loadCascadeIn_8];
-    end
-  end
-
-  initial begin
-    $readmemb("TensorCoreChainArray.v_toplevel_colMem_2.bin",colMem_2);
-  end
-  always @(posedge clk) begin
-    if(_zz_7) begin
-      colMem_2[_zz_colMem_2_port] <= _zz_colMem_2_port_1;
-    end
-  end
-
-  always @(posedge clk) begin
-    if(_zz__zz_io_loadCascadeIn_5) begin
-      _zz_colMem_2_port1 <= colMem_2[_zz_io_loadCascadeIn_4];
-    end
-  end
-
-  always @(posedge clk) begin
-    if(_zz__zz_io_loadCascadeIn_11) begin
-      _zz_colMem_2_port2 <= colMem_2[_zz_io_loadCascadeIn_10];
-    end
-  end
-
-  initial begin
-    $readmemb("TensorCoreChainArray.v_toplevel_rowMem_0.bin",rowMem_0);
-  end
-  always @(posedge clk) begin
-    if(_zz_6) begin
-      rowMem_0[_zz_rowMem_0_port] <= _zz_rowMem_0_port_1;
-    end
-  end
-
-  always @(posedge clk) begin
-    if(_zz__zz_io_dataIn_0_1) begin
-      _zz_rowMem_0_port1 <= rowMem_0[_zz_io_dataIn_0];
-    end
-  end
-
-  always @(posedge clk) begin
-    if(_zz__zz_io_dataIn_0_3) begin
-      _zz_rowMem_0_port2 <= rowMem_0[_zz_io_dataIn_0_2];
-    end
-  end
-
-  always @(posedge clk) begin
-    if(_zz__zz_io_dataIn_0_5) begin
-      _zz_rowMem_0_port3 <= rowMem_0[_zz_io_dataIn_0_4];
-    end
-  end
-
-  initial begin
-    $readmemb("TensorCoreChainArray.v_toplevel_rowMem_1.bin",rowMem_1);
-  end
-  always @(posedge clk) begin
-    if(_zz_5) begin
-      rowMem_1[_zz_rowMem_1_port] <= _zz_rowMem_1_port_1;
-    end
-  end
-
-  always @(posedge clk) begin
-    if(_zz__zz_io_dataIn_1_1) begin
-      _zz_rowMem_1_port1 <= rowMem_1[_zz_io_dataIn_1];
-    end
-  end
-
-  always @(posedge clk) begin
-    if(_zz__zz_io_dataIn_1_3) begin
-      _zz_rowMem_1_port2 <= rowMem_1[_zz_io_dataIn_1_2];
-    end
-  end
-
-  always @(posedge clk) begin
-    if(_zz__zz_io_dataIn_1_5) begin
-      _zz_rowMem_1_port3 <= rowMem_1[_zz_io_dataIn_1_4];
-    end
-  end
-
-  initial begin
-    $readmemb("TensorCoreChainArray.v_toplevel_rowMem_2.bin",rowMem_2);
-  end
-  always @(posedge clk) begin
-    if(_zz_4) begin
-      rowMem_2[_zz_rowMem_2_port] <= _zz_rowMem_2_port_1;
-    end
-  end
-
-  always @(posedge clk) begin
-    if(_zz__zz_io_dataIn_2_1) begin
-      _zz_rowMem_2_port1 <= rowMem_2[_zz_io_dataIn_2];
-    end
-  end
-
-  always @(posedge clk) begin
-    if(_zz__zz_io_dataIn_2_3) begin
-      _zz_rowMem_2_port2 <= rowMem_2[_zz_io_dataIn_2_2];
-    end
-  end
-
-  always @(posedge clk) begin
-    if(_zz__zz_io_dataIn_2_5) begin
-      _zz_rowMem_2_port3 <= rowMem_2[_zz_io_dataIn_2_4];
-    end
-  end
-
-  initial begin
-    $readmemb("TensorCoreChainArray.v_toplevel_rowMem_3.bin",rowMem_3);
-  end
-  always @(posedge clk) begin
-    if(_zz_3) begin
-      rowMem_3[_zz_rowMem_3_port] <= _zz_rowMem_3_port_1;
-    end
-  end
-
-  always @(posedge clk) begin
-    if(_zz__zz_io_dataIn_0_7) begin
-      _zz_rowMem_3_port1 <= rowMem_3[_zz_io_dataIn_0_6];
-    end
-  end
-
-  always @(posedge clk) begin
-    if(_zz__zz_io_dataIn_0_9) begin
-      _zz_rowMem_3_port2 <= rowMem_3[_zz_io_dataIn_0_8];
-    end
-  end
-
-  always @(posedge clk) begin
-    if(_zz__zz_io_dataIn_0_11) begin
-      _zz_rowMem_3_port3 <= rowMem_3[_zz_io_dataIn_0_10];
-    end
-  end
-
-  initial begin
-    $readmemb("TensorCoreChainArray.v_toplevel_rowMem_4.bin",rowMem_4);
-  end
-  always @(posedge clk) begin
-    if(_zz_2) begin
-      rowMem_4[_zz_rowMem_4_port] <= _zz_rowMem_4_port_1;
-    end
-  end
-
-  always @(posedge clk) begin
-    if(_zz__zz_io_dataIn_1_7) begin
-      _zz_rowMem_4_port1 <= rowMem_4[_zz_io_dataIn_1_6];
-    end
-  end
-
-  always @(posedge clk) begin
-    if(_zz__zz_io_dataIn_1_9) begin
-      _zz_rowMem_4_port2 <= rowMem_4[_zz_io_dataIn_1_8];
-    end
-  end
-
-  always @(posedge clk) begin
-    if(_zz__zz_io_dataIn_1_11) begin
-      _zz_rowMem_4_port3 <= rowMem_4[_zz_io_dataIn_1_10];
-    end
-  end
-
-  initial begin
-    $readmemb("TensorCoreChainArray.v_toplevel_rowMem_5.bin",rowMem_5);
-  end
-  always @(posedge clk) begin
-    if(_zz_1) begin
-      rowMem_5[_zz_rowMem_5_port] <= _zz_rowMem_5_port_1;
-    end
-  end
-
-  always @(posedge clk) begin
-    if(_zz__zz_io_dataIn_2_7) begin
-      _zz_rowMem_5_port1 <= rowMem_5[_zz_io_dataIn_2_6];
-    end
-  end
-
-  always @(posedge clk) begin
-    if(_zz__zz_io_dataIn_2_9) begin
-      _zz_rowMem_5_port2 <= rowMem_5[_zz_io_dataIn_2_8];
-    end
-  end
-
-  always @(posedge clk) begin
-    if(_zz__zz_io_dataIn_2_11) begin
-      _zz_rowMem_5_port3 <= rowMem_5[_zz_io_dataIn_2_10];
-    end
-  end
-
   TensorCoreChain tensorCoreChain_6 (
     .io_dataIn_0         (tensorCoreChain_6_io_dataIn_0       ), //i
     .io_dataIn_1         (tensorCoreChain_6_io_dataIn_1       ), //i
@@ -758,9 +398,9 @@ module TensorCoreChainArray (
     .io_expIn_1          (tensorCoreChain_6_io_expIn_1        ), //i
     .io_expIn_2          (tensorCoreChain_6_io_expIn_2        ), //i
     .io_expCascadeIn     (tensorCoreChain_6_io_expCascadeIn   ), //i
-    .io_dataValid        (tensorDataValid                     ), //i
+    .io_dataValid        (tensorDataValid_delay_1             ), //i
     .io_dataIterReady    (tensorCoreChain_6_io_dataIterReady  ), //o
-    .io_loadValid        (tensorLoadValid                     ), //i
+    .io_loadValid        (tensorLoadValid_delay_1             ), //i
     .io_loadReady        (tensorCoreChain_6_io_loadReady      ), //o
     .io_res_0            (tensorCoreChain_6_io_res_0          ), //o
     .io_res_1            (tensorCoreChain_6_io_res_1          ), //o
@@ -779,9 +419,9 @@ module TensorCoreChainArray (
     .io_expIn_1          (tensorCoreChain_7_io_expIn_1        ), //i
     .io_expIn_2          (tensorCoreChain_7_io_expIn_2        ), //i
     .io_expCascadeIn     (tensorCoreChain_7_io_expCascadeIn   ), //i
-    .io_dataValid        (tensorDataValid                     ), //i
+    .io_dataValid        (tensorDataValid_delay_1_1           ), //i
     .io_dataIterReady    (tensorCoreChain_7_io_dataIterReady  ), //o
-    .io_loadValid        (tensorLoadValid                     ), //i
+    .io_loadValid        (tensorLoadValid_delay_1_1           ), //i
     .io_loadReady        (tensorCoreChain_7_io_loadReady      ), //o
     .io_res_0            (tensorCoreChain_7_io_res_0          ), //o
     .io_res_1            (tensorCoreChain_7_io_res_1          ), //o
@@ -800,9 +440,9 @@ module TensorCoreChainArray (
     .io_expIn_1          (tensorCoreChain_8_io_expIn_1        ), //i
     .io_expIn_2          (tensorCoreChain_8_io_expIn_2        ), //i
     .io_expCascadeIn     (tensorCoreChain_8_io_expCascadeIn   ), //i
-    .io_dataValid        (tensorDataValid                     ), //i
+    .io_dataValid        (tensorDataValid_delay_1_2           ), //i
     .io_dataIterReady    (tensorCoreChain_8_io_dataIterReady  ), //o
-    .io_loadValid        (tensorLoadValid                     ), //i
+    .io_loadValid        (tensorLoadValid_delay_1_2           ), //i
     .io_loadReady        (tensorCoreChain_8_io_loadReady      ), //o
     .io_res_0            (tensorCoreChain_8_io_res_0          ), //o
     .io_res_1            (tensorCoreChain_8_io_res_1          ), //o
@@ -821,9 +461,9 @@ module TensorCoreChainArray (
     .io_expIn_1          (tensorCoreChain_9_io_expIn_1        ), //i
     .io_expIn_2          (tensorCoreChain_9_io_expIn_2        ), //i
     .io_expCascadeIn     (tensorCoreChain_9_io_expCascadeIn   ), //i
-    .io_dataValid        (tensorDataValid                     ), //i
+    .io_dataValid        (tensorDataValid_delay_1_3           ), //i
     .io_dataIterReady    (tensorCoreChain_9_io_dataIterReady  ), //o
-    .io_loadValid        (tensorLoadValid                     ), //i
+    .io_loadValid        (tensorLoadValid_delay_1_3           ), //i
     .io_loadReady        (tensorCoreChain_9_io_loadReady      ), //o
     .io_res_0            (tensorCoreChain_9_io_res_0          ), //o
     .io_res_1            (tensorCoreChain_9_io_res_1          ), //o
@@ -842,9 +482,9 @@ module TensorCoreChainArray (
     .io_expIn_1          (tensorCoreChain_10_io_expIn_1        ), //i
     .io_expIn_2          (tensorCoreChain_10_io_expIn_2        ), //i
     .io_expCascadeIn     (tensorCoreChain_10_io_expCascadeIn   ), //i
-    .io_dataValid        (tensorDataValid                      ), //i
+    .io_dataValid        (tensorDataValid_delay_1_4            ), //i
     .io_dataIterReady    (tensorCoreChain_10_io_dataIterReady  ), //o
-    .io_loadValid        (tensorLoadValid                      ), //i
+    .io_loadValid        (tensorLoadValid_delay_1_4            ), //i
     .io_loadReady        (tensorCoreChain_10_io_loadReady      ), //o
     .io_res_0            (tensorCoreChain_10_io_res_0          ), //o
     .io_res_1            (tensorCoreChain_10_io_res_1          ), //o
@@ -863,9 +503,9 @@ module TensorCoreChainArray (
     .io_expIn_1          (tensorCoreChain_11_io_expIn_1        ), //i
     .io_expIn_2          (tensorCoreChain_11_io_expIn_2        ), //i
     .io_expCascadeIn     (tensorCoreChain_11_io_expCascadeIn   ), //i
-    .io_dataValid        (tensorDataValid                      ), //i
+    .io_dataValid        (tensorDataValid_delay_1_5            ), //i
     .io_dataIterReady    (tensorCoreChain_11_io_dataIterReady  ), //o
-    .io_loadValid        (tensorLoadValid                      ), //i
+    .io_loadValid        (tensorLoadValid_delay_1_5            ), //i
     .io_loadReady        (tensorCoreChain_11_io_loadReady      ), //o
     .io_res_0            (tensorCoreChain_11_io_res_0          ), //o
     .io_res_1            (tensorCoreChain_11_io_res_1          ), //o
@@ -874,6 +514,78 @@ module TensorCoreChainArray (
     .io_outValid         (tensorCoreChain_11_io_outValid       ), //o
     .clk                 (clk                                  ), //i
     .resetn              (resetn                               )  //i
+  );
+  in_buffer colMem_0 (
+    .clock        (clk                                 ), //i
+    .wren         (colMem_0_wren                       ), //i
+    .rdaddress    (colMem_0_rdaddress                  ), //i
+    .wraddress    (colMem_0_wraddress                  ), //i
+    .data         (colConverters_0_io_dataOut_payload  ), //i
+    .q            (colMem_0_q                          )  //o
+  );
+  in_buffer colMem_1 (
+    .clock        (clk                                 ), //i
+    .wren         (colMem_1_wren                       ), //i
+    .rdaddress    (colMem_1_rdaddress                  ), //i
+    .wraddress    (colMem_1_wraddress                  ), //i
+    .data         (colConverters_1_io_dataOut_payload  ), //i
+    .q            (colMem_1_q                          )  //o
+  );
+  in_buffer colMem_2 (
+    .clock        (clk                                 ), //i
+    .wren         (colMem_2_wren                       ), //i
+    .rdaddress    (colMem_2_rdaddress                  ), //i
+    .wraddress    (colMem_2_wraddress                  ), //i
+    .data         (colConverters_2_io_dataOut_payload  ), //i
+    .q            (colMem_2_q                          )  //o
+  );
+  in_buffer rowMem_0 (
+    .clock        (clk                                     ), //i
+    .wren         (rowMem_0_wren                           ), //i
+    .rdaddress    (rowMem_0_rdaddress                      ), //i
+    .wraddress    (rowMem_0_wraddress                      ), //i
+    .data         (fixedBfpConverter_9_io_dataOut_payload  ), //i
+    .q            (rowMem_0_q                              )  //o
+  );
+  in_buffer rowMem_1 (
+    .clock        (clk                                      ), //i
+    .wren         (rowMem_1_wren                            ), //i
+    .rdaddress    (rowMem_1_rdaddress                       ), //i
+    .wraddress    (rowMem_1_wraddress                       ), //i
+    .data         (fixedBfpConverter_10_io_dataOut_payload  ), //i
+    .q            (rowMem_1_q                               )  //o
+  );
+  in_buffer rowMem_2 (
+    .clock        (clk                                      ), //i
+    .wren         (rowMem_2_wren                            ), //i
+    .rdaddress    (rowMem_2_rdaddress                       ), //i
+    .wraddress    (rowMem_2_wraddress                       ), //i
+    .data         (fixedBfpConverter_11_io_dataOut_payload  ), //i
+    .q            (rowMem_2_q                               )  //o
+  );
+  in_buffer rowMem_3 (
+    .clock        (clk                                      ), //i
+    .wren         (rowMem_3_wren                            ), //i
+    .rdaddress    (rowMem_3_rdaddress                       ), //i
+    .wraddress    (rowMem_3_wraddress                       ), //i
+    .data         (fixedBfpConverter_12_io_dataOut_payload  ), //i
+    .q            (rowMem_3_q                               )  //o
+  );
+  in_buffer rowMem_4 (
+    .clock        (clk                                      ), //i
+    .wren         (rowMem_4_wren                            ), //i
+    .rdaddress    (rowMem_4_rdaddress                       ), //i
+    .wraddress    (rowMem_4_wraddress                       ), //i
+    .data         (fixedBfpConverter_13_io_dataOut_payload  ), //i
+    .q            (rowMem_4_q                               )  //o
+  );
+  in_buffer rowMem_5 (
+    .clock        (clk                                      ), //i
+    .wren         (rowMem_5_wren                            ), //i
+    .rdaddress    (rowMem_5_rdaddress                       ), //i
+    .wraddress    (rowMem_5_wraddress                       ), //i
+    .data         (fixedBfpConverter_14_io_dataOut_payload  ), //i
+    .q            (rowMem_5_q                               )  //o
   );
   FixedBfpConverter colConverters_0 (
     .io_dataIn_valid       (io_matALoad_0_valid                 ), //i
@@ -947,18 +659,14 @@ module TensorCoreChainArray (
     .clk                   (clk                                      ), //i
     .resetn                (resetn                                   )  //i
   );
-  StreamFifo outputBuffer (
-    .io_push_valid      (bufferIf_valid                ), //i
-    .io_push_ready      (outputBuffer_io_push_ready    ), //o
-    .io_push_payload    (bufferIf_payload              ), //i
-    .io_pop_valid       (outputBuffer_io_pop_valid     ), //o
-    .io_pop_ready       (io_res_ready                  ), //i
-    .io_pop_payload     (outputBuffer_io_pop_payload   ), //o
-    .io_flush           (1'b0                          ), //i
-    .io_occupancy       (outputBuffer_io_occupancy     ), //o
-    .io_availability    (outputBuffer_io_availability  ), //o
-    .clk                (clk                           ), //i
-    .resetn             (resetn                        )  //i
+  out_fifo outputBuffer (
+    .clock    (clk                 ), //i
+    .wrreq    (outputBuffer_wrreq  ), //i
+    .rdreq    (io_res_ready        ), //i
+    .full     (outputBuffer_full   ), //o
+    .empty    (outputBuffer_empty  ), //o
+    .data     (outputBuffer_data   ), //i
+    .q        (outputBuffer_q      )  //o
   );
   `ifndef SYNTHESIS
   always @(*) begin
@@ -984,69 +692,6 @@ module TensorCoreChainArray (
   `endif
 
   always @(*) begin
-    _zz_1 = 1'b0;
-    if(fixedBfpConverter_14_io_dataOut_valid) begin
-      _zz_1 = 1'b1;
-    end
-  end
-
-  always @(*) begin
-    _zz_2 = 1'b0;
-    if(fixedBfpConverter_13_io_dataOut_valid) begin
-      _zz_2 = 1'b1;
-    end
-  end
-
-  always @(*) begin
-    _zz_3 = 1'b0;
-    if(fixedBfpConverter_12_io_dataOut_valid) begin
-      _zz_3 = 1'b1;
-    end
-  end
-
-  always @(*) begin
-    _zz_4 = 1'b0;
-    if(fixedBfpConverter_11_io_dataOut_valid) begin
-      _zz_4 = 1'b1;
-    end
-  end
-
-  always @(*) begin
-    _zz_5 = 1'b0;
-    if(fixedBfpConverter_10_io_dataOut_valid) begin
-      _zz_5 = 1'b1;
-    end
-  end
-
-  always @(*) begin
-    _zz_6 = 1'b0;
-    if(fixedBfpConverter_9_io_dataOut_valid) begin
-      _zz_6 = 1'b1;
-    end
-  end
-
-  always @(*) begin
-    _zz_7 = 1'b0;
-    if(colConverters_2_io_dataOut_valid) begin
-      _zz_7 = 1'b1;
-    end
-  end
-
-  always @(*) begin
-    _zz_8 = 1'b0;
-    if(colConverters_1_io_dataOut_valid) begin
-      _zz_8 = 1'b1;
-    end
-  end
-
-  always @(*) begin
-    _zz_9 = 1'b0;
-    if(colConverters_0_io_dataOut_valid) begin
-      _zz_9 = 1'b1;
-    end
-  end
-
-  always @(*) begin
     rowBufferRdCounter_willIncrement = 1'b0;
     case(ctrlStateMachine_stateReg)
       `ctrlStateMachine_enumDefinition_binary_sequential_ctrlStateMachine_sIdle : begin
@@ -1054,7 +699,7 @@ module TensorCoreChainArray (
       `ctrlStateMachine_enumDefinition_binary_sequential_ctrlStateMachine_sPreLoad : begin
       end
       `ctrlStateMachine_enumDefinition_binary_sequential_ctrlStateMachine_sCompute : begin
-        if(when_TensorCoreChainArray_l155) begin
+        if(when_TensorCoreChainArray_l164) begin
           rowBufferRdCounter_willIncrement = 1'b1;
         end
       end
@@ -1076,7 +721,7 @@ module TensorCoreChainArray (
       `ctrlStateMachine_enumDefinition_binary_sequential_ctrlStateMachine_sPreLoad : begin
       end
       `ctrlStateMachine_enumDefinition_binary_sequential_ctrlStateMachine_sCompute : begin
-        if(!when_TensorCoreChainArray_l155) begin
+        if(!when_TensorCoreChainArray_l164) begin
           rowBufferRdCounter_willClear = 1'b1;
         end
       end
@@ -1112,7 +757,7 @@ module TensorCoreChainArray (
         colBufferRdCounter_willIncrement = 1'b1;
       end
       `ctrlStateMachine_enumDefinition_binary_sequential_ctrlStateMachine_sCompute : begin
-        if(when_TensorCoreChainArray_l165) begin
+        if(when_TensorCoreChainArray_l174) begin
           colBufferRdCounter_willIncrement = 1'b1;
         end
       end
@@ -1134,7 +779,7 @@ module TensorCoreChainArray (
       `ctrlStateMachine_enumDefinition_binary_sequential_ctrlStateMachine_sPreLoad : begin
       end
       `ctrlStateMachine_enumDefinition_binary_sequential_ctrlStateMachine_sCompute : begin
-        if(!when_TensorCoreChainArray_l165) begin
+        if(!when_TensorCoreChainArray_l174) begin
           colBufferRdCounter_willClear = 1'b1;
         end
       end
@@ -1162,349 +807,409 @@ module TensorCoreChainArray (
   end
 
   always @(*) begin
-    _zz_10 = 1'b0;
+    _zz_wraddress = 1'b0;
     if(colConverters_0_io_dataOut_valid) begin
+      _zz_wraddress = 1'b1;
+    end
+  end
+
+  always @(*) begin
+    _zz_1 = 1'b0;
+    if(!colConverters_0_io_dataOut_valid) begin
+      _zz_1 = 1'b1;
+    end
+  end
+
+  assign _zz_2 = (_zz_wraddress_2 == 5'h1a);
+  assign _zz_3 = (_zz_2 && _zz_wraddress);
+  always @(*) begin
+    if(_zz_3) begin
+      _zz_wraddress_1 = 5'h0;
+    end else begin
+      _zz_wraddress_1 = (_zz_wraddress_2 + _zz__zz_wraddress_1);
+    end
+    if(_zz_1) begin
+      _zz_wraddress_1 = 5'h0;
+    end
+  end
+
+  assign colMem_0_wraddress = {2'd0, _zz_wraddress_2};
+  assign colMem_0_rdaddress = {2'd0, colBufferRdCounter_value};
+  always @(*) begin
+    if(colConverters_0_io_dataOut_valid) begin
+      colMem_0_wren = 1'b1;
+    end else begin
+      colMem_0_wren = 1'b0;
+    end
+  end
+
+  always @(*) begin
+    _zz_wraddress_3 = 1'b0;
+    if(colConverters_1_io_dataOut_valid) begin
+      _zz_wraddress_3 = 1'b1;
+    end
+  end
+
+  always @(*) begin
+    _zz_4 = 1'b0;
+    if(!colConverters_1_io_dataOut_valid) begin
+      _zz_4 = 1'b1;
+    end
+  end
+
+  assign _zz_5 = (_zz_wraddress_5 == 5'h1a);
+  assign _zz_6 = (_zz_5 && _zz_wraddress_3);
+  always @(*) begin
+    if(_zz_6) begin
+      _zz_wraddress_4 = 5'h0;
+    end else begin
+      _zz_wraddress_4 = (_zz_wraddress_5 + _zz__zz_wraddress_4);
+    end
+    if(_zz_4) begin
+      _zz_wraddress_4 = 5'h0;
+    end
+  end
+
+  assign colMem_1_wraddress = {2'd0, _zz_wraddress_5};
+  assign colMem_1_rdaddress = {2'd0, colBufferRdCounter_value};
+  always @(*) begin
+    if(colConverters_1_io_dataOut_valid) begin
+      colMem_1_wren = 1'b1;
+    end else begin
+      colMem_1_wren = 1'b0;
+    end
+  end
+
+  always @(*) begin
+    _zz_wraddress_6 = 1'b0;
+    if(colConverters_2_io_dataOut_valid) begin
+      _zz_wraddress_6 = 1'b1;
+    end
+  end
+
+  always @(*) begin
+    _zz_7 = 1'b0;
+    if(!colConverters_2_io_dataOut_valid) begin
+      _zz_7 = 1'b1;
+    end
+  end
+
+  assign _zz_8 = (_zz_wraddress_8 == 5'h1a);
+  assign _zz_9 = (_zz_8 && _zz_wraddress_6);
+  always @(*) begin
+    if(_zz_9) begin
+      _zz_wraddress_7 = 5'h0;
+    end else begin
+      _zz_wraddress_7 = (_zz_wraddress_8 + _zz__zz_wraddress_7);
+    end
+    if(_zz_7) begin
+      _zz_wraddress_7 = 5'h0;
+    end
+  end
+
+  assign colMem_2_wraddress = {2'd0, _zz_wraddress_8};
+  assign colMem_2_rdaddress = {2'd0, colBufferRdCounter_value};
+  always @(*) begin
+    if(colConverters_2_io_dataOut_valid) begin
+      colMem_2_wren = 1'b1;
+    end else begin
+      colMem_2_wren = 1'b0;
+    end
+  end
+
+  always @(*) begin
+    _zz_wraddress_9 = 1'b0;
+    if(fixedBfpConverter_9_io_dataOut_valid) begin
+      _zz_wraddress_9 = 1'b1;
+    end
+  end
+
+  always @(*) begin
+    _zz_10 = 1'b0;
+    if(!fixedBfpConverter_9_io_dataOut_valid) begin
       _zz_10 = 1'b1;
     end
   end
 
+  assign _zz_11 = (_zz_wraddress_11 == 5'h1a);
+  assign _zz_12 = (_zz_11 && _zz_wraddress_9);
   always @(*) begin
-    _zz_11 = 1'b0;
-    if(!colConverters_0_io_dataOut_valid) begin
-      _zz_11 = 1'b1;
+    if(_zz_12) begin
+      _zz_wraddress_10 = 5'h0;
+    end else begin
+      _zz_wraddress_10 = (_zz_wraddress_11 + _zz__zz_wraddress_10);
+    end
+    if(_zz_10) begin
+      _zz_wraddress_10 = 5'h0;
     end
   end
 
-  assign _zz_14 = (_zz_13 == 5'h1a);
-  assign _zz_15 = (_zz_14 && _zz_10);
+  assign rowMem_0_wraddress = {2'd0, _zz_wraddress_11};
+  assign rowMem_0_rdaddress = {2'd0, rowBufferRdCounter_value};
+  always @(*) begin
+    if(fixedBfpConverter_9_io_dataOut_valid) begin
+      rowMem_0_wren = 1'b1;
+    end else begin
+      rowMem_0_wren = 1'b0;
+    end
+  end
+
+  always @(*) begin
+    _zz_wraddress_12 = 1'b0;
+    if(fixedBfpConverter_10_io_dataOut_valid) begin
+      _zz_wraddress_12 = 1'b1;
+    end
+  end
+
+  always @(*) begin
+    _zz_13 = 1'b0;
+    if(!fixedBfpConverter_10_io_dataOut_valid) begin
+      _zz_13 = 1'b1;
+    end
+  end
+
+  assign _zz_14 = (_zz_wraddress_14 == 5'h1a);
+  assign _zz_15 = (_zz_14 && _zz_wraddress_12);
   always @(*) begin
     if(_zz_15) begin
-      _zz_12 = 5'h0;
+      _zz_wraddress_13 = 5'h0;
     end else begin
-      _zz_12 = (_zz_13 + _zz__zz_12);
+      _zz_wraddress_13 = (_zz_wraddress_14 + _zz__zz_wraddress_13);
     end
-    if(_zz_11) begin
-      _zz_12 = 5'h0;
+    if(_zz_13) begin
+      _zz_wraddress_13 = 5'h0;
+    end
+  end
+
+  assign rowMem_1_wraddress = {2'd0, _zz_wraddress_14};
+  assign rowMem_1_rdaddress = {2'd0, rowBufferRdCounter_value};
+  always @(*) begin
+    if(fixedBfpConverter_10_io_dataOut_valid) begin
+      rowMem_1_wren = 1'b1;
+    end else begin
+      rowMem_1_wren = 1'b0;
+    end
+  end
+
+  always @(*) begin
+    _zz_wraddress_15 = 1'b0;
+    if(fixedBfpConverter_11_io_dataOut_valid) begin
+      _zz_wraddress_15 = 1'b1;
     end
   end
 
   always @(*) begin
     _zz_16 = 1'b0;
-    if(colConverters_1_io_dataOut_valid) begin
+    if(!fixedBfpConverter_11_io_dataOut_valid) begin
       _zz_16 = 1'b1;
     end
   end
 
+  assign _zz_17 = (_zz_wraddress_17 == 5'h1a);
+  assign _zz_18 = (_zz_17 && _zz_wraddress_15);
   always @(*) begin
-    _zz_17 = 1'b0;
-    if(!colConverters_1_io_dataOut_valid) begin
-      _zz_17 = 1'b1;
+    if(_zz_18) begin
+      _zz_wraddress_16 = 5'h0;
+    end else begin
+      _zz_wraddress_16 = (_zz_wraddress_17 + _zz__zz_wraddress_16);
+    end
+    if(_zz_16) begin
+      _zz_wraddress_16 = 5'h0;
     end
   end
 
-  assign _zz_20 = (_zz_19 == 5'h1a);
-  assign _zz_21 = (_zz_20 && _zz_16);
+  assign rowMem_2_wraddress = {2'd0, _zz_wraddress_17};
+  assign rowMem_2_rdaddress = {2'd0, rowBufferRdCounter_value};
+  always @(*) begin
+    if(fixedBfpConverter_11_io_dataOut_valid) begin
+      rowMem_2_wren = 1'b1;
+    end else begin
+      rowMem_2_wren = 1'b0;
+    end
+  end
+
+  always @(*) begin
+    _zz_wraddress_18 = 1'b0;
+    if(fixedBfpConverter_12_io_dataOut_valid) begin
+      _zz_wraddress_18 = 1'b1;
+    end
+  end
+
+  always @(*) begin
+    _zz_19 = 1'b0;
+    if(!fixedBfpConverter_12_io_dataOut_valid) begin
+      _zz_19 = 1'b1;
+    end
+  end
+
+  assign _zz_20 = (_zz_wraddress_20 == 5'h1a);
+  assign _zz_21 = (_zz_20 && _zz_wraddress_18);
   always @(*) begin
     if(_zz_21) begin
-      _zz_18 = 5'h0;
+      _zz_wraddress_19 = 5'h0;
     end else begin
-      _zz_18 = (_zz_19 + _zz__zz_18);
+      _zz_wraddress_19 = (_zz_wraddress_20 + _zz__zz_wraddress_19);
     end
-    if(_zz_17) begin
-      _zz_18 = 5'h0;
+    if(_zz_19) begin
+      _zz_wraddress_19 = 5'h0;
+    end
+  end
+
+  assign rowMem_3_wraddress = {2'd0, _zz_wraddress_20};
+  assign rowMem_3_rdaddress = {2'd0, rowBufferRdCounter_value};
+  always @(*) begin
+    if(fixedBfpConverter_12_io_dataOut_valid) begin
+      rowMem_3_wren = 1'b1;
+    end else begin
+      rowMem_3_wren = 1'b0;
+    end
+  end
+
+  always @(*) begin
+    _zz_wraddress_21 = 1'b0;
+    if(fixedBfpConverter_13_io_dataOut_valid) begin
+      _zz_wraddress_21 = 1'b1;
     end
   end
 
   always @(*) begin
     _zz_22 = 1'b0;
-    if(colConverters_2_io_dataOut_valid) begin
+    if(!fixedBfpConverter_13_io_dataOut_valid) begin
       _zz_22 = 1'b1;
     end
   end
 
+  assign _zz_23 = (_zz_wraddress_23 == 5'h1a);
+  assign _zz_24 = (_zz_23 && _zz_wraddress_21);
   always @(*) begin
-    _zz_23 = 1'b0;
-    if(!colConverters_2_io_dataOut_valid) begin
-      _zz_23 = 1'b1;
+    if(_zz_24) begin
+      _zz_wraddress_22 = 5'h0;
+    end else begin
+      _zz_wraddress_22 = (_zz_wraddress_23 + _zz__zz_wraddress_22);
+    end
+    if(_zz_22) begin
+      _zz_wraddress_22 = 5'h0;
     end
   end
 
-  assign _zz_26 = (_zz_25 == 5'h1a);
-  assign _zz_27 = (_zz_26 && _zz_22);
+  assign rowMem_4_wraddress = {2'd0, _zz_wraddress_23};
+  assign rowMem_4_rdaddress = {2'd0, rowBufferRdCounter_value};
+  always @(*) begin
+    if(fixedBfpConverter_13_io_dataOut_valid) begin
+      rowMem_4_wren = 1'b1;
+    end else begin
+      rowMem_4_wren = 1'b0;
+    end
+  end
+
+  always @(*) begin
+    _zz_wraddress_24 = 1'b0;
+    if(fixedBfpConverter_14_io_dataOut_valid) begin
+      _zz_wraddress_24 = 1'b1;
+    end
+  end
+
+  always @(*) begin
+    _zz_25 = 1'b0;
+    if(!fixedBfpConverter_14_io_dataOut_valid) begin
+      _zz_25 = 1'b1;
+    end
+  end
+
+  assign _zz_26 = (_zz_wraddress_26 == 5'h1a);
+  assign _zz_27 = (_zz_26 && _zz_wraddress_24);
   always @(*) begin
     if(_zz_27) begin
-      _zz_24 = 5'h0;
+      _zz_wraddress_25 = 5'h0;
     end else begin
-      _zz_24 = (_zz_25 + _zz__zz_24);
+      _zz_wraddress_25 = (_zz_wraddress_26 + _zz__zz_wraddress_25);
     end
-    if(_zz_23) begin
-      _zz_24 = 5'h0;
-    end
-  end
-
-  always @(*) begin
-    _zz_28 = 1'b0;
-    if(fixedBfpConverter_9_io_dataOut_valid) begin
-      _zz_28 = 1'b1;
+    if(_zz_25) begin
+      _zz_wraddress_25 = 5'h0;
     end
   end
 
+  assign rowMem_5_wraddress = {2'd0, _zz_wraddress_26};
+  assign rowMem_5_rdaddress = {2'd0, rowBufferRdCounter_value};
   always @(*) begin
-    _zz_29 = 1'b0;
-    if(!fixedBfpConverter_9_io_dataOut_valid) begin
-      _zz_29 = 1'b1;
-    end
-  end
-
-  assign _zz_32 = (_zz_31 == 5'h1a);
-  assign _zz_33 = (_zz_32 && _zz_28);
-  always @(*) begin
-    if(_zz_33) begin
-      _zz_30 = 5'h0;
-    end else begin
-      _zz_30 = (_zz_31 + _zz__zz_30);
-    end
-    if(_zz_29) begin
-      _zz_30 = 5'h0;
-    end
-  end
-
-  always @(*) begin
-    _zz_34 = 1'b0;
-    if(fixedBfpConverter_10_io_dataOut_valid) begin
-      _zz_34 = 1'b1;
-    end
-  end
-
-  always @(*) begin
-    _zz_35 = 1'b0;
-    if(!fixedBfpConverter_10_io_dataOut_valid) begin
-      _zz_35 = 1'b1;
-    end
-  end
-
-  assign _zz_38 = (_zz_37 == 5'h1a);
-  assign _zz_39 = (_zz_38 && _zz_34);
-  always @(*) begin
-    if(_zz_39) begin
-      _zz_36 = 5'h0;
-    end else begin
-      _zz_36 = (_zz_37 + _zz__zz_36);
-    end
-    if(_zz_35) begin
-      _zz_36 = 5'h0;
-    end
-  end
-
-  always @(*) begin
-    _zz_40 = 1'b0;
-    if(fixedBfpConverter_11_io_dataOut_valid) begin
-      _zz_40 = 1'b1;
-    end
-  end
-
-  always @(*) begin
-    _zz_41 = 1'b0;
-    if(!fixedBfpConverter_11_io_dataOut_valid) begin
-      _zz_41 = 1'b1;
-    end
-  end
-
-  assign _zz_44 = (_zz_43 == 5'h1a);
-  assign _zz_45 = (_zz_44 && _zz_40);
-  always @(*) begin
-    if(_zz_45) begin
-      _zz_42 = 5'h0;
-    end else begin
-      _zz_42 = (_zz_43 + _zz__zz_42);
-    end
-    if(_zz_41) begin
-      _zz_42 = 5'h0;
-    end
-  end
-
-  always @(*) begin
-    _zz_46 = 1'b0;
-    if(fixedBfpConverter_12_io_dataOut_valid) begin
-      _zz_46 = 1'b1;
-    end
-  end
-
-  always @(*) begin
-    _zz_47 = 1'b0;
-    if(!fixedBfpConverter_12_io_dataOut_valid) begin
-      _zz_47 = 1'b1;
-    end
-  end
-
-  assign _zz_50 = (_zz_49 == 5'h1a);
-  assign _zz_51 = (_zz_50 && _zz_46);
-  always @(*) begin
-    if(_zz_51) begin
-      _zz_48 = 5'h0;
-    end else begin
-      _zz_48 = (_zz_49 + _zz__zz_48);
-    end
-    if(_zz_47) begin
-      _zz_48 = 5'h0;
-    end
-  end
-
-  always @(*) begin
-    _zz_52 = 1'b0;
-    if(fixedBfpConverter_13_io_dataOut_valid) begin
-      _zz_52 = 1'b1;
-    end
-  end
-
-  always @(*) begin
-    _zz_53 = 1'b0;
-    if(!fixedBfpConverter_13_io_dataOut_valid) begin
-      _zz_53 = 1'b1;
-    end
-  end
-
-  assign _zz_56 = (_zz_55 == 5'h1a);
-  assign _zz_57 = (_zz_56 && _zz_52);
-  always @(*) begin
-    if(_zz_57) begin
-      _zz_54 = 5'h0;
-    end else begin
-      _zz_54 = (_zz_55 + _zz__zz_54);
-    end
-    if(_zz_53) begin
-      _zz_54 = 5'h0;
-    end
-  end
-
-  always @(*) begin
-    _zz_58 = 1'b0;
     if(fixedBfpConverter_14_io_dataOut_valid) begin
-      _zz_58 = 1'b1;
-    end
-  end
-
-  always @(*) begin
-    _zz_59 = 1'b0;
-    if(!fixedBfpConverter_14_io_dataOut_valid) begin
-      _zz_59 = 1'b1;
-    end
-  end
-
-  assign _zz_62 = (_zz_61 == 5'h1a);
-  assign _zz_63 = (_zz_62 && _zz_58);
-  always @(*) begin
-    if(_zz_63) begin
-      _zz_60 = 5'h0;
+      rowMem_5_wren = 1'b1;
     end else begin
-      _zz_60 = (_zz_61 + _zz__zz_60);
-    end
-    if(_zz_59) begin
-      _zz_60 = 5'h0;
+      rowMem_5_wren = 1'b0;
     end
   end
 
-  assign _zz_io_dataIn_0 = {2'd0, rowBufferRdCounter_value};
-  assign _zz_io_dataIn_0_1 = _zz_rowMem_0_port1;
-  assign _zz_io_dataIn_1 = {2'd0, rowBufferRdCounter_value};
-  assign _zz_io_dataIn_1_1 = _zz_rowMem_1_port1;
-  assign _zz_io_dataIn_2 = {2'd0, rowBufferRdCounter_value};
-  assign _zz_io_dataIn_2_1 = _zz_rowMem_2_port1;
-  assign _zz_io_loadCascadeIn = {2'd0, colBufferRdCounter_value};
-  assign _zz_io_loadCascadeIn_1 = _zz_colMem_0_port1;
-  assign tensorCoreChain_6_io_dataIn_0 = (tensorDataValid ? _zz_io_dataIn_0_1[87 : 8] : 80'h0);
-  assign tensorCoreChain_6_io_expIn_0 = (tensorDataValid ? _zz_io_dataIn_0_1[7 : 0] : 8'h0);
-  assign tensorCoreChain_6_io_dataIn_1 = (tensorDataValid ? _zz_io_dataIn_1_1[87 : 8] : 80'h0);
-  assign tensorCoreChain_6_io_expIn_1 = (tensorDataValid ? _zz_io_dataIn_1_1[7 : 0] : 8'h0);
-  assign tensorCoreChain_6_io_dataIn_2 = (tensorDataValid ? _zz_io_dataIn_2_1[87 : 8] : 80'h0);
-  assign tensorCoreChain_6_io_expIn_2 = (tensorDataValid ? _zz_io_dataIn_2_1[7 : 0] : 8'h0);
-  assign tensorCoreChain_6_io_loadCascadeIn = (tensorLoadValid ? _zz_io_loadCascadeIn_1[87 : 8] : 80'h0);
-  assign tensorCoreChain_6_io_expCascadeIn = (tensorLoadValid ? _zz_io_loadCascadeIn_1[7 : 0] : 8'h0);
+  assign _zz_io_dataIn_0 = rowMem_0_q;
+  assign _zz_io_dataIn_1 = rowMem_1_q;
+  assign _zz_io_dataIn_2 = rowMem_2_q;
+  assign tensorCoreChain_6_io_dataIn_0 = _zz_io_dataIn_0[87 : 8];
+  assign tensorCoreChain_6_io_expIn_0 = _zz_io_dataIn_0[7 : 0];
+  assign tensorCoreChain_6_io_dataIn_1 = _zz_io_dataIn_1[87 : 8];
+  assign tensorCoreChain_6_io_expIn_1 = _zz_io_dataIn_1[7 : 0];
+  assign tensorCoreChain_6_io_dataIn_2 = _zz_io_dataIn_2[87 : 8];
+  assign tensorCoreChain_6_io_expIn_2 = _zz_io_dataIn_2[7 : 0];
+  assign tensorCoreChain_6_io_loadCascadeIn = colMem_0_q[87 : 8];
+  assign tensorCoreChain_6_io_expCascadeIn = colMem_0_q[7 : 0];
   assign tcArrayRes_payload_0 = {tensorCoreChain_6_io_res_2,{tensorCoreChain_6_io_res_1,tensorCoreChain_6_io_res_0}};
-  assign _zz_io_dataIn_0_2 = {2'd0, rowBufferRdCounter_value};
-  assign _zz_io_dataIn_0_3 = _zz_rowMem_0_port2;
-  assign _zz_io_dataIn_1_2 = {2'd0, rowBufferRdCounter_value};
-  assign _zz_io_dataIn_1_3 = _zz_rowMem_1_port2;
-  assign _zz_io_dataIn_2_2 = {2'd0, rowBufferRdCounter_value};
-  assign _zz_io_dataIn_2_3 = _zz_rowMem_2_port2;
-  assign _zz_io_loadCascadeIn_2 = {2'd0, colBufferRdCounter_value};
-  assign _zz_io_loadCascadeIn_3 = _zz_colMem_1_port1;
-  assign tensorCoreChain_7_io_dataIn_0 = (tensorDataValid ? _zz_io_dataIn_0_3[87 : 8] : 80'h0);
-  assign tensorCoreChain_7_io_expIn_0 = (tensorDataValid ? _zz_io_dataIn_0_3[7 : 0] : 8'h0);
-  assign tensorCoreChain_7_io_dataIn_1 = (tensorDataValid ? _zz_io_dataIn_1_3[87 : 8] : 80'h0);
-  assign tensorCoreChain_7_io_expIn_1 = (tensorDataValid ? _zz_io_dataIn_1_3[7 : 0] : 8'h0);
-  assign tensorCoreChain_7_io_dataIn_2 = (tensorDataValid ? _zz_io_dataIn_2_3[87 : 8] : 80'h0);
-  assign tensorCoreChain_7_io_expIn_2 = (tensorDataValid ? _zz_io_dataIn_2_3[7 : 0] : 8'h0);
-  assign tensorCoreChain_7_io_loadCascadeIn = (tensorLoadValid ? _zz_io_loadCascadeIn_3[87 : 8] : 80'h0);
-  assign tensorCoreChain_7_io_expCascadeIn = (tensorLoadValid ? _zz_io_loadCascadeIn_3[7 : 0] : 8'h0);
+  assign _zz_io_dataIn_0_1 = rowMem_0_q;
+  assign _zz_io_dataIn_1_1 = rowMem_1_q;
+  assign _zz_io_dataIn_2_1 = rowMem_2_q;
+  assign tensorCoreChain_7_io_dataIn_0 = _zz_io_dataIn_0_1[87 : 8];
+  assign tensorCoreChain_7_io_expIn_0 = _zz_io_dataIn_0_1[7 : 0];
+  assign tensorCoreChain_7_io_dataIn_1 = _zz_io_dataIn_1_1[87 : 8];
+  assign tensorCoreChain_7_io_expIn_1 = _zz_io_dataIn_1_1[7 : 0];
+  assign tensorCoreChain_7_io_dataIn_2 = _zz_io_dataIn_2_1[87 : 8];
+  assign tensorCoreChain_7_io_expIn_2 = _zz_io_dataIn_2_1[7 : 0];
+  assign tensorCoreChain_7_io_loadCascadeIn = colMem_1_q[87 : 8];
+  assign tensorCoreChain_7_io_expCascadeIn = colMem_1_q[7 : 0];
   assign tcArrayRes_payload_1 = {tensorCoreChain_7_io_res_2,{tensorCoreChain_7_io_res_1,tensorCoreChain_7_io_res_0}};
-  assign _zz_io_dataIn_0_4 = {2'd0, rowBufferRdCounter_value};
-  assign _zz_io_dataIn_0_5 = _zz_rowMem_0_port3;
-  assign _zz_io_dataIn_1_4 = {2'd0, rowBufferRdCounter_value};
-  assign _zz_io_dataIn_1_5 = _zz_rowMem_1_port3;
-  assign _zz_io_dataIn_2_4 = {2'd0, rowBufferRdCounter_value};
-  assign _zz_io_dataIn_2_5 = _zz_rowMem_2_port3;
-  assign _zz_io_loadCascadeIn_4 = {2'd0, colBufferRdCounter_value};
-  assign _zz_io_loadCascadeIn_5 = _zz_colMem_2_port1;
-  assign tensorCoreChain_8_io_dataIn_0 = (tensorDataValid ? _zz_io_dataIn_0_5[87 : 8] : 80'h0);
-  assign tensorCoreChain_8_io_expIn_0 = (tensorDataValid ? _zz_io_dataIn_0_5[7 : 0] : 8'h0);
-  assign tensorCoreChain_8_io_dataIn_1 = (tensorDataValid ? _zz_io_dataIn_1_5[87 : 8] : 80'h0);
-  assign tensorCoreChain_8_io_expIn_1 = (tensorDataValid ? _zz_io_dataIn_1_5[7 : 0] : 8'h0);
-  assign tensorCoreChain_8_io_dataIn_2 = (tensorDataValid ? _zz_io_dataIn_2_5[87 : 8] : 80'h0);
-  assign tensorCoreChain_8_io_expIn_2 = (tensorDataValid ? _zz_io_dataIn_2_5[7 : 0] : 8'h0);
-  assign tensorCoreChain_8_io_loadCascadeIn = (tensorLoadValid ? _zz_io_loadCascadeIn_5[87 : 8] : 80'h0);
-  assign tensorCoreChain_8_io_expCascadeIn = (tensorLoadValid ? _zz_io_loadCascadeIn_5[7 : 0] : 8'h0);
+  assign _zz_io_dataIn_0_2 = rowMem_0_q;
+  assign _zz_io_dataIn_1_2 = rowMem_1_q;
+  assign _zz_io_dataIn_2_2 = rowMem_2_q;
+  assign tensorCoreChain_8_io_dataIn_0 = _zz_io_dataIn_0_2[87 : 8];
+  assign tensorCoreChain_8_io_expIn_0 = _zz_io_dataIn_0_2[7 : 0];
+  assign tensorCoreChain_8_io_dataIn_1 = _zz_io_dataIn_1_2[87 : 8];
+  assign tensorCoreChain_8_io_expIn_1 = _zz_io_dataIn_1_2[7 : 0];
+  assign tensorCoreChain_8_io_dataIn_2 = _zz_io_dataIn_2_2[87 : 8];
+  assign tensorCoreChain_8_io_expIn_2 = _zz_io_dataIn_2_2[7 : 0];
+  assign tensorCoreChain_8_io_loadCascadeIn = colMem_2_q[87 : 8];
+  assign tensorCoreChain_8_io_expCascadeIn = colMem_2_q[7 : 0];
   assign tcArrayRes_payload_2 = {tensorCoreChain_8_io_res_2,{tensorCoreChain_8_io_res_1,tensorCoreChain_8_io_res_0}};
-  assign _zz_io_dataIn_0_6 = {2'd0, rowBufferRdCounter_value};
-  assign _zz_io_dataIn_0_7 = _zz_rowMem_3_port1;
-  assign _zz_io_dataIn_1_6 = {2'd0, rowBufferRdCounter_value};
-  assign _zz_io_dataIn_1_7 = _zz_rowMem_4_port1;
-  assign _zz_io_dataIn_2_6 = {2'd0, rowBufferRdCounter_value};
-  assign _zz_io_dataIn_2_7 = _zz_rowMem_5_port1;
-  assign _zz_io_loadCascadeIn_6 = {2'd0, colBufferRdCounter_value};
-  assign _zz_io_loadCascadeIn_7 = _zz_colMem_0_port2;
-  assign tensorCoreChain_9_io_dataIn_0 = (tensorDataValid ? _zz_io_dataIn_0_7[87 : 8] : 80'h0);
-  assign tensorCoreChain_9_io_expIn_0 = (tensorDataValid ? _zz_io_dataIn_0_7[7 : 0] : 8'h0);
-  assign tensorCoreChain_9_io_dataIn_1 = (tensorDataValid ? _zz_io_dataIn_1_7[87 : 8] : 80'h0);
-  assign tensorCoreChain_9_io_expIn_1 = (tensorDataValid ? _zz_io_dataIn_1_7[7 : 0] : 8'h0);
-  assign tensorCoreChain_9_io_dataIn_2 = (tensorDataValid ? _zz_io_dataIn_2_7[87 : 8] : 80'h0);
-  assign tensorCoreChain_9_io_expIn_2 = (tensorDataValid ? _zz_io_dataIn_2_7[7 : 0] : 8'h0);
-  assign tensorCoreChain_9_io_loadCascadeIn = (tensorLoadValid ? _zz_io_loadCascadeIn_7[87 : 8] : 80'h0);
-  assign tensorCoreChain_9_io_expCascadeIn = (tensorLoadValid ? _zz_io_loadCascadeIn_7[7 : 0] : 8'h0);
+  assign _zz_io_dataIn_0_3 = rowMem_3_q;
+  assign _zz_io_dataIn_1_3 = rowMem_4_q;
+  assign _zz_io_dataIn_2_3 = rowMem_5_q;
+  assign tensorCoreChain_9_io_dataIn_0 = _zz_io_dataIn_0_3[87 : 8];
+  assign tensorCoreChain_9_io_expIn_0 = _zz_io_dataIn_0_3[7 : 0];
+  assign tensorCoreChain_9_io_dataIn_1 = _zz_io_dataIn_1_3[87 : 8];
+  assign tensorCoreChain_9_io_expIn_1 = _zz_io_dataIn_1_3[7 : 0];
+  assign tensorCoreChain_9_io_dataIn_2 = _zz_io_dataIn_2_3[87 : 8];
+  assign tensorCoreChain_9_io_expIn_2 = _zz_io_dataIn_2_3[7 : 0];
+  assign tensorCoreChain_9_io_loadCascadeIn = colMem_0_q[87 : 8];
+  assign tensorCoreChain_9_io_expCascadeIn = colMem_0_q[7 : 0];
   assign tcArrayRes_payload_3 = {tensorCoreChain_9_io_res_2,{tensorCoreChain_9_io_res_1,tensorCoreChain_9_io_res_0}};
-  assign _zz_io_dataIn_0_8 = {2'd0, rowBufferRdCounter_value};
-  assign _zz_io_dataIn_0_9 = _zz_rowMem_3_port2;
-  assign _zz_io_dataIn_1_8 = {2'd0, rowBufferRdCounter_value};
-  assign _zz_io_dataIn_1_9 = _zz_rowMem_4_port2;
-  assign _zz_io_dataIn_2_8 = {2'd0, rowBufferRdCounter_value};
-  assign _zz_io_dataIn_2_9 = _zz_rowMem_5_port2;
-  assign _zz_io_loadCascadeIn_8 = {2'd0, colBufferRdCounter_value};
-  assign _zz_io_loadCascadeIn_9 = _zz_colMem_1_port2;
-  assign tensorCoreChain_10_io_dataIn_0 = (tensorDataValid ? _zz_io_dataIn_0_9[87 : 8] : 80'h0);
-  assign tensorCoreChain_10_io_expIn_0 = (tensorDataValid ? _zz_io_dataIn_0_9[7 : 0] : 8'h0);
-  assign tensorCoreChain_10_io_dataIn_1 = (tensorDataValid ? _zz_io_dataIn_1_9[87 : 8] : 80'h0);
-  assign tensorCoreChain_10_io_expIn_1 = (tensorDataValid ? _zz_io_dataIn_1_9[7 : 0] : 8'h0);
-  assign tensorCoreChain_10_io_dataIn_2 = (tensorDataValid ? _zz_io_dataIn_2_9[87 : 8] : 80'h0);
-  assign tensorCoreChain_10_io_expIn_2 = (tensorDataValid ? _zz_io_dataIn_2_9[7 : 0] : 8'h0);
-  assign tensorCoreChain_10_io_loadCascadeIn = (tensorLoadValid ? _zz_io_loadCascadeIn_9[87 : 8] : 80'h0);
-  assign tensorCoreChain_10_io_expCascadeIn = (tensorLoadValid ? _zz_io_loadCascadeIn_9[7 : 0] : 8'h0);
+  assign _zz_io_dataIn_0_4 = rowMem_3_q;
+  assign _zz_io_dataIn_1_4 = rowMem_4_q;
+  assign _zz_io_dataIn_2_4 = rowMem_5_q;
+  assign tensorCoreChain_10_io_dataIn_0 = _zz_io_dataIn_0_4[87 : 8];
+  assign tensorCoreChain_10_io_expIn_0 = _zz_io_dataIn_0_4[7 : 0];
+  assign tensorCoreChain_10_io_dataIn_1 = _zz_io_dataIn_1_4[87 : 8];
+  assign tensorCoreChain_10_io_expIn_1 = _zz_io_dataIn_1_4[7 : 0];
+  assign tensorCoreChain_10_io_dataIn_2 = _zz_io_dataIn_2_4[87 : 8];
+  assign tensorCoreChain_10_io_expIn_2 = _zz_io_dataIn_2_4[7 : 0];
+  assign tensorCoreChain_10_io_loadCascadeIn = colMem_1_q[87 : 8];
+  assign tensorCoreChain_10_io_expCascadeIn = colMem_1_q[7 : 0];
   assign tcArrayRes_payload_4 = {tensorCoreChain_10_io_res_2,{tensorCoreChain_10_io_res_1,tensorCoreChain_10_io_res_0}};
-  assign _zz_io_dataIn_0_10 = {2'd0, rowBufferRdCounter_value};
-  assign _zz_io_dataIn_0_11 = _zz_rowMem_3_port3;
-  assign _zz_io_dataIn_1_10 = {2'd0, rowBufferRdCounter_value};
-  assign _zz_io_dataIn_1_11 = _zz_rowMem_4_port3;
-  assign _zz_io_dataIn_2_10 = {2'd0, rowBufferRdCounter_value};
-  assign _zz_io_dataIn_2_11 = _zz_rowMem_5_port3;
-  assign _zz_io_loadCascadeIn_10 = {2'd0, colBufferRdCounter_value};
-  assign _zz_io_loadCascadeIn_11 = _zz_colMem_2_port2;
-  assign tensorCoreChain_11_io_dataIn_0 = (tensorDataValid ? _zz_io_dataIn_0_11[87 : 8] : 80'h0);
-  assign tensorCoreChain_11_io_expIn_0 = (tensorDataValid ? _zz_io_dataIn_0_11[7 : 0] : 8'h0);
-  assign tensorCoreChain_11_io_dataIn_1 = (tensorDataValid ? _zz_io_dataIn_1_11[87 : 8] : 80'h0);
-  assign tensorCoreChain_11_io_expIn_1 = (tensorDataValid ? _zz_io_dataIn_1_11[7 : 0] : 8'h0);
-  assign tensorCoreChain_11_io_dataIn_2 = (tensorDataValid ? _zz_io_dataIn_2_11[87 : 8] : 80'h0);
-  assign tensorCoreChain_11_io_expIn_2 = (tensorDataValid ? _zz_io_dataIn_2_11[7 : 0] : 8'h0);
-  assign tensorCoreChain_11_io_loadCascadeIn = (tensorLoadValid ? _zz_io_loadCascadeIn_11[87 : 8] : 80'h0);
-  assign tensorCoreChain_11_io_expCascadeIn = (tensorLoadValid ? _zz_io_loadCascadeIn_11[7 : 0] : 8'h0);
+  assign _zz_io_dataIn_0_5 = rowMem_3_q;
+  assign _zz_io_dataIn_1_5 = rowMem_4_q;
+  assign _zz_io_dataIn_2_5 = rowMem_5_q;
+  assign tensorCoreChain_11_io_dataIn_0 = _zz_io_dataIn_0_5[87 : 8];
+  assign tensorCoreChain_11_io_expIn_0 = _zz_io_dataIn_0_5[7 : 0];
+  assign tensorCoreChain_11_io_dataIn_1 = _zz_io_dataIn_1_5[87 : 8];
+  assign tensorCoreChain_11_io_expIn_1 = _zz_io_dataIn_1_5[7 : 0];
+  assign tensorCoreChain_11_io_dataIn_2 = _zz_io_dataIn_2_5[87 : 8];
+  assign tensorCoreChain_11_io_expIn_2 = _zz_io_dataIn_2_5[7 : 0];
+  assign tensorCoreChain_11_io_loadCascadeIn = colMem_2_q[87 : 8];
+  assign tensorCoreChain_11_io_expCascadeIn = colMem_2_q[7 : 0];
   assign tcArrayRes_payload_5 = {tensorCoreChain_11_io_res_2,{tensorCoreChain_11_io_res_1,tensorCoreChain_11_io_res_0}};
   always @(*) begin
     tcArrayRes_valid = 1'b0;
@@ -1671,11 +1376,10 @@ module TensorCoreChainArray (
   end
 
   assign ctrlStateMachine_resValidCounter_overflowVal = (computeItersReg - 8'h01);
-  assign bufferIf_ready = outputBuffer_io_push_ready;
-  assign io_res_valid = outputBuffer_io_pop_valid;
-  assign io_res_payload = outputBuffer_io_pop_payload;
-  assign bufferIf_valid = (tcArrayRes_valid && bufferIf_ready);
-  assign bufferIf_payload = {tcArrayRes_payload_5,{tcArrayRes_payload_4,{tcArrayRes_payload_3,{tcArrayRes_payload_2,{tcArrayRes_payload_1,tcArrayRes_payload_0}}}}};
+  assign outputBuffer_wrreq = (tcArrayRes_valid && (! outputBuffer_full));
+  assign outputBuffer_data = {tcArrayRes_payload_5,{tcArrayRes_payload_4,{tcArrayRes_payload_3,{tcArrayRes_payload_2,{tcArrayRes_payload_1,tcArrayRes_payload_0}}}}};
+  assign io_res_payload = outputBuffer_q;
+  assign io_res_valid = (! outputBuffer_empty);
   always @(*) begin
     ctrlStateMachine_stateNext = ctrlStateMachine_stateReg;
     case(ctrlStateMachine_stateReg)
@@ -1710,8 +1414,8 @@ module TensorCoreChainArray (
     end
   end
 
-  assign when_TensorCoreChainArray_l155 = (ctrlStateMachine_dataInFinish == 1'b0);
-  assign when_TensorCoreChainArray_l165 = (ctrlStateMachine_loadFinish == 1'b0);
+  assign when_TensorCoreChainArray_l164 = (ctrlStateMachine_dataInFinish == 1'b0);
+  assign when_TensorCoreChainArray_l174 = (ctrlStateMachine_loadFinish == 1'b0);
   assign when_StateMachine_l230 = ((! (ctrlStateMachine_stateReg == `ctrlStateMachine_enumDefinition_binary_sequential_ctrlStateMachine_sIdle)) && (ctrlStateMachine_stateNext == `ctrlStateMachine_enumDefinition_binary_sequential_ctrlStateMachine_sIdle));
   assign when_StateMachine_l230_1 = ((! (ctrlStateMachine_stateReg == `ctrlStateMachine_enumDefinition_binary_sequential_ctrlStateMachine_sPreLoad)) && (ctrlStateMachine_stateNext == `ctrlStateMachine_enumDefinition_binary_sequential_ctrlStateMachine_sPreLoad));
   assign when_StateMachine_l230_2 = ((! (ctrlStateMachine_stateReg == `ctrlStateMachine_enumDefinition_binary_sequential_ctrlStateMachine_sCompute)) && (ctrlStateMachine_stateNext == `ctrlStateMachine_enumDefinition_binary_sequential_ctrlStateMachine_sCompute));
@@ -1724,15 +1428,27 @@ module TensorCoreChainArray (
       computeItersReg <= 8'h0;
       calEnDelay <= 1'b0;
       computeItersDelay <= 8'h0;
-      _zz_13 <= 5'h0;
-      _zz_19 <= 5'h0;
-      _zz_25 <= 5'h0;
-      _zz_31 <= 5'h0;
-      _zz_37 <= 5'h0;
-      _zz_43 <= 5'h0;
-      _zz_49 <= 5'h0;
-      _zz_55 <= 5'h0;
-      _zz_61 <= 5'h0;
+      _zz_wraddress_2 <= 5'h0;
+      _zz_wraddress_5 <= 5'h0;
+      _zz_wraddress_8 <= 5'h0;
+      _zz_wraddress_11 <= 5'h0;
+      _zz_wraddress_14 <= 5'h0;
+      _zz_wraddress_17 <= 5'h0;
+      _zz_wraddress_20 <= 5'h0;
+      _zz_wraddress_23 <= 5'h0;
+      _zz_wraddress_26 <= 5'h0;
+      tensorLoadValid_delay_1 <= 1'b0;
+      tensorDataValid_delay_1 <= 1'b0;
+      tensorLoadValid_delay_1_1 <= 1'b0;
+      tensorDataValid_delay_1_1 <= 1'b0;
+      tensorLoadValid_delay_1_2 <= 1'b0;
+      tensorDataValid_delay_1_2 <= 1'b0;
+      tensorLoadValid_delay_1_3 <= 1'b0;
+      tensorDataValid_delay_1_3 <= 1'b0;
+      tensorLoadValid_delay_1_4 <= 1'b0;
+      tensorDataValid_delay_1_4 <= 1'b0;
+      tensorLoadValid_delay_1_5 <= 1'b0;
+      tensorDataValid_delay_1_5 <= 1'b0;
       ctrlStateMachine_loadFinish <= 1'b0;
       ctrlStateMachine_dataInFinish <= 1'b0;
       ctrlStateMachine_loadIterCounter_value <= 8'h0;
@@ -1744,15 +1460,27 @@ module TensorCoreChainArray (
       colBufferRdCounter_value <= colBufferRdCounter_valueNext;
       calEnDelay <= io_calEn_delay_1;
       computeItersDelay <= io_computeIters_delay_1;
-      _zz_13 <= _zz_12;
-      _zz_19 <= _zz_18;
-      _zz_25 <= _zz_24;
-      _zz_31 <= _zz_30;
-      _zz_37 <= _zz_36;
-      _zz_43 <= _zz_42;
-      _zz_49 <= _zz_48;
-      _zz_55 <= _zz_54;
-      _zz_61 <= _zz_60;
+      _zz_wraddress_2 <= _zz_wraddress_1;
+      _zz_wraddress_5 <= _zz_wraddress_4;
+      _zz_wraddress_8 <= _zz_wraddress_7;
+      _zz_wraddress_11 <= _zz_wraddress_10;
+      _zz_wraddress_14 <= _zz_wraddress_13;
+      _zz_wraddress_17 <= _zz_wraddress_16;
+      _zz_wraddress_20 <= _zz_wraddress_19;
+      _zz_wraddress_23 <= _zz_wraddress_22;
+      _zz_wraddress_26 <= _zz_wraddress_25;
+      tensorLoadValid_delay_1 <= tensorLoadValid;
+      tensorDataValid_delay_1 <= tensorDataValid;
+      tensorLoadValid_delay_1_1 <= tensorLoadValid;
+      tensorDataValid_delay_1_1 <= tensorDataValid;
+      tensorLoadValid_delay_1_2 <= tensorLoadValid;
+      tensorDataValid_delay_1_2 <= tensorDataValid;
+      tensorLoadValid_delay_1_3 <= tensorLoadValid;
+      tensorDataValid_delay_1_3 <= tensorDataValid;
+      tensorLoadValid_delay_1_4 <= tensorLoadValid;
+      tensorDataValid_delay_1_4 <= tensorDataValid;
+      tensorLoadValid_delay_1_5 <= tensorLoadValid;
+      tensorDataValid_delay_1_5 <= tensorDataValid;
       ctrlStateMachine_loadIterCounter_value <= ctrlStateMachine_loadIterCounter_valueNext;
       ctrlStateMachine_computeIterCounter_value <= ctrlStateMachine_computeIterCounter_valueNext;
       ctrlStateMachine_resValidCounter_value <= ctrlStateMachine_resValidCounter_valueNext;
@@ -1760,19 +1488,19 @@ module TensorCoreChainArray (
       case(ctrlStateMachine_stateReg)
         `ctrlStateMachine_enumDefinition_binary_sequential_ctrlStateMachine_sIdle : begin
           if(calEnDelay) begin
-            computeItersReg <= computeItersReg;
+            computeItersReg <= computeItersDelay;
           end
         end
         `ctrlStateMachine_enumDefinition_binary_sequential_ctrlStateMachine_sPreLoad : begin
         end
         `ctrlStateMachine_enumDefinition_binary_sequential_ctrlStateMachine_sCompute : begin
-          if(!when_TensorCoreChainArray_l155) begin
+          if(!when_TensorCoreChainArray_l164) begin
             tensorDataValid <= 1'b0;
           end
           if(rowBufferRdCounter_willOverflow) begin
             ctrlStateMachine_dataInFinish <= 1'b1;
           end
-          if(!when_TensorCoreChainArray_l165) begin
+          if(!when_TensorCoreChainArray_l174) begin
             tensorLoadValid <= 1'b0;
           end
           if(colBufferRdCounter_willOverflow) begin
@@ -1808,158 +1536,6 @@ module TensorCoreChainArray (
 
 endmodule
 
-module StreamFifo (
-  input               io_push_valid,
-  output              io_push_ready,
-  input      [431:0]  io_push_payload,
-  output              io_pop_valid,
-  input               io_pop_ready,
-  output     [431:0]  io_pop_payload,
-  input               io_flush,
-  output     [7:0]    io_occupancy,
-  output     [7:0]    io_availability,
-  input               clk,
-  input               resetn
-);
-  reg        [431:0]  _zz_logic_ram_port0;
-  wire       [6:0]    _zz_logic_pushPtr_valueNext;
-  wire       [0:0]    _zz_logic_pushPtr_valueNext_1;
-  wire       [6:0]    _zz_logic_popPtr_valueNext;
-  wire       [0:0]    _zz_logic_popPtr_valueNext_1;
-  wire                _zz_logic_ram_port;
-  wire                _zz_io_pop_payload;
-  wire       [431:0]  _zz_logic_ram_port_1;
-  wire       [6:0]    _zz_io_availability;
-  reg                 _zz_1;
-  reg                 logic_pushPtr_willIncrement;
-  reg                 logic_pushPtr_willClear;
-  reg        [6:0]    logic_pushPtr_valueNext;
-  reg        [6:0]    logic_pushPtr_value;
-  wire                logic_pushPtr_willOverflowIfInc;
-  wire                logic_pushPtr_willOverflow;
-  reg                 logic_popPtr_willIncrement;
-  reg                 logic_popPtr_willClear;
-  reg        [6:0]    logic_popPtr_valueNext;
-  reg        [6:0]    logic_popPtr_value;
-  wire                logic_popPtr_willOverflowIfInc;
-  wire                logic_popPtr_willOverflow;
-  wire                logic_ptrMatch;
-  reg                 logic_risingOccupancy;
-  wire                logic_pushing;
-  wire                logic_popping;
-  wire                logic_empty;
-  wire                logic_full;
-  reg                 _zz_io_pop_valid;
-  wire                when_Stream_l933;
-  wire       [6:0]    logic_ptrDif;
-  reg [431:0] logic_ram [0:127];
-
-  assign _zz_logic_pushPtr_valueNext_1 = logic_pushPtr_willIncrement;
-  assign _zz_logic_pushPtr_valueNext = {6'd0, _zz_logic_pushPtr_valueNext_1};
-  assign _zz_logic_popPtr_valueNext_1 = logic_popPtr_willIncrement;
-  assign _zz_logic_popPtr_valueNext = {6'd0, _zz_logic_popPtr_valueNext_1};
-  assign _zz_io_availability = (logic_popPtr_value - logic_pushPtr_value);
-  assign _zz_io_pop_payload = 1'b1;
-  assign _zz_logic_ram_port_1 = io_push_payload;
-  always @(posedge clk) begin
-    if(_zz_io_pop_payload) begin
-      _zz_logic_ram_port0 <= logic_ram[logic_popPtr_valueNext];
-    end
-  end
-
-  always @(posedge clk) begin
-    if(_zz_1) begin
-      logic_ram[logic_pushPtr_value] <= _zz_logic_ram_port_1;
-    end
-  end
-
-  always @(*) begin
-    _zz_1 = 1'b0;
-    if(logic_pushing) begin
-      _zz_1 = 1'b1;
-    end
-  end
-
-  always @(*) begin
-    logic_pushPtr_willIncrement = 1'b0;
-    if(logic_pushing) begin
-      logic_pushPtr_willIncrement = 1'b1;
-    end
-  end
-
-  always @(*) begin
-    logic_pushPtr_willClear = 1'b0;
-    if(io_flush) begin
-      logic_pushPtr_willClear = 1'b1;
-    end
-  end
-
-  assign logic_pushPtr_willOverflowIfInc = (logic_pushPtr_value == 7'h7f);
-  assign logic_pushPtr_willOverflow = (logic_pushPtr_willOverflowIfInc && logic_pushPtr_willIncrement);
-  always @(*) begin
-    logic_pushPtr_valueNext = (logic_pushPtr_value + _zz_logic_pushPtr_valueNext);
-    if(logic_pushPtr_willClear) begin
-      logic_pushPtr_valueNext = 7'h0;
-    end
-  end
-
-  always @(*) begin
-    logic_popPtr_willIncrement = 1'b0;
-    if(logic_popping) begin
-      logic_popPtr_willIncrement = 1'b1;
-    end
-  end
-
-  always @(*) begin
-    logic_popPtr_willClear = 1'b0;
-    if(io_flush) begin
-      logic_popPtr_willClear = 1'b1;
-    end
-  end
-
-  assign logic_popPtr_willOverflowIfInc = (logic_popPtr_value == 7'h7f);
-  assign logic_popPtr_willOverflow = (logic_popPtr_willOverflowIfInc && logic_popPtr_willIncrement);
-  always @(*) begin
-    logic_popPtr_valueNext = (logic_popPtr_value + _zz_logic_popPtr_valueNext);
-    if(logic_popPtr_willClear) begin
-      logic_popPtr_valueNext = 7'h0;
-    end
-  end
-
-  assign logic_ptrMatch = (logic_pushPtr_value == logic_popPtr_value);
-  assign logic_pushing = (io_push_valid && io_push_ready);
-  assign logic_popping = (io_pop_valid && io_pop_ready);
-  assign logic_empty = (logic_ptrMatch && (! logic_risingOccupancy));
-  assign logic_full = (logic_ptrMatch && logic_risingOccupancy);
-  assign io_push_ready = (! logic_full);
-  assign io_pop_valid = ((! logic_empty) && (! (_zz_io_pop_valid && (! logic_full))));
-  assign io_pop_payload = _zz_logic_ram_port0;
-  assign when_Stream_l933 = (logic_pushing != logic_popping);
-  assign logic_ptrDif = (logic_pushPtr_value - logic_popPtr_value);
-  assign io_occupancy = {(logic_risingOccupancy && logic_ptrMatch),logic_ptrDif};
-  assign io_availability = {((! logic_risingOccupancy) && logic_ptrMatch),_zz_io_availability};
-  always @(posedge clk or negedge resetn) begin
-    if(!resetn) begin
-      logic_pushPtr_value <= 7'h0;
-      logic_popPtr_value <= 7'h0;
-      logic_risingOccupancy <= 1'b0;
-      _zz_io_pop_valid <= 1'b0;
-    end else begin
-      logic_pushPtr_value <= logic_pushPtr_valueNext;
-      logic_popPtr_value <= logic_popPtr_valueNext;
-      _zz_io_pop_valid <= (logic_popPtr_valueNext == logic_pushPtr_value);
-      if(when_Stream_l933) begin
-        logic_risingOccupancy <= logic_pushing;
-      end
-      if(io_flush) begin
-        logic_risingOccupancy <= 1'b0;
-      end
-    end
-  end
-
-
-endmodule
-
 //FixedBfpConverter replaced by FixedBfpConverter
 
 //FixedBfpConverter replaced by FixedBfpConverter
@@ -1985,55 +1561,55 @@ module FixedBfpConverter (
   input               resetn
 );
   wire       [7:0]    _zz__zz_resMants_0;
-  wire       [9:0]    _zz_resMants_0_1;
   wire       [9:0]    _zz_resMants_0_2;
-  wire       [8:0]    _zz_resMants_0_3;
-  wire       [9:0]    _zz_resMants_0_4;
+  wire       [9:0]    _zz_resMants_0_3;
+  wire       [8:0]    _zz_resMants_0_4;
+  wire       [9:0]    _zz_resMants_0_5;
   wire       [7:0]    _zz__zz_resMants_1;
-  wire       [9:0]    _zz_resMants_1_1;
   wire       [9:0]    _zz_resMants_1_2;
-  wire       [8:0]    _zz_resMants_1_3;
-  wire       [9:0]    _zz_resMants_1_4;
+  wire       [9:0]    _zz_resMants_1_3;
+  wire       [8:0]    _zz_resMants_1_4;
+  wire       [9:0]    _zz_resMants_1_5;
   wire       [7:0]    _zz__zz_resMants_2;
-  wire       [9:0]    _zz_resMants_2_1;
   wire       [9:0]    _zz_resMants_2_2;
-  wire       [8:0]    _zz_resMants_2_3;
-  wire       [9:0]    _zz_resMants_2_4;
+  wire       [9:0]    _zz_resMants_2_3;
+  wire       [8:0]    _zz_resMants_2_4;
+  wire       [9:0]    _zz_resMants_2_5;
   wire       [7:0]    _zz__zz_resMants_3;
-  wire       [9:0]    _zz_resMants_3_1;
   wire       [9:0]    _zz_resMants_3_2;
-  wire       [8:0]    _zz_resMants_3_3;
-  wire       [9:0]    _zz_resMants_3_4;
+  wire       [9:0]    _zz_resMants_3_3;
+  wire       [8:0]    _zz_resMants_3_4;
+  wire       [9:0]    _zz_resMants_3_5;
   wire       [7:0]    _zz__zz_resMants_4;
-  wire       [9:0]    _zz_resMants_4_1;
   wire       [9:0]    _zz_resMants_4_2;
-  wire       [8:0]    _zz_resMants_4_3;
-  wire       [9:0]    _zz_resMants_4_4;
+  wire       [9:0]    _zz_resMants_4_3;
+  wire       [8:0]    _zz_resMants_4_4;
+  wire       [9:0]    _zz_resMants_4_5;
   wire       [7:0]    _zz__zz_resMants_5;
-  wire       [9:0]    _zz_resMants_5_1;
   wire       [9:0]    _zz_resMants_5_2;
-  wire       [8:0]    _zz_resMants_5_3;
-  wire       [9:0]    _zz_resMants_5_4;
+  wire       [9:0]    _zz_resMants_5_3;
+  wire       [8:0]    _zz_resMants_5_4;
+  wire       [9:0]    _zz_resMants_5_5;
   wire       [7:0]    _zz__zz_resMants_6;
-  wire       [9:0]    _zz_resMants_6_1;
   wire       [9:0]    _zz_resMants_6_2;
-  wire       [8:0]    _zz_resMants_6_3;
-  wire       [9:0]    _zz_resMants_6_4;
+  wire       [9:0]    _zz_resMants_6_3;
+  wire       [8:0]    _zz_resMants_6_4;
+  wire       [9:0]    _zz_resMants_6_5;
   wire       [7:0]    _zz__zz_resMants_7;
-  wire       [9:0]    _zz_resMants_7_1;
   wire       [9:0]    _zz_resMants_7_2;
-  wire       [8:0]    _zz_resMants_7_3;
-  wire       [9:0]    _zz_resMants_7_4;
+  wire       [9:0]    _zz_resMants_7_3;
+  wire       [8:0]    _zz_resMants_7_4;
+  wire       [9:0]    _zz_resMants_7_5;
   wire       [7:0]    _zz__zz_resMants_8;
-  wire       [9:0]    _zz_resMants_8_1;
   wire       [9:0]    _zz_resMants_8_2;
-  wire       [8:0]    _zz_resMants_8_3;
-  wire       [9:0]    _zz_resMants_8_4;
+  wire       [9:0]    _zz_resMants_8_3;
+  wire       [8:0]    _zz_resMants_8_4;
+  wire       [9:0]    _zz_resMants_8_5;
   wire       [7:0]    _zz__zz_resMants_9;
-  wire       [9:0]    _zz_resMants_9_1;
   wire       [9:0]    _zz_resMants_9_2;
-  wire       [8:0]    _zz_resMants_9_3;
-  wire       [9:0]    _zz_resMants_9_4;
+  wire       [9:0]    _zz_resMants_9_3;
+  wire       [8:0]    _zz_resMants_9_4;
+  wire       [9:0]    _zz_resMants_9_5;
   wire       [7:0]    _zz_io_dataOut_payload;
   wire       [7:0]    _zz_io_dataOut_payload_1;
   wire                dataIn_0_signBit;
@@ -2211,6 +1787,66 @@ module FixedBfpConverter (
   reg                 delayedData_9_signBit;
   reg        [22:0]   delayedData_9_mantissa;
   reg        [7:0]    delayedData_9_exp;
+  reg                 delayedData_delay_1_0_signBit;
+  reg        [22:0]   delayedData_delay_1_0_mantissa;
+  reg        [7:0]    delayedData_delay_1_0_exp;
+  reg                 delayedData_delay_1_1_signBit;
+  reg        [22:0]   delayedData_delay_1_1_mantissa;
+  reg        [7:0]    delayedData_delay_1_1_exp;
+  reg                 delayedData_delay_1_2_signBit;
+  reg        [22:0]   delayedData_delay_1_2_mantissa;
+  reg        [7:0]    delayedData_delay_1_2_exp;
+  reg                 delayedData_delay_1_3_signBit;
+  reg        [22:0]   delayedData_delay_1_3_mantissa;
+  reg        [7:0]    delayedData_delay_1_3_exp;
+  reg                 delayedData_delay_1_4_signBit;
+  reg        [22:0]   delayedData_delay_1_4_mantissa;
+  reg        [7:0]    delayedData_delay_1_4_exp;
+  reg                 delayedData_delay_1_5_signBit;
+  reg        [22:0]   delayedData_delay_1_5_mantissa;
+  reg        [7:0]    delayedData_delay_1_5_exp;
+  reg                 delayedData_delay_1_6_signBit;
+  reg        [22:0]   delayedData_delay_1_6_mantissa;
+  reg        [7:0]    delayedData_delay_1_6_exp;
+  reg                 delayedData_delay_1_7_signBit;
+  reg        [22:0]   delayedData_delay_1_7_mantissa;
+  reg        [7:0]    delayedData_delay_1_7_exp;
+  reg                 delayedData_delay_1_8_signBit;
+  reg        [22:0]   delayedData_delay_1_8_mantissa;
+  reg        [7:0]    delayedData_delay_1_8_exp;
+  reg                 delayedData_delay_1_9_signBit;
+  reg        [22:0]   delayedData_delay_1_9_mantissa;
+  reg        [7:0]    delayedData_delay_1_9_exp;
+  reg                 delayedDataForResMants_0_signBit;
+  reg        [22:0]   delayedDataForResMants_0_mantissa;
+  reg        [7:0]    delayedDataForResMants_0_exp;
+  reg                 delayedDataForResMants_1_signBit;
+  reg        [22:0]   delayedDataForResMants_1_mantissa;
+  reg        [7:0]    delayedDataForResMants_1_exp;
+  reg                 delayedDataForResMants_2_signBit;
+  reg        [22:0]   delayedDataForResMants_2_mantissa;
+  reg        [7:0]    delayedDataForResMants_2_exp;
+  reg                 delayedDataForResMants_3_signBit;
+  reg        [22:0]   delayedDataForResMants_3_mantissa;
+  reg        [7:0]    delayedDataForResMants_3_exp;
+  reg                 delayedDataForResMants_4_signBit;
+  reg        [22:0]   delayedDataForResMants_4_mantissa;
+  reg        [7:0]    delayedDataForResMants_4_exp;
+  reg                 delayedDataForResMants_5_signBit;
+  reg        [22:0]   delayedDataForResMants_5_mantissa;
+  reg        [7:0]    delayedDataForResMants_5_exp;
+  reg                 delayedDataForResMants_6_signBit;
+  reg        [22:0]   delayedDataForResMants_6_mantissa;
+  reg        [7:0]    delayedDataForResMants_6_exp;
+  reg                 delayedDataForResMants_7_signBit;
+  reg        [22:0]   delayedDataForResMants_7_mantissa;
+  reg        [7:0]    delayedDataForResMants_7_exp;
+  reg                 delayedDataForResMants_8_signBit;
+  reg        [22:0]   delayedDataForResMants_8_mantissa;
+  reg        [7:0]    delayedDataForResMants_8_exp;
+  reg                 delayedDataForResMants_9_signBit;
+  reg        [22:0]   delayedDataForResMants_9_mantissa;
+  reg        [7:0]    delayedDataForResMants_9_exp;
   reg        [7:0]    resMants_0;
   reg        [7:0]    resMants_1;
   reg        [7:0]    resMants_2;
@@ -2222,72 +1858,86 @@ module FixedBfpConverter (
   reg        [7:0]    resMants_8;
   reg        [7:0]    resMants_9;
   reg        [7:0]    resExp;
-  wire       [8:0]    _zz_resMants_0;
-  wire       [8:0]    _zz_resMants_1;
-  wire       [8:0]    _zz_resMants_2;
-  wire       [8:0]    _zz_resMants_3;
-  wire       [8:0]    _zz_resMants_4;
-  wire       [8:0]    _zz_resMants_5;
-  wire       [8:0]    _zz_resMants_6;
-  wire       [8:0]    _zz_resMants_7;
-  wire       [8:0]    _zz_resMants_8;
-  wire       [8:0]    _zz_resMants_9;
+  reg        [8:0]    _zz_resMants_0;
+  reg        [8:0]    _zz_resMants_0_1;
+  reg        [8:0]    _zz_resMants_1;
+  reg        [8:0]    _zz_resMants_1_1;
+  reg        [8:0]    _zz_resMants_2;
+  reg        [8:0]    _zz_resMants_2_1;
+  reg        [8:0]    _zz_resMants_3;
+  reg        [8:0]    _zz_resMants_3_1;
+  reg        [8:0]    _zz_resMants_4;
+  reg        [8:0]    _zz_resMants_4_1;
+  reg        [8:0]    _zz_resMants_5;
+  reg        [8:0]    _zz_resMants_5_1;
+  reg        [8:0]    _zz_resMants_6;
+  reg        [8:0]    _zz_resMants_6_1;
+  reg        [8:0]    _zz_resMants_7;
+  reg        [8:0]    _zz_resMants_7_1;
+  reg        [8:0]    _zz_resMants_8;
+  reg        [8:0]    _zz_resMants_8_1;
+  reg        [8:0]    _zz_resMants_9;
+  reg        [8:0]    _zz_resMants_9_1;
+  reg        [7:0]    _zz_resExp;
+  reg        [7:0]    _zz_resExp_1;
   reg                 io_dataIn_valid_delay_1;
   reg                 io_dataIn_valid_delay_2;
   reg                 io_dataIn_valid_delay_3;
   reg                 io_dataIn_valid_delay_4;
   reg                 io_dataIn_valid_delay_5;
+  reg                 io_dataIn_valid_delay_6;
+  reg                 io_dataIn_valid_delay_7;
 
   assign _zz__zz_resMants_0 = (largestExp - delayedData_0_exp);
-  assign _zz_resMants_0_1 = ({1'b1,(~ _zz_resMants_0)} + _zz_resMants_0_2);
-  assign _zz_resMants_0_3 = 9'h001;
-  assign _zz_resMants_0_2 = {1'd0, _zz_resMants_0_3};
-  assign _zz_resMants_0_4 = {1'b0,_zz_resMants_0};
+  assign _zz_resMants_0_2 = ({1'b1,(~ _zz_resMants_0_1)} + _zz_resMants_0_3);
+  assign _zz_resMants_0_4 = 9'h001;
+  assign _zz_resMants_0_3 = {1'd0, _zz_resMants_0_4};
+  assign _zz_resMants_0_5 = {1'b0,_zz_resMants_0_1};
   assign _zz__zz_resMants_1 = (largestExp - delayedData_1_exp);
-  assign _zz_resMants_1_1 = ({1'b1,(~ _zz_resMants_1)} + _zz_resMants_1_2);
-  assign _zz_resMants_1_3 = 9'h001;
-  assign _zz_resMants_1_2 = {1'd0, _zz_resMants_1_3};
-  assign _zz_resMants_1_4 = {1'b0,_zz_resMants_1};
+  assign _zz_resMants_1_2 = ({1'b1,(~ _zz_resMants_1_1)} + _zz_resMants_1_3);
+  assign _zz_resMants_1_4 = 9'h001;
+  assign _zz_resMants_1_3 = {1'd0, _zz_resMants_1_4};
+  assign _zz_resMants_1_5 = {1'b0,_zz_resMants_1_1};
   assign _zz__zz_resMants_2 = (largestExp - delayedData_2_exp);
-  assign _zz_resMants_2_1 = ({1'b1,(~ _zz_resMants_2)} + _zz_resMants_2_2);
-  assign _zz_resMants_2_3 = 9'h001;
-  assign _zz_resMants_2_2 = {1'd0, _zz_resMants_2_3};
-  assign _zz_resMants_2_4 = {1'b0,_zz_resMants_2};
+  assign _zz_resMants_2_2 = ({1'b1,(~ _zz_resMants_2_1)} + _zz_resMants_2_3);
+  assign _zz_resMants_2_4 = 9'h001;
+  assign _zz_resMants_2_3 = {1'd0, _zz_resMants_2_4};
+  assign _zz_resMants_2_5 = {1'b0,_zz_resMants_2_1};
   assign _zz__zz_resMants_3 = (largestExp - delayedData_3_exp);
-  assign _zz_resMants_3_1 = ({1'b1,(~ _zz_resMants_3)} + _zz_resMants_3_2);
-  assign _zz_resMants_3_3 = 9'h001;
-  assign _zz_resMants_3_2 = {1'd0, _zz_resMants_3_3};
-  assign _zz_resMants_3_4 = {1'b0,_zz_resMants_3};
+  assign _zz_resMants_3_2 = ({1'b1,(~ _zz_resMants_3_1)} + _zz_resMants_3_3);
+  assign _zz_resMants_3_4 = 9'h001;
+  assign _zz_resMants_3_3 = {1'd0, _zz_resMants_3_4};
+  assign _zz_resMants_3_5 = {1'b0,_zz_resMants_3_1};
   assign _zz__zz_resMants_4 = (largestExp - delayedData_4_exp);
-  assign _zz_resMants_4_1 = ({1'b1,(~ _zz_resMants_4)} + _zz_resMants_4_2);
-  assign _zz_resMants_4_3 = 9'h001;
-  assign _zz_resMants_4_2 = {1'd0, _zz_resMants_4_3};
-  assign _zz_resMants_4_4 = {1'b0,_zz_resMants_4};
+  assign _zz_resMants_4_2 = ({1'b1,(~ _zz_resMants_4_1)} + _zz_resMants_4_3);
+  assign _zz_resMants_4_4 = 9'h001;
+  assign _zz_resMants_4_3 = {1'd0, _zz_resMants_4_4};
+  assign _zz_resMants_4_5 = {1'b0,_zz_resMants_4_1};
   assign _zz__zz_resMants_5 = (largestExp - delayedData_5_exp);
-  assign _zz_resMants_5_1 = ({1'b1,(~ _zz_resMants_5)} + _zz_resMants_5_2);
-  assign _zz_resMants_5_3 = 9'h001;
-  assign _zz_resMants_5_2 = {1'd0, _zz_resMants_5_3};
-  assign _zz_resMants_5_4 = {1'b0,_zz_resMants_5};
+  assign _zz_resMants_5_2 = ({1'b1,(~ _zz_resMants_5_1)} + _zz_resMants_5_3);
+  assign _zz_resMants_5_4 = 9'h001;
+  assign _zz_resMants_5_3 = {1'd0, _zz_resMants_5_4};
+  assign _zz_resMants_5_5 = {1'b0,_zz_resMants_5_1};
   assign _zz__zz_resMants_6 = (largestExp - delayedData_6_exp);
-  assign _zz_resMants_6_1 = ({1'b1,(~ _zz_resMants_6)} + _zz_resMants_6_2);
-  assign _zz_resMants_6_3 = 9'h001;
-  assign _zz_resMants_6_2 = {1'd0, _zz_resMants_6_3};
-  assign _zz_resMants_6_4 = {1'b0,_zz_resMants_6};
+  assign _zz_resMants_6_2 = ({1'b1,(~ _zz_resMants_6_1)} + _zz_resMants_6_3);
+  assign _zz_resMants_6_4 = 9'h001;
+  assign _zz_resMants_6_3 = {1'd0, _zz_resMants_6_4};
+  assign _zz_resMants_6_5 = {1'b0,_zz_resMants_6_1};
   assign _zz__zz_resMants_7 = (largestExp - delayedData_7_exp);
-  assign _zz_resMants_7_1 = ({1'b1,(~ _zz_resMants_7)} + _zz_resMants_7_2);
-  assign _zz_resMants_7_3 = 9'h001;
-  assign _zz_resMants_7_2 = {1'd0, _zz_resMants_7_3};
-  assign _zz_resMants_7_4 = {1'b0,_zz_resMants_7};
+  assign _zz_resMants_7_2 = ({1'b1,(~ _zz_resMants_7_1)} + _zz_resMants_7_3);
+  assign _zz_resMants_7_4 = 9'h001;
+  assign _zz_resMants_7_3 = {1'd0, _zz_resMants_7_4};
+  assign _zz_resMants_7_5 = {1'b0,_zz_resMants_7_1};
   assign _zz__zz_resMants_8 = (largestExp - delayedData_8_exp);
-  assign _zz_resMants_8_1 = ({1'b1,(~ _zz_resMants_8)} + _zz_resMants_8_2);
-  assign _zz_resMants_8_3 = 9'h001;
-  assign _zz_resMants_8_2 = {1'd0, _zz_resMants_8_3};
-  assign _zz_resMants_8_4 = {1'b0,_zz_resMants_8};
+  assign _zz_resMants_8_2 = ({1'b1,(~ _zz_resMants_8_1)} + _zz_resMants_8_3);
+  assign _zz_resMants_8_4 = 9'h001;
+  assign _zz_resMants_8_3 = {1'd0, _zz_resMants_8_4};
+  assign _zz_resMants_8_5 = {1'b0,_zz_resMants_8_1};
   assign _zz__zz_resMants_9 = (largestExp - delayedData_9_exp);
-  assign _zz_resMants_9_1 = ({1'b1,(~ _zz_resMants_9)} + _zz_resMants_9_2);
-  assign _zz_resMants_9_3 = 9'h001;
-  assign _zz_resMants_9_2 = {1'd0, _zz_resMants_9_3};
-  assign _zz_resMants_9_4 = {1'b0,_zz_resMants_9};
+  assign _zz_resMants_9_2 = ({1'b1,(~ _zz_resMants_9_1)} + _zz_resMants_9_3);
+  assign _zz_resMants_9_4 = 9'h001;
+  assign _zz_resMants_9_3 = {1'd0, _zz_resMants_9_4};
+  assign _zz_resMants_9_5 = {1'b0,_zz_resMants_9_1};
   assign _zz_io_dataOut_payload = resMants_1;
   assign _zz_io_dataOut_payload_1 = resMants_0;
   assign dataVec_0 = io_dataIn_payload[31 : 0];
@@ -2334,18 +1984,8 @@ module FixedBfpConverter (
   assign voidData_signBit = 1'b0;
   assign voidData_mantissa = 23'h0;
   assign voidData_exp = 8'h0;
-  assign _zz_resMants_0 = ({1'b1,delayedData_0_mantissa[22 : 15]} >>> _zz__zz_resMants_0);
-  assign _zz_resMants_1 = ({1'b1,delayedData_1_mantissa[22 : 15]} >>> _zz__zz_resMants_1);
-  assign _zz_resMants_2 = ({1'b1,delayedData_2_mantissa[22 : 15]} >>> _zz__zz_resMants_2);
-  assign _zz_resMants_3 = ({1'b1,delayedData_3_mantissa[22 : 15]} >>> _zz__zz_resMants_3);
-  assign _zz_resMants_4 = ({1'b1,delayedData_4_mantissa[22 : 15]} >>> _zz__zz_resMants_4);
-  assign _zz_resMants_5 = ({1'b1,delayedData_5_mantissa[22 : 15]} >>> _zz__zz_resMants_5);
-  assign _zz_resMants_6 = ({1'b1,delayedData_6_mantissa[22 : 15]} >>> _zz__zz_resMants_6);
-  assign _zz_resMants_7 = ({1'b1,delayedData_7_mantissa[22 : 15]} >>> _zz__zz_resMants_7);
-  assign _zz_resMants_8 = ({1'b1,delayedData_8_mantissa[22 : 15]} >>> _zz__zz_resMants_8);
-  assign _zz_resMants_9 = ({1'b1,delayedData_9_mantissa[22 : 15]} >>> _zz__zz_resMants_9);
   assign io_dataOut_payload = {{resMants_9,{resMants_8,{resMants_7,{resMants_6,{resMants_5,{resMants_4,{resMants_3,{resMants_2,{_zz_io_dataOut_payload,_zz_io_dataOut_payload_1}}}}}}}}},resExp};
-  assign io_dataOut_valid = io_dataIn_valid_delay_5;
+  assign io_dataOut_valid = io_dataIn_valid_delay_7;
   always @(posedge clk) begin
     _zz_exceptionalCompRes <= ((dataIn_9_exp <= dataIn_8_exp) ? dataIn_8_exp : dataIn_9_exp);
     _zz_exceptionalCompRes_1 <= _zz_exceptionalCompRes;
@@ -2353,6 +1993,8 @@ module FixedBfpConverter (
     io_dataIn_valid_delay_2 <= io_dataIn_valid_delay_1;
     io_dataIn_valid_delay_3 <= io_dataIn_valid_delay_2;
     io_dataIn_valid_delay_4 <= io_dataIn_valid_delay_3;
+    io_dataIn_valid_delay_5 <= io_dataIn_valid_delay_4;
+    io_dataIn_valid_delay_6 <= io_dataIn_valid_delay_5;
   end
 
   always @(posedge clk or negedge resetn) begin
@@ -2486,6 +2128,66 @@ module FixedBfpConverter (
       delayedData_9_signBit <= voidData_signBit;
       delayedData_9_mantissa <= voidData_mantissa;
       delayedData_9_exp <= voidData_exp;
+      delayedData_delay_1_0_signBit <= voidData_signBit;
+      delayedData_delay_1_0_mantissa <= voidData_mantissa;
+      delayedData_delay_1_0_exp <= voidData_exp;
+      delayedData_delay_1_1_signBit <= voidData_signBit;
+      delayedData_delay_1_1_mantissa <= voidData_mantissa;
+      delayedData_delay_1_1_exp <= voidData_exp;
+      delayedData_delay_1_2_signBit <= voidData_signBit;
+      delayedData_delay_1_2_mantissa <= voidData_mantissa;
+      delayedData_delay_1_2_exp <= voidData_exp;
+      delayedData_delay_1_3_signBit <= voidData_signBit;
+      delayedData_delay_1_3_mantissa <= voidData_mantissa;
+      delayedData_delay_1_3_exp <= voidData_exp;
+      delayedData_delay_1_4_signBit <= voidData_signBit;
+      delayedData_delay_1_4_mantissa <= voidData_mantissa;
+      delayedData_delay_1_4_exp <= voidData_exp;
+      delayedData_delay_1_5_signBit <= voidData_signBit;
+      delayedData_delay_1_5_mantissa <= voidData_mantissa;
+      delayedData_delay_1_5_exp <= voidData_exp;
+      delayedData_delay_1_6_signBit <= voidData_signBit;
+      delayedData_delay_1_6_mantissa <= voidData_mantissa;
+      delayedData_delay_1_6_exp <= voidData_exp;
+      delayedData_delay_1_7_signBit <= voidData_signBit;
+      delayedData_delay_1_7_mantissa <= voidData_mantissa;
+      delayedData_delay_1_7_exp <= voidData_exp;
+      delayedData_delay_1_8_signBit <= voidData_signBit;
+      delayedData_delay_1_8_mantissa <= voidData_mantissa;
+      delayedData_delay_1_8_exp <= voidData_exp;
+      delayedData_delay_1_9_signBit <= voidData_signBit;
+      delayedData_delay_1_9_mantissa <= voidData_mantissa;
+      delayedData_delay_1_9_exp <= voidData_exp;
+      delayedDataForResMants_0_signBit <= voidData_signBit;
+      delayedDataForResMants_0_mantissa <= voidData_mantissa;
+      delayedDataForResMants_0_exp <= voidData_exp;
+      delayedDataForResMants_1_signBit <= voidData_signBit;
+      delayedDataForResMants_1_mantissa <= voidData_mantissa;
+      delayedDataForResMants_1_exp <= voidData_exp;
+      delayedDataForResMants_2_signBit <= voidData_signBit;
+      delayedDataForResMants_2_mantissa <= voidData_mantissa;
+      delayedDataForResMants_2_exp <= voidData_exp;
+      delayedDataForResMants_3_signBit <= voidData_signBit;
+      delayedDataForResMants_3_mantissa <= voidData_mantissa;
+      delayedDataForResMants_3_exp <= voidData_exp;
+      delayedDataForResMants_4_signBit <= voidData_signBit;
+      delayedDataForResMants_4_mantissa <= voidData_mantissa;
+      delayedDataForResMants_4_exp <= voidData_exp;
+      delayedDataForResMants_5_signBit <= voidData_signBit;
+      delayedDataForResMants_5_mantissa <= voidData_mantissa;
+      delayedDataForResMants_5_exp <= voidData_exp;
+      delayedDataForResMants_6_signBit <= voidData_signBit;
+      delayedDataForResMants_6_mantissa <= voidData_mantissa;
+      delayedDataForResMants_6_exp <= voidData_exp;
+      delayedDataForResMants_7_signBit <= voidData_signBit;
+      delayedDataForResMants_7_mantissa <= voidData_mantissa;
+      delayedDataForResMants_7_exp <= voidData_exp;
+      delayedDataForResMants_8_signBit <= voidData_signBit;
+      delayedDataForResMants_8_mantissa <= voidData_mantissa;
+      delayedDataForResMants_8_exp <= voidData_exp;
+      delayedDataForResMants_9_signBit <= voidData_signBit;
+      delayedDataForResMants_9_mantissa <= voidData_mantissa;
+      delayedDataForResMants_9_exp <= voidData_exp;
       resMants_0 <= 8'h0;
       resMants_1 <= 8'h0;
       resMants_2 <= 8'h0;
@@ -2497,7 +2199,29 @@ module FixedBfpConverter (
       resMants_8 <= 8'h0;
       resMants_9 <= 8'h0;
       resExp <= 8'h0;
-      io_dataIn_valid_delay_5 <= 1'b0;
+      _zz_resMants_0 <= 9'h0;
+      _zz_resMants_0_1 <= 9'h0;
+      _zz_resMants_1 <= 9'h0;
+      _zz_resMants_1_1 <= 9'h0;
+      _zz_resMants_2 <= 9'h0;
+      _zz_resMants_2_1 <= 9'h0;
+      _zz_resMants_3 <= 9'h0;
+      _zz_resMants_3_1 <= 9'h0;
+      _zz_resMants_4 <= 9'h0;
+      _zz_resMants_4_1 <= 9'h0;
+      _zz_resMants_5 <= 9'h0;
+      _zz_resMants_5_1 <= 9'h0;
+      _zz_resMants_6 <= 9'h0;
+      _zz_resMants_6_1 <= 9'h0;
+      _zz_resMants_7 <= 9'h0;
+      _zz_resMants_7_1 <= 9'h0;
+      _zz_resMants_8 <= 9'h0;
+      _zz_resMants_8_1 <= 9'h0;
+      _zz_resMants_9 <= 9'h0;
+      _zz_resMants_9_1 <= 9'h0;
+      _zz_resExp <= 8'h0;
+      _zz_resExp_1 <= 8'h0;
+      io_dataIn_valid_delay_7 <= 1'b0;
     end else begin
       _zz_exceptionalCompRes_2 <= _zz_exceptionalCompRes_1;
       intermediateCompRes_0 <= ((dataIn_1_exp <= dataIn_0_exp) ? dataIn_0_exp : dataIn_1_exp);
@@ -2628,58 +2352,140 @@ module FixedBfpConverter (
       delayedData_9_signBit <= dataIn_delay_3_9_signBit;
       delayedData_9_mantissa <= dataIn_delay_3_9_mantissa;
       delayedData_9_exp <= dataIn_delay_3_9_exp;
-      if(delayedData_0_signBit) begin
-        resMants_0 <= _zz_resMants_0_1[9 : 2];
+      delayedData_delay_1_0_signBit <= delayedData_0_signBit;
+      delayedData_delay_1_0_mantissa <= delayedData_0_mantissa;
+      delayedData_delay_1_0_exp <= delayedData_0_exp;
+      delayedData_delay_1_1_signBit <= delayedData_1_signBit;
+      delayedData_delay_1_1_mantissa <= delayedData_1_mantissa;
+      delayedData_delay_1_1_exp <= delayedData_1_exp;
+      delayedData_delay_1_2_signBit <= delayedData_2_signBit;
+      delayedData_delay_1_2_mantissa <= delayedData_2_mantissa;
+      delayedData_delay_1_2_exp <= delayedData_2_exp;
+      delayedData_delay_1_3_signBit <= delayedData_3_signBit;
+      delayedData_delay_1_3_mantissa <= delayedData_3_mantissa;
+      delayedData_delay_1_3_exp <= delayedData_3_exp;
+      delayedData_delay_1_4_signBit <= delayedData_4_signBit;
+      delayedData_delay_1_4_mantissa <= delayedData_4_mantissa;
+      delayedData_delay_1_4_exp <= delayedData_4_exp;
+      delayedData_delay_1_5_signBit <= delayedData_5_signBit;
+      delayedData_delay_1_5_mantissa <= delayedData_5_mantissa;
+      delayedData_delay_1_5_exp <= delayedData_5_exp;
+      delayedData_delay_1_6_signBit <= delayedData_6_signBit;
+      delayedData_delay_1_6_mantissa <= delayedData_6_mantissa;
+      delayedData_delay_1_6_exp <= delayedData_6_exp;
+      delayedData_delay_1_7_signBit <= delayedData_7_signBit;
+      delayedData_delay_1_7_mantissa <= delayedData_7_mantissa;
+      delayedData_delay_1_7_exp <= delayedData_7_exp;
+      delayedData_delay_1_8_signBit <= delayedData_8_signBit;
+      delayedData_delay_1_8_mantissa <= delayedData_8_mantissa;
+      delayedData_delay_1_8_exp <= delayedData_8_exp;
+      delayedData_delay_1_9_signBit <= delayedData_9_signBit;
+      delayedData_delay_1_9_mantissa <= delayedData_9_mantissa;
+      delayedData_delay_1_9_exp <= delayedData_9_exp;
+      delayedDataForResMants_0_signBit <= delayedData_delay_1_0_signBit;
+      delayedDataForResMants_0_mantissa <= delayedData_delay_1_0_mantissa;
+      delayedDataForResMants_0_exp <= delayedData_delay_1_0_exp;
+      delayedDataForResMants_1_signBit <= delayedData_delay_1_1_signBit;
+      delayedDataForResMants_1_mantissa <= delayedData_delay_1_1_mantissa;
+      delayedDataForResMants_1_exp <= delayedData_delay_1_1_exp;
+      delayedDataForResMants_2_signBit <= delayedData_delay_1_2_signBit;
+      delayedDataForResMants_2_mantissa <= delayedData_delay_1_2_mantissa;
+      delayedDataForResMants_2_exp <= delayedData_delay_1_2_exp;
+      delayedDataForResMants_3_signBit <= delayedData_delay_1_3_signBit;
+      delayedDataForResMants_3_mantissa <= delayedData_delay_1_3_mantissa;
+      delayedDataForResMants_3_exp <= delayedData_delay_1_3_exp;
+      delayedDataForResMants_4_signBit <= delayedData_delay_1_4_signBit;
+      delayedDataForResMants_4_mantissa <= delayedData_delay_1_4_mantissa;
+      delayedDataForResMants_4_exp <= delayedData_delay_1_4_exp;
+      delayedDataForResMants_5_signBit <= delayedData_delay_1_5_signBit;
+      delayedDataForResMants_5_mantissa <= delayedData_delay_1_5_mantissa;
+      delayedDataForResMants_5_exp <= delayedData_delay_1_5_exp;
+      delayedDataForResMants_6_signBit <= delayedData_delay_1_6_signBit;
+      delayedDataForResMants_6_mantissa <= delayedData_delay_1_6_mantissa;
+      delayedDataForResMants_6_exp <= delayedData_delay_1_6_exp;
+      delayedDataForResMants_7_signBit <= delayedData_delay_1_7_signBit;
+      delayedDataForResMants_7_mantissa <= delayedData_delay_1_7_mantissa;
+      delayedDataForResMants_7_exp <= delayedData_delay_1_7_exp;
+      delayedDataForResMants_8_signBit <= delayedData_delay_1_8_signBit;
+      delayedDataForResMants_8_mantissa <= delayedData_delay_1_8_mantissa;
+      delayedDataForResMants_8_exp <= delayedData_delay_1_8_exp;
+      delayedDataForResMants_9_signBit <= delayedData_delay_1_9_signBit;
+      delayedDataForResMants_9_mantissa <= delayedData_delay_1_9_mantissa;
+      delayedDataForResMants_9_exp <= delayedData_delay_1_9_exp;
+      _zz_resMants_0 <= (((((delayedData_0_signBit == voidData_signBit) && (delayedData_0_mantissa == voidData_mantissa)) && (delayedData_0_exp == voidData_exp)) ? 9'h0 : {1'b1,delayedData_0_mantissa[22 : 15]}) >>> _zz__zz_resMants_0);
+      _zz_resMants_0_1 <= _zz_resMants_0;
+      if(delayedDataForResMants_0_signBit) begin
+        resMants_0 <= _zz_resMants_0_2[9 : 2];
       end else begin
-        resMants_0 <= _zz_resMants_0_4[9 : 2];
+        resMants_0 <= _zz_resMants_0_5[9 : 2];
       end
-      if(delayedData_1_signBit) begin
-        resMants_1 <= _zz_resMants_1_1[9 : 2];
+      _zz_resMants_1 <= (((((delayedData_1_signBit == voidData_signBit) && (delayedData_1_mantissa == voidData_mantissa)) && (delayedData_1_exp == voidData_exp)) ? 9'h0 : {1'b1,delayedData_1_mantissa[22 : 15]}) >>> _zz__zz_resMants_1);
+      _zz_resMants_1_1 <= _zz_resMants_1;
+      if(delayedDataForResMants_1_signBit) begin
+        resMants_1 <= _zz_resMants_1_2[9 : 2];
       end else begin
-        resMants_1 <= _zz_resMants_1_4[9 : 2];
+        resMants_1 <= _zz_resMants_1_5[9 : 2];
       end
-      if(delayedData_2_signBit) begin
-        resMants_2 <= _zz_resMants_2_1[9 : 2];
+      _zz_resMants_2 <= (((((delayedData_2_signBit == voidData_signBit) && (delayedData_2_mantissa == voidData_mantissa)) && (delayedData_2_exp == voidData_exp)) ? 9'h0 : {1'b1,delayedData_2_mantissa[22 : 15]}) >>> _zz__zz_resMants_2);
+      _zz_resMants_2_1 <= _zz_resMants_2;
+      if(delayedDataForResMants_2_signBit) begin
+        resMants_2 <= _zz_resMants_2_2[9 : 2];
       end else begin
-        resMants_2 <= _zz_resMants_2_4[9 : 2];
+        resMants_2 <= _zz_resMants_2_5[9 : 2];
       end
-      if(delayedData_3_signBit) begin
-        resMants_3 <= _zz_resMants_3_1[9 : 2];
+      _zz_resMants_3 <= (((((delayedData_3_signBit == voidData_signBit) && (delayedData_3_mantissa == voidData_mantissa)) && (delayedData_3_exp == voidData_exp)) ? 9'h0 : {1'b1,delayedData_3_mantissa[22 : 15]}) >>> _zz__zz_resMants_3);
+      _zz_resMants_3_1 <= _zz_resMants_3;
+      if(delayedDataForResMants_3_signBit) begin
+        resMants_3 <= _zz_resMants_3_2[9 : 2];
       end else begin
-        resMants_3 <= _zz_resMants_3_4[9 : 2];
+        resMants_3 <= _zz_resMants_3_5[9 : 2];
       end
-      if(delayedData_4_signBit) begin
-        resMants_4 <= _zz_resMants_4_1[9 : 2];
+      _zz_resMants_4 <= (((((delayedData_4_signBit == voidData_signBit) && (delayedData_4_mantissa == voidData_mantissa)) && (delayedData_4_exp == voidData_exp)) ? 9'h0 : {1'b1,delayedData_4_mantissa[22 : 15]}) >>> _zz__zz_resMants_4);
+      _zz_resMants_4_1 <= _zz_resMants_4;
+      if(delayedDataForResMants_4_signBit) begin
+        resMants_4 <= _zz_resMants_4_2[9 : 2];
       end else begin
-        resMants_4 <= _zz_resMants_4_4[9 : 2];
+        resMants_4 <= _zz_resMants_4_5[9 : 2];
       end
-      if(delayedData_5_signBit) begin
-        resMants_5 <= _zz_resMants_5_1[9 : 2];
+      _zz_resMants_5 <= (((((delayedData_5_signBit == voidData_signBit) && (delayedData_5_mantissa == voidData_mantissa)) && (delayedData_5_exp == voidData_exp)) ? 9'h0 : {1'b1,delayedData_5_mantissa[22 : 15]}) >>> _zz__zz_resMants_5);
+      _zz_resMants_5_1 <= _zz_resMants_5;
+      if(delayedDataForResMants_5_signBit) begin
+        resMants_5 <= _zz_resMants_5_2[9 : 2];
       end else begin
-        resMants_5 <= _zz_resMants_5_4[9 : 2];
+        resMants_5 <= _zz_resMants_5_5[9 : 2];
       end
-      if(delayedData_6_signBit) begin
-        resMants_6 <= _zz_resMants_6_1[9 : 2];
+      _zz_resMants_6 <= (((((delayedData_6_signBit == voidData_signBit) && (delayedData_6_mantissa == voidData_mantissa)) && (delayedData_6_exp == voidData_exp)) ? 9'h0 : {1'b1,delayedData_6_mantissa[22 : 15]}) >>> _zz__zz_resMants_6);
+      _zz_resMants_6_1 <= _zz_resMants_6;
+      if(delayedDataForResMants_6_signBit) begin
+        resMants_6 <= _zz_resMants_6_2[9 : 2];
       end else begin
-        resMants_6 <= _zz_resMants_6_4[9 : 2];
+        resMants_6 <= _zz_resMants_6_5[9 : 2];
       end
-      if(delayedData_7_signBit) begin
-        resMants_7 <= _zz_resMants_7_1[9 : 2];
+      _zz_resMants_7 <= (((((delayedData_7_signBit == voidData_signBit) && (delayedData_7_mantissa == voidData_mantissa)) && (delayedData_7_exp == voidData_exp)) ? 9'h0 : {1'b1,delayedData_7_mantissa[22 : 15]}) >>> _zz__zz_resMants_7);
+      _zz_resMants_7_1 <= _zz_resMants_7;
+      if(delayedDataForResMants_7_signBit) begin
+        resMants_7 <= _zz_resMants_7_2[9 : 2];
       end else begin
-        resMants_7 <= _zz_resMants_7_4[9 : 2];
+        resMants_7 <= _zz_resMants_7_5[9 : 2];
       end
-      if(delayedData_8_signBit) begin
-        resMants_8 <= _zz_resMants_8_1[9 : 2];
+      _zz_resMants_8 <= (((((delayedData_8_signBit == voidData_signBit) && (delayedData_8_mantissa == voidData_mantissa)) && (delayedData_8_exp == voidData_exp)) ? 9'h0 : {1'b1,delayedData_8_mantissa[22 : 15]}) >>> _zz__zz_resMants_8);
+      _zz_resMants_8_1 <= _zz_resMants_8;
+      if(delayedDataForResMants_8_signBit) begin
+        resMants_8 <= _zz_resMants_8_2[9 : 2];
       end else begin
-        resMants_8 <= _zz_resMants_8_4[9 : 2];
+        resMants_8 <= _zz_resMants_8_5[9 : 2];
       end
-      if(delayedData_9_signBit) begin
-        resMants_9 <= _zz_resMants_9_1[9 : 2];
+      _zz_resMants_9 <= (((((delayedData_9_signBit == voidData_signBit) && (delayedData_9_mantissa == voidData_mantissa)) && (delayedData_9_exp == voidData_exp)) ? 9'h0 : {1'b1,delayedData_9_mantissa[22 : 15]}) >>> _zz__zz_resMants_9);
+      _zz_resMants_9_1 <= _zz_resMants_9;
+      if(delayedDataForResMants_9_signBit) begin
+        resMants_9 <= _zz_resMants_9_2[9 : 2];
       end else begin
-        resMants_9 <= _zz_resMants_9_4[9 : 2];
+        resMants_9 <= _zz_resMants_9_5[9 : 2];
       end
-      resExp <= (largestExp - 8'h06);
-      io_dataIn_valid_delay_5 <= io_dataIn_valid_delay_4;
+      _zz_resExp <= (largestExp - 8'h06);
+      _zz_resExp_1 <= _zz_resExp;
+      resExp <= _zz_resExp_1;
+      io_dataIn_valid_delay_7 <= io_dataIn_valid_delay_6;
     end
   end
 
@@ -2861,24 +2667,27 @@ module TensorCoreChain (
   reg        [7:0]    io_expIn_2_delay_2;
   reg        [7:0]    io_expIn_2_delay_3;
   reg        [7:0]    io_expIn_2_delay_4;
-  reg        [23:0]   tcAccu_bf24_col_1_delay_1;
-  reg        [23:0]   tcAccu_bf24_col_1_delay_2;
-  reg        [23:0]   tcAccu_bf24_col_1_delay_3;
-  reg        [23:0]   tcAccu_bf24_col_1_delay_4;
-  reg        [23:0]   tcAccu_bf24_col_1_delay_5;
-  reg        [23:0]   tcAccu_bf24_col_1_delay_6;
-  reg        [23:0]   tcAccu_bf24_col_2_delay_1;
-  reg        [23:0]   tcAccu_bf24_col_2_delay_2;
-  reg        [23:0]   tcAccu_bf24_col_2_delay_3;
-  reg        [23:0]   tcAccu_bf24_col_2_delay_4;
-  reg        [23:0]   tcAccu_bf24_col_2_delay_5;
-  reg        [23:0]   tcAccu_bf24_col_2_delay_6;
-  reg        [23:0]   tcAccu_bf24_col_3_delay_1;
-  reg        [23:0]   tcAccu_bf24_col_3_delay_2;
-  reg        [23:0]   tcAccu_bf24_col_3_delay_3;
-  reg        [23:0]   tcAccu_bf24_col_3_delay_4;
-  reg        [23:0]   tcAccu_bf24_col_3_delay_5;
-  reg        [23:0]   tcAccu_bf24_col_3_delay_6;
+  wire       [23:0]   accuFbDelay_0;
+  wire       [23:0]   accuFbDelay_1;
+  wire       [23:0]   accuFbDelay_2;
+  reg        [23:0]   accuFbDelay_0_delay_1;
+  reg        [23:0]   accuFbDelay_0_delay_2;
+  reg        [23:0]   accuFbDelay_0_delay_3;
+  reg        [23:0]   accuFbDelay_0_delay_4;
+  reg        [23:0]   accuFbDelay_0_delay_5;
+  reg        [23:0]   accuFbDelay_0_delay_6;
+  reg        [23:0]   accuFbDelay_1_delay_1;
+  reg        [23:0]   accuFbDelay_1_delay_2;
+  reg        [23:0]   accuFbDelay_1_delay_3;
+  reg        [23:0]   accuFbDelay_1_delay_4;
+  reg        [23:0]   accuFbDelay_1_delay_5;
+  reg        [23:0]   accuFbDelay_1_delay_6;
+  reg        [23:0]   accuFbDelay_2_delay_1;
+  reg        [23:0]   accuFbDelay_2_delay_2;
+  reg        [23:0]   accuFbDelay_2_delay_3;
+  reg        [23:0]   accuFbDelay_2_delay_4;
+  reg        [23:0]   accuFbDelay_2_delay_5;
+  reg        [23:0]   accuFbDelay_2_delay_6;
 
   assign _zz_loadCounter_valueNext_1 = loadCounter_willIncrement;
   assign _zz_loadCounter_valueNext = {3'd0, _zz_loadCounter_valueNext_1};
@@ -2947,9 +2756,9 @@ module TensorCoreChain (
     .clk                       (clk                                   ), //i
     .acc_en                    (1'b0                                  ), //i
     .zero_en                   (1'b0                                  ), //i
-    .bf24_a1                   (tcAccu_bf24_col_1_delay_6             ), //i
-    .bf24_a2                   (tcAccu_bf24_col_2_delay_6             ), //i
-    .bf24_a3                   (tcAccu_bf24_col_3_delay_6             ), //i
+    .bf24_a1                   (accuFbDelay_0_delay_6                 ), //i
+    .bf24_a2                   (accuFbDelay_1_delay_6                 ), //i
+    .bf24_a3                   (accuFbDelay_2_delay_6                 ), //i
     .cascade_data_in_col_1     (tensor_core_2_cascade_data_out_col_1  ), //i
     .cascade_data_in_col_2     (tensor_core_2_cascade_data_out_col_2  ), //i
     .cascade_data_in_col_3     (tensor_core_2_cascade_data_out_col_3  ), //i
@@ -3162,6 +2971,9 @@ module TensorCoreChain (
   assign tensor_core_2_data_in_10 = io_dataIn_2_delay_4[79 : 72];
   assign tensor_core_2_load_bb_one = loadBufCtrl[0];
   assign tensor_core_2_load_bb_two = loadBufCtrl[1];
+  assign accuFbDelay_0 = (oBufferLoadValid ? tcAccu_bf24_col_1 : 24'h0);
+  assign accuFbDelay_1 = (oBufferLoadValid ? tcAccu_bf24_col_2 : 24'h0);
+  assign accuFbDelay_2 = (oBufferLoadValid ? tcAccu_bf24_col_3 : 24'h0);
   assign io_res_0 = tcAccu_bf24_col_1;
   assign io_res_1 = tcAccu_bf24_col_2;
   assign io_res_2 = tcAccu_bf24_col_3;
@@ -3200,24 +3012,24 @@ module TensorCoreChain (
       io_expIn_2_delay_2 <= 8'h0;
       io_expIn_2_delay_3 <= 8'h0;
       io_expIn_2_delay_4 <= 8'h0;
-      tcAccu_bf24_col_1_delay_1 <= 24'h0;
-      tcAccu_bf24_col_1_delay_2 <= 24'h0;
-      tcAccu_bf24_col_1_delay_3 <= 24'h0;
-      tcAccu_bf24_col_1_delay_4 <= 24'h0;
-      tcAccu_bf24_col_1_delay_5 <= 24'h0;
-      tcAccu_bf24_col_1_delay_6 <= 24'h0;
-      tcAccu_bf24_col_2_delay_1 <= 24'h0;
-      tcAccu_bf24_col_2_delay_2 <= 24'h0;
-      tcAccu_bf24_col_2_delay_3 <= 24'h0;
-      tcAccu_bf24_col_2_delay_4 <= 24'h0;
-      tcAccu_bf24_col_2_delay_5 <= 24'h0;
-      tcAccu_bf24_col_2_delay_6 <= 24'h0;
-      tcAccu_bf24_col_3_delay_1 <= 24'h0;
-      tcAccu_bf24_col_3_delay_2 <= 24'h0;
-      tcAccu_bf24_col_3_delay_3 <= 24'h0;
-      tcAccu_bf24_col_3_delay_4 <= 24'h0;
-      tcAccu_bf24_col_3_delay_5 <= 24'h0;
-      tcAccu_bf24_col_3_delay_6 <= 24'h0;
+      accuFbDelay_0_delay_1 <= 24'h0;
+      accuFbDelay_0_delay_2 <= 24'h0;
+      accuFbDelay_0_delay_3 <= 24'h0;
+      accuFbDelay_0_delay_4 <= 24'h0;
+      accuFbDelay_0_delay_5 <= 24'h0;
+      accuFbDelay_0_delay_6 <= 24'h0;
+      accuFbDelay_1_delay_1 <= 24'h0;
+      accuFbDelay_1_delay_2 <= 24'h0;
+      accuFbDelay_1_delay_3 <= 24'h0;
+      accuFbDelay_1_delay_4 <= 24'h0;
+      accuFbDelay_1_delay_5 <= 24'h0;
+      accuFbDelay_1_delay_6 <= 24'h0;
+      accuFbDelay_2_delay_1 <= 24'h0;
+      accuFbDelay_2_delay_2 <= 24'h0;
+      accuFbDelay_2_delay_3 <= 24'h0;
+      accuFbDelay_2_delay_4 <= 24'h0;
+      accuFbDelay_2_delay_5 <= 24'h0;
+      accuFbDelay_2_delay_6 <= 24'h0;
     end else begin
       io_loadValid_delay_1 <= io_loadValid;
       io_loadValid_delay_2 <= io_loadValid_delay_1;
@@ -3256,24 +3068,24 @@ module TensorCoreChain (
       io_expIn_2_delay_2 <= io_expIn_2_delay_1;
       io_expIn_2_delay_3 <= io_expIn_2_delay_2;
       io_expIn_2_delay_4 <= io_expIn_2_delay_3;
-      tcAccu_bf24_col_1_delay_1 <= tcAccu_bf24_col_1;
-      tcAccu_bf24_col_1_delay_2 <= tcAccu_bf24_col_1_delay_1;
-      tcAccu_bf24_col_1_delay_3 <= tcAccu_bf24_col_1_delay_2;
-      tcAccu_bf24_col_1_delay_4 <= tcAccu_bf24_col_1_delay_3;
-      tcAccu_bf24_col_1_delay_5 <= tcAccu_bf24_col_1_delay_4;
-      tcAccu_bf24_col_1_delay_6 <= tcAccu_bf24_col_1_delay_5;
-      tcAccu_bf24_col_2_delay_1 <= tcAccu_bf24_col_2;
-      tcAccu_bf24_col_2_delay_2 <= tcAccu_bf24_col_2_delay_1;
-      tcAccu_bf24_col_2_delay_3 <= tcAccu_bf24_col_2_delay_2;
-      tcAccu_bf24_col_2_delay_4 <= tcAccu_bf24_col_2_delay_3;
-      tcAccu_bf24_col_2_delay_5 <= tcAccu_bf24_col_2_delay_4;
-      tcAccu_bf24_col_2_delay_6 <= tcAccu_bf24_col_2_delay_5;
-      tcAccu_bf24_col_3_delay_1 <= tcAccu_bf24_col_3;
-      tcAccu_bf24_col_3_delay_2 <= tcAccu_bf24_col_3_delay_1;
-      tcAccu_bf24_col_3_delay_3 <= tcAccu_bf24_col_3_delay_2;
-      tcAccu_bf24_col_3_delay_4 <= tcAccu_bf24_col_3_delay_3;
-      tcAccu_bf24_col_3_delay_5 <= tcAccu_bf24_col_3_delay_4;
-      tcAccu_bf24_col_3_delay_6 <= tcAccu_bf24_col_3_delay_5;
+      accuFbDelay_0_delay_1 <= accuFbDelay_0;
+      accuFbDelay_0_delay_2 <= accuFbDelay_0_delay_1;
+      accuFbDelay_0_delay_3 <= accuFbDelay_0_delay_2;
+      accuFbDelay_0_delay_4 <= accuFbDelay_0_delay_3;
+      accuFbDelay_0_delay_5 <= accuFbDelay_0_delay_4;
+      accuFbDelay_0_delay_6 <= accuFbDelay_0_delay_5;
+      accuFbDelay_1_delay_1 <= accuFbDelay_1;
+      accuFbDelay_1_delay_2 <= accuFbDelay_1_delay_1;
+      accuFbDelay_1_delay_3 <= accuFbDelay_1_delay_2;
+      accuFbDelay_1_delay_4 <= accuFbDelay_1_delay_3;
+      accuFbDelay_1_delay_5 <= accuFbDelay_1_delay_4;
+      accuFbDelay_1_delay_6 <= accuFbDelay_1_delay_5;
+      accuFbDelay_2_delay_1 <= accuFbDelay_2;
+      accuFbDelay_2_delay_2 <= accuFbDelay_2_delay_1;
+      accuFbDelay_2_delay_3 <= accuFbDelay_2_delay_2;
+      accuFbDelay_2_delay_4 <= accuFbDelay_2_delay_3;
+      accuFbDelay_2_delay_5 <= accuFbDelay_2_delay_4;
+      accuFbDelay_2_delay_6 <= accuFbDelay_2_delay_5;
     end
   end
 

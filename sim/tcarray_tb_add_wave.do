@@ -9,13 +9,7 @@ add wave -noupdate -radix hexadecimal /TensorCoreArrayTb/mat_b0
 add wave -noupdate -radix hexadecimal /TensorCoreArrayTb/mat_b1
 add wave -noupdate -radix hexadecimal /TensorCoreArrayTb/res
 add wave -noupdate /TensorCoreArrayTb/dut/colConverters_0/resetn
-add wave -noupdate /TensorCoreArrayTb/io_calEn
 add wave -noupdate /TensorCoreArrayTb/dut/colConverters_0/clk
-add wave -noupdate /TensorCoreArrayTb/dut/colMem_0
-add wave -noupdate /TensorCoreArrayTb/dut/colMem_1
-add wave -noupdate /TensorCoreArrayTb/dut/colMem_2
-add wave -noupdate /TensorCoreArrayTb/dut/rowMem_0
-add wave -noupdate /TensorCoreArrayTb/dut/rowMem_1
 add wave -noupdate /TensorCoreArrayTb/dut/fixedBfpConverter_9/io_dataIn_valid
 add wave -noupdate /TensorCoreArrayTb/dut/fixedBfpConverter_9/io_dataIn_payload
 add wave -noupdate /TensorCoreArrayTb/dut/fixedBfpConverter_9/largestExp
@@ -32,6 +26,7 @@ add wave -noupdate -radix unsigned /TensorCoreArrayTb/dut/colBufferRdCounter_val
 add wave -noupdate /TensorCoreArrayTb/dut/tensorCoreChain_6/io_expCascadeIn
 add wave -noupdate /TensorCoreArrayTb/dut/tensorCoreChain_6/io_loadCascadeIn
 add wave -noupdate -radix unsigned /TensorCoreArrayTb/dut/rowBufferRdCounter_value
+add wave -noupdate /TensorCoreArrayTb/io_calEn
 add wave -noupdate /TensorCoreArrayTb/dut/tensorCoreChain_6/io_dataValid
 add wave -noupdate /TensorCoreArrayTb/dut/tensorCoreChain_6/io_dataIterReady
 add wave -noupdate /TensorCoreArrayTb/dut/tensorCoreChain_6/io_loadValid
@@ -40,12 +35,29 @@ add wave -noupdate /TensorCoreArrayTb/io_res_valid
 add wave -noupdate -radix unsigned /TensorCoreArrayTb/dut/computeItersReg
 add wave -noupdate -radix unsigned /TensorCoreArrayTb/dut/ctrlStateMachine_resValidCounter_overflowVal
 add wave -noupdate /TensorCoreArrayTb/res
-add wave -noupdate -radix hexadecimal /TensorCoreArrayTb/io_res_payload_0_0
-add wave -noupdate -radix hexadecimal /TensorCoreArrayTb/io_res_payload_0_1
-add wave -noupdate -radix hexadecimal /TensorCoreArrayTb/io_res_payload_0_2
-add wave -noupdate -radix hexadecimal /TensorCoreArrayTb/io_res_payload_1_0
-add wave -noupdate -radix hexadecimal /TensorCoreArrayTb/io_res_payload_1_1
-add wave -noupdate -radix hexadecimal /TensorCoreArrayTb/io_res_payload_1_2
+add wave -noupdate /TensorCoreArrayTb/dut/tensorLoadValid
+add wave -noupdate /TensorCoreArrayTb/dut/tensorDataValid
+add wave -noupdate /TensorCoreArrayTb/dut/tensorCoreChain_6/io_loadCascadeIn
+add wave -noupdate /TensorCoreArrayTb/dut/ctrlStateMachine_resValidCounter_value
+add wave -noupdate /TensorCoreArrayTb/dut/ctrlStateMachine_computeIterCounter_value
+add wave -noupdate /TensorCoreArrayTb/dut/ctrlStateMachine_computeIterCounter_willOverflow
+add wave -noupdate /TensorCoreArrayTb/dut/ctrlStateMachine_stateReg
+add wave -noupdate /TensorCoreArrayTb/dut/ctrlStateMachine_stateNext
+add wave -noupdate /TensorCoreArrayTb/dut/ctrlStateMachine_dataInIterReady
+add wave -noupdate /TensorCoreArrayTb/dut/tcArrayRes_valid
+add wave -noupdate /TensorCoreArrayTb/dut/tcArrayRes_payload_0
+add wave -noupdate /TensorCoreArrayTb/dut/tcArrayRes_payload_1
+add wave -noupdate /TensorCoreArrayTb/dut/tcArrayRes_payload_2
+add wave -noupdate /TensorCoreArrayTb/dut/tcArrayRes_payload_3
+add wave -noupdate /TensorCoreArrayTb/dut/tcArrayRes_payload_4
+add wave -noupdate /TensorCoreArrayTb/dut/tcArrayRes_payload_5
+add wave -noupdate /TensorCoreArrayTb/dut/outputBuffer/data
+add wave -noupdate /TensorCoreArrayTb/dut/outputBuffer/wrreq
+add wave -noupdate /TensorCoreArrayTb/dut/outputBuffer/rdreq
+add wave -noupdate /TensorCoreArrayTb/dut/outputBuffer/clock
+add wave -noupdate /TensorCoreArrayTb/dut/outputBuffer/q
+add wave -noupdate /TensorCoreArrayTb/dut/outputBuffer/full
+add wave -noupdate /TensorCoreArrayTb/dut/outputBuffer/empty
 add wave -noupdate -divider {first tc core}
 add wave -noupdate /TensorCoreArrayTb/dut/tensorCoreChain_6/tensor_core_1_load_bb_one
 add wave -noupdate /TensorCoreArrayTb/dut/tensorCoreChain_6/io_dataIn_0
@@ -77,7 +89,7 @@ add wave -noupdate /TensorCoreArrayTb/dut/colConverters_0/io_dataIn_payload
 add wave -noupdate /TensorCoreArrayTb/dut/colConverters_0/io_dataOut_valid
 add wave -noupdate /TensorCoreArrayTb/dut/colConverters_0/io_dataOut_payload
 TreeUpdate [SetDefaultTree]
-WaveRestoreCursors {{Cursor 1} {626132 ps} 0}
+WaveRestoreCursors {{Cursor 1} {5465753 ps} 0}
 quietly wave cursor active 1
 configure wave -namecolwidth 394
 configure wave -valuecolwidth 146
@@ -93,4 +105,4 @@ configure wave -griddelta 40
 configure wave -timeline 0
 configure wave -timelineunits ps
 update
-WaveRestoreZoom {492395 ps} {790197 ps}
+WaveRestoreZoom {5442714 ps} {5569911 ps}

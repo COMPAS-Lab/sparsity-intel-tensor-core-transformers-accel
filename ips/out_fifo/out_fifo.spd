@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<simPackage>
+ <file
+   path="fifo_1910/sim/out_fifo_fifo_1910_tv5nx3y.v"
+   type="VERILOG"
+   library="fifo_1910" />
+ <file
+   path="sim/out_fifo.v"
+   type="VERILOG"
+   library="out_fifo"
+   hasInlineConfiguration="true" />
+ <topLevel name="out_fifo.out_fifo" />
+ <deviceFamily name="stratix10" />
+</simPackage>

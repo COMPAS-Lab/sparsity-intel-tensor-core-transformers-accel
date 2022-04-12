@@ -46,10 +46,8 @@ class TensorCoreChainArray(array_col: Int, array_row: Int, chain_len: Int,
   val tcArrayRes = Flow(Vec((UInt(output_width * 3 bits)), array_col * array_row))
 
   //input buffers
-  val colMem = Array.fill(array_col)(
-    Mem(UInt(8 * 11 bits), col_buf_max_depth) init (Array.fill(col_buf_max_depth)(U(0, 8 * 11 bits))))
-  val rowMem = Array.fill(array_row * chain_len)(
-    Mem(UInt(8 * 11 bits), col_buf_max_depth) init (Array.fill(col_buf_max_depth)(U(0, 8 * 11 bits))))
+  val colMem = Array.fill(array_col)(new in_buffer)
+  val rowMem = Array.fill(array_row * chain_len)(new in_buffer)
   //bfp converters
   val colConverters = Array.fill(array_col)(new FixedBfpConverter())
   val rowConverters = Array.ofDim[FixedBfpConverter](array_row, chain_len)
@@ -58,11 +56,17 @@ class TensorCoreChainArray(array_col: Int, array_row: Int, chain_len: Int,
   for (c <- 0 until array_col) {
     colConverters(c).io.dataIn <> io.matALoad(c)
     val colBufferWrCounter = Counter(matABlksInColBuf * matABlkCols * 3)
+    colMem(c).io.wraddress := colBufferWrCounter.resize(colMem(c).io.wraddress.getWidth)
+    colMem(c).io.data := colConverters(c).io.dataOut.payload
+    colMem(c).io.rdaddress := colBufferRdCounter.resize(colMem(c).io.rdaddress.getWidth)
+
     when(colConverters(c).io.dataOut.fire) {
       colBufferWrCounter.increment()
-      colMem(c)(colBufferWrCounter.resize(colMem(c).addressWidth)) :=
-        colConverters(c).io.dataOut.payload
-    } otherwise (colBufferWrCounter.clear())
+      colMem(c).io.wren := True
+    } otherwise {
+      colBufferWrCounter.clear()
+      colMem(c).io.wren := False
+    }
   }
   for (r <- 0 until array_row) {
     for (tcId <- 0 until chain_len) {
@@ -70,30 +74,35 @@ class TensorCoreChainArray(array_col: Int, array_row: Int, chain_len: Int,
 
       rowConverters(r)(tcId) = new FixedBfpConverter
       rowConverters(r)(tcId).io.dataIn <> io.matBLoad(r)(tcId)
+      rowMem(r * chain_len + tcId).io.wraddress := 
+        rowBufferWrCounter.resize(rowMem(r * chain_len + tcId).io.wraddress.getWidth)
+      rowMem(r * chain_len + tcId).io.data := rowConverters(r)(tcId).io.dataOut.payload
+      rowMem(r * chain_len + tcId).io.rdaddress := 
+        rowBufferRdCounter.resize(rowMem(r * chain_len + tcId).io.rdaddress.getWidth)
 
       when(rowConverters(r)(tcId).io.dataOut.fire) {
         rowBufferWrCounter.increment()
-        rowMem(r * chain_len + tcId)(rowBufferWrCounter.resize(rowMem(r * chain_len + tcId).addressWidth)) :=
-          rowConverters(r)(tcId).io.dataOut.payload
-      } otherwise (rowBufferWrCounter.clear())
+        rowMem(r * chain_len + tcId).io.wren := True
+      } otherwise {
+        rowBufferWrCounter.clear()
+        rowMem(r * chain_len + tcId).io.wren := False
+      }
     }
   }
 
   // row connection
   for (r <- 0 until array_row; c <- 0 until array_col) {
-    val rowMemOut: Vec[UInt] = Vec(
-      for (cl <- 0 until chain_len)
-        yield rowMem(r * chain_len + cl).readSync(rowBufferRdCounter.resize(rowMem(r * chain_len + cl).addressWidth))
-    )
-    val colMemOut = colMem(c).readSync(colBufferRdCounter.resize(colMem(c).addressWidth))
+    val rowMemOut: Vec[UInt] = Vec(UInt(8*11 bits), chain_len)
+    for (cl <- 0 until chain_len) (rowMemOut(cl) := rowMem(r * chain_len + cl).io.q)
+
     for (tcId <- 0 until chain_len) {
-      tensorArray(r)(c).io.dataIn(tcId) := Mux(tensorDataValid, rowMemOut(tcId)(87 downto 8), U"80'd0")
-      tensorArray(r)(c).io.expIn(tcId) := Mux(tensorDataValid, rowMemOut(tcId)(7 downto 0), U"8'd0")
+      tensorArray(r)(c).io.dataIn(tcId) := rowMemOut(tcId)(87 downto 8)
+      tensorArray(r)(c).io.expIn(tcId) := rowMemOut(tcId)(7 downto 0)
     }
-    tensorArray(r)(c).io.loadCascadeIn := Mux(tensorLoadValid, colMemOut(87 downto 8), U"80'd0")
-    tensorArray(r)(c).io.expCascadeIn := Mux(tensorLoadValid, colMemOut(7 downto 0), U"8'd0")
-    tensorArray(r)(c).io.loadValid := tensorLoadValid
-    tensorArray(r)(c).io.dataValid := tensorDataValid
+    tensorArray(r)(c).io.loadCascadeIn := colMem(c).io.q(87 downto 8)
+    tensorArray(r)(c).io.expCascadeIn := colMem(c).io.q(7 downto 0)
+    tensorArray(r)(c).io.loadValid := Delay(tensorLoadValid, 1, init=False)
+    tensorArray(r)(c).io.dataValid := Delay(tensorDataValid, 1, init=False)
     tensorArray(r)(c).io.inputIters := U"8'd9"
     tcArrayRes.payload(r * array_col + c) := tensorArray(r)(c).io.res.as(UInt(output_width * 3 bits))
   }
@@ -125,7 +134,7 @@ class TensorCoreChainArray(array_col: Int, array_row: Int, chain_len: Int,
       }
       whenIsActive {
         when(calEnDelay) {
-          computeItersReg := computeItersReg
+          computeItersReg := computeItersDelay
           goto(sPreLoad)
         }
       }
@@ -193,15 +202,14 @@ class TensorCoreChainArray(array_col: Int, array_row: Int, chain_len: Int,
   }
 
   //output buffer path
-  val outputBuffer = StreamFifo(UInt(tcArrayRes.payload.getBitsWidth bits), 128)
-  val bufferIf = Stream(UInt(tcArrayRes.payload.getBitsWidth bits))
+  val outputBuffer = new out_fifo
 
-  outputBuffer.io.push << bufferIf
-  outputBuffer.io.pop >> io.res
+  outputBuffer.io.wrreq := (tcArrayRes.valid && ~outputBuffer.io.full)
+  outputBuffer.io.data := tcArrayRes.payload.as(UInt(output_width * 3 * array_row * array_col bits))
 
-  bufferIf.valid := (tcArrayRes.valid && bufferIf.ready)
-  bufferIf.payload := tcArrayRes.payload.as(UInt(output_width * 3 * array_row * array_col bits))
-
+  io.res.payload := outputBuffer.io.q
+  io.res.valid := ~outputBuffer.io.empty
+  outputBuffer.io.rdreq := io.res.ready
 }
 
 object TensorCoreArrayGen {

@@ -73,22 +73,24 @@ class FixedBfpConverter extends Component {
   voidData.exp := U"8'd0"
 
   val delayedData = Delay(dataIn, 4, init = Vec(voidData, 10))
+  val delayedDataForResMants = Delay(delayedData, 2, init = Vec(voidData, 10))
   val resMants = Vec(Reg(UInt(8 bits)) init 0, 10)
   val resExp = Reg(UInt(8 bits)) init 0
 
   for (i <- 0 until 10) {
-    val mantsWithSign = U"1'b1" @@ delayedData(i).mantissa(22 downto 23-8)
-    val shiftedMants = mantsWithSign |>> (largestExp - delayedData(i).exp)
-    when(delayedData(i).signBit) {
+    val mantsWithSign = 
+          Mux(delayedData(i) === voidData, U"9'd0", U"1'b1" @@ delayedData(i).mantissa(22 downto 23-8))
+    val shiftedMants = Delay(mantsWithSign |>> (largestExp - delayedData(i).exp), 2, init = U"9'd0")
+    when(delayedDataForResMants(i).signBit) {
       resMants(i) := (U"1'b1" @@ ~(shiftedMants) + U"9'd1")(9 downto 2)
     } otherwise {
       resMants(i) := (U"1'b0" @@ shiftedMants)(9 downto 2)
     }
   }
 
-  resExp := largestExp - U"8'd6"
+  resExp := Delay(largestExp - U"8'd6", 2, init=U"8'd0")
   io.dataOut.payload := resMants.as(UInt(80 bits)) @@ resExp
-  io.dataOut.valid := Delay(io.dataIn.valid, 5) init False
+  io.dataOut.valid := Delay(io.dataIn.valid, 7) init False
 }
 
 object FixedBfpConverterGen {

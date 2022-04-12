@@ -27,12 +27,8 @@ logic [319:0]  io_matBLoad_1_2_payload;
 logic          io_calEn;
 logic [7:0]    io_computeIters;
 logic          io_res_valid;
-logic [95:0]   io_res_payload_0_0;
-logic [95:0]   io_res_payload_0_1;
-logic [95:0]   io_res_payload_0_2;
-logic [95:0]   io_res_payload_1_0;
-logic [95:0]   io_res_payload_1_1;
-logic [95:0]   io_res_payload_1_2;
+logic          io_res_ready;
+logic [431:0]  io_res_payload;
 logic          clk=1;
 logic          resetn=0;
 
@@ -44,7 +40,7 @@ logic [319:0] mat_a2 [3*9-1:0];
 logic [319:0] mat_b0 [9*9-1:0];
 logic [319:0] mat_b1 [9*9-1:0];
 // res: 3x9 matrix, each 24 bit
-logic [95:0] res [9*6-1:0];
+logic [71:0] res [9*6-1:0];
 
 TensorCoreChainArray dut (.*);
 
@@ -194,7 +190,7 @@ initial begin
   for (j=0; j<3*9; j++) begin
     @(posedge clk);
 	#1
-    io_matBLoad_1_2_payload = mat_b0[j*3+2];
+    io_matBLoad_1_2_payload = mat_b1[j*3+2];
     io_matBLoad_1_2_valid = 1'b1;
   end
 
@@ -205,8 +201,11 @@ initial begin
   
 end
 
+logic [5:0][71:0] res_payload_72;
+
 initial begin
   io_calEn = 1'b0;
+  io_res_ready = 1'b0;
   for(k=0; k<500; k++) begin
     @(posedge clk);
   end
@@ -218,14 +217,18 @@ initial begin
   io_calEn = 1'b0;
 
   wait(io_res_valid == 1);
+  #9
+  io_res_ready = 1;
+  @(posedge clk);
   for(k=0; k<9; k++) begin
 	@(posedge clk);
-    res[(6*k)+0] = io_res_payload_0_0;
-    res[(6*k)+1] = io_res_payload_0_1;
-    res[(6*k)+2] = io_res_payload_0_2;
-    res[(6*k)+3] = io_res_payload_1_0;
-    res[(6*k)+4] = io_res_payload_1_1;
-    res[(6*k)+5] = io_res_payload_1_2;
+    res_payload_72 = io_res_payload;
+    res[(6*k)+0] = res_payload_72[0];
+    res[(6*k)+1] = res_payload_72[1];
+    res[(6*k)+2] = res_payload_72[2];
+    res[(6*k)+3] = res_payload_72[3];
+    res[(6*k)+4] = res_payload_72[4];
+    res[(6*k)+5] = res_payload_72[5];
   end
 
   $writememh("./tb/res.mem", res);
