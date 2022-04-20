@@ -35,7 +35,7 @@ proc get_design_files {USER_DEFINED_COMPILE_OPTIONS USER_DEFINED_VERILOG_COMPILE
   lappend design_files "vlog $USER_DEFINED_VERILOG_COMPILE_OPTIONS $USER_DEFINED_COMPILE_OPTIONS  \"[normalize_path "$QSYS_SIMDIR/../ips/tensor_core_start/sim/tensor_core_start.v"]\"  -work tensor_core_start"   
   lappend design_files "vlog $USER_DEFINED_VERILOG_COMPILE_OPTIONS $USER_DEFINED_COMPILE_OPTIONS  \"[normalize_path "$QSYS_SIMDIR/../ips/in_buffer/ram_2port_2020/sim/in_buffer_ram_2port_2020_um36i7a.v"]\"  -work ram_2port_2020"
   lappend design_files "vlog $USER_DEFINED_VERILOG_COMPILE_OPTIONS $USER_DEFINED_COMPILE_OPTIONS  \"[normalize_path "$QSYS_SIMDIR/../ips/in_buffer/sim/in_buffer.v"]\"  -work in_buffer"  
-  lappend design_files "vlog $USER_DEFINED_VERILOG_COMPILE_OPTIONS $USER_DEFINED_COMPILE_OPTIONS  \"[normalize_path "$QSYS_SIMDIR/../ips/out_fifo/fifo_1910/sim/out_fifo_fifo_1910_tv5nx3y.v"]\"  -work fifo_1910"
+  lappend design_files "vlog $USER_DEFINED_VERILOG_COMPILE_OPTIONS $USER_DEFINED_COMPILE_OPTIONS  \"[normalize_path "$QSYS_SIMDIR/../ips/out_fifo/fifo_1910/sim/out_fifo_fifo_1910_stdoldq.v"]\"  -work fifo_1910"
   lappend design_files "vlog $USER_DEFINED_VERILOG_COMPILE_OPTIONS $USER_DEFINED_COMPILE_OPTIONS  \"[normalize_path "$QSYS_SIMDIR/../ips/out_fifo/sim/out_fifo.v"]\"  -work out_fifo"                                      
   return $design_files
 }

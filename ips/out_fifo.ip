@@ -303,7 +303,7 @@
         <ipxact:parameter parameterId="GUI_Optimize" type="int">
           <ipxact:name>GUI_Optimize</ipxact:name>
           <ipxact:displayName>Would you like to register the output to maximize performance but use more area?</ipxact:displayName>
-          <ipxact:value>0</ipxact:value>
+          <ipxact:value>1</ipxact:value>
         </ipxact:parameter>
         <ipxact:parameter parameterId="GUI_Optimize_max" type="int">
           <ipxact:name>GUI_Optimize_max</ipxact:name>

@@ -15,7 +15,7 @@
 // synopsys translate_off
 `timescale 1 ps / 1 ps
 // synopsys translate_on
-module  out_fifo_fifo_1910_tv5nx3y  (
+module  out_fifo_fifo_1910_stdoldq  (
     clock,
     data,
     rdreq,
@@ -54,7 +54,7 @@ module  out_fifo_fifo_1910_tv5nx3y  (
                 .sclr (1'b0),
                 .usedw ());
     defparam
-        scfifo_component.add_ram_output_register  = "OFF",
+        scfifo_component.add_ram_output_register  = "ON",
         scfifo_component.enable_ecc  = "FALSE",
         scfifo_component.intended_device_family  = "Stratix 10",
         scfifo_component.lpm_numwords  = 128,

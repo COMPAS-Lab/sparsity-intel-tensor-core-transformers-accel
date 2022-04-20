@@ -86,7 +86,7 @@
           </parameter>
           <parameter>
             <name>GUI_Optimize</name>
-            <value>0</value>
+            <value>1</value>
           </parameter>
           <parameter>
             <name>GUI_Optimize_max</name>
@@ -193,7 +193,7 @@
         <className>fifo</className>
         <version>19.1.0</version>
         <name>fifo_0</name>
-        <uniqueName>out_fifo_fifo_1910_tv5nx3y</uniqueName>
+        <uniqueName>out_fifo_fifo_1910_stdoldq</uniqueName>
         <nonce>0</nonce>
         <incidentConnections></incidentConnections>
         <path>out_fifo.fifo_0</path>

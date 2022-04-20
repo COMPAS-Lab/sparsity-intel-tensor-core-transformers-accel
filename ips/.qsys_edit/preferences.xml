@@ -8,5 +8,6 @@
    documentation="0"
    simulation="VERILOG"
    greybox="0"
-   ipxact="1" />
+   ipxact="1"
+   clear_previous="1" />
 </preferences>

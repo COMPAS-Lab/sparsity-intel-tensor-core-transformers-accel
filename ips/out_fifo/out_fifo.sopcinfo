@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <EnsembleReport name="out_fifo" kind="out_fifo" version="1.0" fabric="QSYS">
  <!-- Format version 20.4 72 (Future versions may contain additional information.) -->
- <!-- 2022.03.24.01:56:40 -->
+ <!-- 2022.04.19.18:49:56 -->
  <!-- A collection of modules and connections -->
  <parameter name="AUTO_GENERATION_ID">
   <type>java.lang.Integer</type>
@@ -69,7 +69,7 @@
    name="fifo_0"
    kind="fifo"
    version="19.1.0"
-   entity="out_fifo_fifo_1910_tv5nx3y"
+   entity="out_fifo_fifo_1910_stdoldq"
    library="fifo_1910"
    path="fifo_0"
    hpath="fifo_0"
@@ -135,7 +135,7 @@ the requested settings for a module instance. -->
   </parameter>
   <parameter name="GUI_Optimize">
    <type>int</type>
-   <value>0</value>
+   <value>1</value>
    <derived>false</derived>
    <enabled>true</enabled>
    <visible>true</visible>

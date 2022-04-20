@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <deploy
- date="2022.03.24.01:56:40"
+ date="2022.04.19.18:49:56"
  outputDirectory="C:/Users/tianchu.ji/Documents/MvmTensorCore/ips/out_fifo/">
  <perimeter>
   <parameter
@@ -75,10 +75,10 @@
   </childSourceFiles>
   <messages>
    <message level="Info" culprit="out_fifo">"Generating: out_fifo"</message>
-   <message level="Info" culprit="out_fifo">"Generating: out_fifo_fifo_1910_tv5nx3y"</message>
+   <message level="Info" culprit="out_fifo">"Generating: out_fifo_fifo_1910_stdoldq"</message>
   </messages>
  </entity>
- <entity kind="fifo" version="19.1.0" name="out_fifo_fifo_1910_tv5nx3y">
+ <entity kind="fifo" version="19.1.0" name="out_fifo_fifo_1910_stdoldq">
   <parameter name="GUI_Full" value="true" />
   <parameter name="GUI_RdUsedw_width" value="8" />
   <parameter name="GUI_AlmostFullThr" value="1" />
@@ -90,7 +90,7 @@
   <parameter name="GUI_msb_usedw" value="false" />
   <parameter name="GUI_WrUsedw_width" value="8" />
   <parameter name="GUI_rsEmpty" value="true" />
-  <parameter name="GUI_Optimize" value="0" />
+  <parameter name="GUI_Optimize" value="1" />
   <parameter name="GUI_Depth" value="128" />
   <parameter name="GUI_LE_BasedFIFO" value="false" />
   <parameter name="GUI_UsedW" value="false" />
@@ -124,12 +124,12 @@
   <parameter name="GUI_Width" value="432" />
   <generatedFiles>
    <file
-       path="C:\Users\tianchu.ji\Documents\MvmTensorCore\ips\out_fifo\fifo_1910\synth\out_fifo_fifo_1910_tv5nx3y.v"
+       path="C:\Users\tianchu.ji\Documents\MvmTensorCore\ips\out_fifo\fifo_1910\synth\out_fifo_fifo_1910_stdoldq.v"
        attributes="" />
   </generatedFiles>
   <childGeneratedFiles>
    <file
-       path="C:\Users\tianchu.ji\Documents\MvmTensorCore\ips\out_fifo\fifo_1910\synth\out_fifo_fifo_1910_tv5nx3y.v"
+       path="C:\Users\tianchu.ji\Documents\MvmTensorCore\ips\out_fifo\fifo_1910\synth\out_fifo_fifo_1910_stdoldq.v"
        attributes="" />
   </childGeneratedFiles>
   <sourceFiles>
@@ -138,7 +138,7 @@
   <childSourceFiles/>
   <instantiator instantiator="out_fifo" as="fifo_0" />
   <messages>
-   <message level="Info" culprit="out_fifo">"Generating: out_fifo_fifo_1910_tv5nx3y"</message>
+   <message level="Info" culprit="out_fifo">"Generating: out_fifo_fifo_1910_stdoldq"</message>
   </messages>
  </entity>
 </deploy>

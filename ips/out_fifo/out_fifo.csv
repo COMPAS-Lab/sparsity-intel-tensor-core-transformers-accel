@@ -1,4 +1,4 @@
-# system info out_fifo on 2022.03.24.01:56:25
+# system info out_fifo on 2022.04.19.18:49:40
 system_info:
 name,value
 DEVICE,1SN21BHU2F53E2VG
@@ -6,13 +6,13 @@ DEVICE_FAMILY,Stratix 10
 GENERATION_ID,0
 #
 #
-# Files generated for out_fifo on 2022.03.24.01:56:25
+# Files generated for out_fifo on 2022.04.19.18:49:40
 files:
 filepath,kind,attributes,module,is_top
 sim/out_fifo.v,VERILOG,CONTAINS_INLINE_CONFIGURATION,out_fifo,true
-fifo_1910/sim/out_fifo_fifo_1910_tv5nx3y.v,VERILOG,,out_fifo_fifo_1910_tv5nx3y,false
+fifo_1910/sim/out_fifo_fifo_1910_stdoldq.v,VERILOG,,out_fifo_fifo_1910_stdoldq,false
 #
 # Map from instance-path to kind of module
 instances:
 instancePath,module
-out_fifo.fifo_0,out_fifo_fifo_1910_tv5nx3y
+out_fifo.fifo_0,out_fifo_fifo_1910_stdoldq

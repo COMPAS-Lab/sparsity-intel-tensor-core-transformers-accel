@@ -260,7 +260,7 @@
         <ipxact:fileSet>
             <ipxact:name>QUARTUS_SYNTH</ipxact:name>
             <ipxact:file>
-                <ipxact:name>fifo_1910\synth\out_fifo_fifo_1910_tv5nx3y.v</ipxact:name>
+                <ipxact:name>fifo_1910\synth\out_fifo_fifo_1910_stdoldq.v</ipxact:name>
                 <ipxact:fileType>verilogSource</ipxact:fileType>
                 <ipxact:isIncludeFile>false</ipxact:isIncludeFile>
                 <ipxact:vendorExtensions>

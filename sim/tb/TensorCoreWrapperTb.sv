@@ -35,6 +35,7 @@ logic          hbm_3_ready=1;                                     // 1: Memory c
 logic          start_tcarray_out_1;                               // Port start signal. Assert high for 1 port clk + 1 mem clk to reset the port
 logic          select_tcarray_out_1;                              // Port select (enable) signal. Should be high until ready comes to transfer current dataexpects data on each port clock
 logic [255:0]  data_tcarray_out_1;                                // Data to port tcarray_out_1 of MultiPort tcarray_out_1
+logic [31:0]   addr_tcarray_out_1;
 logic          almost_full_tcarray_out_1;                         // Port almost_full flag (goes high when the internal FIFO more than 7/8 full)
 logic          port_error_tcarray_out_1=0;
 
