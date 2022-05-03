@@ -1,6 +1,6 @@
 // Generator : SpinalHDL v1.6.0    git head : 73c8d8e2b86b45646e9d0b2e729291f2b65e6be3
 // Component : TensorCoreChainArray
-// Git hash  : 53eff90a3519d23f96b4893b53d9481a3fc7b3d9
+// Git hash  : c9c92d8bf6bea2eb5650fe006255c3d8ef24e64c
 
 
 `define ctrlStateMachine_enumDefinition_binary_sequential_type [2:0]
@@ -31,7 +31,10 @@ module TensorCoreChainArray (
   input               io_matBLoad_1_2_valid,
   input      [319:0]  io_matBLoad_1_2_payload,
   input               io_calEn,
-  input      [7:0]    io_computeIters,
+  input      [7:0]    io_configPorts_matAColSubGrpLen,
+  input      [7:0]    io_configPorts_matBColsPerTccRow,
+  input      [7:0]    io_configPorts_tccRowBufferCnterRange,
+  input      [7:0]    io_configPorts_tccColBufferCnterRange,
   output              io_res_valid,
   input               io_res_ready,
   output     [431:0]  io_res_payload,
@@ -181,27 +184,36 @@ module TensorCoreChainArray (
   wire                outputBuffer_full;
   wire                outputBuffer_empty;
   wire       [431:0]  outputBuffer_q;
-  wire       [4:0]    _zz_rowBufferRdCounter_valueNext;
+  wire       [7:0]    _zz_rowBufferRdCounter_valueNext;
   wire       [0:0]    _zz_rowBufferRdCounter_valueNext_1;
-  wire       [4:0]    _zz_colBufferRdCounter_valueNext;
+  wire       [7:0]    _zz_colBufferRdCounter_valueNext;
   wire       [0:0]    _zz_colBufferRdCounter_valueNext_1;
-  wire       [4:0]    _zz__zz_wraddress_1;
+  wire       [7:0]    _zz__zz_2;
+  wire       [7:0]    _zz__zz_wraddress_1;
   wire       [0:0]    _zz__zz_wraddress_1_1;
-  wire       [4:0]    _zz__zz_wraddress_4;
+  wire       [7:0]    _zz__zz_5;
+  wire       [7:0]    _zz__zz_wraddress_4;
   wire       [0:0]    _zz__zz_wraddress_4_1;
-  wire       [4:0]    _zz__zz_wraddress_7;
+  wire       [7:0]    _zz__zz_8;
+  wire       [7:0]    _zz__zz_wraddress_7;
   wire       [0:0]    _zz__zz_wraddress_7_1;
-  wire       [4:0]    _zz__zz_wraddress_10;
+  wire       [7:0]    _zz__zz_11;
+  wire       [7:0]    _zz__zz_wraddress_10;
   wire       [0:0]    _zz__zz_wraddress_10_1;
-  wire       [4:0]    _zz__zz_wraddress_13;
+  wire       [7:0]    _zz__zz_14;
+  wire       [7:0]    _zz__zz_wraddress_13;
   wire       [0:0]    _zz__zz_wraddress_13_1;
-  wire       [4:0]    _zz__zz_wraddress_16;
+  wire       [7:0]    _zz__zz_17;
+  wire       [7:0]    _zz__zz_wraddress_16;
   wire       [0:0]    _zz__zz_wraddress_16_1;
-  wire       [4:0]    _zz__zz_wraddress_19;
+  wire       [7:0]    _zz__zz_20;
+  wire       [7:0]    _zz__zz_wraddress_19;
   wire       [0:0]    _zz__zz_wraddress_19_1;
-  wire       [4:0]    _zz__zz_wraddress_22;
+  wire       [7:0]    _zz__zz_23;
+  wire       [7:0]    _zz__zz_wraddress_22;
   wire       [0:0]    _zz__zz_wraddress_22_1;
-  wire       [4:0]    _zz__zz_wraddress_25;
+  wire       [7:0]    _zz__zz_26;
+  wire       [7:0]    _zz__zz_wraddress_25;
   wire       [0:0]    _zz__zz_wraddress_25_1;
   wire       [7:0]    _zz_ctrlStateMachine_loadIterCounter_valueNext;
   wire       [0:0]    _zz_ctrlStateMachine_loadIterCounter_valueNext_1;
@@ -209,25 +221,33 @@ module TensorCoreChainArray (
   wire       [0:0]    _zz_ctrlStateMachine_computeIterCounter_valueNext_1;
   wire       [7:0]    _zz_ctrlStateMachine_resValidCounter_valueNext;
   wire       [0:0]    _zz_ctrlStateMachine_resValidCounter_valueNext_1;
+  reg                 io_calEn_delay_1;
+  reg                 calEnDelay;
+  reg        [7:0]    io_configPorts_delay_1_matAColSubGrpLen;
+  reg        [7:0]    io_configPorts_delay_1_matBColsPerTccRow;
+  reg        [7:0]    io_configPorts_delay_1_tccRowBufferCnterRange;
+  reg        [7:0]    io_configPorts_delay_1_tccColBufferCnterRange;
+  reg        [7:0]    configDelay_matAColSubGrpLen;
+  reg        [7:0]    configDelay_matBColsPerTccRow;
+  reg        [7:0]    configDelay_tccRowBufferCnterRange;
+  reg        [7:0]    configDelay_tccColBufferCnterRange;
+  wire       [7:0]    rowBufferRdCounter_overflowVal;
   reg                 rowBufferRdCounter_willIncrement;
   reg                 rowBufferRdCounter_willClear;
-  reg        [4:0]    rowBufferRdCounter_valueNext;
-  reg        [4:0]    rowBufferRdCounter_value;
+  reg        [7:0]    rowBufferRdCounter_valueNext;
+  reg        [7:0]    rowBufferRdCounter_value;
   wire                rowBufferRdCounter_willOverflowIfInc;
   wire                rowBufferRdCounter_willOverflow;
+  wire       [7:0]    colBufferRdCounter_overflowVal;
   reg                 colBufferRdCounter_willIncrement;
   reg                 colBufferRdCounter_willClear;
-  reg        [4:0]    colBufferRdCounter_valueNext;
-  reg        [4:0]    colBufferRdCounter_value;
+  reg        [7:0]    colBufferRdCounter_valueNext;
+  reg        [7:0]    colBufferRdCounter_value;
   wire                colBufferRdCounter_willOverflowIfInc;
   wire                colBufferRdCounter_willOverflow;
   reg                 tensorLoadValid;
   reg                 tensorDataValid;
-  reg        [7:0]    computeItersReg;
-  reg                 io_calEn_delay_1;
-  reg                 calEnDelay;
-  reg        [7:0]    io_computeIters_delay_1;
-  reg        [7:0]    computeItersDelay;
+  reg        [7:0]    matAColSubGrpLenReg;
   reg                 tcArrayRes_valid;
   wire       [71:0]   tcArrayRes_payload_0;
   wire       [71:0]   tcArrayRes_payload_1;
@@ -237,56 +257,56 @@ module TensorCoreChainArray (
   wire       [71:0]   tcArrayRes_payload_5;
   reg                 _zz_wraddress;
   reg                 _zz_1;
-  reg        [4:0]    _zz_wraddress_1;
-  reg        [4:0]    _zz_wraddress_2;
+  reg        [7:0]    _zz_wraddress_1;
+  reg        [7:0]    _zz_wraddress_2;
   wire                _zz_2;
   wire                _zz_3;
   reg                 _zz_wraddress_3;
   reg                 _zz_4;
-  reg        [4:0]    _zz_wraddress_4;
-  reg        [4:0]    _zz_wraddress_5;
+  reg        [7:0]    _zz_wraddress_4;
+  reg        [7:0]    _zz_wraddress_5;
   wire                _zz_5;
   wire                _zz_6;
   reg                 _zz_wraddress_6;
   reg                 _zz_7;
-  reg        [4:0]    _zz_wraddress_7;
-  reg        [4:0]    _zz_wraddress_8;
+  reg        [7:0]    _zz_wraddress_7;
+  reg        [7:0]    _zz_wraddress_8;
   wire                _zz_8;
   wire                _zz_9;
   reg                 _zz_wraddress_9;
   reg                 _zz_10;
-  reg        [4:0]    _zz_wraddress_10;
-  reg        [4:0]    _zz_wraddress_11;
+  reg        [7:0]    _zz_wraddress_10;
+  reg        [7:0]    _zz_wraddress_11;
   wire                _zz_11;
   wire                _zz_12;
   reg                 _zz_wraddress_12;
   reg                 _zz_13;
-  reg        [4:0]    _zz_wraddress_13;
-  reg        [4:0]    _zz_wraddress_14;
+  reg        [7:0]    _zz_wraddress_13;
+  reg        [7:0]    _zz_wraddress_14;
   wire                _zz_14;
   wire                _zz_15;
   reg                 _zz_wraddress_15;
   reg                 _zz_16;
-  reg        [4:0]    _zz_wraddress_16;
-  reg        [4:0]    _zz_wraddress_17;
+  reg        [7:0]    _zz_wraddress_16;
+  reg        [7:0]    _zz_wraddress_17;
   wire                _zz_17;
   wire                _zz_18;
   reg                 _zz_wraddress_18;
   reg                 _zz_19;
-  reg        [4:0]    _zz_wraddress_19;
-  reg        [4:0]    _zz_wraddress_20;
+  reg        [7:0]    _zz_wraddress_19;
+  reg        [7:0]    _zz_wraddress_20;
   wire                _zz_20;
   wire                _zz_21;
   reg                 _zz_wraddress_21;
   reg                 _zz_22;
-  reg        [4:0]    _zz_wraddress_22;
-  reg        [4:0]    _zz_wraddress_23;
+  reg        [7:0]    _zz_wraddress_22;
+  reg        [7:0]    _zz_wraddress_23;
   wire                _zz_23;
   wire                _zz_24;
   reg                 _zz_wraddress_24;
   reg                 _zz_25;
-  reg        [4:0]    _zz_wraddress_25;
-  reg        [4:0]    _zz_wraddress_26;
+  reg        [7:0]    _zz_wraddress_25;
+  reg        [7:0]    _zz_wraddress_26;
   wire                _zz_26;
   wire                _zz_27;
   wire       [87:0]   _zz_io_dataIn_0;
@@ -350,8 +370,8 @@ module TensorCoreChainArray (
   wire                ctrlStateMachine_resValidCounter_willOverflow;
   reg        `ctrlStateMachine_enumDefinition_binary_sequential_type ctrlStateMachine_stateReg;
   reg        `ctrlStateMachine_enumDefinition_binary_sequential_type ctrlStateMachine_stateNext;
-  wire                when_TensorCoreChainArray_l164;
-  wire                when_TensorCoreChainArray_l174;
+  wire                when_TensorCoreChainArray_l184;
+  wire                when_TensorCoreChainArray_l194;
   wire                when_StateMachine_l230;
   wire                when_StateMachine_l230_1;
   wire                when_StateMachine_l230_2;
@@ -362,27 +382,36 @@ module TensorCoreChainArray (
 
 
   assign _zz_rowBufferRdCounter_valueNext_1 = rowBufferRdCounter_willIncrement;
-  assign _zz_rowBufferRdCounter_valueNext = {4'd0, _zz_rowBufferRdCounter_valueNext_1};
+  assign _zz_rowBufferRdCounter_valueNext = {7'd0, _zz_rowBufferRdCounter_valueNext_1};
   assign _zz_colBufferRdCounter_valueNext_1 = colBufferRdCounter_willIncrement;
-  assign _zz_colBufferRdCounter_valueNext = {4'd0, _zz_colBufferRdCounter_valueNext_1};
+  assign _zz_colBufferRdCounter_valueNext = {7'd0, _zz_colBufferRdCounter_valueNext_1};
+  assign _zz__zz_2 = (configDelay_tccColBufferCnterRange - 8'h01);
   assign _zz__zz_wraddress_1_1 = _zz_wraddress;
-  assign _zz__zz_wraddress_1 = {4'd0, _zz__zz_wraddress_1_1};
+  assign _zz__zz_wraddress_1 = {7'd0, _zz__zz_wraddress_1_1};
+  assign _zz__zz_5 = (configDelay_tccColBufferCnterRange - 8'h01);
   assign _zz__zz_wraddress_4_1 = _zz_wraddress_3;
-  assign _zz__zz_wraddress_4 = {4'd0, _zz__zz_wraddress_4_1};
+  assign _zz__zz_wraddress_4 = {7'd0, _zz__zz_wraddress_4_1};
+  assign _zz__zz_8 = (configDelay_tccColBufferCnterRange - 8'h01);
   assign _zz__zz_wraddress_7_1 = _zz_wraddress_6;
-  assign _zz__zz_wraddress_7 = {4'd0, _zz__zz_wraddress_7_1};
+  assign _zz__zz_wraddress_7 = {7'd0, _zz__zz_wraddress_7_1};
+  assign _zz__zz_11 = (configDelay_tccRowBufferCnterRange - 8'h01);
   assign _zz__zz_wraddress_10_1 = _zz_wraddress_9;
-  assign _zz__zz_wraddress_10 = {4'd0, _zz__zz_wraddress_10_1};
+  assign _zz__zz_wraddress_10 = {7'd0, _zz__zz_wraddress_10_1};
+  assign _zz__zz_14 = (configDelay_tccRowBufferCnterRange - 8'h01);
   assign _zz__zz_wraddress_13_1 = _zz_wraddress_12;
-  assign _zz__zz_wraddress_13 = {4'd0, _zz__zz_wraddress_13_1};
+  assign _zz__zz_wraddress_13 = {7'd0, _zz__zz_wraddress_13_1};
+  assign _zz__zz_17 = (configDelay_tccRowBufferCnterRange - 8'h01);
   assign _zz__zz_wraddress_16_1 = _zz_wraddress_15;
-  assign _zz__zz_wraddress_16 = {4'd0, _zz__zz_wraddress_16_1};
+  assign _zz__zz_wraddress_16 = {7'd0, _zz__zz_wraddress_16_1};
+  assign _zz__zz_20 = (configDelay_tccRowBufferCnterRange - 8'h01);
   assign _zz__zz_wraddress_19_1 = _zz_wraddress_18;
-  assign _zz__zz_wraddress_19 = {4'd0, _zz__zz_wraddress_19_1};
+  assign _zz__zz_wraddress_19 = {7'd0, _zz__zz_wraddress_19_1};
+  assign _zz__zz_23 = (configDelay_tccRowBufferCnterRange - 8'h01);
   assign _zz__zz_wraddress_22_1 = _zz_wraddress_21;
-  assign _zz__zz_wraddress_22 = {4'd0, _zz__zz_wraddress_22_1};
+  assign _zz__zz_wraddress_22 = {7'd0, _zz__zz_wraddress_22_1};
+  assign _zz__zz_26 = (configDelay_tccRowBufferCnterRange - 8'h01);
   assign _zz__zz_wraddress_25_1 = _zz_wraddress_24;
-  assign _zz__zz_wraddress_25 = {4'd0, _zz__zz_wraddress_25_1};
+  assign _zz__zz_wraddress_25 = {7'd0, _zz__zz_wraddress_25_1};
   assign _zz_ctrlStateMachine_loadIterCounter_valueNext_1 = ctrlStateMachine_loadIterCounter_willIncrement;
   assign _zz_ctrlStateMachine_loadIterCounter_valueNext = {7'd0, _zz_ctrlStateMachine_loadIterCounter_valueNext_1};
   assign _zz_ctrlStateMachine_computeIterCounter_valueNext_1 = ctrlStateMachine_computeIterCounter_willIncrement;
@@ -405,7 +434,7 @@ module TensorCoreChainArray (
     .io_res_0            (tensorCoreChain_6_io_res_0          ), //o
     .io_res_1            (tensorCoreChain_6_io_res_1          ), //o
     .io_res_2            (tensorCoreChain_6_io_res_2          ), //o
-    .io_inputIters       (8'h09                               ), //i
+    .io_inputIters       (configDelay_matBColsPerTccRow       ), //i
     .io_outValid         (tensorCoreChain_6_io_outValid       ), //o
     .clk                 (clk                                 ), //i
     .resetn              (resetn                              )  //i
@@ -426,7 +455,7 @@ module TensorCoreChainArray (
     .io_res_0            (tensorCoreChain_7_io_res_0          ), //o
     .io_res_1            (tensorCoreChain_7_io_res_1          ), //o
     .io_res_2            (tensorCoreChain_7_io_res_2          ), //o
-    .io_inputIters       (8'h09                               ), //i
+    .io_inputIters       (configDelay_matBColsPerTccRow       ), //i
     .io_outValid         (tensorCoreChain_7_io_outValid       ), //o
     .clk                 (clk                                 ), //i
     .resetn              (resetn                              )  //i
@@ -447,7 +476,7 @@ module TensorCoreChainArray (
     .io_res_0            (tensorCoreChain_8_io_res_0          ), //o
     .io_res_1            (tensorCoreChain_8_io_res_1          ), //o
     .io_res_2            (tensorCoreChain_8_io_res_2          ), //o
-    .io_inputIters       (8'h09                               ), //i
+    .io_inputIters       (configDelay_matBColsPerTccRow       ), //i
     .io_outValid         (tensorCoreChain_8_io_outValid       ), //o
     .clk                 (clk                                 ), //i
     .resetn              (resetn                              )  //i
@@ -468,7 +497,7 @@ module TensorCoreChainArray (
     .io_res_0            (tensorCoreChain_9_io_res_0          ), //o
     .io_res_1            (tensorCoreChain_9_io_res_1          ), //o
     .io_res_2            (tensorCoreChain_9_io_res_2          ), //o
-    .io_inputIters       (8'h09                               ), //i
+    .io_inputIters       (configDelay_matBColsPerTccRow       ), //i
     .io_outValid         (tensorCoreChain_9_io_outValid       ), //o
     .clk                 (clk                                 ), //i
     .resetn              (resetn                              )  //i
@@ -489,7 +518,7 @@ module TensorCoreChainArray (
     .io_res_0            (tensorCoreChain_10_io_res_0          ), //o
     .io_res_1            (tensorCoreChain_10_io_res_1          ), //o
     .io_res_2            (tensorCoreChain_10_io_res_2          ), //o
-    .io_inputIters       (8'h09                                ), //i
+    .io_inputIters       (configDelay_matBColsPerTccRow        ), //i
     .io_outValid         (tensorCoreChain_10_io_outValid       ), //o
     .clk                 (clk                                  ), //i
     .resetn              (resetn                               )  //i
@@ -510,7 +539,7 @@ module TensorCoreChainArray (
     .io_res_0            (tensorCoreChain_11_io_res_0          ), //o
     .io_res_1            (tensorCoreChain_11_io_res_1          ), //o
     .io_res_2            (tensorCoreChain_11_io_res_2          ), //o
-    .io_inputIters       (8'h09                                ), //i
+    .io_inputIters       (configDelay_matBColsPerTccRow        ), //i
     .io_outValid         (tensorCoreChain_11_io_outValid       ), //o
     .clk                 (clk                                  ), //i
     .resetn              (resetn                               )  //i
@@ -699,7 +728,7 @@ module TensorCoreChainArray (
       `ctrlStateMachine_enumDefinition_binary_sequential_ctrlStateMachine_sPreLoad : begin
       end
       `ctrlStateMachine_enumDefinition_binary_sequential_ctrlStateMachine_sCompute : begin
-        if(when_TensorCoreChainArray_l164) begin
+        if(when_TensorCoreChainArray_l184) begin
           rowBufferRdCounter_willIncrement = 1'b1;
         end
       end
@@ -721,7 +750,7 @@ module TensorCoreChainArray (
       `ctrlStateMachine_enumDefinition_binary_sequential_ctrlStateMachine_sPreLoad : begin
       end
       `ctrlStateMachine_enumDefinition_binary_sequential_ctrlStateMachine_sCompute : begin
-        if(!when_TensorCoreChainArray_l164) begin
+        if(!when_TensorCoreChainArray_l184) begin
           rowBufferRdCounter_willClear = 1'b1;
         end
       end
@@ -735,19 +764,20 @@ module TensorCoreChainArray (
     end
   end
 
-  assign rowBufferRdCounter_willOverflowIfInc = (rowBufferRdCounter_value == 5'h1a);
+  assign rowBufferRdCounter_willOverflowIfInc = (rowBufferRdCounter_overflowVal <= rowBufferRdCounter_value);
   assign rowBufferRdCounter_willOverflow = (rowBufferRdCounter_willOverflowIfInc && rowBufferRdCounter_willIncrement);
   always @(*) begin
     if(rowBufferRdCounter_willOverflow) begin
-      rowBufferRdCounter_valueNext = 5'h0;
+      rowBufferRdCounter_valueNext = 8'h0;
     end else begin
       rowBufferRdCounter_valueNext = (rowBufferRdCounter_value + _zz_rowBufferRdCounter_valueNext);
     end
     if(rowBufferRdCounter_willClear) begin
-      rowBufferRdCounter_valueNext = 5'h0;
+      rowBufferRdCounter_valueNext = 8'h0;
     end
   end
 
+  assign rowBufferRdCounter_overflowVal = (configDelay_tccRowBufferCnterRange - 8'h01);
   always @(*) begin
     colBufferRdCounter_willIncrement = 1'b0;
     case(ctrlStateMachine_stateReg)
@@ -757,7 +787,7 @@ module TensorCoreChainArray (
         colBufferRdCounter_willIncrement = 1'b1;
       end
       `ctrlStateMachine_enumDefinition_binary_sequential_ctrlStateMachine_sCompute : begin
-        if(when_TensorCoreChainArray_l174) begin
+        if(when_TensorCoreChainArray_l194) begin
           colBufferRdCounter_willIncrement = 1'b1;
         end
       end
@@ -779,7 +809,7 @@ module TensorCoreChainArray (
       `ctrlStateMachine_enumDefinition_binary_sequential_ctrlStateMachine_sPreLoad : begin
       end
       `ctrlStateMachine_enumDefinition_binary_sequential_ctrlStateMachine_sCompute : begin
-        if(!when_TensorCoreChainArray_l174) begin
+        if(!when_TensorCoreChainArray_l194) begin
           colBufferRdCounter_willClear = 1'b1;
         end
       end
@@ -793,19 +823,20 @@ module TensorCoreChainArray (
     end
   end
 
-  assign colBufferRdCounter_willOverflowIfInc = (colBufferRdCounter_value == 5'h1a);
+  assign colBufferRdCounter_willOverflowIfInc = (colBufferRdCounter_overflowVal <= colBufferRdCounter_value);
   assign colBufferRdCounter_willOverflow = (colBufferRdCounter_willOverflowIfInc && colBufferRdCounter_willIncrement);
   always @(*) begin
     if(colBufferRdCounter_willOverflow) begin
-      colBufferRdCounter_valueNext = 5'h0;
+      colBufferRdCounter_valueNext = 8'h0;
     end else begin
       colBufferRdCounter_valueNext = (colBufferRdCounter_value + _zz_colBufferRdCounter_valueNext);
     end
     if(colBufferRdCounter_willClear) begin
-      colBufferRdCounter_valueNext = 5'h0;
+      colBufferRdCounter_valueNext = 8'h0;
     end
   end
 
+  assign colBufferRdCounter_overflowVal = (configDelay_tccColBufferCnterRange - 8'h01);
   always @(*) begin
     _zz_wraddress = 1'b0;
     if(colConverters_0_io_dataOut_valid) begin
@@ -820,21 +851,21 @@ module TensorCoreChainArray (
     end
   end
 
-  assign _zz_2 = (_zz_wraddress_2 == 5'h1a);
+  assign _zz_2 = (_zz__zz_2 <= _zz_wraddress_2);
   assign _zz_3 = (_zz_2 && _zz_wraddress);
   always @(*) begin
     if(_zz_3) begin
-      _zz_wraddress_1 = 5'h0;
+      _zz_wraddress_1 = 8'h0;
     end else begin
       _zz_wraddress_1 = (_zz_wraddress_2 + _zz__zz_wraddress_1);
     end
     if(_zz_1) begin
-      _zz_wraddress_1 = 5'h0;
+      _zz_wraddress_1 = 8'h0;
     end
   end
 
-  assign colMem_0_wraddress = {2'd0, _zz_wraddress_2};
-  assign colMem_0_rdaddress = {2'd0, colBufferRdCounter_value};
+  assign colMem_0_wraddress = _zz_wraddress_2[6:0];
+  assign colMem_0_rdaddress = colBufferRdCounter_value[6:0];
   always @(*) begin
     if(colConverters_0_io_dataOut_valid) begin
       colMem_0_wren = 1'b1;
@@ -857,21 +888,21 @@ module TensorCoreChainArray (
     end
   end
 
-  assign _zz_5 = (_zz_wraddress_5 == 5'h1a);
+  assign _zz_5 = (_zz__zz_5 <= _zz_wraddress_5);
   assign _zz_6 = (_zz_5 && _zz_wraddress_3);
   always @(*) begin
     if(_zz_6) begin
-      _zz_wraddress_4 = 5'h0;
+      _zz_wraddress_4 = 8'h0;
     end else begin
       _zz_wraddress_4 = (_zz_wraddress_5 + _zz__zz_wraddress_4);
     end
     if(_zz_4) begin
-      _zz_wraddress_4 = 5'h0;
+      _zz_wraddress_4 = 8'h0;
     end
   end
 
-  assign colMem_1_wraddress = {2'd0, _zz_wraddress_5};
-  assign colMem_1_rdaddress = {2'd0, colBufferRdCounter_value};
+  assign colMem_1_wraddress = _zz_wraddress_5[6:0];
+  assign colMem_1_rdaddress = colBufferRdCounter_value[6:0];
   always @(*) begin
     if(colConverters_1_io_dataOut_valid) begin
       colMem_1_wren = 1'b1;
@@ -894,21 +925,21 @@ module TensorCoreChainArray (
     end
   end
 
-  assign _zz_8 = (_zz_wraddress_8 == 5'h1a);
+  assign _zz_8 = (_zz__zz_8 <= _zz_wraddress_8);
   assign _zz_9 = (_zz_8 && _zz_wraddress_6);
   always @(*) begin
     if(_zz_9) begin
-      _zz_wraddress_7 = 5'h0;
+      _zz_wraddress_7 = 8'h0;
     end else begin
       _zz_wraddress_7 = (_zz_wraddress_8 + _zz__zz_wraddress_7);
     end
     if(_zz_7) begin
-      _zz_wraddress_7 = 5'h0;
+      _zz_wraddress_7 = 8'h0;
     end
   end
 
-  assign colMem_2_wraddress = {2'd0, _zz_wraddress_8};
-  assign colMem_2_rdaddress = {2'd0, colBufferRdCounter_value};
+  assign colMem_2_wraddress = _zz_wraddress_8[6:0];
+  assign colMem_2_rdaddress = colBufferRdCounter_value[6:0];
   always @(*) begin
     if(colConverters_2_io_dataOut_valid) begin
       colMem_2_wren = 1'b1;
@@ -931,21 +962,21 @@ module TensorCoreChainArray (
     end
   end
 
-  assign _zz_11 = (_zz_wraddress_11 == 5'h1a);
+  assign _zz_11 = (_zz__zz_11 <= _zz_wraddress_11);
   assign _zz_12 = (_zz_11 && _zz_wraddress_9);
   always @(*) begin
     if(_zz_12) begin
-      _zz_wraddress_10 = 5'h0;
+      _zz_wraddress_10 = 8'h0;
     end else begin
       _zz_wraddress_10 = (_zz_wraddress_11 + _zz__zz_wraddress_10);
     end
     if(_zz_10) begin
-      _zz_wraddress_10 = 5'h0;
+      _zz_wraddress_10 = 8'h0;
     end
   end
 
-  assign rowMem_0_wraddress = {2'd0, _zz_wraddress_11};
-  assign rowMem_0_rdaddress = {2'd0, rowBufferRdCounter_value};
+  assign rowMem_0_wraddress = _zz_wraddress_11[6:0];
+  assign rowMem_0_rdaddress = rowBufferRdCounter_value[6:0];
   always @(*) begin
     if(fixedBfpConverter_9_io_dataOut_valid) begin
       rowMem_0_wren = 1'b1;
@@ -968,21 +999,21 @@ module TensorCoreChainArray (
     end
   end
 
-  assign _zz_14 = (_zz_wraddress_14 == 5'h1a);
+  assign _zz_14 = (_zz__zz_14 <= _zz_wraddress_14);
   assign _zz_15 = (_zz_14 && _zz_wraddress_12);
   always @(*) begin
     if(_zz_15) begin
-      _zz_wraddress_13 = 5'h0;
+      _zz_wraddress_13 = 8'h0;
     end else begin
       _zz_wraddress_13 = (_zz_wraddress_14 + _zz__zz_wraddress_13);
     end
     if(_zz_13) begin
-      _zz_wraddress_13 = 5'h0;
+      _zz_wraddress_13 = 8'h0;
     end
   end
 
-  assign rowMem_1_wraddress = {2'd0, _zz_wraddress_14};
-  assign rowMem_1_rdaddress = {2'd0, rowBufferRdCounter_value};
+  assign rowMem_1_wraddress = _zz_wraddress_14[6:0];
+  assign rowMem_1_rdaddress = rowBufferRdCounter_value[6:0];
   always @(*) begin
     if(fixedBfpConverter_10_io_dataOut_valid) begin
       rowMem_1_wren = 1'b1;
@@ -1005,21 +1036,21 @@ module TensorCoreChainArray (
     end
   end
 
-  assign _zz_17 = (_zz_wraddress_17 == 5'h1a);
+  assign _zz_17 = (_zz__zz_17 <= _zz_wraddress_17);
   assign _zz_18 = (_zz_17 && _zz_wraddress_15);
   always @(*) begin
     if(_zz_18) begin
-      _zz_wraddress_16 = 5'h0;
+      _zz_wraddress_16 = 8'h0;
     end else begin
       _zz_wraddress_16 = (_zz_wraddress_17 + _zz__zz_wraddress_16);
     end
     if(_zz_16) begin
-      _zz_wraddress_16 = 5'h0;
+      _zz_wraddress_16 = 8'h0;
     end
   end
 
-  assign rowMem_2_wraddress = {2'd0, _zz_wraddress_17};
-  assign rowMem_2_rdaddress = {2'd0, rowBufferRdCounter_value};
+  assign rowMem_2_wraddress = _zz_wraddress_17[6:0];
+  assign rowMem_2_rdaddress = rowBufferRdCounter_value[6:0];
   always @(*) begin
     if(fixedBfpConverter_11_io_dataOut_valid) begin
       rowMem_2_wren = 1'b1;
@@ -1042,21 +1073,21 @@ module TensorCoreChainArray (
     end
   end
 
-  assign _zz_20 = (_zz_wraddress_20 == 5'h1a);
+  assign _zz_20 = (_zz__zz_20 <= _zz_wraddress_20);
   assign _zz_21 = (_zz_20 && _zz_wraddress_18);
   always @(*) begin
     if(_zz_21) begin
-      _zz_wraddress_19 = 5'h0;
+      _zz_wraddress_19 = 8'h0;
     end else begin
       _zz_wraddress_19 = (_zz_wraddress_20 + _zz__zz_wraddress_19);
     end
     if(_zz_19) begin
-      _zz_wraddress_19 = 5'h0;
+      _zz_wraddress_19 = 8'h0;
     end
   end
 
-  assign rowMem_3_wraddress = {2'd0, _zz_wraddress_20};
-  assign rowMem_3_rdaddress = {2'd0, rowBufferRdCounter_value};
+  assign rowMem_3_wraddress = _zz_wraddress_20[6:0];
+  assign rowMem_3_rdaddress = rowBufferRdCounter_value[6:0];
   always @(*) begin
     if(fixedBfpConverter_12_io_dataOut_valid) begin
       rowMem_3_wren = 1'b1;
@@ -1079,21 +1110,21 @@ module TensorCoreChainArray (
     end
   end
 
-  assign _zz_23 = (_zz_wraddress_23 == 5'h1a);
+  assign _zz_23 = (_zz__zz_23 <= _zz_wraddress_23);
   assign _zz_24 = (_zz_23 && _zz_wraddress_21);
   always @(*) begin
     if(_zz_24) begin
-      _zz_wraddress_22 = 5'h0;
+      _zz_wraddress_22 = 8'h0;
     end else begin
       _zz_wraddress_22 = (_zz_wraddress_23 + _zz__zz_wraddress_22);
     end
     if(_zz_22) begin
-      _zz_wraddress_22 = 5'h0;
+      _zz_wraddress_22 = 8'h0;
     end
   end
 
-  assign rowMem_4_wraddress = {2'd0, _zz_wraddress_23};
-  assign rowMem_4_rdaddress = {2'd0, rowBufferRdCounter_value};
+  assign rowMem_4_wraddress = _zz_wraddress_23[6:0];
+  assign rowMem_4_rdaddress = rowBufferRdCounter_value[6:0];
   always @(*) begin
     if(fixedBfpConverter_13_io_dataOut_valid) begin
       rowMem_4_wren = 1'b1;
@@ -1116,21 +1147,21 @@ module TensorCoreChainArray (
     end
   end
 
-  assign _zz_26 = (_zz_wraddress_26 == 5'h1a);
+  assign _zz_26 = (_zz__zz_26 <= _zz_wraddress_26);
   assign _zz_27 = (_zz_26 && _zz_wraddress_24);
   always @(*) begin
     if(_zz_27) begin
-      _zz_wraddress_25 = 5'h0;
+      _zz_wraddress_25 = 8'h0;
     end else begin
       _zz_wraddress_25 = (_zz_wraddress_26 + _zz__zz_wraddress_25);
     end
     if(_zz_25) begin
-      _zz_wraddress_25 = 5'h0;
+      _zz_wraddress_25 = 8'h0;
     end
   end
 
-  assign rowMem_5_wraddress = {2'd0, _zz_wraddress_26};
-  assign rowMem_5_rdaddress = {2'd0, rowBufferRdCounter_value};
+  assign rowMem_5_wraddress = _zz_wraddress_26[6:0];
+  assign rowMem_5_rdaddress = rowBufferRdCounter_value[6:0];
   always @(*) begin
     if(fixedBfpConverter_14_io_dataOut_valid) begin
       rowMem_5_wren = 1'b1;
@@ -1292,7 +1323,7 @@ module TensorCoreChainArray (
     end
   end
 
-  assign ctrlStateMachine_loadIterCounter_overflowVal = (computeItersReg - 8'h01);
+  assign ctrlStateMachine_loadIterCounter_overflowVal = (matAColSubGrpLenReg - 8'h01);
   always @(*) begin
     ctrlStateMachine_computeIterCounter_willIncrement = 1'b0;
     case(ctrlStateMachine_stateReg)
@@ -1332,7 +1363,7 @@ module TensorCoreChainArray (
     end
   end
 
-  assign ctrlStateMachine_computeIterCounter_overflowVal = (computeItersReg - 8'h01);
+  assign ctrlStateMachine_computeIterCounter_overflowVal = (matAColSubGrpLenReg - 8'h01);
   always @(*) begin
     ctrlStateMachine_resValidCounter_willIncrement = 1'b0;
     case(ctrlStateMachine_stateReg)
@@ -1375,7 +1406,7 @@ module TensorCoreChainArray (
     end
   end
 
-  assign ctrlStateMachine_resValidCounter_overflowVal = (computeItersReg - 8'h01);
+  assign ctrlStateMachine_resValidCounter_overflowVal = (matAColSubGrpLenReg - 8'h01);
   assign outputBuffer_wrreq = (tcArrayRes_valid && (! outputBuffer_full));
   assign outputBuffer_data = {tcArrayRes_payload_5,{tcArrayRes_payload_4,{tcArrayRes_payload_3,{tcArrayRes_payload_2,{tcArrayRes_payload_1,tcArrayRes_payload_0}}}}};
   assign io_res_payload = outputBuffer_q;
@@ -1414,29 +1445,37 @@ module TensorCoreChainArray (
     end
   end
 
-  assign when_TensorCoreChainArray_l164 = (ctrlStateMachine_dataInFinish == 1'b0);
-  assign when_TensorCoreChainArray_l174 = (ctrlStateMachine_loadFinish == 1'b0);
+  assign when_TensorCoreChainArray_l184 = (ctrlStateMachine_dataInFinish == 1'b0);
+  assign when_TensorCoreChainArray_l194 = (ctrlStateMachine_loadFinish == 1'b0);
   assign when_StateMachine_l230 = ((! (ctrlStateMachine_stateReg == `ctrlStateMachine_enumDefinition_binary_sequential_ctrlStateMachine_sIdle)) && (ctrlStateMachine_stateNext == `ctrlStateMachine_enumDefinition_binary_sequential_ctrlStateMachine_sIdle));
   assign when_StateMachine_l230_1 = ((! (ctrlStateMachine_stateReg == `ctrlStateMachine_enumDefinition_binary_sequential_ctrlStateMachine_sPreLoad)) && (ctrlStateMachine_stateNext == `ctrlStateMachine_enumDefinition_binary_sequential_ctrlStateMachine_sPreLoad));
   assign when_StateMachine_l230_2 = ((! (ctrlStateMachine_stateReg == `ctrlStateMachine_enumDefinition_binary_sequential_ctrlStateMachine_sCompute)) && (ctrlStateMachine_stateNext == `ctrlStateMachine_enumDefinition_binary_sequential_ctrlStateMachine_sCompute));
   always @(posedge clk or negedge resetn) begin
     if(!resetn) begin
-      rowBufferRdCounter_value <= 5'h0;
-      colBufferRdCounter_value <= 5'h0;
+      io_calEn_delay_1 <= 1'b0;
+      calEnDelay <= 1'b0;
+      io_configPorts_delay_1_matAColSubGrpLen <= 8'h0;
+      io_configPorts_delay_1_matBColsPerTccRow <= 8'h0;
+      io_configPorts_delay_1_tccRowBufferCnterRange <= 8'h0;
+      io_configPorts_delay_1_tccColBufferCnterRange <= 8'h0;
+      configDelay_matAColSubGrpLen <= 8'h0;
+      configDelay_matBColsPerTccRow <= 8'h0;
+      configDelay_tccRowBufferCnterRange <= 8'h0;
+      configDelay_tccColBufferCnterRange <= 8'h0;
+      rowBufferRdCounter_value <= 8'h0;
+      colBufferRdCounter_value <= 8'h0;
       tensorLoadValid <= 1'b0;
       tensorDataValid <= 1'b0;
-      computeItersReg <= 8'h0;
-      calEnDelay <= 1'b0;
-      computeItersDelay <= 8'h0;
-      _zz_wraddress_2 <= 5'h0;
-      _zz_wraddress_5 <= 5'h0;
-      _zz_wraddress_8 <= 5'h0;
-      _zz_wraddress_11 <= 5'h0;
-      _zz_wraddress_14 <= 5'h0;
-      _zz_wraddress_17 <= 5'h0;
-      _zz_wraddress_20 <= 5'h0;
-      _zz_wraddress_23 <= 5'h0;
-      _zz_wraddress_26 <= 5'h0;
+      matAColSubGrpLenReg <= 8'h0;
+      _zz_wraddress_2 <= 8'h0;
+      _zz_wraddress_5 <= 8'h0;
+      _zz_wraddress_8 <= 8'h0;
+      _zz_wraddress_11 <= 8'h0;
+      _zz_wraddress_14 <= 8'h0;
+      _zz_wraddress_17 <= 8'h0;
+      _zz_wraddress_20 <= 8'h0;
+      _zz_wraddress_23 <= 8'h0;
+      _zz_wraddress_26 <= 8'h0;
       tensorLoadValid_delay_1 <= 1'b0;
       tensorDataValid_delay_1 <= 1'b0;
       tensorLoadValid_delay_1_1 <= 1'b0;
@@ -1456,10 +1495,18 @@ module TensorCoreChainArray (
       ctrlStateMachine_resValidCounter_value <= 8'h0;
       ctrlStateMachine_stateReg <= `ctrlStateMachine_enumDefinition_binary_sequential_ctrlStateMachine_BOOT;
     end else begin
+      io_calEn_delay_1 <= io_calEn;
+      calEnDelay <= io_calEn_delay_1;
+      io_configPorts_delay_1_matAColSubGrpLen <= io_configPorts_matAColSubGrpLen;
+      io_configPorts_delay_1_matBColsPerTccRow <= io_configPorts_matBColsPerTccRow;
+      io_configPorts_delay_1_tccRowBufferCnterRange <= io_configPorts_tccRowBufferCnterRange;
+      io_configPorts_delay_1_tccColBufferCnterRange <= io_configPorts_tccColBufferCnterRange;
+      configDelay_matAColSubGrpLen <= io_configPorts_delay_1_matAColSubGrpLen;
+      configDelay_matBColsPerTccRow <= io_configPorts_delay_1_matBColsPerTccRow;
+      configDelay_tccRowBufferCnterRange <= io_configPorts_delay_1_tccRowBufferCnterRange;
+      configDelay_tccColBufferCnterRange <= io_configPorts_delay_1_tccColBufferCnterRange;
       rowBufferRdCounter_value <= rowBufferRdCounter_valueNext;
       colBufferRdCounter_value <= colBufferRdCounter_valueNext;
-      calEnDelay <= io_calEn_delay_1;
-      computeItersDelay <= io_computeIters_delay_1;
       _zz_wraddress_2 <= _zz_wraddress_1;
       _zz_wraddress_5 <= _zz_wraddress_4;
       _zz_wraddress_8 <= _zz_wraddress_7;
@@ -1488,19 +1535,19 @@ module TensorCoreChainArray (
       case(ctrlStateMachine_stateReg)
         `ctrlStateMachine_enumDefinition_binary_sequential_ctrlStateMachine_sIdle : begin
           if(calEnDelay) begin
-            computeItersReg <= computeItersDelay;
+            matAColSubGrpLenReg <= configDelay_matAColSubGrpLen;
           end
         end
         `ctrlStateMachine_enumDefinition_binary_sequential_ctrlStateMachine_sPreLoad : begin
         end
         `ctrlStateMachine_enumDefinition_binary_sequential_ctrlStateMachine_sCompute : begin
-          if(!when_TensorCoreChainArray_l164) begin
+          if(!when_TensorCoreChainArray_l184) begin
             tensorDataValid <= 1'b0;
           end
           if(rowBufferRdCounter_willOverflow) begin
             ctrlStateMachine_dataInFinish <= 1'b1;
           end
-          if(!when_TensorCoreChainArray_l174) begin
+          if(!when_TensorCoreChainArray_l194) begin
             tensorLoadValid <= 1'b0;
           end
           if(colBufferRdCounter_willOverflow) begin
@@ -1513,7 +1560,7 @@ module TensorCoreChainArray (
         end
       endcase
       if(when_StateMachine_l230) begin
-        computeItersReg <= 8'h0;
+        matAColSubGrpLenReg <= 8'h0;
         tensorLoadValid <= 1'b0;
         tensorDataValid <= 1'b0;
         ctrlStateMachine_loadFinish <= 1'b0;
@@ -1526,11 +1573,6 @@ module TensorCoreChainArray (
         tensorDataValid <= 1'b1;
       end
     end
-  end
-
-  always @(posedge clk) begin
-    io_calEn_delay_1 <= io_calEn;
-    io_computeIters_delay_1 <= io_computeIters;
   end
 
 
