@@ -165,7 +165,7 @@
                     <ipxact:vectors>
                         <ipxact:vector>
                             <ipxact:left>0</ipxact:left>
-                            <ipxact:right>431</ipxact:right>
+                            <ipxact:right>71</ipxact:right>
                         </ipxact:vector>
                     </ipxact:vectors>
                     <ipxact:wireTypeDefs>
@@ -219,7 +219,7 @@
                     <ipxact:vectors>
                         <ipxact:vector>
                             <ipxact:left>0</ipxact:left>
-                            <ipxact:right>431</ipxact:right>
+                            <ipxact:right>71</ipxact:right>
                         </ipxact:vector>
                     </ipxact:vectors>
                     <ipxact:wireTypeDefs>
@@ -260,7 +260,7 @@
         <ipxact:fileSet>
             <ipxact:name>QUARTUS_SYNTH</ipxact:name>
             <ipxact:file>
-                <ipxact:name>fifo_1910\synth\out_fifo_fifo_1910_stdoldq.v</ipxact:name>
+                <ipxact:name>fifo_1910\synth\out_fifo_fifo_1910_tx5cw3y.v</ipxact:name>
                 <ipxact:fileType>verilogSource</ipxact:fileType>
                 <ipxact:isIncludeFile>false</ipxact:isIncludeFile>
                 <ipxact:vendorExtensions>

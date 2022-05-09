@@ -15,7 +15,7 @@
 // synopsys translate_off
 `timescale 1 ps / 1 ps
 // synopsys translate_on
-module  out_fifo_fifo_1910_stdoldq  (
+module  out_fifo_fifo_1910_tx5cw3y  (
     clock,
     data,
     rdreq,
@@ -25,19 +25,19 @@ module  out_fifo_fifo_1910_stdoldq  (
     q);
 
     input    clock;
-    input  [431:0]  data;
+    input  [71:0]  data;
     input    rdreq;
     input    wrreq;
     output   empty;
     output   full;
-    output [431:0]  q;
+    output [71:0]  q;
 
     wire  sub_wire0;
     wire  sub_wire1;
-    wire [431:0] sub_wire2;
+    wire [71:0] sub_wire2;
     wire  empty = sub_wire0;
     wire  full = sub_wire1;
-    wire [431:0] q = sub_wire2[431:0];
+    wire [71:0] q = sub_wire2[71:0];
 
     scfifo  scfifo_component (
                 .clock (clock),
@@ -60,7 +60,7 @@ module  out_fifo_fifo_1910_stdoldq  (
         scfifo_component.lpm_numwords  = 128,
         scfifo_component.lpm_showahead  = "OFF",
         scfifo_component.lpm_type  = "scfifo",
-        scfifo_component.lpm_width  = 432,
+        scfifo_component.lpm_width  = 72,
         scfifo_component.lpm_widthu  = 7,
         scfifo_component.overflow_checking  = "ON",
         scfifo_component.underflow_checking  = "ON",

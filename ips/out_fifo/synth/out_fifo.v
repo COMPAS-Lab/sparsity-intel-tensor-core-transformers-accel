@@ -4,23 +4,23 @@
 
 `timescale 1 ps / 1 ps
 module out_fifo (
-		input  wire [431:0] data,  //  fifo_input.datain
-		input  wire         wrreq, //            .wrreq
-		input  wire         rdreq, //            .rdreq
-		input  wire         clock, //            .clk
-		output wire [431:0] q,     // fifo_output.dataout
-		output wire         full,  //            .full
-		output wire         empty  //            .empty
+		input  wire [71:0] data,  //  fifo_input.datain
+		input  wire        wrreq, //            .wrreq
+		input  wire        rdreq, //            .rdreq
+		input  wire        clock, //            .clk
+		output wire [71:0] q,     // fifo_output.dataout
+		output wire        full,  //            .full
+		output wire        empty  //            .empty
 	);
 
-	out_fifo_fifo_1910_stdoldq fifo_0 (
-		.data  (data),  //   input,  width = 432,  fifo_input.datain
-		.wrreq (wrreq), //   input,    width = 1,            .wrreq
-		.rdreq (rdreq), //   input,    width = 1,            .rdreq
-		.clock (clock), //   input,    width = 1,            .clk
-		.q     (q),     //  output,  width = 432, fifo_output.dataout
-		.full  (full),  //  output,    width = 1,            .full
-		.empty (empty)  //  output,    width = 1,            .empty
+	out_fifo_fifo_1910_tx5cw3y fifo_0 (
+		.data  (data),  //   input,  width = 72,  fifo_input.datain
+		.wrreq (wrreq), //   input,   width = 1,            .wrreq
+		.rdreq (rdreq), //   input,   width = 1,            .rdreq
+		.clock (clock), //   input,   width = 1,            .clk
+		.q     (q),     //  output,  width = 72, fifo_output.dataout
+		.full  (full),  //  output,   width = 1,            .full
+		.empty (empty)  //  output,   width = 1,            .empty
 	);
 
 endmodule

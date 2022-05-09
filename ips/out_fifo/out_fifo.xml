@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <deploy
- date="2022.04.19.18:49:56"
+ date="2022.05.05.16:14:07"
  outputDirectory="C:/Users/tianchu.ji/Documents/MvmTensorCore/ips/out_fifo/">
  <perimeter>
   <parameter
@@ -37,7 +37,7 @@
    <property name="associatedClock" value="" />
    <property name="associatedReset" value="" />
    <property name="prSafe" value="false" />
-   <port name="data" direction="input" role="datain" width="432" />
+   <port name="data" direction="input" role="datain" width="72" />
    <port name="wrreq" direction="input" role="wrreq" width="1" />
    <port name="rdreq" direction="input" role="rdreq" width="1" />
    <port name="clock" direction="input" role="clk" width="1" />
@@ -46,7 +46,7 @@
    <property name="associatedClock" value="" />
    <property name="associatedReset" value="" />
    <property name="prSafe" value="false" />
-   <port name="q" direction="output" role="dataout" width="432" />
+   <port name="q" direction="output" role="dataout" width="72" />
    <port name="full" direction="output" role="full" width="1" />
    <port name="empty" direction="output" role="empty" width="1" />
   </interface>
@@ -75,10 +75,10 @@
   </childSourceFiles>
   <messages>
    <message level="Info" culprit="out_fifo">"Generating: out_fifo"</message>
-   <message level="Info" culprit="out_fifo">"Generating: out_fifo_fifo_1910_stdoldq"</message>
+   <message level="Info" culprit="out_fifo">"Generating: out_fifo_fifo_1910_tx5cw3y"</message>
   </messages>
  </entity>
- <entity kind="fifo" version="19.1.0" name="out_fifo_fifo_1910_stdoldq">
+ <entity kind="fifo" version="19.1.0" name="out_fifo_fifo_1910_tx5cw3y">
   <parameter name="GUI_Full" value="true" />
   <parameter name="GUI_RdUsedw_width" value="8" />
   <parameter name="GUI_AlmostFullThr" value="1" />
@@ -121,15 +121,15 @@
   <parameter name="GUI_write_aclr_synch" value="false" />
   <parameter name="GUI_sc_aclr" value="false" />
   <parameter name="GUI_DISABLE_DCFIFO_EMBEDDED_TIMING_CONSTRAINT" value="true" />
-  <parameter name="GUI_Width" value="432" />
+  <parameter name="GUI_Width" value="72" />
   <generatedFiles>
    <file
-       path="C:\Users\tianchu.ji\Documents\MvmTensorCore\ips\out_fifo\fifo_1910\synth\out_fifo_fifo_1910_stdoldq.v"
+       path="C:\Users\tianchu.ji\Documents\MvmTensorCore\ips\out_fifo\fifo_1910\synth\out_fifo_fifo_1910_tx5cw3y.v"
        attributes="" />
   </generatedFiles>
   <childGeneratedFiles>
    <file
-       path="C:\Users\tianchu.ji\Documents\MvmTensorCore\ips\out_fifo\fifo_1910\synth\out_fifo_fifo_1910_stdoldq.v"
+       path="C:\Users\tianchu.ji\Documents\MvmTensorCore\ips\out_fifo\fifo_1910\synth\out_fifo_fifo_1910_tx5cw3y.v"
        attributes="" />
   </childGeneratedFiles>
   <sourceFiles>
@@ -138,7 +138,7 @@
   <childSourceFiles/>
   <instantiator instantiator="out_fifo" as="fifo_0" />
   <messages>
-   <message level="Info" culprit="out_fifo">"Generating: out_fifo_fifo_1910_stdoldq"</message>
+   <message level="Info" culprit="out_fifo">"Generating: out_fifo_fifo_1910_tx5cw3y"</message>
   </messages>
  </entity>
 </deploy>

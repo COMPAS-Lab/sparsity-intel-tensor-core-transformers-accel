@@ -161,16 +161,17 @@ def prepare_single_input_files(input_path: str):
 def main(args: dict):
     if args['inputs_gen']:
         chain_len = int(args['chain_len'])
-        compute_iter = int(args['compute_iter'])
-        matA = mat_a_gen((9, chain_len*10*compute_iter), \
-                            chain_len, compute_iter)
-        matB = mat_b_gen((chain_len*10*compute_iter, 3*chain_len*2), 
-                            chain_len, compute_iter)
+        matAColSubGrpLen = int(args['compute_iter'])
+
+        matA = mat_a_gen((3*50, chain_len*10*matAColSubGrpLen), \
+                            chain_len, matAColSubGrpLen)
+        matB = mat_b_gen((chain_len*10*matAColSubGrpLen, 3*chain_len*5), 
+                            chain_len, matAColSubGrpLen)
         res = np.matmul(matA, matB)
         np.save("mult_a_b_fp32_res.npy", res)
 
-    if args['outputs-translate']:
-        fname = str(args['outputs-translate'])
+    if args['outputs-check']:
+        fname = str(args['outputs-check'])
         correct_res_filename = str(args['correct_res'])
         check_outputs(fname, correct_res_filename, 2, 3)
 
@@ -191,8 +192,8 @@ if __name__ == "__main__":
                                 action="store", dest="chain_len")
     arg_parser.add_argument("-ci", "--compute-iter", help="compute iteration", \
                                 action="store", dest="compute_iter")
-    arg_parser.add_argument("-ot", "--outputs-translate", help="translate the output file to floats", \
-                                action="store", dest="outputs-translate")
+    arg_parser.add_argument("-oc", "--outputs-check", help="check the correctness of the simulation output", \
+                                action="store", dest="outputs-check")
     arg_parser.add_argument("-v", "--view-npy", help="view numpy file", \
                                 action="store", dest="view-npy")
     arg_parser.add_argument("-cr", "--correct-res", help="path of the correct results", \
@@ -205,7 +206,7 @@ if __name__ == "__main__":
     if args['inputs_gen'] and (args['chain_len'] is None or args['compute_iter'] is None):
         arg_parser.error("inputs generation requires a chain length AND a compute iteration!")
 
-    if args['outputs-translate'] and args['correct_res'] is None:
+    if args['outputs-check'] and args['correct_res'] is None:
         arg_parser.error("must specify correct result to compare to.")
 
     main(args)

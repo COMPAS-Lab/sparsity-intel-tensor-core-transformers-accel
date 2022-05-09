@@ -106,7 +106,6 @@ end
 initial begin
   $readmemh("./tb/MAT_B_FP32_0.mem", mat_b0);
   $readmemh("./tb/MAT_B_FP32_1.mem", mat_b1);
-  io_computeIters = 8'd3;
   io_matBLoad_0_0_valid = '0;
   io_matBLoad_0_0_payload = '0;
   io_matBLoad_0_1_valid = '0;

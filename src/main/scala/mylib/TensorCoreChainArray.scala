@@ -16,6 +16,7 @@ case class TensorCoreChainArrayConfigPorts() extends Bundle {
   //   matBColsPerTccRow = matBCols / array_row
   //   it equals to the chain_loading_latency when the Dot Product
   //   hides the matA loading latency just fine.
+  // TODO: may make this a static parameter
   val matBColsPerTccRow = UInt (8 bits)
   // Tensor Core Chain row buffer counter boundary:
   //   calculated as Ceil(matBCols / array_row) * Ceil(matACols / (chain_len * 10.0))
@@ -39,7 +40,8 @@ class TensorCoreChainArray(array_col: Int, array_row: Int, chain_len: Int,
     val calEn = in Bool()
     // config ports
     val configPorts =  in (TensorCoreChainArrayConfigPorts())
-    val res = master Stream (UInt(output_width * 3 * array_col * array_row bits))
+    val res = master Stream (UInt(output_width * 3 bits))
+    val res_id = in UInt(log2Up(array_col * array_row) bits)
   }
 
   //adding pipes to the ctrl signals
@@ -222,24 +224,29 @@ class TensorCoreChainArray(array_col: Int, array_row: Int, chain_len: Int,
   }
 
   //output buffer path
-  val outputBuffer = new out_fifo
+  val outputBuffer = Array.fill(array_row * array_col)(new out_fifo(output_width))
+  val outputBufferSelOut = Vec(Stream(UInt(output_width *3 bits)), array_row * array_col)
 
-  outputBuffer.io.wrreq := (tcArrayRes.valid && ~outputBuffer.io.full)
-  outputBuffer.io.data := tcArrayRes.payload.as(UInt(output_width * 3 * array_row * array_col bits))
+  for (idx <- 0 until array_row * array_col) {
+    outputBuffer(idx).io.wrreq := (tcArrayRes.valid && ~outputBuffer(idx).io.full)
+    outputBuffer(idx).io.data := tcArrayRes.payload(idx)
 
-  io.res.payload := outputBuffer.io.q
-  io.res.valid := ~outputBuffer.io.empty
-  outputBuffer.io.rdreq := io.res.ready
+    outputBuffer(idx).io.rdreq := outputBufferSelOut(idx).ready
+    outputBufferSelOut(idx).payload := outputBuffer(idx).io.q
+    outputBufferSelOut(idx).valid := ~outputBuffer(idx).io.empty
+  }
+  outputBufferSelOut.foreach(_.ready := False)
+  io.res <> outputBufferSelOut(io.res_id)
 }
 
 object TensorCoreArrayGen {
   def main(args: Array[String]): Unit = {
     val gen = new DefaultConfig
     gen.defaultSpinalConfig.generate(new TensorCoreChainArray(
-      array_col = 3,
-      array_row = 2,
-      chain_len = 3,
-      out_buf_delay = 9-3,
+      array_col = 50,
+      array_row = 5,
+      chain_len = 10,
+      out_buf_delay = 30-3,
       col_buf_max_depth = 128,
       row_buf_max_depth = 128,
       output_width = 24

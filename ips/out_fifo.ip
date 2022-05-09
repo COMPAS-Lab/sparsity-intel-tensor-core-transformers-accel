@@ -165,7 +165,7 @@
           <ipxact:vectors>
             <ipxact:vector>
               <ipxact:left>0</ipxact:left>
-              <ipxact:right>431</ipxact:right>
+              <ipxact:right>71</ipxact:right>
             </ipxact:vector>
           </ipxact:vectors>
           <ipxact:wireTypeDefs>
@@ -219,7 +219,7 @@
           <ipxact:vectors>
             <ipxact:vector>
               <ipxact:left>0</ipxact:left>
-              <ipxact:right>431</ipxact:right>
+              <ipxact:right>71</ipxact:right>
             </ipxact:vector>
           </ipxact:vectors>
           <ipxact:wireTypeDefs>
@@ -313,7 +313,7 @@
         <ipxact:parameter parameterId="GUI_Width" type="int">
           <ipxact:name>GUI_Width</ipxact:name>
           <ipxact:displayName>How wide should the FIFO be?</ipxact:displayName>
-          <ipxact:value>432</ipxact:value>
+          <ipxact:value>72</ipxact:value>
         </ipxact:parameter>
         <ipxact:parameter parameterId="GUI_Depth" type="int">
           <ipxact:name>GUI_Depth</ipxact:name>
