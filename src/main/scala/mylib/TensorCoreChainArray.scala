@@ -226,6 +226,7 @@ class TensorCoreChainArray(array_col: Int, array_row: Int, chain_len: Int,
   //output buffer path
   val outputBuffer = Array.fill(array_row * array_col)(new out_fifo(output_width))
   val outputBufferSelOut = Vec(Stream(UInt(output_width *3 bits)), array_row * array_col)
+  val outputBufferSelOutDelayed = Vec(Stream(UInt(output_width * 3 bits)), array_row*array_col)
 
   for (idx <- 0 until array_row * array_col) {
     outputBuffer(idx).io.wrreq := (tcArrayRes.valid && ~outputBuffer(idx).io.full)
@@ -234,19 +235,22 @@ class TensorCoreChainArray(array_col: Int, array_row: Int, chain_len: Int,
     outputBuffer(idx).io.rdreq := outputBufferSelOut(idx).ready
     outputBufferSelOut(idx).payload := outputBuffer(idx).io.q
     outputBufferSelOut(idx).valid := ~outputBuffer(idx).io.empty
+
+    outputBufferSelOutDelayed(idx) << StreamDelay(outputBufferSelOut(idx), 3)
   }
-  outputBufferSelOut.foreach(_.ready := False)
-  io.res <> outputBufferSelOut(io.res_id)
+
+  outputBufferSelOutDelayed.foreach(_.ready := False)
+  io.res << outputBufferSelOutDelayed(io.res_id)
 }
 
 object TensorCoreArrayGen {
   def main(args: Array[String]): Unit = {
     val gen = new DefaultConfig
     gen.defaultSpinalConfig.generate(new TensorCoreChainArray(
-      array_col = 50,
+      array_col = 22,
       array_row = 5,
-      chain_len = 10,
-      out_buf_delay = 30-3,
+      chain_len = 34,
+      out_buf_delay = 102-3,
       col_buf_max_depth = 128,
       row_buf_max_depth = 128,
       output_width = 24

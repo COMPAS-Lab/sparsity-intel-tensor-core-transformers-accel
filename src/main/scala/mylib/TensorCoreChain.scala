@@ -2,7 +2,6 @@ package mylib
 
 import spinal.core._
 import spinal.lib._
-
 import config._
 import intel_ips._
 import util._
@@ -44,7 +43,7 @@ class TensorCoreChain(chain_len: Int, out_buf_delay: Int, output_width: Int) ext
   val tcStartPoint = new tensor_core_start
   val tcCoreChainElems = new Array[tensor_core](chain_len-1)
   val tcAccu = new tensor_core_accu
-  
+
   // loading requires 3 extra cycles, align the valid signal
   // with the first compute core here
   val loadValidD3t = Delay(io.loadValid, 3, init=False)
@@ -62,7 +61,7 @@ class TensorCoreChain(chain_len: Int, out_buf_delay: Int, output_width: Int) ext
   }
   loadBufCtrl := Mux(loadValidD2t, loadBufCtrlReg, U"2'b00")
   io.loadReady := loadCounter.willOverflow
-  
+
   val inputCounter = DynaCounter(8, io.inputIters)
   val loadBufSel = Reg(Bool()) init False
   when(io.dataValid) {
@@ -130,15 +129,27 @@ class TensorCoreChain(chain_len: Int, out_buf_delay: Int, output_width: Int) ext
     tcCoreChainElems(i).io.side_in_1 <> U"8'd0"
     tcCoreChainElems(i).io.side_in_2 <> U"8'd0"
   }
-  
+
   val accuFbDelay = Vec(UInt(24 bits), 3)
   accuFbDelay(0) := Mux(oBufferLoadValid, tcAccu.io.bf24_col_1, U"24'd0")
   accuFbDelay(1) := Mux(oBufferLoadValid, tcAccu.io.bf24_col_2, U"24'd0")
   accuFbDelay(2) := Mux(oBufferLoadValid, tcAccu.io.bf24_col_3, U"24'd0")
-  
-  tcAccu.io.bf24_a1 := Delay(accuFbDelay(0), out_buf_delay, init=U(0, 24 bits))
-  tcAccu.io.bf24_a2 := Delay(accuFbDelay(1), out_buf_delay, init=U(0, 24 bits))
-  tcAccu.io.bf24_a3 := Delay(accuFbDelay(2), out_buf_delay, init=U(0, 24 bits))
+
+
+  if (out_buf_delay < 5) {
+    tcAccu.io.bf24_a1 := Delay(accuFbDelay(0), out_buf_delay, init = U(0, 24 bits))
+    tcAccu.io.bf24_a2 := Delay(accuFbDelay(1), out_buf_delay, init = U(0, 24 bits))
+    tcAccu.io.bf24_a3 := Delay(accuFbDelay(2), out_buf_delay, init = U(0, 24 bits))
+  } else {
+    val fbDelayFifo = StreamFifo(UInt(24*3 bits), out_buf_delay)
+    fbDelayFifo.io.push.valid := oBufferLoadValid
+    fbDelayFifo.io.push.payload := tcAccu.io.bf24_col_3 @@ tcAccu.io.bf24_col_2 @@ tcAccu.io.bf24_col_1
+    fbDelayFifo.io.pop.ready := Delay(oBufferLoadValid, out_buf_delay-2, init = False)
+
+    tcAccu.io.bf24_a1 := fbDelayFifo.io.pop.payload(23 downto 0)
+    tcAccu.io.bf24_a2 := fbDelayFifo.io.pop.payload(47 downto 24)
+    tcAccu.io.bf24_a3 := fbDelayFifo.io.pop.payload(71 downto 48)
+  }
   tcAccu.io.cascade_data_in_col_1 <> tcCoreChainElems(chain_len-2).io.cascade_data_out_col_1
   tcAccu.io.cascade_data_in_col_2 <> tcCoreChainElems(chain_len-2).io.cascade_data_out_col_2
   tcAccu.io.cascade_data_in_col_3 <> tcCoreChainElems(chain_len-2).io.cascade_data_out_col_3

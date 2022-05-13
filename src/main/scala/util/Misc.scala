@@ -1,6 +1,7 @@
 package util
 
 import spinal.core._
+import spinal.lib._
 
 object LeadingZeros {
 
@@ -63,5 +64,27 @@ object DynaCounter {
     val dynaCounter = new DynaCounter(width)
     dynaCounter.overflowVal := overflowVal-1
     dynaCounter
+  }
+}
+
+class StreamDelay[T <: Data](dataType: HardType[T]) extends Component {
+  val io = new Bundle {
+    val inputStream = slave Stream(dataType)
+    val outputStream = master Stream(dataType)
+  }
+
+  io.outputStream <-/< io.inputStream
+}
+
+object StreamDelay {
+  def apply[T <: Data](src: Stream[T], delayCycles: Int): Stream[T] = {
+    val streamPipe = Array.fill(delayCycles-1)(new StreamDelay(src.payloadType))
+
+    src >> streamPipe(0).io.inputStream
+    for (i <- 1 until delayCycles-1) {
+      streamPipe(i-1).io.outputStream >> streamPipe(i).io.inputStream
+    }
+
+    streamPipe(delayCycles-2).io.outputStream
   }
 }
