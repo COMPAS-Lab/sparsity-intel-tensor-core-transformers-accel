@@ -105,21 +105,24 @@ class TensorCoreChain(chain_len: Int, out_buf_delay: Int, output_width: Int) ext
   for (i <- 0 until chain_len-1) {
     tcCoreChainElems(i) = new tensor_core
 
-	val delayedDataIn = Delay(io.dataIn(i+1), 2*(i+1), init=U(0, io.dataIn(i+1).getWidth bits))
-    connect_data_in(tcCoreChainElems(i).io, delayedDataIn)
-	val delayedExpIn = Delay(io.expIn(i+1), 2*(i+1), init=U(0, io.expIn(i+1).getWidth bits))
-    tcCoreChainElems(i).io.shared_exponent_data <> delayedExpIn
-	if (i == 0) {
-		tcCoreChainElems(i).io.cascade_data_in_col_1 <> tcStartPoint.io.cascade_data_out_col_1
-		tcCoreChainElems(i).io.cascade_data_in_col_2 <> tcStartPoint.io.cascade_data_out_col_2
-		tcCoreChainElems(i).io.cascade_data_in_col_3 <> tcStartPoint.io.cascade_data_out_col_3
-		tcCoreChainElems(i).io.cascade_weight_in <> tcStartPoint.io.cascade_weight_out
-	} else {
-		tcCoreChainElems(i).io.cascade_data_in_col_1 <> tcCoreChainElems(i-1).io.cascade_data_out_col_1
-		tcCoreChainElems(i).io.cascade_data_in_col_2 <> tcCoreChainElems(i-1).io.cascade_data_out_col_2
-		tcCoreChainElems(i).io.cascade_data_in_col_3 <> tcCoreChainElems(i-1).io.cascade_data_out_col_3
-		tcCoreChainElems(i).io.cascade_weight_in <> tcCoreChainElems(i-1).io.cascade_weight_out
-	}
+//    val delayedDataIn = Delay(io.dataIn(i+1), 2*(i+1), init=U(0, io.dataIn(i+1).getWidth bits))
+//    connect_data_in(tcCoreChainElems(i).io, delayedDataIn)
+    connect_data_in(tcCoreChainElems(i).io, io.dataIn(i+1))
+//    val delayedExpIn = Delay(io.expIn(i+1), 2*(i+1), init=U(0, io.expIn(i+1).getWidth bits))
+//    tcCoreChainElems(i).io.shared_exponent_data <> delayedExpIn
+    tcCoreChainElems(i).io.shared_exponent_data <> io.expIn(i+1)
+
+    if (i == 0) {
+      tcCoreChainElems(i).io.cascade_data_in_col_1 <> tcStartPoint.io.cascade_data_out_col_1
+      tcCoreChainElems(i).io.cascade_data_in_col_2 <> tcStartPoint.io.cascade_data_out_col_2
+      tcCoreChainElems(i).io.cascade_data_in_col_3 <> tcStartPoint.io.cascade_data_out_col_3
+      tcCoreChainElems(i).io.cascade_weight_in <> tcStartPoint.io.cascade_weight_out
+    } else {
+      tcCoreChainElems(i).io.cascade_data_in_col_1 <> tcCoreChainElems(i-1).io.cascade_data_out_col_1
+      tcCoreChainElems(i).io.cascade_data_in_col_2 <> tcCoreChainElems(i-1).io.cascade_data_out_col_2
+      tcCoreChainElems(i).io.cascade_data_in_col_3 <> tcCoreChainElems(i-1).io.cascade_data_out_col_3
+      tcCoreChainElems(i).io.cascade_weight_in <> tcCoreChainElems(i-1).io.cascade_weight_out
+    }
     tcCoreChainElems(i).io.zero_en <> False
     tcCoreChainElems(i).io.acc_en <> False
     tcCoreChainElems(i).io.load_buf_sel <> loadBufSel

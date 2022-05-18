@@ -48,7 +48,7 @@ class TensorCoreChainArray(array_col: Int, array_row: Int, chain_len: Int,
   val calEnDelay = Delay(io.calEn, 2, init=False)
   val configDelay = Delay(io.configPorts, 2, init=TensorCoreChainArrayConfigPorts().getZero)
 
-  val rowBufferRdCounter = DynaCounter(8, configDelay.tccRowBufferCnterRange)
+  val rowBufferRdCounter = DynaCounter(8, configDelay.tccRowBufferCnterRange + (chain_len-1) * 2)
   val colBufferRdCounter = DynaCounter(8, configDelay.tccColBufferCnterRange)
 
   val tensorLoadValid, tensorDataValid = Reg(Bool()) init False
@@ -70,7 +70,7 @@ class TensorCoreChainArray(array_col: Int, array_row: Int, chain_len: Int,
   val colConverters = Array.fill(array_col)(new FixedBfpConverter())
   val rowConverters = Array.ofDim[FixedBfpConverter](array_row, chain_len)
 
-  //buffer load
+  //buffer write and read
   for (c <- 0 until array_col) {
     colConverters(c).io.dataIn <> io.matALoad(c)
     val colBufferWrCounter = DynaCounter(8, configDelay.tccColBufferCnterRange)
@@ -86,6 +86,8 @@ class TensorCoreChainArray(array_col: Int, array_row: Int, chain_len: Int,
       colMem(c).io.wren := False
     }
   }
+
+  val rowMemAddr = Array.ofDim[UInt](array_row, chain_len)
   for (r <- 0 until array_row) {
     for (tcId <- 0 until chain_len) {
       val rowBufferWrCounter = DynaCounter(8, configDelay.tccRowBufferCnterRange)
@@ -95,8 +97,11 @@ class TensorCoreChainArray(array_col: Int, array_row: Int, chain_len: Int,
       rowMem(r * chain_len + tcId).io.wraddress :=
         rowBufferWrCounter.resize(rowMem(r * chain_len + tcId).io.wraddress.getWidth)
       rowMem(r * chain_len + tcId).io.data := rowConverters(r)(tcId).io.dataOut.payload
+      // utilize row buffer to delay the inputs according to its destination tensor core
+      //   in each tensor core chain
+      rowMemAddr(r)(tcId) = rowBufferRdCounter - U(2*tcId, rowBufferRdCounter.getWidth bits)
       rowMem(r * chain_len + tcId).io.rdaddress :=
-        rowBufferRdCounter.resize(rowMem(r * chain_len + tcId).io.rdaddress.getWidth)
+        rowMemAddr(r)(tcId).resize(rowMem(r * chain_len + tcId).io.rdaddress.getWidth)
 
       when(rowConverters(r)(tcId).io.dataOut.fire) {
         rowBufferWrCounter.increment()
@@ -108,15 +113,22 @@ class TensorCoreChainArray(array_col: Int, array_row: Int, chain_len: Int,
     }
   }
 
-  // row connection
+  // data connection from row/col buffer to the tensor core chains
   for (r <- 0 until array_row; c <- 0 until array_col) {
     val rowMemOut: Vec[UInt] = Vec(UInt(8*11 bits), chain_len)
     for (cl <- 0 until chain_len) (rowMemOut(cl) := rowMem(r * chain_len + cl).io.q)
 
     for (tcId <- 0 until chain_len) {
-      tensorArray(r)(c).io.dataIn(tcId) := rowMemOut(tcId)(87 downto 8)
-      tensorArray(r)(c).io.expIn(tcId) := rowMemOut(tcId)(7 downto 0)
+      when(rowMemAddr(r)(c) < io.configPorts.tccRowBufferCnterRange &&
+            rowMemAddr(r)(c) >= 2*tcId) {
+        tensorArray(r)(c).io.dataIn(tcId) := rowMemOut(tcId)(87 downto 8)
+        tensorArray(r)(c).io.expIn(tcId) := rowMemOut(tcId)(7 downto 0)
+      }.otherwise {
+        tensorArray(r)(c).io.dataIn(tcId) := 0
+        tensorArray(r)(c).io.expIn(tcId) := 0
+      }
     }
+
     tensorArray(r)(c).io.loadCascadeIn := colMem(c).io.q(87 downto 8)
     tensorArray(r)(c).io.expCascadeIn := colMem(c).io.q(7 downto 0)
     tensorArray(r)(c).io.loadValid := Delay(tensorLoadValid, 1, init=False)
