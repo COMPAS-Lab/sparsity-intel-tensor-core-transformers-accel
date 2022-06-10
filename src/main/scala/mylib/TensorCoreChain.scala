@@ -145,6 +145,7 @@ class TensorCoreChain(chain_len: Int, out_buf_delay: Int, output_width: Int) ext
     tcAccu.io.bf24_a3 := Delay(accuFbDelay(2), out_buf_delay, init = U(0, 24 bits))
   } else {
     val fbDelayFifo = StreamFifo(UInt(24*3 bits), out_buf_delay)
+    fbDelayFifo.setName("AccuDelayInst")
     fbDelayFifo.io.push.valid := oBufferLoadValid
     fbDelayFifo.io.push.payload := tcAccu.io.bf24_col_3 @@ tcAccu.io.bf24_col_2 @@ tcAccu.io.bf24_col_1
     fbDelayFifo.io.pop.ready := Delay(oBufferLoadValid, out_buf_delay-2, init = False)

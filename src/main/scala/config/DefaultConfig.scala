@@ -7,7 +7,8 @@ import spinal.core.sim._
 class DefaultConfig {
   var defaultClockConfig = ClockDomainConfig(
     clockEdge = RISING,
-    resetActiveLevel = LOW
+    resetActiveLevel = LOW,
+    resetKind = SYNC
   )
 
   var defaultSpinalConfig = SpinalConfig(
