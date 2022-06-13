@@ -95,7 +95,7 @@ class tensor_core_array_wrapper(array_col: Int, array_row: Int, chain_len: Int,
   val tcArray = new TensorCoreChainArray(array_col = array_col, array_row = array_row,
                                       chain_len = chain_len, out_buf_delay = chain_len*3-3,
                                       col_buf_max_depth = 128, row_buf_max_depth = 128,
-                                      output_width = 24)
+                                      output_fifo_depth = 128, output_width = 24)
 
   tcArray.io.matALoad := data2TcarrayCol
   for (rowIdx <- 0 until array_row; chainIdx <- 0 until chain_len) {
@@ -198,9 +198,8 @@ class tensor_core_array_wrapper(array_col: Int, array_row: Int, chain_len: Int,
   //  generate mem usage report
   val col_mem_size = tcArray.colMem.length * 3
   val row_mem_size = tcArray.rowMem.length * 3
-  val out_fifo_size = tcArray.outputBuffer.length * 2
   val fb_fifo_size = tcArray.tensorArray.length * tcArray.tensorArray(0).length * 2
-  println("total ram blocks: ", (col_mem_size + row_mem_size + out_fifo_size + fb_fifo_size))
+  println("total ram blocks: ", (col_mem_size + row_mem_size + fb_fifo_size))
 
 }
 

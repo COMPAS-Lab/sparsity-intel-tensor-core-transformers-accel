@@ -2,11 +2,13 @@ package mylib
 
 import spinal.core._
 import spinal.lib._
+import spinal.lib.fsm._
 import config._
 import intel_ips._
 import util._
 
-class TensorCoreChain(chain_len: Int, out_buf_delay: Int, output_width: Int) extends Component {
+class TensorCoreChain(chain_len: Int, out_buf_delay: Int,
+                      out_fifo_depth: Int, output_width: Int) extends Component {
   val io = new Bundle {
     val dataIn = in Vec(UInt(80 bits), chain_len)
     val loadCascadeIn = in UInt(80 bits)
@@ -18,8 +20,8 @@ class TensorCoreChain(chain_len: Int, out_buf_delay: Int, output_width: Int) ext
     val dataIterReady = out Bool()
     val loadValid = in Bool()
     val loadReady = out Bool()
-    val res = out Vec(UInt(output_width bits), 3)
-    val inputIters = in UInt(8 bits)
+    val res = master Stream(Vec(UInt(output_width bits), 3))
+    val inputIters, matAColSubGrpLen = in UInt(8 bits)
     val outValid = out Bool()
   }
 
@@ -133,47 +135,39 @@ class TensorCoreChain(chain_len: Int, out_buf_delay: Int, output_width: Int) ext
     tcCoreChainElems(i).io.side_in_2 <> U"8'd0"
   }
 
-  val accuFbDelay = Vec(UInt(24 bits), 3)
-  accuFbDelay(0) := Mux(oBufferLoadValid, tcAccu.io.bf24_col_1, U"24'd0")
-  accuFbDelay(1) := Mux(oBufferLoadValid, tcAccu.io.bf24_col_2, U"24'd0")
-  accuFbDelay(2) := Mux(oBufferLoadValid, tcAccu.io.bf24_col_3, U"24'd0")
+  val fbDelayFifo = StreamFifo(Vec(UInt(24 bits), 3), out_fifo_depth)
+  fbDelayFifo.setName("AccuDelayInst")
+  fbDelayFifo.io.push.valid := oBufferLoadValid
+  fbDelayFifo.io.push.payload := Vec(tcAccu.io.bf24_col_1, tcAccu.io.bf24_col_2, tcAccu.io.bf24_col_3)
 
+  val resValidCounter = DynaCounter(io.matAColSubGrpLen.getWidth, io.matAColSubGrpLen)
+  when(io.outValid) (resValidCounter.increment())
 
-  if (out_buf_delay < 5) {
-    tcAccu.io.bf24_a1 := Delay(accuFbDelay(0), out_buf_delay, init = U(0, 24 bits))
-    tcAccu.io.bf24_a2 := Delay(accuFbDelay(1), out_buf_delay, init = U(0, 24 bits))
-    tcAccu.io.bf24_a3 := Delay(accuFbDelay(2), out_buf_delay, init = U(0, 24 bits))
-  } else {
-    val fbDelayFifo = StreamFifo(UInt(24*3 bits), out_buf_delay)
-    fbDelayFifo.setName("AccuDelayInst")
-    fbDelayFifo.io.push.valid := oBufferLoadValid
-    fbDelayFifo.io.push.payload := tcAccu.io.bf24_col_3 @@ tcAccu.io.bf24_col_2 @@ tcAccu.io.bf24_col_1
-    fbDelayFifo.io.pop.ready := Delay(oBufferLoadValid, out_buf_delay-2, init = False)
-
-    tcAccu.io.bf24_a1 := fbDelayFifo.io.pop.payload(23 downto 0)
-    tcAccu.io.bf24_a2 := fbDelayFifo.io.pop.payload(47 downto 24)
-    tcAccu.io.bf24_a3 := fbDelayFifo.io.pop.payload(71 downto 48)
+  when(resValidCounter.willOverflowIfInc) {
+    tcAccu.io.bf24_a1.clearAll()
+    tcAccu.io.bf24_a2.clearAll()
+    tcAccu.io.bf24_a3.clearAll()
+    io.res <> fbDelayFifo.io.pop
+  } .otherwise {
+    fbDelayFifo.io.pop.ready := Delay(oBufferLoadValid, out_buf_delay - 2, init = False)
+    //TODO: double check the assignment sequence here
+    tcAccu.io.bf24_a1 := fbDelayFifo.io.pop.payload(0)
+    tcAccu.io.bf24_a2 := fbDelayFifo.io.pop.payload(1)
+    tcAccu.io.bf24_a3 := fbDelayFifo.io.pop.payload(2)
+    io.res.payload.foreach(_ := U(0))
+    io.res.valid := False
   }
+
   tcAccu.io.cascade_data_in_col_1 <> tcCoreChainElems(chain_len-2).io.cascade_data_out_col_1
   tcAccu.io.cascade_data_in_col_2 <> tcCoreChainElems(chain_len-2).io.cascade_data_out_col_2
   tcAccu.io.cascade_data_in_col_3 <> tcCoreChainElems(chain_len-2).io.cascade_data_out_col_3
   tcAccu.io.zero_en := False
   tcAccu.io.acc_en := False
-
-  if (output_width > 24) {
-    io.res(0) <> tcAccu.io.bf24_col_1 @@ U"8'd0"
-    io.res(1) <> tcAccu.io.bf24_col_2 @@ U"8'd0"
-    io.res(2) <> tcAccu.io.bf24_col_3 @@ U"8'd0"
-  } else {
-    io.res(0) <> tcAccu.io.bf24_col_1
-    io.res(1) <> tcAccu.io.bf24_col_2
-    io.res(2) <> tcAccu.io.bf24_col_3
-  }
 }
 
 object TensorCoreChainGen {
   def main(args: Array[String]): Unit = {
     val gen = new DefaultConfig
-    gen.defaultSpinalConfig.generate(new TensorCoreChain(3, 9-3, 32)).printPruned()
+    gen.defaultSpinalConfig.generate(new TensorCoreChain(3, 9-3, 128, 24)).printPruned()
   }
 }

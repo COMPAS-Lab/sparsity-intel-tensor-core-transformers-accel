@@ -33,7 +33,8 @@ case class TensorCoreChainArrayConfigPorts() extends Bundle {
 
 class TensorCoreChainArray(array_col: Int, array_row: Int, chain_len: Int,
                            out_buf_delay: Int, //should be (matBCols / array_row).ceil.toInt - 3
-                           col_buf_max_depth: Int, row_buf_max_depth: Int, output_width: Int) extends Component {
+                           col_buf_max_depth: Int, row_buf_max_depth: Int,
+                           output_fifo_depth: Int, output_width: Int) extends Component {
   val io = new Bundle {
     val matALoad = Vec(slave Flow (UInt(32 * 10 bits)), array_col)
     val matBLoad = Vec(Vec(slave Flow (UInt(32 * 10 bits)), chain_len), array_row)
@@ -59,11 +60,9 @@ class TensorCoreChainArray(array_col: Int, array_row: Int, chain_len: Int,
   for (r <- 0 until array_row; c <- 0 until array_col) {
     // out buf delay = number of B columns in each tensor core chain row - 3
     tensorArray(r)(c) = new TensorCoreChain(chain_len, out_buf_delay = out_buf_delay,
-      output_width = output_width)
+                                              out_fifo_depth = output_fifo_depth, output_width = output_width)
     tensorArray(r)(c).setName("u_tc_core_r_" + r + "_c_" + c)
   }
-
-  val tcArrayRes = Flow(Vec(Reg(UInt(output_width * 3 bits)) init 0, array_col * array_row))
 
   //input buffers
   val colMem = Array.fill(array_col)(new in_buffer)
@@ -142,10 +141,9 @@ class TensorCoreChainArray(array_col: Int, array_row: Int, chain_len: Int,
     //   it equals to the chain_loading_latency when the Dot Product
     //   hides the matA loading latency just fine.
     tensorArray(r)(c).io.inputIters := configDelay.matBColsPerTccRow
-    tcArrayRes.payload(r * array_col + c) := tensorArray(r)(c).io.res.as(UInt(output_width * 3 bits))
+    tensorArray(r)(c).io.matAColSubGrpLen := configDelay.matAColSubGrpLen
   }
 
-  tcArrayRes.valid := False
   // compute control path
   val ctrlStateMachine = new StateMachine {
     val loadRdy, dataInIterReady, resOutValid = Bool()
@@ -231,7 +229,6 @@ class TensorCoreChainArray(array_col: Int, array_row: Int, chain_len: Int,
     val sWriteRes: State = new State {
       whenIsActive {
         when(resOutValid)(resValidCounter.increment())
-        tcArrayRes.valid := resValidCounter.willOverflowIfInc
         when(resValidCounter.willOverflow) {
           goto(sIdle)
         }
@@ -240,23 +237,20 @@ class TensorCoreChainArray(array_col: Int, array_row: Int, chain_len: Int,
   }
 
   //output buffer path
-  val outputBuffer = Array.fill(array_row * array_col)(new out_fifo(output_width))
-  val outputBufferSelOut = Vec(Stream(UInt(output_width *3 bits)), array_row * array_col)
-  val outputBufferSelOutDelayedTop, outputBufferSelOutDelayedBot = Vec(Stream(UInt(output_width * 3 bits)), array_row*array_col/2)
+  val outputBufferSelOut = Vec(Stream(UInt(output_width * 3 bits)), array_row * array_col)
+  val outputBufferSelOutDelayedTop = Vec(Stream(UInt(output_width * 3 bits)), array_row*array_col/2)
+  val outputBufferSelOutDelayedBot = Vec(Stream(UInt(output_width * 3 bits)), array_row*array_col/2)
 
-  for (idx <- 0 until array_row * array_col) {
-    outputBuffer(idx).setName("oBufferInst_" + idx)
-    outputBuffer(idx).io.wrreq := (tcArrayRes.valid && ~outputBuffer(idx).io.full)
-    outputBuffer(idx).io.data := tcArrayRes.payload(idx)
-
-    outputBuffer(idx).io.rdreq := outputBufferSelOut(idx).ready
-    outputBufferSelOut(idx).payload := outputBuffer(idx).io.q
-    outputBufferSelOut(idx).valid := ~outputBuffer(idx).io.empty
-
-    if (idx < array_row * array_col / 2) {
-      outputBufferSelOutDelayedTop(idx) << StreamDelay(outputBufferSelOut(idx), 3)
+  for (r <- 0 until array_row; c <- 0 until array_col) {
+    val tcChainId = r * array_col + c
+    outputBufferSelOut(tcChainId).payload := tensorArray(r)(c).io.res.payload.asBits.asUInt
+    outputBufferSelOut(tcChainId).valid := tensorArray(r)(c).io.res.valid
+    tensorArray(r)(c).io.res.ready := outputBufferSelOut(tcChainId).ready
+    if (tcChainId < array_row * array_col / 2) {
+      outputBufferSelOutDelayedTop(tcChainId) << StreamDelay(outputBufferSelOut(tcChainId), 3)
     } else {
-      outputBufferSelOutDelayedBot(idx - array_row * array_col / 2) << StreamDelay(outputBufferSelOut(idx), 3)
+      outputBufferSelOutDelayedBot(tcChainId - array_row * array_col / 2) <<
+                                                                StreamDelay(outputBufferSelOut(tcChainId), 3)
     }
   }
 
@@ -276,6 +270,7 @@ object TensorCoreArrayGen {
       out_buf_delay = 102-3,
       col_buf_max_depth = 128,
       row_buf_max_depth = 128,
+      output_fifo_depth = 128,
       output_width = 24
     )).printPruned()
   }
