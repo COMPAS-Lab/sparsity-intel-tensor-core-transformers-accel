@@ -67,7 +67,7 @@ class tensor_core_array_wrapper(array_col: Int, array_row: Int, chain_len: Int,
 
   val selectTcarrayIn, startTCarrayIn = Reg(Bool()) init False
   val selectTcarrayOut, startTCarrayOut = Reg(Bool()) init False
-  val outPop = Reg(Bool()) init False
+  val outPopTop, outPopBot = Reg(Bool()) init False
 
   val dataIn = Vec(Flow(UInt(320 bits)), 2)
   val combinedDataIn0 = RegNext(io.tcarray_in(1).data(63 downto 0) @@ io.tcarray_in(0).data) init 0
@@ -95,7 +95,8 @@ class tensor_core_array_wrapper(array_col: Int, array_row: Int, chain_len: Int,
   val tcArray = new TensorCoreChainArray(array_col = array_col, array_row = array_row,
                                       chain_len = chain_len, out_buf_delay = chain_len*3-3,
                                       col_buf_max_depth = 128, row_buf_max_depth = 128,
-                                      output_fifo_depth = 128, output_width = 24)
+                                      output_fifo_depth = 128, output_width = 24, 
+                                      inout_pipe_delay = 4)
 
   tcArray.io.matALoad := data2TcarrayCol
   for (rowIdx <- 0 until array_row; chainIdx <- 0 until chain_len) {
@@ -112,7 +113,7 @@ class tensor_core_array_wrapper(array_col: Int, array_row: Int, chain_len: Int,
   tcArray.io.configPorts.matBColsPerTccRow := U((mat_b_col/array_row), 8 bits)
   tcArray.io.configPorts.matAColSubGrpLen := U(mat_a_col/(chain_len * 10), 8 bits)
   tcArray.io.calEn := io.start(0).rise()
-  tcArray.io.res_id := io.in_buffer_id.resize(tcArray.io.res_id.getWidth)
+  tcArray.io.res_id := io.in_buffer_id
   tcArray.io.res_top >> dataOutStreamTop
   tcArray.io.res_bot >> dataOutStreamBot
 
@@ -165,20 +166,27 @@ class tensor_core_array_wrapper(array_col: Int, array_row: Int, chain_len: Int,
   }
 
   //out logic
-  val wrInitCount = Counter(2 bits)
-  val outValid = tcArray.io.res_top.valid
-  dataOutStreamTop.ready := outPop
-  dataOutStreamBot.ready := outPop
+  val wrInitCountTop = Counter(2 bits)
+  val outValidTop = tcArray.io.res_top.valid
+  dataOutStreamTop.ready := outPopTop
 
-  when(outValid.rise() && ~wrInitCount.willOverflowIfInc) {
-    wrInitCount.increment()
-  }.elsewhen(~outValid && wrInitCount.willOverflowIfInc) {
-    wrInitCount.clear()
+  when(outValidTop.rise() && ~wrInitCountTop.willOverflowIfInc) {
+    wrInitCountTop.increment()
+  }.elsewhen(~outValidTop && wrInitCountTop.willOverflowIfInc) {
+    wrInitCountTop.clear()
   }
+  outPopTop := wrInitCountTop.willOverflowIfInc && io.tcarray_out(0).almost_full
 
-  outPop := wrInitCount.willOverflowIfInc && io.tcarray_out(0).almost_full && io.tcarray_out(1).almost_full
-  startTCarrayOut := ~wrInitCount.willOverflowIfInc
-  selectTcarrayOut := outPop && outValid
+  val wrInitCountBot = Counter(2 bits)
+  val outValidBot = tcArray.io.res_bot.valid
+  dataOutStreamBot.ready := outPopBot
+
+  when(outValidBot.rise() && ~wrInitCountBot.willOverflowIfInc) {
+    wrInitCountBot.increment()
+  }.elsewhen(~outValidBot && wrInitCountBot.willOverflowIfInc) {
+    wrInitCountBot.clear()
+  }
+  outPopBot := wrInitCountBot.willOverflowIfInc && io.tcarray_out(1).almost_full
 
   for (elem <- io.tcarray_in) {
     elem.start := startTCarrayIn
@@ -186,12 +194,12 @@ class tensor_core_array_wrapper(array_col: Int, array_row: Int, chain_len: Int,
     elem.addr := io.rd_addr
   }
 
-  io.tcarray_out(0).start := startTCarrayOut
-  io.tcarray_out(0).select := selectTcarrayOut
+  io.tcarray_out(0).start := ~wrInitCountTop.willOverflowIfInc
+  io.tcarray_out(0).select := outPopTop && outValidTop
   io.tcarray_out(0).addr := io.wr_addr
   io.tcarray_out(0).data := dataOutStreamTop.payload.resize(128 bits)
-  io.tcarray_out(1).start := startTCarrayOut
-  io.tcarray_out(1).select := selectTcarrayOut
+  io.tcarray_out(1).start := ~wrInitCountBot.willOverflowIfInc
+  io.tcarray_out(1).select := outPopBot && outValidBot
   io.tcarray_out(1).addr := io.wr_addr
   io.tcarray_out(1).data := dataOutStreamBot.payload.resize(128 bits)
 

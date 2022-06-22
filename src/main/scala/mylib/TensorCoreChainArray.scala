@@ -34,7 +34,8 @@ case class TensorCoreChainArrayConfigPorts() extends Bundle {
 class TensorCoreChainArray(array_col: Int, array_row: Int, chain_len: Int,
                            out_buf_delay: Int, //should be (matBCols / array_row).ceil.toInt - 3
                            col_buf_max_depth: Int, row_buf_max_depth: Int,
-                           output_fifo_depth: Int, output_width: Int) extends Component {
+                           output_fifo_depth: Int, output_width: Int,
+                           inout_pipe_delay: Int = 5) extends Component {
   val io = new Bundle {
     val matALoad = Vec(slave Flow (UInt(32 * 10 bits)), array_col)
     val matBLoad = Vec(Vec(slave Flow (UInt(32 * 10 bits)), chain_len), array_row)
@@ -43,7 +44,7 @@ class TensorCoreChainArray(array_col: Int, array_row: Int, chain_len: Int,
     val configPorts =  in (TensorCoreChainArrayConfigPorts())
     val res_top = master Stream (UInt(output_width * 3 bits))
     val res_bot = master Stream (UInt(output_width * 3 bits))
-    val res_id = in UInt(log2Up(array_col * array_row / 2) bits)
+    val res_id = in UInt(16 bits)
   }
 
   //adding pipes to the ctrl signals
@@ -77,7 +78,8 @@ class TensorCoreChainArray(array_col: Int, array_row: Int, chain_len: Int,
     val colBufferWrCounter = DynaCounter(8, configDelay.tccColBufferCnterRange)
     colMem(c).io.wraddress := colBufferWrCounter.resize(colMem(c).io.wraddress.getWidth)
     colMem(c).io.data := colConverters(c).io.dataOut.payload
-    colMem(c).io.rdaddress := colBufferRdCounter.resize(colMem(c).io.rdaddress.getWidth)
+    //TODO: fix col buffer rd addr delay timing misalignment
+    colMem(c).io.rdaddress := Delay(colBufferRdCounter.resize(colMem(c).io.rdaddress.getWidth), 2)
     colMem(c).setName("colMem_" + c)
 
     when(colConverters(c).io.dataOut.fire) {
@@ -100,11 +102,12 @@ class TensorCoreChainArray(array_col: Int, array_row: Int, chain_len: Int,
       rowMem(r * chain_len + tcId).io.wraddress :=
         rowBufferWrCounter.resize(rowMem(r * chain_len + tcId).io.wraddress.getWidth)
       rowMem(r * chain_len + tcId).io.data := rowConverters(r)(tcId).io.dataOut.payload
-      // utilize row buffer to delay the inputs according to its destination tensor core
+      //TODO: utilize row buffer to delay the inputs according to its destination tensor core
       //   in each tensor core chain
       rowMemAddr(r)(tcId) = rowBufferRdCounter - U(2*tcId, rowBufferRdCounter.getWidth bits)
+      //TODO: fix row mem rd addr delay timing misalignment
       rowMem(r * chain_len + tcId).io.rdaddress :=
-        rowMemAddr(r)(tcId).resize(rowMem(r * chain_len + tcId).io.rdaddress.getWidth)
+        Delay(rowMemAddr(r)(tcId).resize(rowMem(r * chain_len + tcId).io.rdaddress.getWidth), 2)
 
       when(rowConverters(r)(tcId).io.dataOut.fire) {
         rowBufferWrCounter.increment()
@@ -124,18 +127,18 @@ class TensorCoreChainArray(array_col: Int, array_row: Int, chain_len: Int,
     for (tcId <- 0 until chain_len) {
       when(rowMemAddr(r)(c) < io.configPorts.tccRowBufferCnterRange &&
             rowMemAddr(r)(c) >= 2*tcId) {
-        tensorArray(r)(c).io.dataIn(tcId) := rowMemOut(tcId)(87 downto 8)
-        tensorArray(r)(c).io.expIn(tcId) := rowMemOut(tcId)(7 downto 0)
+        tensorArray(r)(c).io.dataIn(tcId) := Delay(rowMemOut(tcId)(87 downto 8), inout_pipe_delay, init=U"80'd0")
+        tensorArray(r)(c).io.expIn(tcId) := Delay(rowMemOut(tcId)(7 downto 0), inout_pipe_delay, init=U"8'd0")
       }.otherwise {
         tensorArray(r)(c).io.dataIn(tcId) := 0
         tensorArray(r)(c).io.expIn(tcId) := 0
       }
     }
 
-    tensorArray(r)(c).io.loadCascadeIn := colMem(c).io.q(87 downto 8)
-    tensorArray(r)(c).io.expCascadeIn := colMem(c).io.q(7 downto 0)
-    tensorArray(r)(c).io.loadValid := Delay(tensorLoadValid, 1, init=False)
-    tensorArray(r)(c).io.dataValid := Delay(tensorDataValid, 1, init=False)
+    tensorArray(r)(c).io.loadCascadeIn := Delay(colMem(c).io.q(87 downto 8), inout_pipe_delay, init=U"80'd0")
+    tensorArray(r)(c).io.expCascadeIn := Delay(colMem(c).io.q(7 downto 0), inout_pipe_delay, init=U"8'd0")
+    tensorArray(r)(c).io.loadValid := Delay(tensorLoadValid, 1+2+inout_pipe_delay, init=False)
+    tensorArray(r)(c).io.dataValid := Delay(tensorDataValid, 1+2+inout_pipe_delay, init=False)
     // tensor core input iters: number of iterations to take matB sub columns
     //   it is the number of B columns for a tensor core chain row.
     //   it equals to the chain_loading_latency when the Dot Product
@@ -247,15 +250,18 @@ class TensorCoreChainArray(array_col: Int, array_row: Int, chain_len: Int,
     outputBufferSelOut(tcChainId).valid := tensorArray(r)(c).io.res.valid
     tensorArray(r)(c).io.res.ready := outputBufferSelOut(tcChainId).ready
     if (tcChainId < array_row * array_col / 2) {
-      outputBufferSelOutDelayedTop(tcChainId) << StreamDelay(outputBufferSelOut(tcChainId), 3)
+      outputBufferSelOutDelayedTop(tcChainId) << StreamDelay(outputBufferSelOut(tcChainId), inout_pipe_delay)
     } else {
       outputBufferSelOutDelayedBot(tcChainId - array_row * array_col / 2) <<
-                                                                StreamDelay(outputBufferSelOut(tcChainId), 3)
+                                                                 StreamDelay(outputBufferSelOut(tcChainId), inout_pipe_delay)
     }
   }
 
   outputBufferSelOutDelayedTop.foreach(_.ready := False)
   outputBufferSelOutDelayedBot.foreach(_.ready := False)
+
+
+
   io.res_top << outputBufferSelOutDelayedTop(io.res_id)
   io.res_bot << outputBufferSelOutDelayedBot(io.res_id)
 }
