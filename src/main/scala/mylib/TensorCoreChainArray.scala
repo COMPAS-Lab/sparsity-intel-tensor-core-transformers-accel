@@ -250,20 +250,54 @@ class TensorCoreChainArray(array_col: Int, array_row: Int, chain_len: Int,
     outputBufferSelOut(tcChainId).valid := tensorArray(r)(c).io.res.valid
     tensorArray(r)(c).io.res.ready := outputBufferSelOut(tcChainId).ready
     if (tcChainId < array_row * array_col / 2) {
-      outputBufferSelOutDelayedTop(tcChainId) << StreamDelay(outputBufferSelOut(tcChainId), inout_pipe_delay)
+      outputBufferSelOutDelayedTop(tcChainId) << outputBufferSelOut(tcChainId)
     } else {
-      outputBufferSelOutDelayedBot(tcChainId - array_row * array_col / 2) <<
-                                                                 StreamDelay(outputBufferSelOut(tcChainId), inout_pipe_delay)
+      outputBufferSelOutDelayedBot(
+        tcChainId - array_row * array_col / 2) << outputBufferSelOut(tcChainId)
     }
   }
 
-  outputBufferSelOutDelayedTop.foreach(_.ready := False)
-  outputBufferSelOutDelayedBot.foreach(_.ready := False)
+  // TODO: temporary factorizing the number of output ports
+  def calculatePrimeFactors(n: Int): List[Int] = {
+    def loop(p: Int, rem: Int, res: List[Int]): List[Int] =
+      if (rem % p == 0) {
+        loop(p, rem / p, res :+ p)
+      } else if (p > rem) {
+        res
+      } else {
+        loop(p + 1, rem, res)
+      }
 
+    loop(2, n, Nil)
+  }
 
+  def createMuxHierarchy(inputs: Vec[Stream[UInt]], factor: List[Int], currUsedBits: Int): Vec[Stream[UInt]] = {
+    val outStageStreams = Vec(Stream(UInt(output_width*3 bits)), inputs.length / factor(0))
+    val usedIdBits = log2Up(factor(0)) + currUsedBits
+    println("currently on " + factor(0))
+    println("used bits " + usedIdBits)
 
-  io.res_top << outputBufferSelOutDelayedTop(io.res_id)
-  io.res_bot << outputBufferSelOutDelayedBot(io.res_id)
+    for (i <- 0 until outStageStreams.length) {
+      val currInputs = Vec(Stream(UInt(output_width*3 bits)), factor(0))
+      for (j <- 0 until factor(0)) {
+        currInputs(j) <-/< inputs(i*factor(0) + j)
+      }
+      currInputs.foreach(_.ready := False)
+      outStageStreams(i) << currInputs(io.res_id(currUsedBits+log2Up(factor(0))-1 downto currUsedBits))
+    }
+
+    if(factor.length > 1) {
+      return createMuxHierarchy(outStageStreams, factor.slice(1, factor.length), usedIdBits)
+    } else {
+      return outStageStreams
+    }
+  }
+
+  val muxStages = calculatePrimeFactors(array_col * array_row / 2)
+
+  println("factors: " + muxStages)
+  io.res_top << createMuxHierarchy(outputBufferSelOutDelayedTop, muxStages, 0)(0)
+  io.res_bot << createMuxHierarchy(outputBufferSelOutDelayedBot, muxStages, 0)(0)
 }
 
 object TensorCoreArrayGen {
