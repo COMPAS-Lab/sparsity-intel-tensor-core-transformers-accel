@@ -1,5 +1,6 @@
 	tensor_core_accu u0 (
 		.clk                    (_connected_to_clk_),                    //   input,   width = 1,                    clk.clk
+		.clr0                   (_connected_to_clr0_),                   //   input,   width = 1,                   clr0.clr
 		.acc_en                 (_connected_to_acc_en_),                 //   input,   width = 1,                 acc_en.acc_en
 		.zero_en                (_connected_to_zero_en_),                //   input,   width = 1,                zero_en.zero_en
 		.bf24_a1                (_connected_to_bf24_a1_),                //   input,  width = 24,                bf24_a1.data_in

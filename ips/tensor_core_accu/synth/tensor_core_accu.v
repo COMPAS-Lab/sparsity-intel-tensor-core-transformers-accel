@@ -5,6 +5,7 @@
 `timescale 1 ps / 1 ps
 module tensor_core_accu (
 		input  wire        clk,                    //                    clk.clk
+		input  wire        clr0,                   //                   clr0.clr
 		input  wire        acc_en,                 //                 acc_en.acc_en
 		input  wire        zero_en,                //                zero_en.zero_en
 		input  wire [23:0] bf24_a1,                //                bf24_a1.data_in
@@ -21,8 +22,9 @@ module tensor_core_accu (
 		output wire [23:0] bf24_col_3              //             bf24_col_3.result_h
 	);
 
-	tensor_core_accu_dsp_prime_10_wcj43fa dsp_prime_0 (
+	tensor_core_accu_dsp_prime_10_jua6hty dsp_prime_0 (
 		.clk                    (clk),                    //   input,   width = 1,                    clk.clk
+		.clr0                   (clr0),                   //   input,   width = 1,                   clr0.clr
 		.acc_en                 (acc_en),                 //   input,   width = 1,                 acc_en.acc_en
 		.zero_en                (zero_en),                //   input,   width = 1,                zero_en.zero_en
 		.bf24_a1                (bf24_a1),                //   input,  width = 24,                bf24_a1.data_in

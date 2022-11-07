@@ -143,26 +143,26 @@ class TensorCoreChain(chain_len: Int, out_buf_delay: Int,
   val resValidCounter = DynaCounter(io.matAColSubGrpLen.getWidth, io.matAColSubGrpLen)
   when(io.outValid) (resValidCounter.increment())
 
+  val fbOutRegPipe = 2  
   when(resValidCounter.willOverflowIfInc) {
-    tcAccu.io.bf24_a1.clearAll()
-    tcAccu.io.bf24_a2.clearAll()
-    tcAccu.io.bf24_a3.clearAll()
     io.res <> fbDelayFifo.io.pop
   } .otherwise {
-    fbDelayFifo.io.pop.ready := Delay(oBufferLoadValid, out_buf_delay - 2, init = False)
-    //TODO: double check the assignment sequence here
-    tcAccu.io.bf24_a1 := fbDelayFifo.io.pop.payload(0)
-    tcAccu.io.bf24_a2 := fbDelayFifo.io.pop.payload(1)
-    tcAccu.io.bf24_a3 := fbDelayFifo.io.pop.payload(2)
+    //TODO: check validity of ready delay
+    fbDelayFifo.io.pop.ready := Delay(oBufferLoadValid, out_buf_delay - 2 - fbOutRegPipe, init = False)
     io.res.payload.foreach(_ := U(0))
     io.res.valid := False
   }
 
+  //TODO: double check the assignment sequence here
+  tcAccu.io.bf24_a1 := Delay(fbDelayFifo.io.pop.payload(0), fbOutRegPipe, init = U"24'd0")
+  tcAccu.io.bf24_a2 := Delay(fbDelayFifo.io.pop.payload(1), fbOutRegPipe, init = U"24'd0")
+  tcAccu.io.bf24_a3 := Delay(fbDelayFifo.io.pop.payload(2), fbOutRegPipe, init = U"24'd0")
   tcAccu.io.cascade_data_in_col_1 <> tcCoreChainElems(chain_len-2).io.cascade_data_out_col_1
   tcAccu.io.cascade_data_in_col_2 <> tcCoreChainElems(chain_len-2).io.cascade_data_out_col_2
   tcAccu.io.cascade_data_in_col_3 <> tcCoreChainElems(chain_len-2).io.cascade_data_out_col_3
   tcAccu.io.zero_en := False
-  tcAccu.io.acc_en := False
+  tcAccu.io.acc_en := False 
+  tcAccu.io.clr0 <> resValidCounter.willOverflowIfInc
 }
 
 object TensorCoreChainGen {

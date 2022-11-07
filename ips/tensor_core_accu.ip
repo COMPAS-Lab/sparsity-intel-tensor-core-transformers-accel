@@ -53,6 +53,53 @@
       </ipxact:vendorExtensions>
     </ipxact:busInterface>
     <ipxact:busInterface>
+      <ipxact:name>clr0</ipxact:name>
+      <ipxact:busType vendor="altera" library="altera" name="conduit" version="20.4"></ipxact:busType>
+      <ipxact:abstractionTypes>
+        <ipxact:abstractionType>
+          <ipxact:abstractionRef vendor="altera" library="altera" name="conduit" version="20.4"></ipxact:abstractionRef>
+          <ipxact:portMaps>
+            <ipxact:portMap>
+              <ipxact:logicalPort>
+                <ipxact:name>clr</ipxact:name>
+              </ipxact:logicalPort>
+              <ipxact:physicalPort>
+                <ipxact:name>clr0</ipxact:name>
+              </ipxact:physicalPort>
+            </ipxact:portMap>
+          </ipxact:portMaps>
+        </ipxact:abstractionType>
+      </ipxact:abstractionTypes>
+      <ipxact:slave></ipxact:slave>
+      <ipxact:parameters>
+        <ipxact:parameter parameterId="associatedClock" type="string">
+          <ipxact:name>associatedClock</ipxact:name>
+          <ipxact:displayName>associatedClock</ipxact:displayName>
+          <ipxact:value></ipxact:value>
+        </ipxact:parameter>
+        <ipxact:parameter parameterId="associatedReset" type="string">
+          <ipxact:name>associatedReset</ipxact:name>
+          <ipxact:displayName>associatedReset</ipxact:displayName>
+          <ipxact:value></ipxact:value>
+        </ipxact:parameter>
+        <ipxact:parameter parameterId="prSafe" type="bit">
+          <ipxact:name>prSafe</ipxact:name>
+          <ipxact:displayName>Partial Reconfiguration Safe</ipxact:displayName>
+          <ipxact:value>false</ipxact:value>
+        </ipxact:parameter>
+      </ipxact:parameters>
+      <ipxact:vendorExtensions>
+        <altera:altera_assignments>
+          <ipxact:parameters>
+            <ipxact:parameter parameterId="ui.blockdiagram.direction" type="string">
+              <ipxact:name>ui.blockdiagram.direction</ipxact:name>
+              <ipxact:value>input</ipxact:value>
+            </ipxact:parameter>
+          </ipxact:parameters>
+        </altera:altera_assignments>
+      </ipxact:vendorExtensions>
+    </ipxact:busInterface>
+    <ipxact:busInterface>
       <ipxact:name>acc_en</ipxact:name>
       <ipxact:busType vendor="altera" library="altera" name="conduit" version="20.4"></ipxact:busType>
       <ipxact:abstractionTypes>
@@ -742,6 +789,18 @@
         </ipxact:wire>
       </ipxact:port>
       <ipxact:port>
+        <ipxact:name>clr0</ipxact:name>
+        <ipxact:wire>
+          <ipxact:direction>in</ipxact:direction>
+          <ipxact:wireTypeDefs>
+            <ipxact:wireTypeDef>
+              <ipxact:typeName>STD_LOGIC</ipxact:typeName>
+              <ipxact:viewRef>QUARTUS_SYNTH</ipxact:viewRef>
+            </ipxact:wireTypeDef>
+          </ipxact:wireTypeDefs>
+        </ipxact:wire>
+      </ipxact:port>
+      <ipxact:port>
         <ipxact:name>acc_en</ipxact:name>
         <ipxact:wire>
           <ipxact:direction>in</ipxact:direction>
@@ -1065,7 +1124,7 @@
         <ipxact:parameter parameterId="enable_clr0" type="string">
           <ipxact:name>enable_clr0</ipxact:name>
           <ipxact:displayName>Enable clr0 for all input registers</ipxact:displayName>
-          <ipxact:value>No</ipxact:value>
+          <ipxact:value>Yes</ipxact:value>
         </ipxact:parameter>
         <ipxact:parameter parameterId="enable_clr1" type="string">
           <ipxact:name>enable_clr1</ipxact:name>
@@ -1179,6 +1238,10 @@
       <altera:interface_mapping altera:name="clk" altera:internal="dsp_prime_0.clk" altera:type="conduit" altera:dir="end">
         <altera:port_mapping altera:name="clk" altera:internal="clk"></altera:port_mapping>
       </altera:interface_mapping>
+      <altera:interface_mapping altera:name="clr0" altera:internal="dsp_prime_0.clr0" altera:type="conduit" altera:dir="end">
+        <altera:port_mapping altera:name="clr0" altera:internal="clr0"></altera:port_mapping>
+      </altera:interface_mapping>
+      <altera:interface_mapping altera:name="clr1" altera:internal="dsp_prime_0.clr1"></altera:interface_mapping>
       <altera:interface_mapping altera:name="data_in_1" altera:internal="dsp_prime_0.data_in_1"></altera:interface_mapping>
       <altera:interface_mapping altera:name="data_in_10" altera:internal="dsp_prime_0.data_in_10"></altera:interface_mapping>
       <altera:interface_mapping altera:name="data_in_2" altera:internal="dsp_prime_0.data_in_2"></altera:interface_mapping>

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <deploy
- date="2022.02.14.15:55:07"
- outputDirectory="C:/Users/tianchu.ji/Documents/quartus_tryer/quartus_proj_nx10/ips/tensor_core_accu/">
+ date="2022.06.23.14:55:16"
+ outputDirectory="C:/Users/tianchu.ji/Documents/MvmTensorCore/ips/tensor_core_accu/">
  <perimeter>
   <parameter
      name="AUTO_GENERATION_ID"
@@ -38,6 +38,12 @@
    <property name="associatedReset" value="" />
    <property name="prSafe" value="false" />
    <port name="clk" direction="input" role="clk" width="1" />
+  </interface>
+  <interface name="clr0" kind="conduit" start="0">
+   <property name="associatedClock" value="" />
+   <property name="associatedReset" value="" />
+   <property name="prSafe" value="false" />
+   <port name="clr0" direction="input" role="clr" width="1" />
   </interface>
   <interface name="acc_en" kind="conduit" start="0">
    <property name="associatedClock" value="" />
@@ -160,31 +166,31 @@
   <parameter name="AUTO_DEVICE_SPEEDGRADE" value="2" />
   <generatedFiles>
    <file
-       path="C:\Users\tianchu.ji\Documents\quartus_tryer\quartus_proj_nx10\ips\tensor_core_accu\synth\tensor_core_accu.v"
+       path="C:\Users\tianchu.ji\Documents\MvmTensorCore\ips\tensor_core_accu\synth\tensor_core_accu.v"
        attributes="CONTAINS_INLINE_CONFIGURATION" />
   </generatedFiles>
   <childGeneratedFiles>
    <file
-       path="C:\Users\tianchu.ji\Documents\quartus_tryer\quartus_proj_nx10\ips\tensor_core_accu\synth\tensor_core_accu.v"
+       path="C:\Users\tianchu.ji\Documents\MvmTensorCore\ips\tensor_core_accu\synth\tensor_core_accu.v"
        attributes="CONTAINS_INLINE_CONFIGURATION" />
   </childGeneratedFiles>
   <sourceFiles>
    <file
-       path="C:/Users/tianchu.ji/Documents/quartus_tryer/quartus_proj_nx10/ips/tensor_core_accu.ip" />
+       path="C:/Users/tianchu.ji/Documents/MvmTensorCore/ips/tensor_core_accu.ip" />
   </sourceFiles>
   <childSourceFiles>
    <file path="C:/intelfpga_pro/20.4/ip/altera/dsp_prime/dsp_prime_hw.tcl" />
   </childSourceFiles>
   <messages>
    <message level="Info" culprit="tensor_core_accu">"Generating: tensor_core_accu"</message>
-   <message level="Info" culprit="tensor_core_accu">"Generating: tensor_core_accu_dsp_prime_10_wcj43fa"</message>
-   <message level="Info" culprit="dsp_prime_0">generating top-level entity tensor_core_accu_dsp_prime_10_wcj43fa</message>
+   <message level="Info" culprit="tensor_core_accu">"Generating: tensor_core_accu_dsp_prime_10_jua6hty"</message>
+   <message level="Info" culprit="dsp_prime_0">generating top-level entity tensor_core_accu_dsp_prime_10_jua6hty</message>
   </messages>
  </entity>
  <entity
    kind="dsp_prime"
    version="1.0"
-   name="tensor_core_accu_dsp_prime_10_wcj43fa">
+   name="tensor_core_accu_dsp_prime_10_jua6hty">
   <parameter name="enable_cascade_weight_out" value="No" />
   <parameter name="enable_ena" value="No" />
   <parameter name="enable_zero_en" value="Yes" />
@@ -193,7 +199,7 @@
   <parameter name="enable_clr1" value="No" />
   <parameter name="enable_load_buf_sel" value="No" />
   <parameter name="base_device" value="ND4P" />
-  <parameter name="enable_clr0" value="No" />
+  <parameter name="enable_clr0" value="Yes" />
   <parameter name="enable_cascade_data_out" value="Yes" />
   <parameter name="dsp_mode" value="TENSOR_ACC_BF24" />
   <parameter name="dsp_sel_int4" value="SELECT_INT8" />
@@ -204,12 +210,12 @@
   <parameter name="dsp_fp32_sub_en" value="FLOAT_SUB_DISABLED" />
   <generatedFiles>
    <file
-       path="C:\Users\tianchu.ji\Documents\quartus_tryer\quartus_proj_nx10\ips\tensor_core_accu\dsp_prime_10\synth\tensor_core_accu_dsp_prime_10_wcj43fa.v"
+       path="C:\Users\tianchu.ji\Documents\MvmTensorCore\ips\tensor_core_accu\dsp_prime_10\synth\tensor_core_accu_dsp_prime_10_jua6hty.v"
        attributes="" />
   </generatedFiles>
   <childGeneratedFiles>
    <file
-       path="C:\Users\tianchu.ji\Documents\quartus_tryer\quartus_proj_nx10\ips\tensor_core_accu\dsp_prime_10\synth\tensor_core_accu_dsp_prime_10_wcj43fa.v"
+       path="C:\Users\tianchu.ji\Documents\MvmTensorCore\ips\tensor_core_accu\dsp_prime_10\synth\tensor_core_accu_dsp_prime_10_jua6hty.v"
        attributes="" />
   </childGeneratedFiles>
   <sourceFiles>
@@ -218,8 +224,8 @@
   <childSourceFiles/>
   <instantiator instantiator="tensor_core_accu" as="dsp_prime_0" />
   <messages>
-   <message level="Info" culprit="tensor_core_accu">"Generating: tensor_core_accu_dsp_prime_10_wcj43fa"</message>
-   <message level="Info" culprit="dsp_prime_0">generating top-level entity tensor_core_accu_dsp_prime_10_wcj43fa</message>
+   <message level="Info" culprit="tensor_core_accu">"Generating: tensor_core_accu_dsp_prime_10_jua6hty"</message>
+   <message level="Info" culprit="dsp_prime_0">generating top-level entity tensor_core_accu_dsp_prime_10_jua6hty</message>
   </messages>
  </entity>
 </deploy>

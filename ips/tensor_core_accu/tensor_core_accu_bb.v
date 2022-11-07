@@ -1,5 +1,6 @@
 module tensor_core_accu (
 		input  wire        clk,                    //                    clk.clk
+		input  wire        clr0,                   //                   clr0.clr
 		input  wire        acc_en,                 //                 acc_en.acc_en
 		input  wire        zero_en,                //                zero_en.zero_en
 		input  wire [23:0] bf24_a1,                //                bf24_a1.data_in

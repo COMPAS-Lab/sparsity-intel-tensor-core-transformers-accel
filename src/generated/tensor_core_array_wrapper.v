@@ -1,6 +1,6 @@
 // Generator : SpinalHDL v1.6.0    git head : 73c8d8e2b86b45646e9d0b2e729291f2b65e6be3
 // Component : tensor_core_array_wrapper
-// Git hash  : da46e6871e701b1d63aff03336f4c8858781c02d
+// Git hash  : f48c82bba7ffa09ee57a2f057dc8faa8295f65ff
 
 
 `define rdFsm_enumDefinition_binary_sequential_type [1:0]
@@ -227745,9 +227745,6 @@ module TensorCoreChain (
   wire       [7:0]    tcStartPoint_data_in_10;
   wire                tcStartPoint_load_bb_one;
   wire                tcStartPoint_load_bb_two;
-  reg        [23:0]   tcAccu_bf24_a1;
-  reg        [23:0]   tcAccu_bf24_a2;
-  reg        [23:0]   tcAccu_bf24_a3;
   wire       [7:0]    tensor_core_1_data_in_1;
   wire       [7:0]    tensor_core_1_data_in_2;
   wire       [7:0]    tensor_core_1_data_in_3;
@@ -228621,8 +228618,12 @@ module TensorCoreChain (
   reg                 oBufferLoadValid_delay_93;
   reg                 oBufferLoadValid_delay_94;
   reg                 oBufferLoadValid_delay_95;
-  reg                 oBufferLoadValid_delay_96;
-  reg                 oBufferLoadValid_delay_97;
+  reg        [23:0]   AccuDelayInst_io_pop_payload_0_delay_1;
+  reg        [23:0]   AccuDelayInst_io_pop_payload_0_delay_2;
+  reg        [23:0]   AccuDelayInst_io_pop_payload_1_delay_1;
+  reg        [23:0]   AccuDelayInst_io_pop_payload_1_delay_2;
+  reg        [23:0]   AccuDelayInst_io_pop_payload_2_delay_1;
+  reg        [23:0]   AccuDelayInst_io_pop_payload_2_delay_2;
 
   assign _zz_loadCounter_valueNext_1 = loadCounter_willIncrement;
   assign _zz_loadCounter_valueNext = {6'd0, _zz_loadCounter_valueNext_1};
@@ -228690,21 +228691,22 @@ module TensorCoreChain (
     .cascade_data_out_col_3    (tcStartPoint_cascade_data_out_col_3  )  //o
   );
   tensor_core_accu tcAccu (
-    .clk                       (clk                                    ), //i
-    .acc_en                    (1'b0                                   ), //i
-    .zero_en                   (1'b0                                   ), //i
-    .bf24_a1                   (tcAccu_bf24_a1                         ), //i
-    .bf24_a2                   (tcAccu_bf24_a2                         ), //i
-    .bf24_a3                   (tcAccu_bf24_a3                         ), //i
-    .cascade_data_in_col_1     (tensor_core_33_cascade_data_out_col_1  ), //i
-    .cascade_data_in_col_2     (tensor_core_33_cascade_data_out_col_2  ), //i
-    .cascade_data_in_col_3     (tensor_core_33_cascade_data_out_col_3  ), //i
-    .bf24_col_1                (tcAccu_bf24_col_1                      ), //o
-    .bf24_col_2                (tcAccu_bf24_col_2                      ), //o
-    .bf24_col_3                (tcAccu_bf24_col_3                      ), //o
-    .cascade_data_out_col_1    (tcAccu_cascade_data_out_col_1          ), //o
-    .cascade_data_out_col_2    (tcAccu_cascade_data_out_col_2          ), //o
-    .cascade_data_out_col_3    (tcAccu_cascade_data_out_col_3          )  //o
+    .clk                       (clk                                     ), //i
+    .acc_en                    (1'b0                                    ), //i
+    .zero_en                   (1'b0                                    ), //i
+    .clr0                      (resValidCounter_willOverflowIfInc       ), //i
+    .bf24_a1                   (AccuDelayInst_io_pop_payload_0_delay_2  ), //i
+    .bf24_a2                   (AccuDelayInst_io_pop_payload_1_delay_2  ), //i
+    .bf24_a3                   (AccuDelayInst_io_pop_payload_2_delay_2  ), //i
+    .cascade_data_in_col_1     (tensor_core_33_cascade_data_out_col_1   ), //i
+    .cascade_data_in_col_2     (tensor_core_33_cascade_data_out_col_2   ), //i
+    .cascade_data_in_col_3     (tensor_core_33_cascade_data_out_col_3   ), //i
+    .bf24_col_1                (tcAccu_bf24_col_1                       ), //o
+    .bf24_col_2                (tcAccu_bf24_col_2                       ), //o
+    .bf24_col_3                (tcAccu_bf24_col_3                       ), //o
+    .cascade_data_out_col_1    (tcAccu_cascade_data_out_col_1           ), //o
+    .cascade_data_out_col_2    (tcAccu_cascade_data_out_col_2           ), //o
+    .cascade_data_out_col_3    (tcAccu_cascade_data_out_col_3           )  //o
   );
   tensor_core tensor_core_1 (
     .clk                       (clk                                   ), //i
@@ -230344,30 +230346,6 @@ module TensorCoreChain (
   assign resValidCounter_overflowVal = (io_matAColSubGrpLen - 8'h01);
   always @(*) begin
     if(resValidCounter_willOverflowIfInc) begin
-      tcAccu_bf24_a1 = 24'h0;
-    end else begin
-      tcAccu_bf24_a1 = AccuDelayInst_io_pop_payload_0;
-    end
-  end
-
-  always @(*) begin
-    if(resValidCounter_willOverflowIfInc) begin
-      tcAccu_bf24_a2 = 24'h0;
-    end else begin
-      tcAccu_bf24_a2 = AccuDelayInst_io_pop_payload_1;
-    end
-  end
-
-  always @(*) begin
-    if(resValidCounter_willOverflowIfInc) begin
-      tcAccu_bf24_a3 = 24'h0;
-    end else begin
-      tcAccu_bf24_a3 = AccuDelayInst_io_pop_payload_2;
-    end
-  end
-
-  always @(*) begin
-    if(resValidCounter_willOverflowIfInc) begin
       io_res_valid = AccuDelayInst_io_pop_valid;
     end else begin
       io_res_valid = 1'b0;
@@ -230378,7 +230356,7 @@ module TensorCoreChain (
     if(resValidCounter_willOverflowIfInc) begin
       AccuDelayInst_io_pop_ready = io_res_ready;
     end else begin
-      AccuDelayInst_io_pop_ready = oBufferLoadValid_delay_97;
+      AccuDelayInst_io_pop_ready = oBufferLoadValid_delay_95;
     end
   end
 
@@ -230492,6 +230470,12 @@ module TensorCoreChain (
       oBufferLoadValid <= 1'b0;
       outValidCounter_value <= 8'h0;
       resValidCounter_value <= 8'h0;
+      AccuDelayInst_io_pop_payload_0_delay_1 <= 24'h0;
+      AccuDelayInst_io_pop_payload_0_delay_2 <= 24'h0;
+      AccuDelayInst_io_pop_payload_1_delay_1 <= 24'h0;
+      AccuDelayInst_io_pop_payload_1_delay_2 <= 24'h0;
+      AccuDelayInst_io_pop_payload_2_delay_1 <= 24'h0;
+      AccuDelayInst_io_pop_payload_2_delay_2 <= 24'h0;
     end else begin
       io_loadValid_delay_1 <= io_loadValid;
       io_loadValid_delay_2 <= io_loadValid_delay_1;
@@ -230581,6 +230565,12 @@ module TensorCoreChain (
       oBufferLoadValid <= io_dataValid_delay_71;
       outValidCounter_value <= outValidCounter_valueNext;
       resValidCounter_value <= resValidCounter_valueNext;
+      AccuDelayInst_io_pop_payload_0_delay_1 <= AccuDelayInst_io_pop_payload_0;
+      AccuDelayInst_io_pop_payload_0_delay_2 <= AccuDelayInst_io_pop_payload_0_delay_1;
+      AccuDelayInst_io_pop_payload_1_delay_1 <= AccuDelayInst_io_pop_payload_1;
+      AccuDelayInst_io_pop_payload_1_delay_2 <= AccuDelayInst_io_pop_payload_1_delay_1;
+      AccuDelayInst_io_pop_payload_2_delay_1 <= AccuDelayInst_io_pop_payload_2;
+      AccuDelayInst_io_pop_payload_2_delay_2 <= AccuDelayInst_io_pop_payload_2_delay_1;
     end
   end
 
@@ -230681,8 +230671,6 @@ module TensorCoreChain (
       oBufferLoadValid_delay_93 <= 1'b0;
       oBufferLoadValid_delay_94 <= 1'b0;
       oBufferLoadValid_delay_95 <= 1'b0;
-      oBufferLoadValid_delay_96 <= 1'b0;
-      oBufferLoadValid_delay_97 <= 1'b0;
     end else begin
       oBufferLoadValid_delay_1 <= oBufferLoadValid;
       oBufferLoadValid_delay_2 <= oBufferLoadValid_delay_1;
@@ -230779,8 +230767,6 @@ module TensorCoreChain (
       oBufferLoadValid_delay_93 <= oBufferLoadValid_delay_92;
       oBufferLoadValid_delay_94 <= oBufferLoadValid_delay_93;
       oBufferLoadValid_delay_95 <= oBufferLoadValid_delay_94;
-      oBufferLoadValid_delay_96 <= oBufferLoadValid_delay_95;
-      oBufferLoadValid_delay_97 <= oBufferLoadValid_delay_96;
     end
   end
 

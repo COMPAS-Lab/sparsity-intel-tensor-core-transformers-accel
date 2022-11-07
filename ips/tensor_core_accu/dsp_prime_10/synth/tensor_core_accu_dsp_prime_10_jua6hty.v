@@ -14,8 +14,9 @@
 // synopsys translate_off
 `timescale 1 ps / 1 ps
 // synopsys translate_on
-module	tensor_core_accu_dsp_prime_10_wcj43fa	(
+module	tensor_core_accu_dsp_prime_10_jua6hty	(
 			clk,
+			clr0,
 			acc_en,
 			zero_en,
 			bf24_a1,
@@ -32,6 +33,7 @@ module	tensor_core_accu_dsp_prime_10_wcj43fa	(
 			bf24_col_3);
  
 			input  clk;
+			input  clr0;
 			input  acc_en;
 			input  zero_en;
 			input [23:0] bf24_a1;
@@ -64,6 +66,7 @@ module	tensor_core_accu_dsp_prime_10_wcj43fa	(
 						 .clk (clk),
 						 .acc_en (acc_en),
 						 .zero_en (zero_en),
+						 .clr ({1'b0,clr0}),
 						 .data_in({bf24_a3,bf24_a2,bf24_a1}),
 						 .cascade_data_in ({cascade_data_in_col_3,cascade_data_in_col_2,cascade_data_in_col_1}),
 						 .cascade_data_out ({cascade_data_out_col_3_w,cascade_data_out_col_2_w,cascade_data_out_col_1_w}),

@@ -5,7 +5,7 @@
  version="1.0"
  fabric="QSYS">
  <!-- Format version 20.4 72 (Future versions may contain additional information.) -->
- <!-- 2022.02.14.15:55:07 -->
+ <!-- 2022.06.23.14:55:15 -->
  <!-- A collection of modules and connections -->
  <parameter name="AUTO_GENERATION_ID">
   <type>java.lang.Integer</type>
@@ -73,7 +73,7 @@
    name="dsp_prime_0"
    kind="dsp_prime"
    version="1.0"
-   entity="tensor_core_accu_dsp_prime_10_wcj43fa"
+   entity="tensor_core_accu_dsp_prime_10_jua6hty"
    library="dsp_prime_10"
    path="dsp_prime_0"
    hpath="dsp_prime_0"
@@ -194,7 +194,7 @@ the requested settings for a module instance. -->
   </parameter>
   <parameter name="enable_clr0">
    <type>java.lang.String</type>
-   <value>No</value>
+   <value>Yes</value>
    <derived>false</derived>
    <enabled>true</enabled>
    <visible>true</visible>
@@ -289,6 +289,63 @@ parameters are a RESULT of the module parameters. -->
     <direction>Input</direction>
     <width>1</width>
     <role>clk</role>
+   </port>
+  </interface>
+  <interface name="clr0" kind="conduit_end" version="20.4">
+   <!-- The connection points exposed by a module instance for the
+particular module parameters. Connection points and their
+parameters are a RESULT of the module parameters. -->
+   <assignment>
+    <name>ui.blockdiagram.direction</name>
+    <value>input</value>
+   </assignment>
+   <parameter name="associatedClock">
+    <type>java.lang.String</type>
+    <value></value>
+    <derived>false</derived>
+    <enabled>true</enabled>
+    <visible>true</visible>
+    <valid>true</valid>
+   </parameter>
+   <parameter name="associatedReset">
+    <type>java.lang.String</type>
+    <value></value>
+    <derived>false</derived>
+    <enabled>true</enabled>
+    <visible>true</visible>
+    <valid>true</valid>
+   </parameter>
+   <parameter name="prSafe">
+    <type>boolean</type>
+    <value>false</value>
+    <derived>false</derived>
+    <enabled>true</enabled>
+    <visible>false</visible>
+    <valid>true</valid>
+   </parameter>
+   <parameter name="deviceFamily">
+    <type>java.lang.String</type>
+    <value>UNKNOWN</value>
+    <derived>false</derived>
+    <enabled>true</enabled>
+    <visible>true</visible>
+    <valid>true</valid>
+   </parameter>
+   <parameter name="generateLegacySim">
+    <type>boolean</type>
+    <value>false</value>
+    <derived>false</derived>
+    <enabled>true</enabled>
+    <visible>true</visible>
+    <valid>true</valid>
+   </parameter>
+   <type>conduit</type>
+   <isStart>false</isStart>
+   <port>
+    <name>clr0</name>
+    <direction>Input</direction>
+    <width>1</width>
+    <role>clr</role>
    </port>
   </interface>
   <interface name="acc_en" kind="conduit_end" version="20.4">
@@ -1099,7 +1156,7 @@ parameters are a RESULT of the module parameters. -->
   <version>1.0</version>
  </plugin>
  <plugin>
-  <instanceCount>15</instanceCount>
+  <instanceCount>16</instanceCount>
   <name>conduit_end</name>
   <type>com.altera.entityinterfaces.IElementClass</type>
   <subtype>com.altera.entityinterfaces.IMutableConnectionPoint</subtype>

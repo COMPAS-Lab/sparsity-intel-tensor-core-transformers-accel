@@ -1,6 +1,7 @@
 	component tensor_core_accu is
 		port (
 			clk                    : in  std_logic                     := 'X';             -- clk
+			clr0                   : in  std_logic                     := 'X';             -- clr
 			acc_en                 : in  std_logic                     := 'X';             -- acc_en
 			zero_en                : in  std_logic                     := 'X';             -- zero_en
 			bf24_a1                : in  std_logic_vector(23 downto 0) := (others => 'X'); -- data_in

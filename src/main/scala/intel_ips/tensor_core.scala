@@ -79,7 +79,7 @@ class tensor_core_start extends BlackBox {
 
 class tensor_core_accu extends BlackBox {
   val io = new Bundle {
-    val clk, acc_en, zero_en = in Bool()
+    val clk, acc_en, zero_en, clr0 = in Bool()
     val bf24_a1, bf24_a2, bf24_a3 = in UInt(24 bits)
     val cascade_data_in_col_1, cascade_data_in_col_2, cascade_data_in_col_3 =
       in UInt(32 bits)
