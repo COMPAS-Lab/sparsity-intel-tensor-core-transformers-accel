@@ -21,7 +21,7 @@ class TensorCoreChainBf12(chain_len: Int, out_buf_delay: Int,
     val loadValid = in Bool()
     val loadReady = out Bool()
     val res = master Stream(Vec(UInt(output_width bits), 3))
-    val inputIters, matAColSubGrpLen = in UInt(8 bits)
+    val inputIters, matAColSubGrpLen = in UInt(16 bits)
     val outValid = out Bool()
   }
 
@@ -74,7 +74,7 @@ class TensorCoreChainBf12(chain_len: Int, out_buf_delay: Int,
   loadBufCtrl := Mux(loadValidD2t, loadBufCtrlReg, U"2'b00")
   io.loadReady := loadCounter.willOverflow
 
-  val inputCounter = DynaCounter(8, io.inputIters)
+  val inputCounter = DynaCounter(io.inputIters.getWidth, io.inputIters)
   val loadBufSel = Reg(Bool()) init False
   when(io.dataValid) {
     inputCounter.increment()
@@ -90,7 +90,7 @@ class TensorCoreChainBf12(chain_len: Int, out_buf_delay: Int,
   // of input delay on the last stage of the chain
   val oBufferLoadValid = Delay(io.dataValid, 2*(chain_len-1)+4+3-1, init=False)
   //counting the output iterations for output valid
-  val outValidCounter = DynaCounter(8, io.inputIters)
+  val outValidCounter = DynaCounter(io.inputIters.getWidth, io.inputIters)
 
   when(oBufferLoadValid) (outValidCounter.increment())
   io.outValid := outValidCounter.willOverflow

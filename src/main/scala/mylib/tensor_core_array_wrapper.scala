@@ -107,11 +107,11 @@ class tensor_core_array_wrapper(array_col: Int, array_row: Int, chain_len: Int,
     }
   }
   tcArray.io.configPorts.tccColBufferCnterRange := U(
-      (mat_a_row / array_col) * (mat_a_col / 10), 8 bits)
+      (mat_a_row / array_col) * (mat_a_col / 20), 16 bits)
   tcArray.io.configPorts.tccRowBufferCnterRange := U(
-      (mat_b_col / array_row) * (mat_a_col/(chain_len * 10)), 8 bits)
-  tcArray.io.configPorts.matBColsPerTccRow := U((mat_b_col/array_row), 8 bits)
-  tcArray.io.configPorts.matAColSubGrpLen := U(mat_a_col/(chain_len * 10), 8 bits)
+      (mat_b_col / array_row) * (mat_a_col/(chain_len * 20)), 16 bits)
+  tcArray.io.configPorts.matBColsPerTccRow := U((mat_b_col/array_row), 16 bits)
+  tcArray.io.configPorts.matAColSubGrpLen := U(mat_a_col/(chain_len * 20), 16 bits)
   tcArray.io.calEn := io.start(0).rise()
   tcArray.io.res_id := io.in_buffer_id
   tcArray.io.res_top >> dataOutStreamTop

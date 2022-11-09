@@ -10,17 +10,17 @@ import util._
 case class TensorCoreChainArrayConfigPorts() extends Bundle {
   // matAColSubGrpLen: iterations to load the matrix A columns (or 3-row sub-blocks)
   // matAColSubGrpLen = matACols / (chain len x 10)
-  val matAColSubGrpLen = UInt (8 bits)
+  val matAColSubGrpLen = UInt (16 bits)
   // matBColsPerTccRow: number of iterations to take matB sub columns
   //   it is the number of B columns computed by a tensor core chain row.
   //   matBColsPerTccRow = matBCols / array_row
   //   it equals to the chain_loading_latency when the Dot Product
   //   hides the matA loading latency just fine.
   // TODO: may make this a static parameter
-  val matBColsPerTccRow = UInt (8 bits)
+  val matBColsPerTccRow = UInt (16 bits)
   // Tensor Core Chain row buffer counter boundary:
   //   calculated as Ceil(matBCols / array_row) * Ceil(matACols / (chain_len * 10.0))
-  val tccRowBufferCnterRange = UInt (8 bits)
+  val tccRowBufferCnterRange = UInt (16 bits)
   // Tensor Core Chain col buffer counter boundary:
   //   each mat A blk has the size of 3 x matACols:
   //   matABlksInColBuf = ((matARows / 3.0).ceil / array_col).ceil.toInt
@@ -28,7 +28,7 @@ case class TensorCoreChainArrayConfigPorts() extends Bundle {
   //   matABlkCols = (matACols / 10.0).ceil.toInt
   //   total number of counter to read mat A:
   //   tccColBufferCnterRange = matABlksInColBuf * matABlkCols * 3
-  val tccColBufferCnterRange = UInt (8 bits)
+  val tccColBufferCnterRange = UInt (16 bits)
 }
 
 class TensorCoreChainArray(array_col: Int, array_row: Int, chain_len: Int,
@@ -51,11 +51,11 @@ class TensorCoreChainArray(array_col: Int, array_row: Int, chain_len: Int,
   val calEnDelay = Delay(io.calEn, 2, init=False)
   val configDelay = Delay(io.configPorts, 2, init=TensorCoreChainArrayConfigPorts().getZero)
 
-  val rowBufferRdCounter = DynaCounter(8, configDelay.tccRowBufferCnterRange + (chain_len-1) * 2)
-  val colBufferRdCounter = DynaCounter(8, configDelay.tccColBufferCnterRange)
+  val rowBufferRdCounter = DynaCounter(16, configDelay.tccRowBufferCnterRange + (chain_len-1) * 2)
+  val colBufferRdCounter = DynaCounter(16, configDelay.tccColBufferCnterRange)
 
   val tensorLoadValid, tensorDataValid = Reg(Bool()) init False
-  val matAColSubGrpLenReg = Reg(UInt(8 bits)) init U"8'd0"
+  val matAColSubGrpLenReg = Reg(UInt(io.configPorts.matAColSubGrpLen.getWidth bits)) init 0
 
   val tensorArray = Array.ofDim[TensorCoreChainBf12](array_row, array_col)
   for (r <- 0 until array_row; c <- 0 until array_col) {
@@ -75,7 +75,7 @@ class TensorCoreChainArray(array_col: Int, array_row: Int, chain_len: Int,
   //buffer write and read
   for (c <- 0 until array_col) {
     colConverters(c).io.dataIn <> io.matALoad(c)
-    val colBufferWrCounter = DynaCounter(8, configDelay.tccColBufferCnterRange)
+    val colBufferWrCounter = DynaCounter(16, configDelay.tccColBufferCnterRange)
     colMem(c).io.wraddress := colBufferWrCounter.resize(colMem(c).io.wraddress.getWidth)
     colMem(c).io.data := colConverters(c).io.dataOut.payload
     //TODO: fix col buffer rd addr delay timing misalignment
@@ -94,7 +94,8 @@ class TensorCoreChainArray(array_col: Int, array_row: Int, chain_len: Int,
   val rowMemAddr = Array.ofDim[UInt](array_row, chain_len)
   for (r <- 0 until array_row) {
     for (tcId <- 0 until chain_len) {
-      val rowBufferWrCounter = DynaCounter(8, configDelay.tccRowBufferCnterRange)
+      val rowBufferWrCounter =
+          DynaCounter(io.configPorts.tccColBufferCnterRange.getWidth, configDelay.tccRowBufferCnterRange)
 
       rowMem(r * chain_len + tcId).setName("rowMem_" + r + "_" + tcId)
       rowConverters(r)(tcId) = new FixedBfpConverter
@@ -161,7 +162,7 @@ class TensorCoreChainArray(array_col: Int, array_row: Int, chain_len: Int,
 
     val sIdle: State = new State with EntryPoint {
       onEntry {
-        matAColSubGrpLenReg := U"8'd0"
+        matAColSubGrpLenReg := 0
         colBufferRdCounter.clear()
         rowBufferRdCounter.clear()
         computeIterCounter.clear()
