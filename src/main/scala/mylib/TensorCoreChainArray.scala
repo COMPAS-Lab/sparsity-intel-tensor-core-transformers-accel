@@ -57,10 +57,10 @@ class TensorCoreChainArray(array_col: Int, array_row: Int, chain_len: Int,
   val tensorLoadValid, tensorDataValid = Reg(Bool()) init False
   val matAColSubGrpLenReg = Reg(UInt(8 bits)) init U"8'd0"
 
-  val tensorArray = Array.ofDim[TensorCoreChain](array_row, array_col)
+  val tensorArray = Array.ofDim[TensorCoreChainBf12](array_row, array_col)
   for (r <- 0 until array_row; c <- 0 until array_col) {
     // out buf delay = number of B columns in each tensor core chain row - 3
-    tensorArray(r)(c) = new TensorCoreChain(chain_len, out_buf_delay = out_buf_delay,
+    tensorArray(r)(c) = new TensorCoreChainBf12(chain_len, out_buf_delay = out_buf_delay,
                                               out_fifo_depth = output_fifo_depth, output_width = output_width)
     tensorArray(r)(c).setName("u_tc_core_r_" + r + "_c_" + c)
   }
@@ -125,8 +125,8 @@ class TensorCoreChainArray(array_col: Int, array_row: Int, chain_len: Int,
     for (cl <- 0 until chain_len) (rowMemOut(cl) := rowMem(r * chain_len + cl).io.q)
 
     for (tcId <- 0 until chain_len) {
-      when(rowMemAddr(r)(c) < io.configPorts.tccRowBufferCnterRange &&
-            rowMemAddr(r)(c) >= 2*tcId) {
+      when(rowMemAddr(r)(tcId) < io.configPorts.tccRowBufferCnterRange &&
+            rowMemAddr(r)(tcId) >= 2*tcId) {
         tensorArray(r)(c).io.dataIn(tcId) := Delay(rowMemOut(tcId)(87 downto 8), inout_pipe_delay, init=U"80'd0")
         tensorArray(r)(c).io.expIn(tcId) := Delay(rowMemOut(tcId)(7 downto 0), inout_pipe_delay, init=U"8'd0")
       }.otherwise {
@@ -242,7 +242,7 @@ class TensorCoreChainArray(array_col: Int, array_row: Int, chain_len: Int,
   //output buffer path
   val outputBufferSelOut = Vec(Stream(UInt(output_width * 3 bits)), array_row * array_col)
   val outputBufferSelOutDelayedTop = Vec(Stream(UInt(output_width * 3 bits)), array_row*array_col/2)
-  val outputBufferSelOutDelayedBot = Vec(Stream(UInt(output_width * 3 bits)), array_row*array_col/2)
+  val outputBufferSelOutDelayedBot = Vec(Stream(UInt(output_width * 3 bits)), array_row*array_col - (array_row*array_col/2))
 
   for (r <- 0 until array_row; c <- 0 until array_col) {
     val tcChainId = r * array_col + c
@@ -293,11 +293,12 @@ class TensorCoreChainArray(array_col: Int, array_row: Int, chain_len: Int,
     }
   }
 
-  val muxStages = calculatePrimeFactors(array_col * array_row / 2)
+  val topMuxStages = calculatePrimeFactors(array_col * array_row / 2)
+  val botMuxStages = calculatePrimeFactors(array_col * array_row - array_col * array_row / 2)
 
-  println("factors: " + muxStages)
-  io.res_top << createMuxHierarchy(outputBufferSelOutDelayedTop, muxStages, 0)(0)
-  io.res_bot << createMuxHierarchy(outputBufferSelOutDelayedBot, muxStages, 0)(0)
+  println("top factors: " + topMuxStages + " bot factors: " + botMuxStages)
+  io.res_top << createMuxHierarchy(outputBufferSelOutDelayedTop, topMuxStages, 0)(0)
+  io.res_bot << createMuxHierarchy(outputBufferSelOutDelayedBot, botMuxStages, 0)(0)
 }
 
 object TensorCoreArrayGen {

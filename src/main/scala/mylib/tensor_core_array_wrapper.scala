@@ -214,13 +214,16 @@ class tensor_core_array_wrapper(array_col: Int, array_row: Int, chain_len: Int,
 object tensor_core_array_wrapper_gen {
   def main(args: Array[String]): Unit = {
     val gen = new DefaultConfig
+    val array_col = 33
+    val array_row = 15
+    val chain_len = 6
     gen.defaultSpinalConfig.generate(new tensor_core_array_wrapper(
-      array_col = 12,
-      array_row = 8,
-      chain_len = 34,
-      mat_a_row = 96,
-      mat_a_col = 204,
-      mat_b_col = 816 
+      array_col = array_col,
+      array_row = array_row,
+      chain_len = chain_len,
+      mat_a_row = array_col*2*2,
+      mat_a_col = chain_len*array_row*20,
+      mat_b_col = chain_len*array_row*2*8*3 
     ))
   }
 }

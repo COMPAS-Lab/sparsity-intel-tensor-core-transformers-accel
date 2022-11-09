@@ -1,6 +1,6 @@
 // Generator : SpinalHDL v1.6.0    git head : 73c8d8e2b86b45646e9d0b2e729291f2b65e6be3
 // Component : tensor_core_array_wrapper
-// Git hash  : f48c82bba7ffa09ee57a2f057dc8faa8295f65ff
+// Git hash  : 6990e75e5dd9c0a716d8d6028454939a47dd72e4
 
 
 `define rdFsm_enumDefinition_binary_sequential_type [1:0]
@@ -57723,7 +57723,7 @@ module TensorCoreChainArray (
   assign _zz_ctrlStateMachine_computeIterCounter_valueNext = {7'd0, _zz_ctrlStateMachine_computeIterCounter_valueNext_1};
   assign _zz_ctrlStateMachine_resValidCounter_valueNext_1 = ctrlStateMachine_resValidCounter_willIncrement;
   assign _zz_ctrlStateMachine_resValidCounter_valueNext = {7'd0, _zz_ctrlStateMachine_resValidCounter_valueNext_1};
-  TensorCoreChain u_tc_core_r_0_c_0 (
+  TensorCoreChainBf12 u_tc_core_r_0_c_0 (
     .io_dataIn_0            (u_tc_core_r_0_c_0_io_dataIn_0       ), //i
     .io_dataIn_1            (u_tc_core_r_0_c_0_io_dataIn_1       ), //i
     .io_dataIn_2            (u_tc_core_r_0_c_0_io_dataIn_2       ), //i
@@ -57809,7 +57809,7 @@ module TensorCoreChainArray (
     .clk                    (clk                                 ), //i
     .clrn                   (clrn                                )  //i
   );
-  TensorCoreChain u_tc_core_r_0_c_1 (
+  TensorCoreChainBf12 u_tc_core_r_0_c_1 (
     .io_dataIn_0            (u_tc_core_r_0_c_1_io_dataIn_0       ), //i
     .io_dataIn_1            (u_tc_core_r_0_c_1_io_dataIn_1       ), //i
     .io_dataIn_2            (u_tc_core_r_0_c_1_io_dataIn_2       ), //i
@@ -57895,7 +57895,7 @@ module TensorCoreChainArray (
     .clk                    (clk                                 ), //i
     .clrn                   (clrn                                )  //i
   );
-  TensorCoreChain u_tc_core_r_0_c_2 (
+  TensorCoreChainBf12 u_tc_core_r_0_c_2 (
     .io_dataIn_0            (u_tc_core_r_0_c_2_io_dataIn_0       ), //i
     .io_dataIn_1            (u_tc_core_r_0_c_2_io_dataIn_1       ), //i
     .io_dataIn_2            (u_tc_core_r_0_c_2_io_dataIn_2       ), //i
@@ -57981,7 +57981,7 @@ module TensorCoreChainArray (
     .clk                    (clk                                 ), //i
     .clrn                   (clrn                                )  //i
   );
-  TensorCoreChain u_tc_core_r_0_c_3 (
+  TensorCoreChainBf12 u_tc_core_r_0_c_3 (
     .io_dataIn_0            (u_tc_core_r_0_c_3_io_dataIn_0       ), //i
     .io_dataIn_1            (u_tc_core_r_0_c_3_io_dataIn_1       ), //i
     .io_dataIn_2            (u_tc_core_r_0_c_3_io_dataIn_2       ), //i
@@ -58067,7 +58067,7 @@ module TensorCoreChainArray (
     .clk                    (clk                                 ), //i
     .clrn                   (clrn                                )  //i
   );
-  TensorCoreChain u_tc_core_r_0_c_4 (
+  TensorCoreChainBf12 u_tc_core_r_0_c_4 (
     .io_dataIn_0            (u_tc_core_r_0_c_4_io_dataIn_0       ), //i
     .io_dataIn_1            (u_tc_core_r_0_c_4_io_dataIn_1       ), //i
     .io_dataIn_2            (u_tc_core_r_0_c_4_io_dataIn_2       ), //i
@@ -58153,7 +58153,7 @@ module TensorCoreChainArray (
     .clk                    (clk                                 ), //i
     .clrn                   (clrn                                )  //i
   );
-  TensorCoreChain u_tc_core_r_0_c_5 (
+  TensorCoreChainBf12 u_tc_core_r_0_c_5 (
     .io_dataIn_0            (u_tc_core_r_0_c_5_io_dataIn_0       ), //i
     .io_dataIn_1            (u_tc_core_r_0_c_5_io_dataIn_1       ), //i
     .io_dataIn_2            (u_tc_core_r_0_c_5_io_dataIn_2       ), //i
@@ -58239,7 +58239,7 @@ module TensorCoreChainArray (
     .clk                    (clk                                 ), //i
     .clrn                   (clrn                                )  //i
   );
-  TensorCoreChain u_tc_core_r_0_c_6 (
+  TensorCoreChainBf12 u_tc_core_r_0_c_6 (
     .io_dataIn_0            (u_tc_core_r_0_c_6_io_dataIn_0       ), //i
     .io_dataIn_1            (u_tc_core_r_0_c_6_io_dataIn_1       ), //i
     .io_dataIn_2            (u_tc_core_r_0_c_6_io_dataIn_2       ), //i
@@ -58325,7 +58325,7 @@ module TensorCoreChainArray (
     .clk                    (clk                                 ), //i
     .clrn                   (clrn                                )  //i
   );
-  TensorCoreChain u_tc_core_r_0_c_7 (
+  TensorCoreChainBf12 u_tc_core_r_0_c_7 (
     .io_dataIn_0            (u_tc_core_r_0_c_7_io_dataIn_0       ), //i
     .io_dataIn_1            (u_tc_core_r_0_c_7_io_dataIn_1       ), //i
     .io_dataIn_2            (u_tc_core_r_0_c_7_io_dataIn_2       ), //i
@@ -58411,7 +58411,7 @@ module TensorCoreChainArray (
     .clk                    (clk                                 ), //i
     .clrn                   (clrn                                )  //i
   );
-  TensorCoreChain u_tc_core_r_0_c_8 (
+  TensorCoreChainBf12 u_tc_core_r_0_c_8 (
     .io_dataIn_0            (u_tc_core_r_0_c_8_io_dataIn_0       ), //i
     .io_dataIn_1            (u_tc_core_r_0_c_8_io_dataIn_1       ), //i
     .io_dataIn_2            (u_tc_core_r_0_c_8_io_dataIn_2       ), //i
@@ -58497,7 +58497,7 @@ module TensorCoreChainArray (
     .clk                    (clk                                 ), //i
     .clrn                   (clrn                                )  //i
   );
-  TensorCoreChain u_tc_core_r_0_c_9 (
+  TensorCoreChainBf12 u_tc_core_r_0_c_9 (
     .io_dataIn_0            (u_tc_core_r_0_c_9_io_dataIn_0       ), //i
     .io_dataIn_1            (u_tc_core_r_0_c_9_io_dataIn_1       ), //i
     .io_dataIn_2            (u_tc_core_r_0_c_9_io_dataIn_2       ), //i
@@ -58583,7 +58583,7 @@ module TensorCoreChainArray (
     .clk                    (clk                                 ), //i
     .clrn                   (clrn                                )  //i
   );
-  TensorCoreChain u_tc_core_r_0_c_10 (
+  TensorCoreChainBf12 u_tc_core_r_0_c_10 (
     .io_dataIn_0            (u_tc_core_r_0_c_10_io_dataIn_0       ), //i
     .io_dataIn_1            (u_tc_core_r_0_c_10_io_dataIn_1       ), //i
     .io_dataIn_2            (u_tc_core_r_0_c_10_io_dataIn_2       ), //i
@@ -58669,7 +58669,7 @@ module TensorCoreChainArray (
     .clk                    (clk                                  ), //i
     .clrn                   (clrn                                 )  //i
   );
-  TensorCoreChain u_tc_core_r_0_c_11 (
+  TensorCoreChainBf12 u_tc_core_r_0_c_11 (
     .io_dataIn_0            (u_tc_core_r_0_c_11_io_dataIn_0       ), //i
     .io_dataIn_1            (u_tc_core_r_0_c_11_io_dataIn_1       ), //i
     .io_dataIn_2            (u_tc_core_r_0_c_11_io_dataIn_2       ), //i
@@ -58755,7 +58755,7 @@ module TensorCoreChainArray (
     .clk                    (clk                                  ), //i
     .clrn                   (clrn                                 )  //i
   );
-  TensorCoreChain u_tc_core_r_1_c_0 (
+  TensorCoreChainBf12 u_tc_core_r_1_c_0 (
     .io_dataIn_0            (u_tc_core_r_1_c_0_io_dataIn_0       ), //i
     .io_dataIn_1            (u_tc_core_r_1_c_0_io_dataIn_1       ), //i
     .io_dataIn_2            (u_tc_core_r_1_c_0_io_dataIn_2       ), //i
@@ -58841,7 +58841,7 @@ module TensorCoreChainArray (
     .clk                    (clk                                 ), //i
     .clrn                   (clrn                                )  //i
   );
-  TensorCoreChain u_tc_core_r_1_c_1 (
+  TensorCoreChainBf12 u_tc_core_r_1_c_1 (
     .io_dataIn_0            (u_tc_core_r_1_c_1_io_dataIn_0       ), //i
     .io_dataIn_1            (u_tc_core_r_1_c_1_io_dataIn_1       ), //i
     .io_dataIn_2            (u_tc_core_r_1_c_1_io_dataIn_2       ), //i
@@ -58927,7 +58927,7 @@ module TensorCoreChainArray (
     .clk                    (clk                                 ), //i
     .clrn                   (clrn                                )  //i
   );
-  TensorCoreChain u_tc_core_r_1_c_2 (
+  TensorCoreChainBf12 u_tc_core_r_1_c_2 (
     .io_dataIn_0            (u_tc_core_r_1_c_2_io_dataIn_0       ), //i
     .io_dataIn_1            (u_tc_core_r_1_c_2_io_dataIn_1       ), //i
     .io_dataIn_2            (u_tc_core_r_1_c_2_io_dataIn_2       ), //i
@@ -59013,7 +59013,7 @@ module TensorCoreChainArray (
     .clk                    (clk                                 ), //i
     .clrn                   (clrn                                )  //i
   );
-  TensorCoreChain u_tc_core_r_1_c_3 (
+  TensorCoreChainBf12 u_tc_core_r_1_c_3 (
     .io_dataIn_0            (u_tc_core_r_1_c_3_io_dataIn_0       ), //i
     .io_dataIn_1            (u_tc_core_r_1_c_3_io_dataIn_1       ), //i
     .io_dataIn_2            (u_tc_core_r_1_c_3_io_dataIn_2       ), //i
@@ -59099,7 +59099,7 @@ module TensorCoreChainArray (
     .clk                    (clk                                 ), //i
     .clrn                   (clrn                                )  //i
   );
-  TensorCoreChain u_tc_core_r_1_c_4 (
+  TensorCoreChainBf12 u_tc_core_r_1_c_4 (
     .io_dataIn_0            (u_tc_core_r_1_c_4_io_dataIn_0       ), //i
     .io_dataIn_1            (u_tc_core_r_1_c_4_io_dataIn_1       ), //i
     .io_dataIn_2            (u_tc_core_r_1_c_4_io_dataIn_2       ), //i
@@ -59185,7 +59185,7 @@ module TensorCoreChainArray (
     .clk                    (clk                                 ), //i
     .clrn                   (clrn                                )  //i
   );
-  TensorCoreChain u_tc_core_r_1_c_5 (
+  TensorCoreChainBf12 u_tc_core_r_1_c_5 (
     .io_dataIn_0            (u_tc_core_r_1_c_5_io_dataIn_0       ), //i
     .io_dataIn_1            (u_tc_core_r_1_c_5_io_dataIn_1       ), //i
     .io_dataIn_2            (u_tc_core_r_1_c_5_io_dataIn_2       ), //i
@@ -59271,7 +59271,7 @@ module TensorCoreChainArray (
     .clk                    (clk                                 ), //i
     .clrn                   (clrn                                )  //i
   );
-  TensorCoreChain u_tc_core_r_1_c_6 (
+  TensorCoreChainBf12 u_tc_core_r_1_c_6 (
     .io_dataIn_0            (u_tc_core_r_1_c_6_io_dataIn_0       ), //i
     .io_dataIn_1            (u_tc_core_r_1_c_6_io_dataIn_1       ), //i
     .io_dataIn_2            (u_tc_core_r_1_c_6_io_dataIn_2       ), //i
@@ -59357,7 +59357,7 @@ module TensorCoreChainArray (
     .clk                    (clk                                 ), //i
     .clrn                   (clrn                                )  //i
   );
-  TensorCoreChain u_tc_core_r_1_c_7 (
+  TensorCoreChainBf12 u_tc_core_r_1_c_7 (
     .io_dataIn_0            (u_tc_core_r_1_c_7_io_dataIn_0       ), //i
     .io_dataIn_1            (u_tc_core_r_1_c_7_io_dataIn_1       ), //i
     .io_dataIn_2            (u_tc_core_r_1_c_7_io_dataIn_2       ), //i
@@ -59443,7 +59443,7 @@ module TensorCoreChainArray (
     .clk                    (clk                                 ), //i
     .clrn                   (clrn                                )  //i
   );
-  TensorCoreChain u_tc_core_r_1_c_8 (
+  TensorCoreChainBf12 u_tc_core_r_1_c_8 (
     .io_dataIn_0            (u_tc_core_r_1_c_8_io_dataIn_0       ), //i
     .io_dataIn_1            (u_tc_core_r_1_c_8_io_dataIn_1       ), //i
     .io_dataIn_2            (u_tc_core_r_1_c_8_io_dataIn_2       ), //i
@@ -59529,7 +59529,7 @@ module TensorCoreChainArray (
     .clk                    (clk                                 ), //i
     .clrn                   (clrn                                )  //i
   );
-  TensorCoreChain u_tc_core_r_1_c_9 (
+  TensorCoreChainBf12 u_tc_core_r_1_c_9 (
     .io_dataIn_0            (u_tc_core_r_1_c_9_io_dataIn_0       ), //i
     .io_dataIn_1            (u_tc_core_r_1_c_9_io_dataIn_1       ), //i
     .io_dataIn_2            (u_tc_core_r_1_c_9_io_dataIn_2       ), //i
@@ -59615,7 +59615,7 @@ module TensorCoreChainArray (
     .clk                    (clk                                 ), //i
     .clrn                   (clrn                                )  //i
   );
-  TensorCoreChain u_tc_core_r_1_c_10 (
+  TensorCoreChainBf12 u_tc_core_r_1_c_10 (
     .io_dataIn_0            (u_tc_core_r_1_c_10_io_dataIn_0       ), //i
     .io_dataIn_1            (u_tc_core_r_1_c_10_io_dataIn_1       ), //i
     .io_dataIn_2            (u_tc_core_r_1_c_10_io_dataIn_2       ), //i
@@ -59701,7 +59701,7 @@ module TensorCoreChainArray (
     .clk                    (clk                                  ), //i
     .clrn                   (clrn                                 )  //i
   );
-  TensorCoreChain u_tc_core_r_1_c_11 (
+  TensorCoreChainBf12 u_tc_core_r_1_c_11 (
     .io_dataIn_0            (u_tc_core_r_1_c_11_io_dataIn_0       ), //i
     .io_dataIn_1            (u_tc_core_r_1_c_11_io_dataIn_1       ), //i
     .io_dataIn_2            (u_tc_core_r_1_c_11_io_dataIn_2       ), //i
@@ -59787,7 +59787,7 @@ module TensorCoreChainArray (
     .clk                    (clk                                  ), //i
     .clrn                   (clrn                                 )  //i
   );
-  TensorCoreChain u_tc_core_r_2_c_0 (
+  TensorCoreChainBf12 u_tc_core_r_2_c_0 (
     .io_dataIn_0            (u_tc_core_r_2_c_0_io_dataIn_0       ), //i
     .io_dataIn_1            (u_tc_core_r_2_c_0_io_dataIn_1       ), //i
     .io_dataIn_2            (u_tc_core_r_2_c_0_io_dataIn_2       ), //i
@@ -59873,7 +59873,7 @@ module TensorCoreChainArray (
     .clk                    (clk                                 ), //i
     .clrn                   (clrn                                )  //i
   );
-  TensorCoreChain u_tc_core_r_2_c_1 (
+  TensorCoreChainBf12 u_tc_core_r_2_c_1 (
     .io_dataIn_0            (u_tc_core_r_2_c_1_io_dataIn_0       ), //i
     .io_dataIn_1            (u_tc_core_r_2_c_1_io_dataIn_1       ), //i
     .io_dataIn_2            (u_tc_core_r_2_c_1_io_dataIn_2       ), //i
@@ -59959,7 +59959,7 @@ module TensorCoreChainArray (
     .clk                    (clk                                 ), //i
     .clrn                   (clrn                                )  //i
   );
-  TensorCoreChain u_tc_core_r_2_c_2 (
+  TensorCoreChainBf12 u_tc_core_r_2_c_2 (
     .io_dataIn_0            (u_tc_core_r_2_c_2_io_dataIn_0       ), //i
     .io_dataIn_1            (u_tc_core_r_2_c_2_io_dataIn_1       ), //i
     .io_dataIn_2            (u_tc_core_r_2_c_2_io_dataIn_2       ), //i
@@ -60045,7 +60045,7 @@ module TensorCoreChainArray (
     .clk                    (clk                                 ), //i
     .clrn                   (clrn                                )  //i
   );
-  TensorCoreChain u_tc_core_r_2_c_3 (
+  TensorCoreChainBf12 u_tc_core_r_2_c_3 (
     .io_dataIn_0            (u_tc_core_r_2_c_3_io_dataIn_0       ), //i
     .io_dataIn_1            (u_tc_core_r_2_c_3_io_dataIn_1       ), //i
     .io_dataIn_2            (u_tc_core_r_2_c_3_io_dataIn_2       ), //i
@@ -60131,7 +60131,7 @@ module TensorCoreChainArray (
     .clk                    (clk                                 ), //i
     .clrn                   (clrn                                )  //i
   );
-  TensorCoreChain u_tc_core_r_2_c_4 (
+  TensorCoreChainBf12 u_tc_core_r_2_c_4 (
     .io_dataIn_0            (u_tc_core_r_2_c_4_io_dataIn_0       ), //i
     .io_dataIn_1            (u_tc_core_r_2_c_4_io_dataIn_1       ), //i
     .io_dataIn_2            (u_tc_core_r_2_c_4_io_dataIn_2       ), //i
@@ -60217,7 +60217,7 @@ module TensorCoreChainArray (
     .clk                    (clk                                 ), //i
     .clrn                   (clrn                                )  //i
   );
-  TensorCoreChain u_tc_core_r_2_c_5 (
+  TensorCoreChainBf12 u_tc_core_r_2_c_5 (
     .io_dataIn_0            (u_tc_core_r_2_c_5_io_dataIn_0       ), //i
     .io_dataIn_1            (u_tc_core_r_2_c_5_io_dataIn_1       ), //i
     .io_dataIn_2            (u_tc_core_r_2_c_5_io_dataIn_2       ), //i
@@ -60303,7 +60303,7 @@ module TensorCoreChainArray (
     .clk                    (clk                                 ), //i
     .clrn                   (clrn                                )  //i
   );
-  TensorCoreChain u_tc_core_r_2_c_6 (
+  TensorCoreChainBf12 u_tc_core_r_2_c_6 (
     .io_dataIn_0            (u_tc_core_r_2_c_6_io_dataIn_0       ), //i
     .io_dataIn_1            (u_tc_core_r_2_c_6_io_dataIn_1       ), //i
     .io_dataIn_2            (u_tc_core_r_2_c_6_io_dataIn_2       ), //i
@@ -60389,7 +60389,7 @@ module TensorCoreChainArray (
     .clk                    (clk                                 ), //i
     .clrn                   (clrn                                )  //i
   );
-  TensorCoreChain u_tc_core_r_2_c_7 (
+  TensorCoreChainBf12 u_tc_core_r_2_c_7 (
     .io_dataIn_0            (u_tc_core_r_2_c_7_io_dataIn_0       ), //i
     .io_dataIn_1            (u_tc_core_r_2_c_7_io_dataIn_1       ), //i
     .io_dataIn_2            (u_tc_core_r_2_c_7_io_dataIn_2       ), //i
@@ -60475,7 +60475,7 @@ module TensorCoreChainArray (
     .clk                    (clk                                 ), //i
     .clrn                   (clrn                                )  //i
   );
-  TensorCoreChain u_tc_core_r_2_c_8 (
+  TensorCoreChainBf12 u_tc_core_r_2_c_8 (
     .io_dataIn_0            (u_tc_core_r_2_c_8_io_dataIn_0       ), //i
     .io_dataIn_1            (u_tc_core_r_2_c_8_io_dataIn_1       ), //i
     .io_dataIn_2            (u_tc_core_r_2_c_8_io_dataIn_2       ), //i
@@ -60561,7 +60561,7 @@ module TensorCoreChainArray (
     .clk                    (clk                                 ), //i
     .clrn                   (clrn                                )  //i
   );
-  TensorCoreChain u_tc_core_r_2_c_9 (
+  TensorCoreChainBf12 u_tc_core_r_2_c_9 (
     .io_dataIn_0            (u_tc_core_r_2_c_9_io_dataIn_0       ), //i
     .io_dataIn_1            (u_tc_core_r_2_c_9_io_dataIn_1       ), //i
     .io_dataIn_2            (u_tc_core_r_2_c_9_io_dataIn_2       ), //i
@@ -60647,7 +60647,7 @@ module TensorCoreChainArray (
     .clk                    (clk                                 ), //i
     .clrn                   (clrn                                )  //i
   );
-  TensorCoreChain u_tc_core_r_2_c_10 (
+  TensorCoreChainBf12 u_tc_core_r_2_c_10 (
     .io_dataIn_0            (u_tc_core_r_2_c_10_io_dataIn_0       ), //i
     .io_dataIn_1            (u_tc_core_r_2_c_10_io_dataIn_1       ), //i
     .io_dataIn_2            (u_tc_core_r_2_c_10_io_dataIn_2       ), //i
@@ -60733,7 +60733,7 @@ module TensorCoreChainArray (
     .clk                    (clk                                  ), //i
     .clrn                   (clrn                                 )  //i
   );
-  TensorCoreChain u_tc_core_r_2_c_11 (
+  TensorCoreChainBf12 u_tc_core_r_2_c_11 (
     .io_dataIn_0            (u_tc_core_r_2_c_11_io_dataIn_0       ), //i
     .io_dataIn_1            (u_tc_core_r_2_c_11_io_dataIn_1       ), //i
     .io_dataIn_2            (u_tc_core_r_2_c_11_io_dataIn_2       ), //i
@@ -60819,7 +60819,7 @@ module TensorCoreChainArray (
     .clk                    (clk                                  ), //i
     .clrn                   (clrn                                 )  //i
   );
-  TensorCoreChain u_tc_core_r_3_c_0 (
+  TensorCoreChainBf12 u_tc_core_r_3_c_0 (
     .io_dataIn_0            (u_tc_core_r_3_c_0_io_dataIn_0       ), //i
     .io_dataIn_1            (u_tc_core_r_3_c_0_io_dataIn_1       ), //i
     .io_dataIn_2            (u_tc_core_r_3_c_0_io_dataIn_2       ), //i
@@ -60905,7 +60905,7 @@ module TensorCoreChainArray (
     .clk                    (clk                                 ), //i
     .clrn                   (clrn                                )  //i
   );
-  TensorCoreChain u_tc_core_r_3_c_1 (
+  TensorCoreChainBf12 u_tc_core_r_3_c_1 (
     .io_dataIn_0            (u_tc_core_r_3_c_1_io_dataIn_0       ), //i
     .io_dataIn_1            (u_tc_core_r_3_c_1_io_dataIn_1       ), //i
     .io_dataIn_2            (u_tc_core_r_3_c_1_io_dataIn_2       ), //i
@@ -60991,7 +60991,7 @@ module TensorCoreChainArray (
     .clk                    (clk                                 ), //i
     .clrn                   (clrn                                )  //i
   );
-  TensorCoreChain u_tc_core_r_3_c_2 (
+  TensorCoreChainBf12 u_tc_core_r_3_c_2 (
     .io_dataIn_0            (u_tc_core_r_3_c_2_io_dataIn_0       ), //i
     .io_dataIn_1            (u_tc_core_r_3_c_2_io_dataIn_1       ), //i
     .io_dataIn_2            (u_tc_core_r_3_c_2_io_dataIn_2       ), //i
@@ -61077,7 +61077,7 @@ module TensorCoreChainArray (
     .clk                    (clk                                 ), //i
     .clrn                   (clrn                                )  //i
   );
-  TensorCoreChain u_tc_core_r_3_c_3 (
+  TensorCoreChainBf12 u_tc_core_r_3_c_3 (
     .io_dataIn_0            (u_tc_core_r_3_c_3_io_dataIn_0       ), //i
     .io_dataIn_1            (u_tc_core_r_3_c_3_io_dataIn_1       ), //i
     .io_dataIn_2            (u_tc_core_r_3_c_3_io_dataIn_2       ), //i
@@ -61163,7 +61163,7 @@ module TensorCoreChainArray (
     .clk                    (clk                                 ), //i
     .clrn                   (clrn                                )  //i
   );
-  TensorCoreChain u_tc_core_r_3_c_4 (
+  TensorCoreChainBf12 u_tc_core_r_3_c_4 (
     .io_dataIn_0            (u_tc_core_r_3_c_4_io_dataIn_0       ), //i
     .io_dataIn_1            (u_tc_core_r_3_c_4_io_dataIn_1       ), //i
     .io_dataIn_2            (u_tc_core_r_3_c_4_io_dataIn_2       ), //i
@@ -61249,7 +61249,7 @@ module TensorCoreChainArray (
     .clk                    (clk                                 ), //i
     .clrn                   (clrn                                )  //i
   );
-  TensorCoreChain u_tc_core_r_3_c_5 (
+  TensorCoreChainBf12 u_tc_core_r_3_c_5 (
     .io_dataIn_0            (u_tc_core_r_3_c_5_io_dataIn_0       ), //i
     .io_dataIn_1            (u_tc_core_r_3_c_5_io_dataIn_1       ), //i
     .io_dataIn_2            (u_tc_core_r_3_c_5_io_dataIn_2       ), //i
@@ -61335,7 +61335,7 @@ module TensorCoreChainArray (
     .clk                    (clk                                 ), //i
     .clrn                   (clrn                                )  //i
   );
-  TensorCoreChain u_tc_core_r_3_c_6 (
+  TensorCoreChainBf12 u_tc_core_r_3_c_6 (
     .io_dataIn_0            (u_tc_core_r_3_c_6_io_dataIn_0       ), //i
     .io_dataIn_1            (u_tc_core_r_3_c_6_io_dataIn_1       ), //i
     .io_dataIn_2            (u_tc_core_r_3_c_6_io_dataIn_2       ), //i
@@ -61421,7 +61421,7 @@ module TensorCoreChainArray (
     .clk                    (clk                                 ), //i
     .clrn                   (clrn                                )  //i
   );
-  TensorCoreChain u_tc_core_r_3_c_7 (
+  TensorCoreChainBf12 u_tc_core_r_3_c_7 (
     .io_dataIn_0            (u_tc_core_r_3_c_7_io_dataIn_0       ), //i
     .io_dataIn_1            (u_tc_core_r_3_c_7_io_dataIn_1       ), //i
     .io_dataIn_2            (u_tc_core_r_3_c_7_io_dataIn_2       ), //i
@@ -61507,7 +61507,7 @@ module TensorCoreChainArray (
     .clk                    (clk                                 ), //i
     .clrn                   (clrn                                )  //i
   );
-  TensorCoreChain u_tc_core_r_3_c_8 (
+  TensorCoreChainBf12 u_tc_core_r_3_c_8 (
     .io_dataIn_0            (u_tc_core_r_3_c_8_io_dataIn_0       ), //i
     .io_dataIn_1            (u_tc_core_r_3_c_8_io_dataIn_1       ), //i
     .io_dataIn_2            (u_tc_core_r_3_c_8_io_dataIn_2       ), //i
@@ -61593,7 +61593,7 @@ module TensorCoreChainArray (
     .clk                    (clk                                 ), //i
     .clrn                   (clrn                                )  //i
   );
-  TensorCoreChain u_tc_core_r_3_c_9 (
+  TensorCoreChainBf12 u_tc_core_r_3_c_9 (
     .io_dataIn_0            (u_tc_core_r_3_c_9_io_dataIn_0       ), //i
     .io_dataIn_1            (u_tc_core_r_3_c_9_io_dataIn_1       ), //i
     .io_dataIn_2            (u_tc_core_r_3_c_9_io_dataIn_2       ), //i
@@ -61679,7 +61679,7 @@ module TensorCoreChainArray (
     .clk                    (clk                                 ), //i
     .clrn                   (clrn                                )  //i
   );
-  TensorCoreChain u_tc_core_r_3_c_10 (
+  TensorCoreChainBf12 u_tc_core_r_3_c_10 (
     .io_dataIn_0            (u_tc_core_r_3_c_10_io_dataIn_0       ), //i
     .io_dataIn_1            (u_tc_core_r_3_c_10_io_dataIn_1       ), //i
     .io_dataIn_2            (u_tc_core_r_3_c_10_io_dataIn_2       ), //i
@@ -61765,7 +61765,7 @@ module TensorCoreChainArray (
     .clk                    (clk                                  ), //i
     .clrn                   (clrn                                 )  //i
   );
-  TensorCoreChain u_tc_core_r_3_c_11 (
+  TensorCoreChainBf12 u_tc_core_r_3_c_11 (
     .io_dataIn_0            (u_tc_core_r_3_c_11_io_dataIn_0       ), //i
     .io_dataIn_1            (u_tc_core_r_3_c_11_io_dataIn_1       ), //i
     .io_dataIn_2            (u_tc_core_r_3_c_11_io_dataIn_2       ), //i
@@ -61851,7 +61851,7 @@ module TensorCoreChainArray (
     .clk                    (clk                                  ), //i
     .clrn                   (clrn                                 )  //i
   );
-  TensorCoreChain u_tc_core_r_4_c_0 (
+  TensorCoreChainBf12 u_tc_core_r_4_c_0 (
     .io_dataIn_0            (u_tc_core_r_4_c_0_io_dataIn_0       ), //i
     .io_dataIn_1            (u_tc_core_r_4_c_0_io_dataIn_1       ), //i
     .io_dataIn_2            (u_tc_core_r_4_c_0_io_dataIn_2       ), //i
@@ -61937,7 +61937,7 @@ module TensorCoreChainArray (
     .clk                    (clk                                 ), //i
     .clrn                   (clrn                                )  //i
   );
-  TensorCoreChain u_tc_core_r_4_c_1 (
+  TensorCoreChainBf12 u_tc_core_r_4_c_1 (
     .io_dataIn_0            (u_tc_core_r_4_c_1_io_dataIn_0       ), //i
     .io_dataIn_1            (u_tc_core_r_4_c_1_io_dataIn_1       ), //i
     .io_dataIn_2            (u_tc_core_r_4_c_1_io_dataIn_2       ), //i
@@ -62023,7 +62023,7 @@ module TensorCoreChainArray (
     .clk                    (clk                                 ), //i
     .clrn                   (clrn                                )  //i
   );
-  TensorCoreChain u_tc_core_r_4_c_2 (
+  TensorCoreChainBf12 u_tc_core_r_4_c_2 (
     .io_dataIn_0            (u_tc_core_r_4_c_2_io_dataIn_0       ), //i
     .io_dataIn_1            (u_tc_core_r_4_c_2_io_dataIn_1       ), //i
     .io_dataIn_2            (u_tc_core_r_4_c_2_io_dataIn_2       ), //i
@@ -62109,7 +62109,7 @@ module TensorCoreChainArray (
     .clk                    (clk                                 ), //i
     .clrn                   (clrn                                )  //i
   );
-  TensorCoreChain u_tc_core_r_4_c_3 (
+  TensorCoreChainBf12 u_tc_core_r_4_c_3 (
     .io_dataIn_0            (u_tc_core_r_4_c_3_io_dataIn_0       ), //i
     .io_dataIn_1            (u_tc_core_r_4_c_3_io_dataIn_1       ), //i
     .io_dataIn_2            (u_tc_core_r_4_c_3_io_dataIn_2       ), //i
@@ -62195,7 +62195,7 @@ module TensorCoreChainArray (
     .clk                    (clk                                 ), //i
     .clrn                   (clrn                                )  //i
   );
-  TensorCoreChain u_tc_core_r_4_c_4 (
+  TensorCoreChainBf12 u_tc_core_r_4_c_4 (
     .io_dataIn_0            (u_tc_core_r_4_c_4_io_dataIn_0       ), //i
     .io_dataIn_1            (u_tc_core_r_4_c_4_io_dataIn_1       ), //i
     .io_dataIn_2            (u_tc_core_r_4_c_4_io_dataIn_2       ), //i
@@ -62281,7 +62281,7 @@ module TensorCoreChainArray (
     .clk                    (clk                                 ), //i
     .clrn                   (clrn                                )  //i
   );
-  TensorCoreChain u_tc_core_r_4_c_5 (
+  TensorCoreChainBf12 u_tc_core_r_4_c_5 (
     .io_dataIn_0            (u_tc_core_r_4_c_5_io_dataIn_0       ), //i
     .io_dataIn_1            (u_tc_core_r_4_c_5_io_dataIn_1       ), //i
     .io_dataIn_2            (u_tc_core_r_4_c_5_io_dataIn_2       ), //i
@@ -62367,7 +62367,7 @@ module TensorCoreChainArray (
     .clk                    (clk                                 ), //i
     .clrn                   (clrn                                )  //i
   );
-  TensorCoreChain u_tc_core_r_4_c_6 (
+  TensorCoreChainBf12 u_tc_core_r_4_c_6 (
     .io_dataIn_0            (u_tc_core_r_4_c_6_io_dataIn_0       ), //i
     .io_dataIn_1            (u_tc_core_r_4_c_6_io_dataIn_1       ), //i
     .io_dataIn_2            (u_tc_core_r_4_c_6_io_dataIn_2       ), //i
@@ -62453,7 +62453,7 @@ module TensorCoreChainArray (
     .clk                    (clk                                 ), //i
     .clrn                   (clrn                                )  //i
   );
-  TensorCoreChain u_tc_core_r_4_c_7 (
+  TensorCoreChainBf12 u_tc_core_r_4_c_7 (
     .io_dataIn_0            (u_tc_core_r_4_c_7_io_dataIn_0       ), //i
     .io_dataIn_1            (u_tc_core_r_4_c_7_io_dataIn_1       ), //i
     .io_dataIn_2            (u_tc_core_r_4_c_7_io_dataIn_2       ), //i
@@ -62539,7 +62539,7 @@ module TensorCoreChainArray (
     .clk                    (clk                                 ), //i
     .clrn                   (clrn                                )  //i
   );
-  TensorCoreChain u_tc_core_r_4_c_8 (
+  TensorCoreChainBf12 u_tc_core_r_4_c_8 (
     .io_dataIn_0            (u_tc_core_r_4_c_8_io_dataIn_0       ), //i
     .io_dataIn_1            (u_tc_core_r_4_c_8_io_dataIn_1       ), //i
     .io_dataIn_2            (u_tc_core_r_4_c_8_io_dataIn_2       ), //i
@@ -62625,7 +62625,7 @@ module TensorCoreChainArray (
     .clk                    (clk                                 ), //i
     .clrn                   (clrn                                )  //i
   );
-  TensorCoreChain u_tc_core_r_4_c_9 (
+  TensorCoreChainBf12 u_tc_core_r_4_c_9 (
     .io_dataIn_0            (u_tc_core_r_4_c_9_io_dataIn_0       ), //i
     .io_dataIn_1            (u_tc_core_r_4_c_9_io_dataIn_1       ), //i
     .io_dataIn_2            (u_tc_core_r_4_c_9_io_dataIn_2       ), //i
@@ -62711,7 +62711,7 @@ module TensorCoreChainArray (
     .clk                    (clk                                 ), //i
     .clrn                   (clrn                                )  //i
   );
-  TensorCoreChain u_tc_core_r_4_c_10 (
+  TensorCoreChainBf12 u_tc_core_r_4_c_10 (
     .io_dataIn_0            (u_tc_core_r_4_c_10_io_dataIn_0       ), //i
     .io_dataIn_1            (u_tc_core_r_4_c_10_io_dataIn_1       ), //i
     .io_dataIn_2            (u_tc_core_r_4_c_10_io_dataIn_2       ), //i
@@ -62797,7 +62797,7 @@ module TensorCoreChainArray (
     .clk                    (clk                                  ), //i
     .clrn                   (clrn                                 )  //i
   );
-  TensorCoreChain u_tc_core_r_4_c_11 (
+  TensorCoreChainBf12 u_tc_core_r_4_c_11 (
     .io_dataIn_0            (u_tc_core_r_4_c_11_io_dataIn_0       ), //i
     .io_dataIn_1            (u_tc_core_r_4_c_11_io_dataIn_1       ), //i
     .io_dataIn_2            (u_tc_core_r_4_c_11_io_dataIn_2       ), //i
@@ -62883,7 +62883,7 @@ module TensorCoreChainArray (
     .clk                    (clk                                  ), //i
     .clrn                   (clrn                                 )  //i
   );
-  TensorCoreChain u_tc_core_r_5_c_0 (
+  TensorCoreChainBf12 u_tc_core_r_5_c_0 (
     .io_dataIn_0            (u_tc_core_r_5_c_0_io_dataIn_0       ), //i
     .io_dataIn_1            (u_tc_core_r_5_c_0_io_dataIn_1       ), //i
     .io_dataIn_2            (u_tc_core_r_5_c_0_io_dataIn_2       ), //i
@@ -62969,7 +62969,7 @@ module TensorCoreChainArray (
     .clk                    (clk                                 ), //i
     .clrn                   (clrn                                )  //i
   );
-  TensorCoreChain u_tc_core_r_5_c_1 (
+  TensorCoreChainBf12 u_tc_core_r_5_c_1 (
     .io_dataIn_0            (u_tc_core_r_5_c_1_io_dataIn_0       ), //i
     .io_dataIn_1            (u_tc_core_r_5_c_1_io_dataIn_1       ), //i
     .io_dataIn_2            (u_tc_core_r_5_c_1_io_dataIn_2       ), //i
@@ -63055,7 +63055,7 @@ module TensorCoreChainArray (
     .clk                    (clk                                 ), //i
     .clrn                   (clrn                                )  //i
   );
-  TensorCoreChain u_tc_core_r_5_c_2 (
+  TensorCoreChainBf12 u_tc_core_r_5_c_2 (
     .io_dataIn_0            (u_tc_core_r_5_c_2_io_dataIn_0       ), //i
     .io_dataIn_1            (u_tc_core_r_5_c_2_io_dataIn_1       ), //i
     .io_dataIn_2            (u_tc_core_r_5_c_2_io_dataIn_2       ), //i
@@ -63141,7 +63141,7 @@ module TensorCoreChainArray (
     .clk                    (clk                                 ), //i
     .clrn                   (clrn                                )  //i
   );
-  TensorCoreChain u_tc_core_r_5_c_3 (
+  TensorCoreChainBf12 u_tc_core_r_5_c_3 (
     .io_dataIn_0            (u_tc_core_r_5_c_3_io_dataIn_0       ), //i
     .io_dataIn_1            (u_tc_core_r_5_c_3_io_dataIn_1       ), //i
     .io_dataIn_2            (u_tc_core_r_5_c_3_io_dataIn_2       ), //i
@@ -63227,7 +63227,7 @@ module TensorCoreChainArray (
     .clk                    (clk                                 ), //i
     .clrn                   (clrn                                )  //i
   );
-  TensorCoreChain u_tc_core_r_5_c_4 (
+  TensorCoreChainBf12 u_tc_core_r_5_c_4 (
     .io_dataIn_0            (u_tc_core_r_5_c_4_io_dataIn_0       ), //i
     .io_dataIn_1            (u_tc_core_r_5_c_4_io_dataIn_1       ), //i
     .io_dataIn_2            (u_tc_core_r_5_c_4_io_dataIn_2       ), //i
@@ -63313,7 +63313,7 @@ module TensorCoreChainArray (
     .clk                    (clk                                 ), //i
     .clrn                   (clrn                                )  //i
   );
-  TensorCoreChain u_tc_core_r_5_c_5 (
+  TensorCoreChainBf12 u_tc_core_r_5_c_5 (
     .io_dataIn_0            (u_tc_core_r_5_c_5_io_dataIn_0       ), //i
     .io_dataIn_1            (u_tc_core_r_5_c_5_io_dataIn_1       ), //i
     .io_dataIn_2            (u_tc_core_r_5_c_5_io_dataIn_2       ), //i
@@ -63399,7 +63399,7 @@ module TensorCoreChainArray (
     .clk                    (clk                                 ), //i
     .clrn                   (clrn                                )  //i
   );
-  TensorCoreChain u_tc_core_r_5_c_6 (
+  TensorCoreChainBf12 u_tc_core_r_5_c_6 (
     .io_dataIn_0            (u_tc_core_r_5_c_6_io_dataIn_0       ), //i
     .io_dataIn_1            (u_tc_core_r_5_c_6_io_dataIn_1       ), //i
     .io_dataIn_2            (u_tc_core_r_5_c_6_io_dataIn_2       ), //i
@@ -63485,7 +63485,7 @@ module TensorCoreChainArray (
     .clk                    (clk                                 ), //i
     .clrn                   (clrn                                )  //i
   );
-  TensorCoreChain u_tc_core_r_5_c_7 (
+  TensorCoreChainBf12 u_tc_core_r_5_c_7 (
     .io_dataIn_0            (u_tc_core_r_5_c_7_io_dataIn_0       ), //i
     .io_dataIn_1            (u_tc_core_r_5_c_7_io_dataIn_1       ), //i
     .io_dataIn_2            (u_tc_core_r_5_c_7_io_dataIn_2       ), //i
@@ -63571,7 +63571,7 @@ module TensorCoreChainArray (
     .clk                    (clk                                 ), //i
     .clrn                   (clrn                                )  //i
   );
-  TensorCoreChain u_tc_core_r_5_c_8 (
+  TensorCoreChainBf12 u_tc_core_r_5_c_8 (
     .io_dataIn_0            (u_tc_core_r_5_c_8_io_dataIn_0       ), //i
     .io_dataIn_1            (u_tc_core_r_5_c_8_io_dataIn_1       ), //i
     .io_dataIn_2            (u_tc_core_r_5_c_8_io_dataIn_2       ), //i
@@ -63657,7 +63657,7 @@ module TensorCoreChainArray (
     .clk                    (clk                                 ), //i
     .clrn                   (clrn                                )  //i
   );
-  TensorCoreChain u_tc_core_r_5_c_9 (
+  TensorCoreChainBf12 u_tc_core_r_5_c_9 (
     .io_dataIn_0            (u_tc_core_r_5_c_9_io_dataIn_0       ), //i
     .io_dataIn_1            (u_tc_core_r_5_c_9_io_dataIn_1       ), //i
     .io_dataIn_2            (u_tc_core_r_5_c_9_io_dataIn_2       ), //i
@@ -63743,7 +63743,7 @@ module TensorCoreChainArray (
     .clk                    (clk                                 ), //i
     .clrn                   (clrn                                )  //i
   );
-  TensorCoreChain u_tc_core_r_5_c_10 (
+  TensorCoreChainBf12 u_tc_core_r_5_c_10 (
     .io_dataIn_0            (u_tc_core_r_5_c_10_io_dataIn_0       ), //i
     .io_dataIn_1            (u_tc_core_r_5_c_10_io_dataIn_1       ), //i
     .io_dataIn_2            (u_tc_core_r_5_c_10_io_dataIn_2       ), //i
@@ -63829,7 +63829,7 @@ module TensorCoreChainArray (
     .clk                    (clk                                  ), //i
     .clrn                   (clrn                                 )  //i
   );
-  TensorCoreChain u_tc_core_r_5_c_11 (
+  TensorCoreChainBf12 u_tc_core_r_5_c_11 (
     .io_dataIn_0            (u_tc_core_r_5_c_11_io_dataIn_0       ), //i
     .io_dataIn_1            (u_tc_core_r_5_c_11_io_dataIn_1       ), //i
     .io_dataIn_2            (u_tc_core_r_5_c_11_io_dataIn_2       ), //i
@@ -63915,7 +63915,7 @@ module TensorCoreChainArray (
     .clk                    (clk                                  ), //i
     .clrn                   (clrn                                 )  //i
   );
-  TensorCoreChain u_tc_core_r_6_c_0 (
+  TensorCoreChainBf12 u_tc_core_r_6_c_0 (
     .io_dataIn_0            (u_tc_core_r_6_c_0_io_dataIn_0       ), //i
     .io_dataIn_1            (u_tc_core_r_6_c_0_io_dataIn_1       ), //i
     .io_dataIn_2            (u_tc_core_r_6_c_0_io_dataIn_2       ), //i
@@ -64001,7 +64001,7 @@ module TensorCoreChainArray (
     .clk                    (clk                                 ), //i
     .clrn                   (clrn                                )  //i
   );
-  TensorCoreChain u_tc_core_r_6_c_1 (
+  TensorCoreChainBf12 u_tc_core_r_6_c_1 (
     .io_dataIn_0            (u_tc_core_r_6_c_1_io_dataIn_0       ), //i
     .io_dataIn_1            (u_tc_core_r_6_c_1_io_dataIn_1       ), //i
     .io_dataIn_2            (u_tc_core_r_6_c_1_io_dataIn_2       ), //i
@@ -64087,7 +64087,7 @@ module TensorCoreChainArray (
     .clk                    (clk                                 ), //i
     .clrn                   (clrn                                )  //i
   );
-  TensorCoreChain u_tc_core_r_6_c_2 (
+  TensorCoreChainBf12 u_tc_core_r_6_c_2 (
     .io_dataIn_0            (u_tc_core_r_6_c_2_io_dataIn_0       ), //i
     .io_dataIn_1            (u_tc_core_r_6_c_2_io_dataIn_1       ), //i
     .io_dataIn_2            (u_tc_core_r_6_c_2_io_dataIn_2       ), //i
@@ -64173,7 +64173,7 @@ module TensorCoreChainArray (
     .clk                    (clk                                 ), //i
     .clrn                   (clrn                                )  //i
   );
-  TensorCoreChain u_tc_core_r_6_c_3 (
+  TensorCoreChainBf12 u_tc_core_r_6_c_3 (
     .io_dataIn_0            (u_tc_core_r_6_c_3_io_dataIn_0       ), //i
     .io_dataIn_1            (u_tc_core_r_6_c_3_io_dataIn_1       ), //i
     .io_dataIn_2            (u_tc_core_r_6_c_3_io_dataIn_2       ), //i
@@ -64259,7 +64259,7 @@ module TensorCoreChainArray (
     .clk                    (clk                                 ), //i
     .clrn                   (clrn                                )  //i
   );
-  TensorCoreChain u_tc_core_r_6_c_4 (
+  TensorCoreChainBf12 u_tc_core_r_6_c_4 (
     .io_dataIn_0            (u_tc_core_r_6_c_4_io_dataIn_0       ), //i
     .io_dataIn_1            (u_tc_core_r_6_c_4_io_dataIn_1       ), //i
     .io_dataIn_2            (u_tc_core_r_6_c_4_io_dataIn_2       ), //i
@@ -64345,7 +64345,7 @@ module TensorCoreChainArray (
     .clk                    (clk                                 ), //i
     .clrn                   (clrn                                )  //i
   );
-  TensorCoreChain u_tc_core_r_6_c_5 (
+  TensorCoreChainBf12 u_tc_core_r_6_c_5 (
     .io_dataIn_0            (u_tc_core_r_6_c_5_io_dataIn_0       ), //i
     .io_dataIn_1            (u_tc_core_r_6_c_5_io_dataIn_1       ), //i
     .io_dataIn_2            (u_tc_core_r_6_c_5_io_dataIn_2       ), //i
@@ -64431,7 +64431,7 @@ module TensorCoreChainArray (
     .clk                    (clk                                 ), //i
     .clrn                   (clrn                                )  //i
   );
-  TensorCoreChain u_tc_core_r_6_c_6 (
+  TensorCoreChainBf12 u_tc_core_r_6_c_6 (
     .io_dataIn_0            (u_tc_core_r_6_c_6_io_dataIn_0       ), //i
     .io_dataIn_1            (u_tc_core_r_6_c_6_io_dataIn_1       ), //i
     .io_dataIn_2            (u_tc_core_r_6_c_6_io_dataIn_2       ), //i
@@ -64517,7 +64517,7 @@ module TensorCoreChainArray (
     .clk                    (clk                                 ), //i
     .clrn                   (clrn                                )  //i
   );
-  TensorCoreChain u_tc_core_r_6_c_7 (
+  TensorCoreChainBf12 u_tc_core_r_6_c_7 (
     .io_dataIn_0            (u_tc_core_r_6_c_7_io_dataIn_0       ), //i
     .io_dataIn_1            (u_tc_core_r_6_c_7_io_dataIn_1       ), //i
     .io_dataIn_2            (u_tc_core_r_6_c_7_io_dataIn_2       ), //i
@@ -64603,7 +64603,7 @@ module TensorCoreChainArray (
     .clk                    (clk                                 ), //i
     .clrn                   (clrn                                )  //i
   );
-  TensorCoreChain u_tc_core_r_6_c_8 (
+  TensorCoreChainBf12 u_tc_core_r_6_c_8 (
     .io_dataIn_0            (u_tc_core_r_6_c_8_io_dataIn_0       ), //i
     .io_dataIn_1            (u_tc_core_r_6_c_8_io_dataIn_1       ), //i
     .io_dataIn_2            (u_tc_core_r_6_c_8_io_dataIn_2       ), //i
@@ -64689,7 +64689,7 @@ module TensorCoreChainArray (
     .clk                    (clk                                 ), //i
     .clrn                   (clrn                                )  //i
   );
-  TensorCoreChain u_tc_core_r_6_c_9 (
+  TensorCoreChainBf12 u_tc_core_r_6_c_9 (
     .io_dataIn_0            (u_tc_core_r_6_c_9_io_dataIn_0       ), //i
     .io_dataIn_1            (u_tc_core_r_6_c_9_io_dataIn_1       ), //i
     .io_dataIn_2            (u_tc_core_r_6_c_9_io_dataIn_2       ), //i
@@ -64775,7 +64775,7 @@ module TensorCoreChainArray (
     .clk                    (clk                                 ), //i
     .clrn                   (clrn                                )  //i
   );
-  TensorCoreChain u_tc_core_r_6_c_10 (
+  TensorCoreChainBf12 u_tc_core_r_6_c_10 (
     .io_dataIn_0            (u_tc_core_r_6_c_10_io_dataIn_0       ), //i
     .io_dataIn_1            (u_tc_core_r_6_c_10_io_dataIn_1       ), //i
     .io_dataIn_2            (u_tc_core_r_6_c_10_io_dataIn_2       ), //i
@@ -64861,7 +64861,7 @@ module TensorCoreChainArray (
     .clk                    (clk                                  ), //i
     .clrn                   (clrn                                 )  //i
   );
-  TensorCoreChain u_tc_core_r_6_c_11 (
+  TensorCoreChainBf12 u_tc_core_r_6_c_11 (
     .io_dataIn_0            (u_tc_core_r_6_c_11_io_dataIn_0       ), //i
     .io_dataIn_1            (u_tc_core_r_6_c_11_io_dataIn_1       ), //i
     .io_dataIn_2            (u_tc_core_r_6_c_11_io_dataIn_2       ), //i
@@ -64947,7 +64947,7 @@ module TensorCoreChainArray (
     .clk                    (clk                                  ), //i
     .clrn                   (clrn                                 )  //i
   );
-  TensorCoreChain u_tc_core_r_7_c_0 (
+  TensorCoreChainBf12 u_tc_core_r_7_c_0 (
     .io_dataIn_0            (u_tc_core_r_7_c_0_io_dataIn_0       ), //i
     .io_dataIn_1            (u_tc_core_r_7_c_0_io_dataIn_1       ), //i
     .io_dataIn_2            (u_tc_core_r_7_c_0_io_dataIn_2       ), //i
@@ -65033,7 +65033,7 @@ module TensorCoreChainArray (
     .clk                    (clk                                 ), //i
     .clrn                   (clrn                                )  //i
   );
-  TensorCoreChain u_tc_core_r_7_c_1 (
+  TensorCoreChainBf12 u_tc_core_r_7_c_1 (
     .io_dataIn_0            (u_tc_core_r_7_c_1_io_dataIn_0       ), //i
     .io_dataIn_1            (u_tc_core_r_7_c_1_io_dataIn_1       ), //i
     .io_dataIn_2            (u_tc_core_r_7_c_1_io_dataIn_2       ), //i
@@ -65119,7 +65119,7 @@ module TensorCoreChainArray (
     .clk                    (clk                                 ), //i
     .clrn                   (clrn                                )  //i
   );
-  TensorCoreChain u_tc_core_r_7_c_2 (
+  TensorCoreChainBf12 u_tc_core_r_7_c_2 (
     .io_dataIn_0            (u_tc_core_r_7_c_2_io_dataIn_0       ), //i
     .io_dataIn_1            (u_tc_core_r_7_c_2_io_dataIn_1       ), //i
     .io_dataIn_2            (u_tc_core_r_7_c_2_io_dataIn_2       ), //i
@@ -65205,7 +65205,7 @@ module TensorCoreChainArray (
     .clk                    (clk                                 ), //i
     .clrn                   (clrn                                )  //i
   );
-  TensorCoreChain u_tc_core_r_7_c_3 (
+  TensorCoreChainBf12 u_tc_core_r_7_c_3 (
     .io_dataIn_0            (u_tc_core_r_7_c_3_io_dataIn_0       ), //i
     .io_dataIn_1            (u_tc_core_r_7_c_3_io_dataIn_1       ), //i
     .io_dataIn_2            (u_tc_core_r_7_c_3_io_dataIn_2       ), //i
@@ -65291,7 +65291,7 @@ module TensorCoreChainArray (
     .clk                    (clk                                 ), //i
     .clrn                   (clrn                                )  //i
   );
-  TensorCoreChain u_tc_core_r_7_c_4 (
+  TensorCoreChainBf12 u_tc_core_r_7_c_4 (
     .io_dataIn_0            (u_tc_core_r_7_c_4_io_dataIn_0       ), //i
     .io_dataIn_1            (u_tc_core_r_7_c_4_io_dataIn_1       ), //i
     .io_dataIn_2            (u_tc_core_r_7_c_4_io_dataIn_2       ), //i
@@ -65377,7 +65377,7 @@ module TensorCoreChainArray (
     .clk                    (clk                                 ), //i
     .clrn                   (clrn                                )  //i
   );
-  TensorCoreChain u_tc_core_r_7_c_5 (
+  TensorCoreChainBf12 u_tc_core_r_7_c_5 (
     .io_dataIn_0            (u_tc_core_r_7_c_5_io_dataIn_0       ), //i
     .io_dataIn_1            (u_tc_core_r_7_c_5_io_dataIn_1       ), //i
     .io_dataIn_2            (u_tc_core_r_7_c_5_io_dataIn_2       ), //i
@@ -65463,7 +65463,7 @@ module TensorCoreChainArray (
     .clk                    (clk                                 ), //i
     .clrn                   (clrn                                )  //i
   );
-  TensorCoreChain u_tc_core_r_7_c_6 (
+  TensorCoreChainBf12 u_tc_core_r_7_c_6 (
     .io_dataIn_0            (u_tc_core_r_7_c_6_io_dataIn_0       ), //i
     .io_dataIn_1            (u_tc_core_r_7_c_6_io_dataIn_1       ), //i
     .io_dataIn_2            (u_tc_core_r_7_c_6_io_dataIn_2       ), //i
@@ -65549,7 +65549,7 @@ module TensorCoreChainArray (
     .clk                    (clk                                 ), //i
     .clrn                   (clrn                                )  //i
   );
-  TensorCoreChain u_tc_core_r_7_c_7 (
+  TensorCoreChainBf12 u_tc_core_r_7_c_7 (
     .io_dataIn_0            (u_tc_core_r_7_c_7_io_dataIn_0       ), //i
     .io_dataIn_1            (u_tc_core_r_7_c_7_io_dataIn_1       ), //i
     .io_dataIn_2            (u_tc_core_r_7_c_7_io_dataIn_2       ), //i
@@ -65635,7 +65635,7 @@ module TensorCoreChainArray (
     .clk                    (clk                                 ), //i
     .clrn                   (clrn                                )  //i
   );
-  TensorCoreChain u_tc_core_r_7_c_8 (
+  TensorCoreChainBf12 u_tc_core_r_7_c_8 (
     .io_dataIn_0            (u_tc_core_r_7_c_8_io_dataIn_0       ), //i
     .io_dataIn_1            (u_tc_core_r_7_c_8_io_dataIn_1       ), //i
     .io_dataIn_2            (u_tc_core_r_7_c_8_io_dataIn_2       ), //i
@@ -65721,7 +65721,7 @@ module TensorCoreChainArray (
     .clk                    (clk                                 ), //i
     .clrn                   (clrn                                )  //i
   );
-  TensorCoreChain u_tc_core_r_7_c_9 (
+  TensorCoreChainBf12 u_tc_core_r_7_c_9 (
     .io_dataIn_0            (u_tc_core_r_7_c_9_io_dataIn_0       ), //i
     .io_dataIn_1            (u_tc_core_r_7_c_9_io_dataIn_1       ), //i
     .io_dataIn_2            (u_tc_core_r_7_c_9_io_dataIn_2       ), //i
@@ -65807,7 +65807,7 @@ module TensorCoreChainArray (
     .clk                    (clk                                 ), //i
     .clrn                   (clrn                                )  //i
   );
-  TensorCoreChain u_tc_core_r_7_c_10 (
+  TensorCoreChainBf12 u_tc_core_r_7_c_10 (
     .io_dataIn_0            (u_tc_core_r_7_c_10_io_dataIn_0       ), //i
     .io_dataIn_1            (u_tc_core_r_7_c_10_io_dataIn_1       ), //i
     .io_dataIn_2            (u_tc_core_r_7_c_10_io_dataIn_2       ), //i
@@ -65893,7 +65893,7 @@ module TensorCoreChainArray (
     .clk                    (clk                                  ), //i
     .clrn                   (clrn                                 )  //i
   );
-  TensorCoreChain u_tc_core_r_7_c_11 (
+  TensorCoreChainBf12 u_tc_core_r_7_c_11 (
     .io_dataIn_0            (u_tc_core_r_7_c_11_io_dataIn_0       ), //i
     .io_dataIn_1            (u_tc_core_r_7_c_11_io_dataIn_1       ), //i
     .io_dataIn_2            (u_tc_core_r_7_c_11_io_dataIn_2       ), //i
@@ -227447,197 +227447,197 @@ module FixedBfpConverter (
 
 endmodule
 
-//TensorCoreChain replaced by TensorCoreChain
+//TensorCoreChainBf12 replaced by TensorCoreChainBf12
 
-//TensorCoreChain replaced by TensorCoreChain
+//TensorCoreChainBf12 replaced by TensorCoreChainBf12
 
-//TensorCoreChain replaced by TensorCoreChain
+//TensorCoreChainBf12 replaced by TensorCoreChainBf12
 
-//TensorCoreChain replaced by TensorCoreChain
+//TensorCoreChainBf12 replaced by TensorCoreChainBf12
 
-//TensorCoreChain replaced by TensorCoreChain
+//TensorCoreChainBf12 replaced by TensorCoreChainBf12
 
-//TensorCoreChain replaced by TensorCoreChain
+//TensorCoreChainBf12 replaced by TensorCoreChainBf12
 
-//TensorCoreChain replaced by TensorCoreChain
+//TensorCoreChainBf12 replaced by TensorCoreChainBf12
 
-//TensorCoreChain replaced by TensorCoreChain
+//TensorCoreChainBf12 replaced by TensorCoreChainBf12
 
-//TensorCoreChain replaced by TensorCoreChain
+//TensorCoreChainBf12 replaced by TensorCoreChainBf12
 
-//TensorCoreChain replaced by TensorCoreChain
+//TensorCoreChainBf12 replaced by TensorCoreChainBf12
 
-//TensorCoreChain replaced by TensorCoreChain
+//TensorCoreChainBf12 replaced by TensorCoreChainBf12
 
-//TensorCoreChain replaced by TensorCoreChain
+//TensorCoreChainBf12 replaced by TensorCoreChainBf12
 
-//TensorCoreChain replaced by TensorCoreChain
+//TensorCoreChainBf12 replaced by TensorCoreChainBf12
 
-//TensorCoreChain replaced by TensorCoreChain
+//TensorCoreChainBf12 replaced by TensorCoreChainBf12
 
-//TensorCoreChain replaced by TensorCoreChain
+//TensorCoreChainBf12 replaced by TensorCoreChainBf12
 
-//TensorCoreChain replaced by TensorCoreChain
+//TensorCoreChainBf12 replaced by TensorCoreChainBf12
 
-//TensorCoreChain replaced by TensorCoreChain
+//TensorCoreChainBf12 replaced by TensorCoreChainBf12
 
-//TensorCoreChain replaced by TensorCoreChain
+//TensorCoreChainBf12 replaced by TensorCoreChainBf12
 
-//TensorCoreChain replaced by TensorCoreChain
+//TensorCoreChainBf12 replaced by TensorCoreChainBf12
 
-//TensorCoreChain replaced by TensorCoreChain
+//TensorCoreChainBf12 replaced by TensorCoreChainBf12
 
-//TensorCoreChain replaced by TensorCoreChain
+//TensorCoreChainBf12 replaced by TensorCoreChainBf12
 
-//TensorCoreChain replaced by TensorCoreChain
+//TensorCoreChainBf12 replaced by TensorCoreChainBf12
 
-//TensorCoreChain replaced by TensorCoreChain
+//TensorCoreChainBf12 replaced by TensorCoreChainBf12
 
-//TensorCoreChain replaced by TensorCoreChain
+//TensorCoreChainBf12 replaced by TensorCoreChainBf12
 
-//TensorCoreChain replaced by TensorCoreChain
+//TensorCoreChainBf12 replaced by TensorCoreChainBf12
 
-//TensorCoreChain replaced by TensorCoreChain
+//TensorCoreChainBf12 replaced by TensorCoreChainBf12
 
-//TensorCoreChain replaced by TensorCoreChain
+//TensorCoreChainBf12 replaced by TensorCoreChainBf12
 
-//TensorCoreChain replaced by TensorCoreChain
+//TensorCoreChainBf12 replaced by TensorCoreChainBf12
 
-//TensorCoreChain replaced by TensorCoreChain
+//TensorCoreChainBf12 replaced by TensorCoreChainBf12
 
-//TensorCoreChain replaced by TensorCoreChain
+//TensorCoreChainBf12 replaced by TensorCoreChainBf12
 
-//TensorCoreChain replaced by TensorCoreChain
+//TensorCoreChainBf12 replaced by TensorCoreChainBf12
 
-//TensorCoreChain replaced by TensorCoreChain
+//TensorCoreChainBf12 replaced by TensorCoreChainBf12
 
-//TensorCoreChain replaced by TensorCoreChain
+//TensorCoreChainBf12 replaced by TensorCoreChainBf12
 
-//TensorCoreChain replaced by TensorCoreChain
+//TensorCoreChainBf12 replaced by TensorCoreChainBf12
 
-//TensorCoreChain replaced by TensorCoreChain
+//TensorCoreChainBf12 replaced by TensorCoreChainBf12
 
-//TensorCoreChain replaced by TensorCoreChain
+//TensorCoreChainBf12 replaced by TensorCoreChainBf12
 
-//TensorCoreChain replaced by TensorCoreChain
+//TensorCoreChainBf12 replaced by TensorCoreChainBf12
 
-//TensorCoreChain replaced by TensorCoreChain
+//TensorCoreChainBf12 replaced by TensorCoreChainBf12
 
-//TensorCoreChain replaced by TensorCoreChain
+//TensorCoreChainBf12 replaced by TensorCoreChainBf12
 
-//TensorCoreChain replaced by TensorCoreChain
+//TensorCoreChainBf12 replaced by TensorCoreChainBf12
 
-//TensorCoreChain replaced by TensorCoreChain
+//TensorCoreChainBf12 replaced by TensorCoreChainBf12
 
-//TensorCoreChain replaced by TensorCoreChain
+//TensorCoreChainBf12 replaced by TensorCoreChainBf12
 
-//TensorCoreChain replaced by TensorCoreChain
+//TensorCoreChainBf12 replaced by TensorCoreChainBf12
 
-//TensorCoreChain replaced by TensorCoreChain
+//TensorCoreChainBf12 replaced by TensorCoreChainBf12
 
-//TensorCoreChain replaced by TensorCoreChain
+//TensorCoreChainBf12 replaced by TensorCoreChainBf12
 
-//TensorCoreChain replaced by TensorCoreChain
+//TensorCoreChainBf12 replaced by TensorCoreChainBf12
 
-//TensorCoreChain replaced by TensorCoreChain
+//TensorCoreChainBf12 replaced by TensorCoreChainBf12
 
-//TensorCoreChain replaced by TensorCoreChain
+//TensorCoreChainBf12 replaced by TensorCoreChainBf12
 
-//TensorCoreChain replaced by TensorCoreChain
+//TensorCoreChainBf12 replaced by TensorCoreChainBf12
 
-//TensorCoreChain replaced by TensorCoreChain
+//TensorCoreChainBf12 replaced by TensorCoreChainBf12
 
-//TensorCoreChain replaced by TensorCoreChain
+//TensorCoreChainBf12 replaced by TensorCoreChainBf12
 
-//TensorCoreChain replaced by TensorCoreChain
+//TensorCoreChainBf12 replaced by TensorCoreChainBf12
 
-//TensorCoreChain replaced by TensorCoreChain
+//TensorCoreChainBf12 replaced by TensorCoreChainBf12
 
-//TensorCoreChain replaced by TensorCoreChain
+//TensorCoreChainBf12 replaced by TensorCoreChainBf12
 
-//TensorCoreChain replaced by TensorCoreChain
+//TensorCoreChainBf12 replaced by TensorCoreChainBf12
 
-//TensorCoreChain replaced by TensorCoreChain
+//TensorCoreChainBf12 replaced by TensorCoreChainBf12
 
-//TensorCoreChain replaced by TensorCoreChain
+//TensorCoreChainBf12 replaced by TensorCoreChainBf12
 
-//TensorCoreChain replaced by TensorCoreChain
+//TensorCoreChainBf12 replaced by TensorCoreChainBf12
 
-//TensorCoreChain replaced by TensorCoreChain
+//TensorCoreChainBf12 replaced by TensorCoreChainBf12
 
-//TensorCoreChain replaced by TensorCoreChain
+//TensorCoreChainBf12 replaced by TensorCoreChainBf12
 
-//TensorCoreChain replaced by TensorCoreChain
+//TensorCoreChainBf12 replaced by TensorCoreChainBf12
 
-//TensorCoreChain replaced by TensorCoreChain
+//TensorCoreChainBf12 replaced by TensorCoreChainBf12
 
-//TensorCoreChain replaced by TensorCoreChain
+//TensorCoreChainBf12 replaced by TensorCoreChainBf12
 
-//TensorCoreChain replaced by TensorCoreChain
+//TensorCoreChainBf12 replaced by TensorCoreChainBf12
 
-//TensorCoreChain replaced by TensorCoreChain
+//TensorCoreChainBf12 replaced by TensorCoreChainBf12
 
-//TensorCoreChain replaced by TensorCoreChain
+//TensorCoreChainBf12 replaced by TensorCoreChainBf12
 
-//TensorCoreChain replaced by TensorCoreChain
+//TensorCoreChainBf12 replaced by TensorCoreChainBf12
 
-//TensorCoreChain replaced by TensorCoreChain
+//TensorCoreChainBf12 replaced by TensorCoreChainBf12
 
-//TensorCoreChain replaced by TensorCoreChain
+//TensorCoreChainBf12 replaced by TensorCoreChainBf12
 
-//TensorCoreChain replaced by TensorCoreChain
+//TensorCoreChainBf12 replaced by TensorCoreChainBf12
 
-//TensorCoreChain replaced by TensorCoreChain
+//TensorCoreChainBf12 replaced by TensorCoreChainBf12
 
-//TensorCoreChain replaced by TensorCoreChain
+//TensorCoreChainBf12 replaced by TensorCoreChainBf12
 
-//TensorCoreChain replaced by TensorCoreChain
+//TensorCoreChainBf12 replaced by TensorCoreChainBf12
 
-//TensorCoreChain replaced by TensorCoreChain
+//TensorCoreChainBf12 replaced by TensorCoreChainBf12
 
-//TensorCoreChain replaced by TensorCoreChain
+//TensorCoreChainBf12 replaced by TensorCoreChainBf12
 
-//TensorCoreChain replaced by TensorCoreChain
+//TensorCoreChainBf12 replaced by TensorCoreChainBf12
 
-//TensorCoreChain replaced by TensorCoreChain
+//TensorCoreChainBf12 replaced by TensorCoreChainBf12
 
-//TensorCoreChain replaced by TensorCoreChain
+//TensorCoreChainBf12 replaced by TensorCoreChainBf12
 
-//TensorCoreChain replaced by TensorCoreChain
+//TensorCoreChainBf12 replaced by TensorCoreChainBf12
 
-//TensorCoreChain replaced by TensorCoreChain
+//TensorCoreChainBf12 replaced by TensorCoreChainBf12
 
-//TensorCoreChain replaced by TensorCoreChain
+//TensorCoreChainBf12 replaced by TensorCoreChainBf12
 
-//TensorCoreChain replaced by TensorCoreChain
+//TensorCoreChainBf12 replaced by TensorCoreChainBf12
 
-//TensorCoreChain replaced by TensorCoreChain
+//TensorCoreChainBf12 replaced by TensorCoreChainBf12
 
-//TensorCoreChain replaced by TensorCoreChain
+//TensorCoreChainBf12 replaced by TensorCoreChainBf12
 
-//TensorCoreChain replaced by TensorCoreChain
+//TensorCoreChainBf12 replaced by TensorCoreChainBf12
 
-//TensorCoreChain replaced by TensorCoreChain
+//TensorCoreChainBf12 replaced by TensorCoreChainBf12
 
-//TensorCoreChain replaced by TensorCoreChain
+//TensorCoreChainBf12 replaced by TensorCoreChainBf12
 
-//TensorCoreChain replaced by TensorCoreChain
+//TensorCoreChainBf12 replaced by TensorCoreChainBf12
 
-//TensorCoreChain replaced by TensorCoreChain
+//TensorCoreChainBf12 replaced by TensorCoreChainBf12
 
-//TensorCoreChain replaced by TensorCoreChain
+//TensorCoreChainBf12 replaced by TensorCoreChainBf12
 
-//TensorCoreChain replaced by TensorCoreChain
+//TensorCoreChainBf12 replaced by TensorCoreChainBf12
 
-//TensorCoreChain replaced by TensorCoreChain
+//TensorCoreChainBf12 replaced by TensorCoreChainBf12
 
-//TensorCoreChain replaced by TensorCoreChain
+//TensorCoreChainBf12 replaced by TensorCoreChainBf12
 
-//TensorCoreChain replaced by TensorCoreChain
+//TensorCoreChainBf12 replaced by TensorCoreChainBf12
 
-//TensorCoreChain replaced by TensorCoreChain
+//TensorCoreChainBf12 replaced by TensorCoreChainBf12
 
-module TensorCoreChain (
+module TensorCoreChainBf12 (
   input      [79:0]   io_dataIn_0,
   input      [79:0]   io_dataIn_1,
   input      [79:0]   io_dataIn_2,
@@ -227723,424 +227723,774 @@ module TensorCoreChain (
   input               clk,
   input               clrn
 );
-  wire       [7:0]    tcEntry_data_in_1;
-  wire       [7:0]    tcEntry_data_in_2;
-  wire       [7:0]    tcEntry_data_in_3;
-  wire       [7:0]    tcEntry_data_in_4;
-  wire       [7:0]    tcEntry_data_in_5;
-  wire       [7:0]    tcEntry_data_in_6;
-  wire       [7:0]    tcEntry_data_in_7;
-  wire       [7:0]    tcEntry_data_in_8;
-  wire       [7:0]    tcEntry_data_in_9;
-  wire       [7:0]    tcEntry_data_in_10;
-  wire       [7:0]    tcStartPoint_data_in_1;
-  wire       [7:0]    tcStartPoint_data_in_2;
-  wire       [7:0]    tcStartPoint_data_in_3;
-  wire       [7:0]    tcStartPoint_data_in_4;
-  wire       [7:0]    tcStartPoint_data_in_5;
-  wire       [7:0]    tcStartPoint_data_in_6;
-  wire       [7:0]    tcStartPoint_data_in_7;
-  wire       [7:0]    tcStartPoint_data_in_8;
-  wire       [7:0]    tcStartPoint_data_in_9;
-  wire       [7:0]    tcStartPoint_data_in_10;
+  wire       [3:0]    tcEntry_data_in_1;
+  wire       [3:0]    tcEntry_data_in_2;
+  wire       [3:0]    tcEntry_data_in_3;
+  wire       [3:0]    tcEntry_data_in_4;
+  wire       [3:0]    tcEntry_data_in_5;
+  wire       [3:0]    tcEntry_data_in_6;
+  wire       [3:0]    tcEntry_data_in_7;
+  wire       [3:0]    tcEntry_data_in_8;
+  wire       [3:0]    tcEntry_data_in_9;
+  wire       [3:0]    tcEntry_data_in_10;
+  wire       [3:0]    tcEntry_data_in_11;
+  wire       [3:0]    tcEntry_data_in_12;
+  wire       [3:0]    tcEntry_data_in_13;
+  wire       [3:0]    tcEntry_data_in_14;
+  wire       [3:0]    tcEntry_data_in_15;
+  wire       [3:0]    tcEntry_data_in_16;
+  wire       [3:0]    tcEntry_data_in_17;
+  wire       [3:0]    tcEntry_data_in_18;
+  wire       [3:0]    tcEntry_data_in_19;
+  wire       [3:0]    tcEntry_data_in_20;
+  wire       [3:0]    tcStartPoint_data_in_1;
+  wire       [3:0]    tcStartPoint_data_in_2;
+  wire       [3:0]    tcStartPoint_data_in_3;
+  wire       [3:0]    tcStartPoint_data_in_4;
+  wire       [3:0]    tcStartPoint_data_in_5;
+  wire       [3:0]    tcStartPoint_data_in_6;
+  wire       [3:0]    tcStartPoint_data_in_7;
+  wire       [3:0]    tcStartPoint_data_in_8;
+  wire       [3:0]    tcStartPoint_data_in_9;
+  wire       [3:0]    tcStartPoint_data_in_10;
+  wire       [3:0]    tcStartPoint_data_in_11;
+  wire       [3:0]    tcStartPoint_data_in_12;
+  wire       [3:0]    tcStartPoint_data_in_13;
+  wire       [3:0]    tcStartPoint_data_in_14;
+  wire       [3:0]    tcStartPoint_data_in_15;
+  wire       [3:0]    tcStartPoint_data_in_16;
+  wire       [3:0]    tcStartPoint_data_in_17;
+  wire       [3:0]    tcStartPoint_data_in_18;
+  wire       [3:0]    tcStartPoint_data_in_19;
+  wire       [3:0]    tcStartPoint_data_in_20;
   wire                tcStartPoint_load_bb_one;
   wire                tcStartPoint_load_bb_two;
-  wire       [7:0]    tensor_core_1_data_in_1;
-  wire       [7:0]    tensor_core_1_data_in_2;
-  wire       [7:0]    tensor_core_1_data_in_3;
-  wire       [7:0]    tensor_core_1_data_in_4;
-  wire       [7:0]    tensor_core_1_data_in_5;
-  wire       [7:0]    tensor_core_1_data_in_6;
-  wire       [7:0]    tensor_core_1_data_in_7;
-  wire       [7:0]    tensor_core_1_data_in_8;
-  wire       [7:0]    tensor_core_1_data_in_9;
-  wire       [7:0]    tensor_core_1_data_in_10;
-  wire                tensor_core_1_load_bb_one;
-  wire                tensor_core_1_load_bb_two;
-  wire       [7:0]    tensor_core_2_data_in_1;
-  wire       [7:0]    tensor_core_2_data_in_2;
-  wire       [7:0]    tensor_core_2_data_in_3;
-  wire       [7:0]    tensor_core_2_data_in_4;
-  wire       [7:0]    tensor_core_2_data_in_5;
-  wire       [7:0]    tensor_core_2_data_in_6;
-  wire       [7:0]    tensor_core_2_data_in_7;
-  wire       [7:0]    tensor_core_2_data_in_8;
-  wire       [7:0]    tensor_core_2_data_in_9;
-  wire       [7:0]    tensor_core_2_data_in_10;
-  wire                tensor_core_2_load_bb_one;
-  wire                tensor_core_2_load_bb_two;
-  wire       [7:0]    tensor_core_3_data_in_1;
-  wire       [7:0]    tensor_core_3_data_in_2;
-  wire       [7:0]    tensor_core_3_data_in_3;
-  wire       [7:0]    tensor_core_3_data_in_4;
-  wire       [7:0]    tensor_core_3_data_in_5;
-  wire       [7:0]    tensor_core_3_data_in_6;
-  wire       [7:0]    tensor_core_3_data_in_7;
-  wire       [7:0]    tensor_core_3_data_in_8;
-  wire       [7:0]    tensor_core_3_data_in_9;
-  wire       [7:0]    tensor_core_3_data_in_10;
-  wire                tensor_core_3_load_bb_one;
-  wire                tensor_core_3_load_bb_two;
-  wire       [7:0]    tensor_core_4_data_in_1;
-  wire       [7:0]    tensor_core_4_data_in_2;
-  wire       [7:0]    tensor_core_4_data_in_3;
-  wire       [7:0]    tensor_core_4_data_in_4;
-  wire       [7:0]    tensor_core_4_data_in_5;
-  wire       [7:0]    tensor_core_4_data_in_6;
-  wire       [7:0]    tensor_core_4_data_in_7;
-  wire       [7:0]    tensor_core_4_data_in_8;
-  wire       [7:0]    tensor_core_4_data_in_9;
-  wire       [7:0]    tensor_core_4_data_in_10;
-  wire                tensor_core_4_load_bb_one;
-  wire                tensor_core_4_load_bb_two;
-  wire       [7:0]    tensor_core_5_data_in_1;
-  wire       [7:0]    tensor_core_5_data_in_2;
-  wire       [7:0]    tensor_core_5_data_in_3;
-  wire       [7:0]    tensor_core_5_data_in_4;
-  wire       [7:0]    tensor_core_5_data_in_5;
-  wire       [7:0]    tensor_core_5_data_in_6;
-  wire       [7:0]    tensor_core_5_data_in_7;
-  wire       [7:0]    tensor_core_5_data_in_8;
-  wire       [7:0]    tensor_core_5_data_in_9;
-  wire       [7:0]    tensor_core_5_data_in_10;
-  wire                tensor_core_5_load_bb_one;
-  wire                tensor_core_5_load_bb_two;
-  wire       [7:0]    tensor_core_6_data_in_1;
-  wire       [7:0]    tensor_core_6_data_in_2;
-  wire       [7:0]    tensor_core_6_data_in_3;
-  wire       [7:0]    tensor_core_6_data_in_4;
-  wire       [7:0]    tensor_core_6_data_in_5;
-  wire       [7:0]    tensor_core_6_data_in_6;
-  wire       [7:0]    tensor_core_6_data_in_7;
-  wire       [7:0]    tensor_core_6_data_in_8;
-  wire       [7:0]    tensor_core_6_data_in_9;
-  wire       [7:0]    tensor_core_6_data_in_10;
-  wire                tensor_core_6_load_bb_one;
-  wire                tensor_core_6_load_bb_two;
-  wire       [7:0]    tensor_core_7_data_in_1;
-  wire       [7:0]    tensor_core_7_data_in_2;
-  wire       [7:0]    tensor_core_7_data_in_3;
-  wire       [7:0]    tensor_core_7_data_in_4;
-  wire       [7:0]    tensor_core_7_data_in_5;
-  wire       [7:0]    tensor_core_7_data_in_6;
-  wire       [7:0]    tensor_core_7_data_in_7;
-  wire       [7:0]    tensor_core_7_data_in_8;
-  wire       [7:0]    tensor_core_7_data_in_9;
-  wire       [7:0]    tensor_core_7_data_in_10;
-  wire                tensor_core_7_load_bb_one;
-  wire                tensor_core_7_load_bb_two;
-  wire       [7:0]    tensor_core_8_data_in_1;
-  wire       [7:0]    tensor_core_8_data_in_2;
-  wire       [7:0]    tensor_core_8_data_in_3;
-  wire       [7:0]    tensor_core_8_data_in_4;
-  wire       [7:0]    tensor_core_8_data_in_5;
-  wire       [7:0]    tensor_core_8_data_in_6;
-  wire       [7:0]    tensor_core_8_data_in_7;
-  wire       [7:0]    tensor_core_8_data_in_8;
-  wire       [7:0]    tensor_core_8_data_in_9;
-  wire       [7:0]    tensor_core_8_data_in_10;
-  wire                tensor_core_8_load_bb_one;
-  wire                tensor_core_8_load_bb_two;
-  wire       [7:0]    tensor_core_9_data_in_1;
-  wire       [7:0]    tensor_core_9_data_in_2;
-  wire       [7:0]    tensor_core_9_data_in_3;
-  wire       [7:0]    tensor_core_9_data_in_4;
-  wire       [7:0]    tensor_core_9_data_in_5;
-  wire       [7:0]    tensor_core_9_data_in_6;
-  wire       [7:0]    tensor_core_9_data_in_7;
-  wire       [7:0]    tensor_core_9_data_in_8;
-  wire       [7:0]    tensor_core_9_data_in_9;
-  wire       [7:0]    tensor_core_9_data_in_10;
-  wire                tensor_core_9_load_bb_one;
-  wire                tensor_core_9_load_bb_two;
-  wire       [7:0]    tensor_core_10_data_in_1;
-  wire       [7:0]    tensor_core_10_data_in_2;
-  wire       [7:0]    tensor_core_10_data_in_3;
-  wire       [7:0]    tensor_core_10_data_in_4;
-  wire       [7:0]    tensor_core_10_data_in_5;
-  wire       [7:0]    tensor_core_10_data_in_6;
-  wire       [7:0]    tensor_core_10_data_in_7;
-  wire       [7:0]    tensor_core_10_data_in_8;
-  wire       [7:0]    tensor_core_10_data_in_9;
-  wire       [7:0]    tensor_core_10_data_in_10;
-  wire                tensor_core_10_load_bb_one;
-  wire                tensor_core_10_load_bb_two;
-  wire       [7:0]    tensor_core_11_data_in_1;
-  wire       [7:0]    tensor_core_11_data_in_2;
-  wire       [7:0]    tensor_core_11_data_in_3;
-  wire       [7:0]    tensor_core_11_data_in_4;
-  wire       [7:0]    tensor_core_11_data_in_5;
-  wire       [7:0]    tensor_core_11_data_in_6;
-  wire       [7:0]    tensor_core_11_data_in_7;
-  wire       [7:0]    tensor_core_11_data_in_8;
-  wire       [7:0]    tensor_core_11_data_in_9;
-  wire       [7:0]    tensor_core_11_data_in_10;
-  wire                tensor_core_11_load_bb_one;
-  wire                tensor_core_11_load_bb_two;
-  wire       [7:0]    tensor_core_12_data_in_1;
-  wire       [7:0]    tensor_core_12_data_in_2;
-  wire       [7:0]    tensor_core_12_data_in_3;
-  wire       [7:0]    tensor_core_12_data_in_4;
-  wire       [7:0]    tensor_core_12_data_in_5;
-  wire       [7:0]    tensor_core_12_data_in_6;
-  wire       [7:0]    tensor_core_12_data_in_7;
-  wire       [7:0]    tensor_core_12_data_in_8;
-  wire       [7:0]    tensor_core_12_data_in_9;
-  wire       [7:0]    tensor_core_12_data_in_10;
-  wire                tensor_core_12_load_bb_one;
-  wire                tensor_core_12_load_bb_two;
-  wire       [7:0]    tensor_core_13_data_in_1;
-  wire       [7:0]    tensor_core_13_data_in_2;
-  wire       [7:0]    tensor_core_13_data_in_3;
-  wire       [7:0]    tensor_core_13_data_in_4;
-  wire       [7:0]    tensor_core_13_data_in_5;
-  wire       [7:0]    tensor_core_13_data_in_6;
-  wire       [7:0]    tensor_core_13_data_in_7;
-  wire       [7:0]    tensor_core_13_data_in_8;
-  wire       [7:0]    tensor_core_13_data_in_9;
-  wire       [7:0]    tensor_core_13_data_in_10;
-  wire                tensor_core_13_load_bb_one;
-  wire                tensor_core_13_load_bb_two;
-  wire       [7:0]    tensor_core_14_data_in_1;
-  wire       [7:0]    tensor_core_14_data_in_2;
-  wire       [7:0]    tensor_core_14_data_in_3;
-  wire       [7:0]    tensor_core_14_data_in_4;
-  wire       [7:0]    tensor_core_14_data_in_5;
-  wire       [7:0]    tensor_core_14_data_in_6;
-  wire       [7:0]    tensor_core_14_data_in_7;
-  wire       [7:0]    tensor_core_14_data_in_8;
-  wire       [7:0]    tensor_core_14_data_in_9;
-  wire       [7:0]    tensor_core_14_data_in_10;
-  wire                tensor_core_14_load_bb_one;
-  wire                tensor_core_14_load_bb_two;
-  wire       [7:0]    tensor_core_15_data_in_1;
-  wire       [7:0]    tensor_core_15_data_in_2;
-  wire       [7:0]    tensor_core_15_data_in_3;
-  wire       [7:0]    tensor_core_15_data_in_4;
-  wire       [7:0]    tensor_core_15_data_in_5;
-  wire       [7:0]    tensor_core_15_data_in_6;
-  wire       [7:0]    tensor_core_15_data_in_7;
-  wire       [7:0]    tensor_core_15_data_in_8;
-  wire       [7:0]    tensor_core_15_data_in_9;
-  wire       [7:0]    tensor_core_15_data_in_10;
-  wire                tensor_core_15_load_bb_one;
-  wire                tensor_core_15_load_bb_two;
-  wire       [7:0]    tensor_core_16_data_in_1;
-  wire       [7:0]    tensor_core_16_data_in_2;
-  wire       [7:0]    tensor_core_16_data_in_3;
-  wire       [7:0]    tensor_core_16_data_in_4;
-  wire       [7:0]    tensor_core_16_data_in_5;
-  wire       [7:0]    tensor_core_16_data_in_6;
-  wire       [7:0]    tensor_core_16_data_in_7;
-  wire       [7:0]    tensor_core_16_data_in_8;
-  wire       [7:0]    tensor_core_16_data_in_9;
-  wire       [7:0]    tensor_core_16_data_in_10;
-  wire                tensor_core_16_load_bb_one;
-  wire                tensor_core_16_load_bb_two;
-  wire       [7:0]    tensor_core_17_data_in_1;
-  wire       [7:0]    tensor_core_17_data_in_2;
-  wire       [7:0]    tensor_core_17_data_in_3;
-  wire       [7:0]    tensor_core_17_data_in_4;
-  wire       [7:0]    tensor_core_17_data_in_5;
-  wire       [7:0]    tensor_core_17_data_in_6;
-  wire       [7:0]    tensor_core_17_data_in_7;
-  wire       [7:0]    tensor_core_17_data_in_8;
-  wire       [7:0]    tensor_core_17_data_in_9;
-  wire       [7:0]    tensor_core_17_data_in_10;
-  wire                tensor_core_17_load_bb_one;
-  wire                tensor_core_17_load_bb_two;
-  wire       [7:0]    tensor_core_18_data_in_1;
-  wire       [7:0]    tensor_core_18_data_in_2;
-  wire       [7:0]    tensor_core_18_data_in_3;
-  wire       [7:0]    tensor_core_18_data_in_4;
-  wire       [7:0]    tensor_core_18_data_in_5;
-  wire       [7:0]    tensor_core_18_data_in_6;
-  wire       [7:0]    tensor_core_18_data_in_7;
-  wire       [7:0]    tensor_core_18_data_in_8;
-  wire       [7:0]    tensor_core_18_data_in_9;
-  wire       [7:0]    tensor_core_18_data_in_10;
-  wire                tensor_core_18_load_bb_one;
-  wire                tensor_core_18_load_bb_two;
-  wire       [7:0]    tensor_core_19_data_in_1;
-  wire       [7:0]    tensor_core_19_data_in_2;
-  wire       [7:0]    tensor_core_19_data_in_3;
-  wire       [7:0]    tensor_core_19_data_in_4;
-  wire       [7:0]    tensor_core_19_data_in_5;
-  wire       [7:0]    tensor_core_19_data_in_6;
-  wire       [7:0]    tensor_core_19_data_in_7;
-  wire       [7:0]    tensor_core_19_data_in_8;
-  wire       [7:0]    tensor_core_19_data_in_9;
-  wire       [7:0]    tensor_core_19_data_in_10;
-  wire                tensor_core_19_load_bb_one;
-  wire                tensor_core_19_load_bb_two;
-  wire       [7:0]    tensor_core_20_data_in_1;
-  wire       [7:0]    tensor_core_20_data_in_2;
-  wire       [7:0]    tensor_core_20_data_in_3;
-  wire       [7:0]    tensor_core_20_data_in_4;
-  wire       [7:0]    tensor_core_20_data_in_5;
-  wire       [7:0]    tensor_core_20_data_in_6;
-  wire       [7:0]    tensor_core_20_data_in_7;
-  wire       [7:0]    tensor_core_20_data_in_8;
-  wire       [7:0]    tensor_core_20_data_in_9;
-  wire       [7:0]    tensor_core_20_data_in_10;
-  wire                tensor_core_20_load_bb_one;
-  wire                tensor_core_20_load_bb_two;
-  wire       [7:0]    tensor_core_21_data_in_1;
-  wire       [7:0]    tensor_core_21_data_in_2;
-  wire       [7:0]    tensor_core_21_data_in_3;
-  wire       [7:0]    tensor_core_21_data_in_4;
-  wire       [7:0]    tensor_core_21_data_in_5;
-  wire       [7:0]    tensor_core_21_data_in_6;
-  wire       [7:0]    tensor_core_21_data_in_7;
-  wire       [7:0]    tensor_core_21_data_in_8;
-  wire       [7:0]    tensor_core_21_data_in_9;
-  wire       [7:0]    tensor_core_21_data_in_10;
-  wire                tensor_core_21_load_bb_one;
-  wire                tensor_core_21_load_bb_two;
-  wire       [7:0]    tensor_core_22_data_in_1;
-  wire       [7:0]    tensor_core_22_data_in_2;
-  wire       [7:0]    tensor_core_22_data_in_3;
-  wire       [7:0]    tensor_core_22_data_in_4;
-  wire       [7:0]    tensor_core_22_data_in_5;
-  wire       [7:0]    tensor_core_22_data_in_6;
-  wire       [7:0]    tensor_core_22_data_in_7;
-  wire       [7:0]    tensor_core_22_data_in_8;
-  wire       [7:0]    tensor_core_22_data_in_9;
-  wire       [7:0]    tensor_core_22_data_in_10;
-  wire                tensor_core_22_load_bb_one;
-  wire                tensor_core_22_load_bb_two;
-  wire       [7:0]    tensor_core_23_data_in_1;
-  wire       [7:0]    tensor_core_23_data_in_2;
-  wire       [7:0]    tensor_core_23_data_in_3;
-  wire       [7:0]    tensor_core_23_data_in_4;
-  wire       [7:0]    tensor_core_23_data_in_5;
-  wire       [7:0]    tensor_core_23_data_in_6;
-  wire       [7:0]    tensor_core_23_data_in_7;
-  wire       [7:0]    tensor_core_23_data_in_8;
-  wire       [7:0]    tensor_core_23_data_in_9;
-  wire       [7:0]    tensor_core_23_data_in_10;
-  wire                tensor_core_23_load_bb_one;
-  wire                tensor_core_23_load_bb_two;
-  wire       [7:0]    tensor_core_24_data_in_1;
-  wire       [7:0]    tensor_core_24_data_in_2;
-  wire       [7:0]    tensor_core_24_data_in_3;
-  wire       [7:0]    tensor_core_24_data_in_4;
-  wire       [7:0]    tensor_core_24_data_in_5;
-  wire       [7:0]    tensor_core_24_data_in_6;
-  wire       [7:0]    tensor_core_24_data_in_7;
-  wire       [7:0]    tensor_core_24_data_in_8;
-  wire       [7:0]    tensor_core_24_data_in_9;
-  wire       [7:0]    tensor_core_24_data_in_10;
-  wire                tensor_core_24_load_bb_one;
-  wire                tensor_core_24_load_bb_two;
-  wire       [7:0]    tensor_core_25_data_in_1;
-  wire       [7:0]    tensor_core_25_data_in_2;
-  wire       [7:0]    tensor_core_25_data_in_3;
-  wire       [7:0]    tensor_core_25_data_in_4;
-  wire       [7:0]    tensor_core_25_data_in_5;
-  wire       [7:0]    tensor_core_25_data_in_6;
-  wire       [7:0]    tensor_core_25_data_in_7;
-  wire       [7:0]    tensor_core_25_data_in_8;
-  wire       [7:0]    tensor_core_25_data_in_9;
-  wire       [7:0]    tensor_core_25_data_in_10;
-  wire                tensor_core_25_load_bb_one;
-  wire                tensor_core_25_load_bb_two;
-  wire       [7:0]    tensor_core_26_data_in_1;
-  wire       [7:0]    tensor_core_26_data_in_2;
-  wire       [7:0]    tensor_core_26_data_in_3;
-  wire       [7:0]    tensor_core_26_data_in_4;
-  wire       [7:0]    tensor_core_26_data_in_5;
-  wire       [7:0]    tensor_core_26_data_in_6;
-  wire       [7:0]    tensor_core_26_data_in_7;
-  wire       [7:0]    tensor_core_26_data_in_8;
-  wire       [7:0]    tensor_core_26_data_in_9;
-  wire       [7:0]    tensor_core_26_data_in_10;
-  wire                tensor_core_26_load_bb_one;
-  wire                tensor_core_26_load_bb_two;
-  wire       [7:0]    tensor_core_27_data_in_1;
-  wire       [7:0]    tensor_core_27_data_in_2;
-  wire       [7:0]    tensor_core_27_data_in_3;
-  wire       [7:0]    tensor_core_27_data_in_4;
-  wire       [7:0]    tensor_core_27_data_in_5;
-  wire       [7:0]    tensor_core_27_data_in_6;
-  wire       [7:0]    tensor_core_27_data_in_7;
-  wire       [7:0]    tensor_core_27_data_in_8;
-  wire       [7:0]    tensor_core_27_data_in_9;
-  wire       [7:0]    tensor_core_27_data_in_10;
-  wire                tensor_core_27_load_bb_one;
-  wire                tensor_core_27_load_bb_two;
-  wire       [7:0]    tensor_core_28_data_in_1;
-  wire       [7:0]    tensor_core_28_data_in_2;
-  wire       [7:0]    tensor_core_28_data_in_3;
-  wire       [7:0]    tensor_core_28_data_in_4;
-  wire       [7:0]    tensor_core_28_data_in_5;
-  wire       [7:0]    tensor_core_28_data_in_6;
-  wire       [7:0]    tensor_core_28_data_in_7;
-  wire       [7:0]    tensor_core_28_data_in_8;
-  wire       [7:0]    tensor_core_28_data_in_9;
-  wire       [7:0]    tensor_core_28_data_in_10;
-  wire                tensor_core_28_load_bb_one;
-  wire                tensor_core_28_load_bb_two;
-  wire       [7:0]    tensor_core_29_data_in_1;
-  wire       [7:0]    tensor_core_29_data_in_2;
-  wire       [7:0]    tensor_core_29_data_in_3;
-  wire       [7:0]    tensor_core_29_data_in_4;
-  wire       [7:0]    tensor_core_29_data_in_5;
-  wire       [7:0]    tensor_core_29_data_in_6;
-  wire       [7:0]    tensor_core_29_data_in_7;
-  wire       [7:0]    tensor_core_29_data_in_8;
-  wire       [7:0]    tensor_core_29_data_in_9;
-  wire       [7:0]    tensor_core_29_data_in_10;
-  wire                tensor_core_29_load_bb_one;
-  wire                tensor_core_29_load_bb_two;
-  wire       [7:0]    tensor_core_30_data_in_1;
-  wire       [7:0]    tensor_core_30_data_in_2;
-  wire       [7:0]    tensor_core_30_data_in_3;
-  wire       [7:0]    tensor_core_30_data_in_4;
-  wire       [7:0]    tensor_core_30_data_in_5;
-  wire       [7:0]    tensor_core_30_data_in_6;
-  wire       [7:0]    tensor_core_30_data_in_7;
-  wire       [7:0]    tensor_core_30_data_in_8;
-  wire       [7:0]    tensor_core_30_data_in_9;
-  wire       [7:0]    tensor_core_30_data_in_10;
-  wire                tensor_core_30_load_bb_one;
-  wire                tensor_core_30_load_bb_two;
-  wire       [7:0]    tensor_core_31_data_in_1;
-  wire       [7:0]    tensor_core_31_data_in_2;
-  wire       [7:0]    tensor_core_31_data_in_3;
-  wire       [7:0]    tensor_core_31_data_in_4;
-  wire       [7:0]    tensor_core_31_data_in_5;
-  wire       [7:0]    tensor_core_31_data_in_6;
-  wire       [7:0]    tensor_core_31_data_in_7;
-  wire       [7:0]    tensor_core_31_data_in_8;
-  wire       [7:0]    tensor_core_31_data_in_9;
-  wire       [7:0]    tensor_core_31_data_in_10;
-  wire                tensor_core_31_load_bb_one;
-  wire                tensor_core_31_load_bb_two;
-  wire       [7:0]    tensor_core_32_data_in_1;
-  wire       [7:0]    tensor_core_32_data_in_2;
-  wire       [7:0]    tensor_core_32_data_in_3;
-  wire       [7:0]    tensor_core_32_data_in_4;
-  wire       [7:0]    tensor_core_32_data_in_5;
-  wire       [7:0]    tensor_core_32_data_in_6;
-  wire       [7:0]    tensor_core_32_data_in_7;
-  wire       [7:0]    tensor_core_32_data_in_8;
-  wire       [7:0]    tensor_core_32_data_in_9;
-  wire       [7:0]    tensor_core_32_data_in_10;
-  wire                tensor_core_32_load_bb_one;
-  wire                tensor_core_32_load_bb_two;
-  wire       [7:0]    tensor_core_33_data_in_1;
-  wire       [7:0]    tensor_core_33_data_in_2;
-  wire       [7:0]    tensor_core_33_data_in_3;
-  wire       [7:0]    tensor_core_33_data_in_4;
-  wire       [7:0]    tensor_core_33_data_in_5;
-  wire       [7:0]    tensor_core_33_data_in_6;
-  wire       [7:0]    tensor_core_33_data_in_7;
-  wire       [7:0]    tensor_core_33_data_in_8;
-  wire       [7:0]    tensor_core_33_data_in_9;
-  wire       [7:0]    tensor_core_33_data_in_10;
-  wire                tensor_core_33_load_bb_one;
-  wire                tensor_core_33_load_bb_two;
+  wire       [3:0]    tensor_core_bf12_1_data_in_1;
+  wire       [3:0]    tensor_core_bf12_1_data_in_2;
+  wire       [3:0]    tensor_core_bf12_1_data_in_3;
+  wire       [3:0]    tensor_core_bf12_1_data_in_4;
+  wire       [3:0]    tensor_core_bf12_1_data_in_5;
+  wire       [3:0]    tensor_core_bf12_1_data_in_6;
+  wire       [3:0]    tensor_core_bf12_1_data_in_7;
+  wire       [3:0]    tensor_core_bf12_1_data_in_8;
+  wire       [3:0]    tensor_core_bf12_1_data_in_9;
+  wire       [3:0]    tensor_core_bf12_1_data_in_10;
+  wire       [3:0]    tensor_core_bf12_1_data_in_11;
+  wire       [3:0]    tensor_core_bf12_1_data_in_12;
+  wire       [3:0]    tensor_core_bf12_1_data_in_13;
+  wire       [3:0]    tensor_core_bf12_1_data_in_14;
+  wire       [3:0]    tensor_core_bf12_1_data_in_15;
+  wire       [3:0]    tensor_core_bf12_1_data_in_16;
+  wire       [3:0]    tensor_core_bf12_1_data_in_17;
+  wire       [3:0]    tensor_core_bf12_1_data_in_18;
+  wire       [3:0]    tensor_core_bf12_1_data_in_19;
+  wire       [3:0]    tensor_core_bf12_1_data_in_20;
+  wire                tensor_core_bf12_1_load_bb_one;
+  wire                tensor_core_bf12_1_load_bb_two;
+  wire       [3:0]    tensor_core_bf12_2_data_in_1;
+  wire       [3:0]    tensor_core_bf12_2_data_in_2;
+  wire       [3:0]    tensor_core_bf12_2_data_in_3;
+  wire       [3:0]    tensor_core_bf12_2_data_in_4;
+  wire       [3:0]    tensor_core_bf12_2_data_in_5;
+  wire       [3:0]    tensor_core_bf12_2_data_in_6;
+  wire       [3:0]    tensor_core_bf12_2_data_in_7;
+  wire       [3:0]    tensor_core_bf12_2_data_in_8;
+  wire       [3:0]    tensor_core_bf12_2_data_in_9;
+  wire       [3:0]    tensor_core_bf12_2_data_in_10;
+  wire       [3:0]    tensor_core_bf12_2_data_in_11;
+  wire       [3:0]    tensor_core_bf12_2_data_in_12;
+  wire       [3:0]    tensor_core_bf12_2_data_in_13;
+  wire       [3:0]    tensor_core_bf12_2_data_in_14;
+  wire       [3:0]    tensor_core_bf12_2_data_in_15;
+  wire       [3:0]    tensor_core_bf12_2_data_in_16;
+  wire       [3:0]    tensor_core_bf12_2_data_in_17;
+  wire       [3:0]    tensor_core_bf12_2_data_in_18;
+  wire       [3:0]    tensor_core_bf12_2_data_in_19;
+  wire       [3:0]    tensor_core_bf12_2_data_in_20;
+  wire                tensor_core_bf12_2_load_bb_one;
+  wire                tensor_core_bf12_2_load_bb_two;
+  wire       [3:0]    tensor_core_bf12_3_data_in_1;
+  wire       [3:0]    tensor_core_bf12_3_data_in_2;
+  wire       [3:0]    tensor_core_bf12_3_data_in_3;
+  wire       [3:0]    tensor_core_bf12_3_data_in_4;
+  wire       [3:0]    tensor_core_bf12_3_data_in_5;
+  wire       [3:0]    tensor_core_bf12_3_data_in_6;
+  wire       [3:0]    tensor_core_bf12_3_data_in_7;
+  wire       [3:0]    tensor_core_bf12_3_data_in_8;
+  wire       [3:0]    tensor_core_bf12_3_data_in_9;
+  wire       [3:0]    tensor_core_bf12_3_data_in_10;
+  wire       [3:0]    tensor_core_bf12_3_data_in_11;
+  wire       [3:0]    tensor_core_bf12_3_data_in_12;
+  wire       [3:0]    tensor_core_bf12_3_data_in_13;
+  wire       [3:0]    tensor_core_bf12_3_data_in_14;
+  wire       [3:0]    tensor_core_bf12_3_data_in_15;
+  wire       [3:0]    tensor_core_bf12_3_data_in_16;
+  wire       [3:0]    tensor_core_bf12_3_data_in_17;
+  wire       [3:0]    tensor_core_bf12_3_data_in_18;
+  wire       [3:0]    tensor_core_bf12_3_data_in_19;
+  wire       [3:0]    tensor_core_bf12_3_data_in_20;
+  wire                tensor_core_bf12_3_load_bb_one;
+  wire                tensor_core_bf12_3_load_bb_two;
+  wire       [3:0]    tensor_core_bf12_4_data_in_1;
+  wire       [3:0]    tensor_core_bf12_4_data_in_2;
+  wire       [3:0]    tensor_core_bf12_4_data_in_3;
+  wire       [3:0]    tensor_core_bf12_4_data_in_4;
+  wire       [3:0]    tensor_core_bf12_4_data_in_5;
+  wire       [3:0]    tensor_core_bf12_4_data_in_6;
+  wire       [3:0]    tensor_core_bf12_4_data_in_7;
+  wire       [3:0]    tensor_core_bf12_4_data_in_8;
+  wire       [3:0]    tensor_core_bf12_4_data_in_9;
+  wire       [3:0]    tensor_core_bf12_4_data_in_10;
+  wire       [3:0]    tensor_core_bf12_4_data_in_11;
+  wire       [3:0]    tensor_core_bf12_4_data_in_12;
+  wire       [3:0]    tensor_core_bf12_4_data_in_13;
+  wire       [3:0]    tensor_core_bf12_4_data_in_14;
+  wire       [3:0]    tensor_core_bf12_4_data_in_15;
+  wire       [3:0]    tensor_core_bf12_4_data_in_16;
+  wire       [3:0]    tensor_core_bf12_4_data_in_17;
+  wire       [3:0]    tensor_core_bf12_4_data_in_18;
+  wire       [3:0]    tensor_core_bf12_4_data_in_19;
+  wire       [3:0]    tensor_core_bf12_4_data_in_20;
+  wire                tensor_core_bf12_4_load_bb_one;
+  wire                tensor_core_bf12_4_load_bb_two;
+  wire       [3:0]    tensor_core_bf12_5_data_in_1;
+  wire       [3:0]    tensor_core_bf12_5_data_in_2;
+  wire       [3:0]    tensor_core_bf12_5_data_in_3;
+  wire       [3:0]    tensor_core_bf12_5_data_in_4;
+  wire       [3:0]    tensor_core_bf12_5_data_in_5;
+  wire       [3:0]    tensor_core_bf12_5_data_in_6;
+  wire       [3:0]    tensor_core_bf12_5_data_in_7;
+  wire       [3:0]    tensor_core_bf12_5_data_in_8;
+  wire       [3:0]    tensor_core_bf12_5_data_in_9;
+  wire       [3:0]    tensor_core_bf12_5_data_in_10;
+  wire       [3:0]    tensor_core_bf12_5_data_in_11;
+  wire       [3:0]    tensor_core_bf12_5_data_in_12;
+  wire       [3:0]    tensor_core_bf12_5_data_in_13;
+  wire       [3:0]    tensor_core_bf12_5_data_in_14;
+  wire       [3:0]    tensor_core_bf12_5_data_in_15;
+  wire       [3:0]    tensor_core_bf12_5_data_in_16;
+  wire       [3:0]    tensor_core_bf12_5_data_in_17;
+  wire       [3:0]    tensor_core_bf12_5_data_in_18;
+  wire       [3:0]    tensor_core_bf12_5_data_in_19;
+  wire       [3:0]    tensor_core_bf12_5_data_in_20;
+  wire                tensor_core_bf12_5_load_bb_one;
+  wire                tensor_core_bf12_5_load_bb_two;
+  wire       [3:0]    tensor_core_bf12_6_data_in_1;
+  wire       [3:0]    tensor_core_bf12_6_data_in_2;
+  wire       [3:0]    tensor_core_bf12_6_data_in_3;
+  wire       [3:0]    tensor_core_bf12_6_data_in_4;
+  wire       [3:0]    tensor_core_bf12_6_data_in_5;
+  wire       [3:0]    tensor_core_bf12_6_data_in_6;
+  wire       [3:0]    tensor_core_bf12_6_data_in_7;
+  wire       [3:0]    tensor_core_bf12_6_data_in_8;
+  wire       [3:0]    tensor_core_bf12_6_data_in_9;
+  wire       [3:0]    tensor_core_bf12_6_data_in_10;
+  wire       [3:0]    tensor_core_bf12_6_data_in_11;
+  wire       [3:0]    tensor_core_bf12_6_data_in_12;
+  wire       [3:0]    tensor_core_bf12_6_data_in_13;
+  wire       [3:0]    tensor_core_bf12_6_data_in_14;
+  wire       [3:0]    tensor_core_bf12_6_data_in_15;
+  wire       [3:0]    tensor_core_bf12_6_data_in_16;
+  wire       [3:0]    tensor_core_bf12_6_data_in_17;
+  wire       [3:0]    tensor_core_bf12_6_data_in_18;
+  wire       [3:0]    tensor_core_bf12_6_data_in_19;
+  wire       [3:0]    tensor_core_bf12_6_data_in_20;
+  wire                tensor_core_bf12_6_load_bb_one;
+  wire                tensor_core_bf12_6_load_bb_two;
+  wire       [3:0]    tensor_core_bf12_7_data_in_1;
+  wire       [3:0]    tensor_core_bf12_7_data_in_2;
+  wire       [3:0]    tensor_core_bf12_7_data_in_3;
+  wire       [3:0]    tensor_core_bf12_7_data_in_4;
+  wire       [3:0]    tensor_core_bf12_7_data_in_5;
+  wire       [3:0]    tensor_core_bf12_7_data_in_6;
+  wire       [3:0]    tensor_core_bf12_7_data_in_7;
+  wire       [3:0]    tensor_core_bf12_7_data_in_8;
+  wire       [3:0]    tensor_core_bf12_7_data_in_9;
+  wire       [3:0]    tensor_core_bf12_7_data_in_10;
+  wire       [3:0]    tensor_core_bf12_7_data_in_11;
+  wire       [3:0]    tensor_core_bf12_7_data_in_12;
+  wire       [3:0]    tensor_core_bf12_7_data_in_13;
+  wire       [3:0]    tensor_core_bf12_7_data_in_14;
+  wire       [3:0]    tensor_core_bf12_7_data_in_15;
+  wire       [3:0]    tensor_core_bf12_7_data_in_16;
+  wire       [3:0]    tensor_core_bf12_7_data_in_17;
+  wire       [3:0]    tensor_core_bf12_7_data_in_18;
+  wire       [3:0]    tensor_core_bf12_7_data_in_19;
+  wire       [3:0]    tensor_core_bf12_7_data_in_20;
+  wire                tensor_core_bf12_7_load_bb_one;
+  wire                tensor_core_bf12_7_load_bb_two;
+  wire       [3:0]    tensor_core_bf12_8_data_in_1;
+  wire       [3:0]    tensor_core_bf12_8_data_in_2;
+  wire       [3:0]    tensor_core_bf12_8_data_in_3;
+  wire       [3:0]    tensor_core_bf12_8_data_in_4;
+  wire       [3:0]    tensor_core_bf12_8_data_in_5;
+  wire       [3:0]    tensor_core_bf12_8_data_in_6;
+  wire       [3:0]    tensor_core_bf12_8_data_in_7;
+  wire       [3:0]    tensor_core_bf12_8_data_in_8;
+  wire       [3:0]    tensor_core_bf12_8_data_in_9;
+  wire       [3:0]    tensor_core_bf12_8_data_in_10;
+  wire       [3:0]    tensor_core_bf12_8_data_in_11;
+  wire       [3:0]    tensor_core_bf12_8_data_in_12;
+  wire       [3:0]    tensor_core_bf12_8_data_in_13;
+  wire       [3:0]    tensor_core_bf12_8_data_in_14;
+  wire       [3:0]    tensor_core_bf12_8_data_in_15;
+  wire       [3:0]    tensor_core_bf12_8_data_in_16;
+  wire       [3:0]    tensor_core_bf12_8_data_in_17;
+  wire       [3:0]    tensor_core_bf12_8_data_in_18;
+  wire       [3:0]    tensor_core_bf12_8_data_in_19;
+  wire       [3:0]    tensor_core_bf12_8_data_in_20;
+  wire                tensor_core_bf12_8_load_bb_one;
+  wire                tensor_core_bf12_8_load_bb_two;
+  wire       [3:0]    tensor_core_bf12_9_data_in_1;
+  wire       [3:0]    tensor_core_bf12_9_data_in_2;
+  wire       [3:0]    tensor_core_bf12_9_data_in_3;
+  wire       [3:0]    tensor_core_bf12_9_data_in_4;
+  wire       [3:0]    tensor_core_bf12_9_data_in_5;
+  wire       [3:0]    tensor_core_bf12_9_data_in_6;
+  wire       [3:0]    tensor_core_bf12_9_data_in_7;
+  wire       [3:0]    tensor_core_bf12_9_data_in_8;
+  wire       [3:0]    tensor_core_bf12_9_data_in_9;
+  wire       [3:0]    tensor_core_bf12_9_data_in_10;
+  wire       [3:0]    tensor_core_bf12_9_data_in_11;
+  wire       [3:0]    tensor_core_bf12_9_data_in_12;
+  wire       [3:0]    tensor_core_bf12_9_data_in_13;
+  wire       [3:0]    tensor_core_bf12_9_data_in_14;
+  wire       [3:0]    tensor_core_bf12_9_data_in_15;
+  wire       [3:0]    tensor_core_bf12_9_data_in_16;
+  wire       [3:0]    tensor_core_bf12_9_data_in_17;
+  wire       [3:0]    tensor_core_bf12_9_data_in_18;
+  wire       [3:0]    tensor_core_bf12_9_data_in_19;
+  wire       [3:0]    tensor_core_bf12_9_data_in_20;
+  wire                tensor_core_bf12_9_load_bb_one;
+  wire                tensor_core_bf12_9_load_bb_two;
+  wire       [3:0]    tensor_core_bf12_10_data_in_1;
+  wire       [3:0]    tensor_core_bf12_10_data_in_2;
+  wire       [3:0]    tensor_core_bf12_10_data_in_3;
+  wire       [3:0]    tensor_core_bf12_10_data_in_4;
+  wire       [3:0]    tensor_core_bf12_10_data_in_5;
+  wire       [3:0]    tensor_core_bf12_10_data_in_6;
+  wire       [3:0]    tensor_core_bf12_10_data_in_7;
+  wire       [3:0]    tensor_core_bf12_10_data_in_8;
+  wire       [3:0]    tensor_core_bf12_10_data_in_9;
+  wire       [3:0]    tensor_core_bf12_10_data_in_10;
+  wire       [3:0]    tensor_core_bf12_10_data_in_11;
+  wire       [3:0]    tensor_core_bf12_10_data_in_12;
+  wire       [3:0]    tensor_core_bf12_10_data_in_13;
+  wire       [3:0]    tensor_core_bf12_10_data_in_14;
+  wire       [3:0]    tensor_core_bf12_10_data_in_15;
+  wire       [3:0]    tensor_core_bf12_10_data_in_16;
+  wire       [3:0]    tensor_core_bf12_10_data_in_17;
+  wire       [3:0]    tensor_core_bf12_10_data_in_18;
+  wire       [3:0]    tensor_core_bf12_10_data_in_19;
+  wire       [3:0]    tensor_core_bf12_10_data_in_20;
+  wire                tensor_core_bf12_10_load_bb_one;
+  wire                tensor_core_bf12_10_load_bb_two;
+  wire       [3:0]    tensor_core_bf12_11_data_in_1;
+  wire       [3:0]    tensor_core_bf12_11_data_in_2;
+  wire       [3:0]    tensor_core_bf12_11_data_in_3;
+  wire       [3:0]    tensor_core_bf12_11_data_in_4;
+  wire       [3:0]    tensor_core_bf12_11_data_in_5;
+  wire       [3:0]    tensor_core_bf12_11_data_in_6;
+  wire       [3:0]    tensor_core_bf12_11_data_in_7;
+  wire       [3:0]    tensor_core_bf12_11_data_in_8;
+  wire       [3:0]    tensor_core_bf12_11_data_in_9;
+  wire       [3:0]    tensor_core_bf12_11_data_in_10;
+  wire       [3:0]    tensor_core_bf12_11_data_in_11;
+  wire       [3:0]    tensor_core_bf12_11_data_in_12;
+  wire       [3:0]    tensor_core_bf12_11_data_in_13;
+  wire       [3:0]    tensor_core_bf12_11_data_in_14;
+  wire       [3:0]    tensor_core_bf12_11_data_in_15;
+  wire       [3:0]    tensor_core_bf12_11_data_in_16;
+  wire       [3:0]    tensor_core_bf12_11_data_in_17;
+  wire       [3:0]    tensor_core_bf12_11_data_in_18;
+  wire       [3:0]    tensor_core_bf12_11_data_in_19;
+  wire       [3:0]    tensor_core_bf12_11_data_in_20;
+  wire                tensor_core_bf12_11_load_bb_one;
+  wire                tensor_core_bf12_11_load_bb_two;
+  wire       [3:0]    tensor_core_bf12_12_data_in_1;
+  wire       [3:0]    tensor_core_bf12_12_data_in_2;
+  wire       [3:0]    tensor_core_bf12_12_data_in_3;
+  wire       [3:0]    tensor_core_bf12_12_data_in_4;
+  wire       [3:0]    tensor_core_bf12_12_data_in_5;
+  wire       [3:0]    tensor_core_bf12_12_data_in_6;
+  wire       [3:0]    tensor_core_bf12_12_data_in_7;
+  wire       [3:0]    tensor_core_bf12_12_data_in_8;
+  wire       [3:0]    tensor_core_bf12_12_data_in_9;
+  wire       [3:0]    tensor_core_bf12_12_data_in_10;
+  wire       [3:0]    tensor_core_bf12_12_data_in_11;
+  wire       [3:0]    tensor_core_bf12_12_data_in_12;
+  wire       [3:0]    tensor_core_bf12_12_data_in_13;
+  wire       [3:0]    tensor_core_bf12_12_data_in_14;
+  wire       [3:0]    tensor_core_bf12_12_data_in_15;
+  wire       [3:0]    tensor_core_bf12_12_data_in_16;
+  wire       [3:0]    tensor_core_bf12_12_data_in_17;
+  wire       [3:0]    tensor_core_bf12_12_data_in_18;
+  wire       [3:0]    tensor_core_bf12_12_data_in_19;
+  wire       [3:0]    tensor_core_bf12_12_data_in_20;
+  wire                tensor_core_bf12_12_load_bb_one;
+  wire                tensor_core_bf12_12_load_bb_two;
+  wire       [3:0]    tensor_core_bf12_13_data_in_1;
+  wire       [3:0]    tensor_core_bf12_13_data_in_2;
+  wire       [3:0]    tensor_core_bf12_13_data_in_3;
+  wire       [3:0]    tensor_core_bf12_13_data_in_4;
+  wire       [3:0]    tensor_core_bf12_13_data_in_5;
+  wire       [3:0]    tensor_core_bf12_13_data_in_6;
+  wire       [3:0]    tensor_core_bf12_13_data_in_7;
+  wire       [3:0]    tensor_core_bf12_13_data_in_8;
+  wire       [3:0]    tensor_core_bf12_13_data_in_9;
+  wire       [3:0]    tensor_core_bf12_13_data_in_10;
+  wire       [3:0]    tensor_core_bf12_13_data_in_11;
+  wire       [3:0]    tensor_core_bf12_13_data_in_12;
+  wire       [3:0]    tensor_core_bf12_13_data_in_13;
+  wire       [3:0]    tensor_core_bf12_13_data_in_14;
+  wire       [3:0]    tensor_core_bf12_13_data_in_15;
+  wire       [3:0]    tensor_core_bf12_13_data_in_16;
+  wire       [3:0]    tensor_core_bf12_13_data_in_17;
+  wire       [3:0]    tensor_core_bf12_13_data_in_18;
+  wire       [3:0]    tensor_core_bf12_13_data_in_19;
+  wire       [3:0]    tensor_core_bf12_13_data_in_20;
+  wire                tensor_core_bf12_13_load_bb_one;
+  wire                tensor_core_bf12_13_load_bb_two;
+  wire       [3:0]    tensor_core_bf12_14_data_in_1;
+  wire       [3:0]    tensor_core_bf12_14_data_in_2;
+  wire       [3:0]    tensor_core_bf12_14_data_in_3;
+  wire       [3:0]    tensor_core_bf12_14_data_in_4;
+  wire       [3:0]    tensor_core_bf12_14_data_in_5;
+  wire       [3:0]    tensor_core_bf12_14_data_in_6;
+  wire       [3:0]    tensor_core_bf12_14_data_in_7;
+  wire       [3:0]    tensor_core_bf12_14_data_in_8;
+  wire       [3:0]    tensor_core_bf12_14_data_in_9;
+  wire       [3:0]    tensor_core_bf12_14_data_in_10;
+  wire       [3:0]    tensor_core_bf12_14_data_in_11;
+  wire       [3:0]    tensor_core_bf12_14_data_in_12;
+  wire       [3:0]    tensor_core_bf12_14_data_in_13;
+  wire       [3:0]    tensor_core_bf12_14_data_in_14;
+  wire       [3:0]    tensor_core_bf12_14_data_in_15;
+  wire       [3:0]    tensor_core_bf12_14_data_in_16;
+  wire       [3:0]    tensor_core_bf12_14_data_in_17;
+  wire       [3:0]    tensor_core_bf12_14_data_in_18;
+  wire       [3:0]    tensor_core_bf12_14_data_in_19;
+  wire       [3:0]    tensor_core_bf12_14_data_in_20;
+  wire                tensor_core_bf12_14_load_bb_one;
+  wire                tensor_core_bf12_14_load_bb_two;
+  wire       [3:0]    tensor_core_bf12_15_data_in_1;
+  wire       [3:0]    tensor_core_bf12_15_data_in_2;
+  wire       [3:0]    tensor_core_bf12_15_data_in_3;
+  wire       [3:0]    tensor_core_bf12_15_data_in_4;
+  wire       [3:0]    tensor_core_bf12_15_data_in_5;
+  wire       [3:0]    tensor_core_bf12_15_data_in_6;
+  wire       [3:0]    tensor_core_bf12_15_data_in_7;
+  wire       [3:0]    tensor_core_bf12_15_data_in_8;
+  wire       [3:0]    tensor_core_bf12_15_data_in_9;
+  wire       [3:0]    tensor_core_bf12_15_data_in_10;
+  wire       [3:0]    tensor_core_bf12_15_data_in_11;
+  wire       [3:0]    tensor_core_bf12_15_data_in_12;
+  wire       [3:0]    tensor_core_bf12_15_data_in_13;
+  wire       [3:0]    tensor_core_bf12_15_data_in_14;
+  wire       [3:0]    tensor_core_bf12_15_data_in_15;
+  wire       [3:0]    tensor_core_bf12_15_data_in_16;
+  wire       [3:0]    tensor_core_bf12_15_data_in_17;
+  wire       [3:0]    tensor_core_bf12_15_data_in_18;
+  wire       [3:0]    tensor_core_bf12_15_data_in_19;
+  wire       [3:0]    tensor_core_bf12_15_data_in_20;
+  wire                tensor_core_bf12_15_load_bb_one;
+  wire                tensor_core_bf12_15_load_bb_two;
+  wire       [3:0]    tensor_core_bf12_16_data_in_1;
+  wire       [3:0]    tensor_core_bf12_16_data_in_2;
+  wire       [3:0]    tensor_core_bf12_16_data_in_3;
+  wire       [3:0]    tensor_core_bf12_16_data_in_4;
+  wire       [3:0]    tensor_core_bf12_16_data_in_5;
+  wire       [3:0]    tensor_core_bf12_16_data_in_6;
+  wire       [3:0]    tensor_core_bf12_16_data_in_7;
+  wire       [3:0]    tensor_core_bf12_16_data_in_8;
+  wire       [3:0]    tensor_core_bf12_16_data_in_9;
+  wire       [3:0]    tensor_core_bf12_16_data_in_10;
+  wire       [3:0]    tensor_core_bf12_16_data_in_11;
+  wire       [3:0]    tensor_core_bf12_16_data_in_12;
+  wire       [3:0]    tensor_core_bf12_16_data_in_13;
+  wire       [3:0]    tensor_core_bf12_16_data_in_14;
+  wire       [3:0]    tensor_core_bf12_16_data_in_15;
+  wire       [3:0]    tensor_core_bf12_16_data_in_16;
+  wire       [3:0]    tensor_core_bf12_16_data_in_17;
+  wire       [3:0]    tensor_core_bf12_16_data_in_18;
+  wire       [3:0]    tensor_core_bf12_16_data_in_19;
+  wire       [3:0]    tensor_core_bf12_16_data_in_20;
+  wire                tensor_core_bf12_16_load_bb_one;
+  wire                tensor_core_bf12_16_load_bb_two;
+  wire       [3:0]    tensor_core_bf12_17_data_in_1;
+  wire       [3:0]    tensor_core_bf12_17_data_in_2;
+  wire       [3:0]    tensor_core_bf12_17_data_in_3;
+  wire       [3:0]    tensor_core_bf12_17_data_in_4;
+  wire       [3:0]    tensor_core_bf12_17_data_in_5;
+  wire       [3:0]    tensor_core_bf12_17_data_in_6;
+  wire       [3:0]    tensor_core_bf12_17_data_in_7;
+  wire       [3:0]    tensor_core_bf12_17_data_in_8;
+  wire       [3:0]    tensor_core_bf12_17_data_in_9;
+  wire       [3:0]    tensor_core_bf12_17_data_in_10;
+  wire       [3:0]    tensor_core_bf12_17_data_in_11;
+  wire       [3:0]    tensor_core_bf12_17_data_in_12;
+  wire       [3:0]    tensor_core_bf12_17_data_in_13;
+  wire       [3:0]    tensor_core_bf12_17_data_in_14;
+  wire       [3:0]    tensor_core_bf12_17_data_in_15;
+  wire       [3:0]    tensor_core_bf12_17_data_in_16;
+  wire       [3:0]    tensor_core_bf12_17_data_in_17;
+  wire       [3:0]    tensor_core_bf12_17_data_in_18;
+  wire       [3:0]    tensor_core_bf12_17_data_in_19;
+  wire       [3:0]    tensor_core_bf12_17_data_in_20;
+  wire                tensor_core_bf12_17_load_bb_one;
+  wire                tensor_core_bf12_17_load_bb_two;
+  wire       [3:0]    tensor_core_bf12_18_data_in_1;
+  wire       [3:0]    tensor_core_bf12_18_data_in_2;
+  wire       [3:0]    tensor_core_bf12_18_data_in_3;
+  wire       [3:0]    tensor_core_bf12_18_data_in_4;
+  wire       [3:0]    tensor_core_bf12_18_data_in_5;
+  wire       [3:0]    tensor_core_bf12_18_data_in_6;
+  wire       [3:0]    tensor_core_bf12_18_data_in_7;
+  wire       [3:0]    tensor_core_bf12_18_data_in_8;
+  wire       [3:0]    tensor_core_bf12_18_data_in_9;
+  wire       [3:0]    tensor_core_bf12_18_data_in_10;
+  wire       [3:0]    tensor_core_bf12_18_data_in_11;
+  wire       [3:0]    tensor_core_bf12_18_data_in_12;
+  wire       [3:0]    tensor_core_bf12_18_data_in_13;
+  wire       [3:0]    tensor_core_bf12_18_data_in_14;
+  wire       [3:0]    tensor_core_bf12_18_data_in_15;
+  wire       [3:0]    tensor_core_bf12_18_data_in_16;
+  wire       [3:0]    tensor_core_bf12_18_data_in_17;
+  wire       [3:0]    tensor_core_bf12_18_data_in_18;
+  wire       [3:0]    tensor_core_bf12_18_data_in_19;
+  wire       [3:0]    tensor_core_bf12_18_data_in_20;
+  wire                tensor_core_bf12_18_load_bb_one;
+  wire                tensor_core_bf12_18_load_bb_two;
+  wire       [3:0]    tensor_core_bf12_19_data_in_1;
+  wire       [3:0]    tensor_core_bf12_19_data_in_2;
+  wire       [3:0]    tensor_core_bf12_19_data_in_3;
+  wire       [3:0]    tensor_core_bf12_19_data_in_4;
+  wire       [3:0]    tensor_core_bf12_19_data_in_5;
+  wire       [3:0]    tensor_core_bf12_19_data_in_6;
+  wire       [3:0]    tensor_core_bf12_19_data_in_7;
+  wire       [3:0]    tensor_core_bf12_19_data_in_8;
+  wire       [3:0]    tensor_core_bf12_19_data_in_9;
+  wire       [3:0]    tensor_core_bf12_19_data_in_10;
+  wire       [3:0]    tensor_core_bf12_19_data_in_11;
+  wire       [3:0]    tensor_core_bf12_19_data_in_12;
+  wire       [3:0]    tensor_core_bf12_19_data_in_13;
+  wire       [3:0]    tensor_core_bf12_19_data_in_14;
+  wire       [3:0]    tensor_core_bf12_19_data_in_15;
+  wire       [3:0]    tensor_core_bf12_19_data_in_16;
+  wire       [3:0]    tensor_core_bf12_19_data_in_17;
+  wire       [3:0]    tensor_core_bf12_19_data_in_18;
+  wire       [3:0]    tensor_core_bf12_19_data_in_19;
+  wire       [3:0]    tensor_core_bf12_19_data_in_20;
+  wire                tensor_core_bf12_19_load_bb_one;
+  wire                tensor_core_bf12_19_load_bb_two;
+  wire       [3:0]    tensor_core_bf12_20_data_in_1;
+  wire       [3:0]    tensor_core_bf12_20_data_in_2;
+  wire       [3:0]    tensor_core_bf12_20_data_in_3;
+  wire       [3:0]    tensor_core_bf12_20_data_in_4;
+  wire       [3:0]    tensor_core_bf12_20_data_in_5;
+  wire       [3:0]    tensor_core_bf12_20_data_in_6;
+  wire       [3:0]    tensor_core_bf12_20_data_in_7;
+  wire       [3:0]    tensor_core_bf12_20_data_in_8;
+  wire       [3:0]    tensor_core_bf12_20_data_in_9;
+  wire       [3:0]    tensor_core_bf12_20_data_in_10;
+  wire       [3:0]    tensor_core_bf12_20_data_in_11;
+  wire       [3:0]    tensor_core_bf12_20_data_in_12;
+  wire       [3:0]    tensor_core_bf12_20_data_in_13;
+  wire       [3:0]    tensor_core_bf12_20_data_in_14;
+  wire       [3:0]    tensor_core_bf12_20_data_in_15;
+  wire       [3:0]    tensor_core_bf12_20_data_in_16;
+  wire       [3:0]    tensor_core_bf12_20_data_in_17;
+  wire       [3:0]    tensor_core_bf12_20_data_in_18;
+  wire       [3:0]    tensor_core_bf12_20_data_in_19;
+  wire       [3:0]    tensor_core_bf12_20_data_in_20;
+  wire                tensor_core_bf12_20_load_bb_one;
+  wire                tensor_core_bf12_20_load_bb_two;
+  wire       [3:0]    tensor_core_bf12_21_data_in_1;
+  wire       [3:0]    tensor_core_bf12_21_data_in_2;
+  wire       [3:0]    tensor_core_bf12_21_data_in_3;
+  wire       [3:0]    tensor_core_bf12_21_data_in_4;
+  wire       [3:0]    tensor_core_bf12_21_data_in_5;
+  wire       [3:0]    tensor_core_bf12_21_data_in_6;
+  wire       [3:0]    tensor_core_bf12_21_data_in_7;
+  wire       [3:0]    tensor_core_bf12_21_data_in_8;
+  wire       [3:0]    tensor_core_bf12_21_data_in_9;
+  wire       [3:0]    tensor_core_bf12_21_data_in_10;
+  wire       [3:0]    tensor_core_bf12_21_data_in_11;
+  wire       [3:0]    tensor_core_bf12_21_data_in_12;
+  wire       [3:0]    tensor_core_bf12_21_data_in_13;
+  wire       [3:0]    tensor_core_bf12_21_data_in_14;
+  wire       [3:0]    tensor_core_bf12_21_data_in_15;
+  wire       [3:0]    tensor_core_bf12_21_data_in_16;
+  wire       [3:0]    tensor_core_bf12_21_data_in_17;
+  wire       [3:0]    tensor_core_bf12_21_data_in_18;
+  wire       [3:0]    tensor_core_bf12_21_data_in_19;
+  wire       [3:0]    tensor_core_bf12_21_data_in_20;
+  wire                tensor_core_bf12_21_load_bb_one;
+  wire                tensor_core_bf12_21_load_bb_two;
+  wire       [3:0]    tensor_core_bf12_22_data_in_1;
+  wire       [3:0]    tensor_core_bf12_22_data_in_2;
+  wire       [3:0]    tensor_core_bf12_22_data_in_3;
+  wire       [3:0]    tensor_core_bf12_22_data_in_4;
+  wire       [3:0]    tensor_core_bf12_22_data_in_5;
+  wire       [3:0]    tensor_core_bf12_22_data_in_6;
+  wire       [3:0]    tensor_core_bf12_22_data_in_7;
+  wire       [3:0]    tensor_core_bf12_22_data_in_8;
+  wire       [3:0]    tensor_core_bf12_22_data_in_9;
+  wire       [3:0]    tensor_core_bf12_22_data_in_10;
+  wire       [3:0]    tensor_core_bf12_22_data_in_11;
+  wire       [3:0]    tensor_core_bf12_22_data_in_12;
+  wire       [3:0]    tensor_core_bf12_22_data_in_13;
+  wire       [3:0]    tensor_core_bf12_22_data_in_14;
+  wire       [3:0]    tensor_core_bf12_22_data_in_15;
+  wire       [3:0]    tensor_core_bf12_22_data_in_16;
+  wire       [3:0]    tensor_core_bf12_22_data_in_17;
+  wire       [3:0]    tensor_core_bf12_22_data_in_18;
+  wire       [3:0]    tensor_core_bf12_22_data_in_19;
+  wire       [3:0]    tensor_core_bf12_22_data_in_20;
+  wire                tensor_core_bf12_22_load_bb_one;
+  wire                tensor_core_bf12_22_load_bb_two;
+  wire       [3:0]    tensor_core_bf12_23_data_in_1;
+  wire       [3:0]    tensor_core_bf12_23_data_in_2;
+  wire       [3:0]    tensor_core_bf12_23_data_in_3;
+  wire       [3:0]    tensor_core_bf12_23_data_in_4;
+  wire       [3:0]    tensor_core_bf12_23_data_in_5;
+  wire       [3:0]    tensor_core_bf12_23_data_in_6;
+  wire       [3:0]    tensor_core_bf12_23_data_in_7;
+  wire       [3:0]    tensor_core_bf12_23_data_in_8;
+  wire       [3:0]    tensor_core_bf12_23_data_in_9;
+  wire       [3:0]    tensor_core_bf12_23_data_in_10;
+  wire       [3:0]    tensor_core_bf12_23_data_in_11;
+  wire       [3:0]    tensor_core_bf12_23_data_in_12;
+  wire       [3:0]    tensor_core_bf12_23_data_in_13;
+  wire       [3:0]    tensor_core_bf12_23_data_in_14;
+  wire       [3:0]    tensor_core_bf12_23_data_in_15;
+  wire       [3:0]    tensor_core_bf12_23_data_in_16;
+  wire       [3:0]    tensor_core_bf12_23_data_in_17;
+  wire       [3:0]    tensor_core_bf12_23_data_in_18;
+  wire       [3:0]    tensor_core_bf12_23_data_in_19;
+  wire       [3:0]    tensor_core_bf12_23_data_in_20;
+  wire                tensor_core_bf12_23_load_bb_one;
+  wire                tensor_core_bf12_23_load_bb_two;
+  wire       [3:0]    tensor_core_bf12_24_data_in_1;
+  wire       [3:0]    tensor_core_bf12_24_data_in_2;
+  wire       [3:0]    tensor_core_bf12_24_data_in_3;
+  wire       [3:0]    tensor_core_bf12_24_data_in_4;
+  wire       [3:0]    tensor_core_bf12_24_data_in_5;
+  wire       [3:0]    tensor_core_bf12_24_data_in_6;
+  wire       [3:0]    tensor_core_bf12_24_data_in_7;
+  wire       [3:0]    tensor_core_bf12_24_data_in_8;
+  wire       [3:0]    tensor_core_bf12_24_data_in_9;
+  wire       [3:0]    tensor_core_bf12_24_data_in_10;
+  wire       [3:0]    tensor_core_bf12_24_data_in_11;
+  wire       [3:0]    tensor_core_bf12_24_data_in_12;
+  wire       [3:0]    tensor_core_bf12_24_data_in_13;
+  wire       [3:0]    tensor_core_bf12_24_data_in_14;
+  wire       [3:0]    tensor_core_bf12_24_data_in_15;
+  wire       [3:0]    tensor_core_bf12_24_data_in_16;
+  wire       [3:0]    tensor_core_bf12_24_data_in_17;
+  wire       [3:0]    tensor_core_bf12_24_data_in_18;
+  wire       [3:0]    tensor_core_bf12_24_data_in_19;
+  wire       [3:0]    tensor_core_bf12_24_data_in_20;
+  wire                tensor_core_bf12_24_load_bb_one;
+  wire                tensor_core_bf12_24_load_bb_two;
+  wire       [3:0]    tensor_core_bf12_25_data_in_1;
+  wire       [3:0]    tensor_core_bf12_25_data_in_2;
+  wire       [3:0]    tensor_core_bf12_25_data_in_3;
+  wire       [3:0]    tensor_core_bf12_25_data_in_4;
+  wire       [3:0]    tensor_core_bf12_25_data_in_5;
+  wire       [3:0]    tensor_core_bf12_25_data_in_6;
+  wire       [3:0]    tensor_core_bf12_25_data_in_7;
+  wire       [3:0]    tensor_core_bf12_25_data_in_8;
+  wire       [3:0]    tensor_core_bf12_25_data_in_9;
+  wire       [3:0]    tensor_core_bf12_25_data_in_10;
+  wire       [3:0]    tensor_core_bf12_25_data_in_11;
+  wire       [3:0]    tensor_core_bf12_25_data_in_12;
+  wire       [3:0]    tensor_core_bf12_25_data_in_13;
+  wire       [3:0]    tensor_core_bf12_25_data_in_14;
+  wire       [3:0]    tensor_core_bf12_25_data_in_15;
+  wire       [3:0]    tensor_core_bf12_25_data_in_16;
+  wire       [3:0]    tensor_core_bf12_25_data_in_17;
+  wire       [3:0]    tensor_core_bf12_25_data_in_18;
+  wire       [3:0]    tensor_core_bf12_25_data_in_19;
+  wire       [3:0]    tensor_core_bf12_25_data_in_20;
+  wire                tensor_core_bf12_25_load_bb_one;
+  wire                tensor_core_bf12_25_load_bb_two;
+  wire       [3:0]    tensor_core_bf12_26_data_in_1;
+  wire       [3:0]    tensor_core_bf12_26_data_in_2;
+  wire       [3:0]    tensor_core_bf12_26_data_in_3;
+  wire       [3:0]    tensor_core_bf12_26_data_in_4;
+  wire       [3:0]    tensor_core_bf12_26_data_in_5;
+  wire       [3:0]    tensor_core_bf12_26_data_in_6;
+  wire       [3:0]    tensor_core_bf12_26_data_in_7;
+  wire       [3:0]    tensor_core_bf12_26_data_in_8;
+  wire       [3:0]    tensor_core_bf12_26_data_in_9;
+  wire       [3:0]    tensor_core_bf12_26_data_in_10;
+  wire       [3:0]    tensor_core_bf12_26_data_in_11;
+  wire       [3:0]    tensor_core_bf12_26_data_in_12;
+  wire       [3:0]    tensor_core_bf12_26_data_in_13;
+  wire       [3:0]    tensor_core_bf12_26_data_in_14;
+  wire       [3:0]    tensor_core_bf12_26_data_in_15;
+  wire       [3:0]    tensor_core_bf12_26_data_in_16;
+  wire       [3:0]    tensor_core_bf12_26_data_in_17;
+  wire       [3:0]    tensor_core_bf12_26_data_in_18;
+  wire       [3:0]    tensor_core_bf12_26_data_in_19;
+  wire       [3:0]    tensor_core_bf12_26_data_in_20;
+  wire                tensor_core_bf12_26_load_bb_one;
+  wire                tensor_core_bf12_26_load_bb_two;
+  wire       [3:0]    tensor_core_bf12_27_data_in_1;
+  wire       [3:0]    tensor_core_bf12_27_data_in_2;
+  wire       [3:0]    tensor_core_bf12_27_data_in_3;
+  wire       [3:0]    tensor_core_bf12_27_data_in_4;
+  wire       [3:0]    tensor_core_bf12_27_data_in_5;
+  wire       [3:0]    tensor_core_bf12_27_data_in_6;
+  wire       [3:0]    tensor_core_bf12_27_data_in_7;
+  wire       [3:0]    tensor_core_bf12_27_data_in_8;
+  wire       [3:0]    tensor_core_bf12_27_data_in_9;
+  wire       [3:0]    tensor_core_bf12_27_data_in_10;
+  wire       [3:0]    tensor_core_bf12_27_data_in_11;
+  wire       [3:0]    tensor_core_bf12_27_data_in_12;
+  wire       [3:0]    tensor_core_bf12_27_data_in_13;
+  wire       [3:0]    tensor_core_bf12_27_data_in_14;
+  wire       [3:0]    tensor_core_bf12_27_data_in_15;
+  wire       [3:0]    tensor_core_bf12_27_data_in_16;
+  wire       [3:0]    tensor_core_bf12_27_data_in_17;
+  wire       [3:0]    tensor_core_bf12_27_data_in_18;
+  wire       [3:0]    tensor_core_bf12_27_data_in_19;
+  wire       [3:0]    tensor_core_bf12_27_data_in_20;
+  wire                tensor_core_bf12_27_load_bb_one;
+  wire                tensor_core_bf12_27_load_bb_two;
+  wire       [3:0]    tensor_core_bf12_28_data_in_1;
+  wire       [3:0]    tensor_core_bf12_28_data_in_2;
+  wire       [3:0]    tensor_core_bf12_28_data_in_3;
+  wire       [3:0]    tensor_core_bf12_28_data_in_4;
+  wire       [3:0]    tensor_core_bf12_28_data_in_5;
+  wire       [3:0]    tensor_core_bf12_28_data_in_6;
+  wire       [3:0]    tensor_core_bf12_28_data_in_7;
+  wire       [3:0]    tensor_core_bf12_28_data_in_8;
+  wire       [3:0]    tensor_core_bf12_28_data_in_9;
+  wire       [3:0]    tensor_core_bf12_28_data_in_10;
+  wire       [3:0]    tensor_core_bf12_28_data_in_11;
+  wire       [3:0]    tensor_core_bf12_28_data_in_12;
+  wire       [3:0]    tensor_core_bf12_28_data_in_13;
+  wire       [3:0]    tensor_core_bf12_28_data_in_14;
+  wire       [3:0]    tensor_core_bf12_28_data_in_15;
+  wire       [3:0]    tensor_core_bf12_28_data_in_16;
+  wire       [3:0]    tensor_core_bf12_28_data_in_17;
+  wire       [3:0]    tensor_core_bf12_28_data_in_18;
+  wire       [3:0]    tensor_core_bf12_28_data_in_19;
+  wire       [3:0]    tensor_core_bf12_28_data_in_20;
+  wire                tensor_core_bf12_28_load_bb_one;
+  wire                tensor_core_bf12_28_load_bb_two;
+  wire       [3:0]    tensor_core_bf12_29_data_in_1;
+  wire       [3:0]    tensor_core_bf12_29_data_in_2;
+  wire       [3:0]    tensor_core_bf12_29_data_in_3;
+  wire       [3:0]    tensor_core_bf12_29_data_in_4;
+  wire       [3:0]    tensor_core_bf12_29_data_in_5;
+  wire       [3:0]    tensor_core_bf12_29_data_in_6;
+  wire       [3:0]    tensor_core_bf12_29_data_in_7;
+  wire       [3:0]    tensor_core_bf12_29_data_in_8;
+  wire       [3:0]    tensor_core_bf12_29_data_in_9;
+  wire       [3:0]    tensor_core_bf12_29_data_in_10;
+  wire       [3:0]    tensor_core_bf12_29_data_in_11;
+  wire       [3:0]    tensor_core_bf12_29_data_in_12;
+  wire       [3:0]    tensor_core_bf12_29_data_in_13;
+  wire       [3:0]    tensor_core_bf12_29_data_in_14;
+  wire       [3:0]    tensor_core_bf12_29_data_in_15;
+  wire       [3:0]    tensor_core_bf12_29_data_in_16;
+  wire       [3:0]    tensor_core_bf12_29_data_in_17;
+  wire       [3:0]    tensor_core_bf12_29_data_in_18;
+  wire       [3:0]    tensor_core_bf12_29_data_in_19;
+  wire       [3:0]    tensor_core_bf12_29_data_in_20;
+  wire                tensor_core_bf12_29_load_bb_one;
+  wire                tensor_core_bf12_29_load_bb_two;
+  wire       [3:0]    tensor_core_bf12_30_data_in_1;
+  wire       [3:0]    tensor_core_bf12_30_data_in_2;
+  wire       [3:0]    tensor_core_bf12_30_data_in_3;
+  wire       [3:0]    tensor_core_bf12_30_data_in_4;
+  wire       [3:0]    tensor_core_bf12_30_data_in_5;
+  wire       [3:0]    tensor_core_bf12_30_data_in_6;
+  wire       [3:0]    tensor_core_bf12_30_data_in_7;
+  wire       [3:0]    tensor_core_bf12_30_data_in_8;
+  wire       [3:0]    tensor_core_bf12_30_data_in_9;
+  wire       [3:0]    tensor_core_bf12_30_data_in_10;
+  wire       [3:0]    tensor_core_bf12_30_data_in_11;
+  wire       [3:0]    tensor_core_bf12_30_data_in_12;
+  wire       [3:0]    tensor_core_bf12_30_data_in_13;
+  wire       [3:0]    tensor_core_bf12_30_data_in_14;
+  wire       [3:0]    tensor_core_bf12_30_data_in_15;
+  wire       [3:0]    tensor_core_bf12_30_data_in_16;
+  wire       [3:0]    tensor_core_bf12_30_data_in_17;
+  wire       [3:0]    tensor_core_bf12_30_data_in_18;
+  wire       [3:0]    tensor_core_bf12_30_data_in_19;
+  wire       [3:0]    tensor_core_bf12_30_data_in_20;
+  wire                tensor_core_bf12_30_load_bb_one;
+  wire                tensor_core_bf12_30_load_bb_two;
+  wire       [3:0]    tensor_core_bf12_31_data_in_1;
+  wire       [3:0]    tensor_core_bf12_31_data_in_2;
+  wire       [3:0]    tensor_core_bf12_31_data_in_3;
+  wire       [3:0]    tensor_core_bf12_31_data_in_4;
+  wire       [3:0]    tensor_core_bf12_31_data_in_5;
+  wire       [3:0]    tensor_core_bf12_31_data_in_6;
+  wire       [3:0]    tensor_core_bf12_31_data_in_7;
+  wire       [3:0]    tensor_core_bf12_31_data_in_8;
+  wire       [3:0]    tensor_core_bf12_31_data_in_9;
+  wire       [3:0]    tensor_core_bf12_31_data_in_10;
+  wire       [3:0]    tensor_core_bf12_31_data_in_11;
+  wire       [3:0]    tensor_core_bf12_31_data_in_12;
+  wire       [3:0]    tensor_core_bf12_31_data_in_13;
+  wire       [3:0]    tensor_core_bf12_31_data_in_14;
+  wire       [3:0]    tensor_core_bf12_31_data_in_15;
+  wire       [3:0]    tensor_core_bf12_31_data_in_16;
+  wire       [3:0]    tensor_core_bf12_31_data_in_17;
+  wire       [3:0]    tensor_core_bf12_31_data_in_18;
+  wire       [3:0]    tensor_core_bf12_31_data_in_19;
+  wire       [3:0]    tensor_core_bf12_31_data_in_20;
+  wire                tensor_core_bf12_31_load_bb_one;
+  wire                tensor_core_bf12_31_load_bb_two;
+  wire       [3:0]    tensor_core_bf12_32_data_in_1;
+  wire       [3:0]    tensor_core_bf12_32_data_in_2;
+  wire       [3:0]    tensor_core_bf12_32_data_in_3;
+  wire       [3:0]    tensor_core_bf12_32_data_in_4;
+  wire       [3:0]    tensor_core_bf12_32_data_in_5;
+  wire       [3:0]    tensor_core_bf12_32_data_in_6;
+  wire       [3:0]    tensor_core_bf12_32_data_in_7;
+  wire       [3:0]    tensor_core_bf12_32_data_in_8;
+  wire       [3:0]    tensor_core_bf12_32_data_in_9;
+  wire       [3:0]    tensor_core_bf12_32_data_in_10;
+  wire       [3:0]    tensor_core_bf12_32_data_in_11;
+  wire       [3:0]    tensor_core_bf12_32_data_in_12;
+  wire       [3:0]    tensor_core_bf12_32_data_in_13;
+  wire       [3:0]    tensor_core_bf12_32_data_in_14;
+  wire       [3:0]    tensor_core_bf12_32_data_in_15;
+  wire       [3:0]    tensor_core_bf12_32_data_in_16;
+  wire       [3:0]    tensor_core_bf12_32_data_in_17;
+  wire       [3:0]    tensor_core_bf12_32_data_in_18;
+  wire       [3:0]    tensor_core_bf12_32_data_in_19;
+  wire       [3:0]    tensor_core_bf12_32_data_in_20;
+  wire                tensor_core_bf12_32_load_bb_one;
+  wire                tensor_core_bf12_32_load_bb_two;
+  wire       [3:0]    tensor_core_bf12_33_data_in_1;
+  wire       [3:0]    tensor_core_bf12_33_data_in_2;
+  wire       [3:0]    tensor_core_bf12_33_data_in_3;
+  wire       [3:0]    tensor_core_bf12_33_data_in_4;
+  wire       [3:0]    tensor_core_bf12_33_data_in_5;
+  wire       [3:0]    tensor_core_bf12_33_data_in_6;
+  wire       [3:0]    tensor_core_bf12_33_data_in_7;
+  wire       [3:0]    tensor_core_bf12_33_data_in_8;
+  wire       [3:0]    tensor_core_bf12_33_data_in_9;
+  wire       [3:0]    tensor_core_bf12_33_data_in_10;
+  wire       [3:0]    tensor_core_bf12_33_data_in_11;
+  wire       [3:0]    tensor_core_bf12_33_data_in_12;
+  wire       [3:0]    tensor_core_bf12_33_data_in_13;
+  wire       [3:0]    tensor_core_bf12_33_data_in_14;
+  wire       [3:0]    tensor_core_bf12_33_data_in_15;
+  wire       [3:0]    tensor_core_bf12_33_data_in_16;
+  wire       [3:0]    tensor_core_bf12_33_data_in_17;
+  wire       [3:0]    tensor_core_bf12_33_data_in_18;
+  wire       [3:0]    tensor_core_bf12_33_data_in_19;
+  wire       [3:0]    tensor_core_bf12_33_data_in_20;
+  wire                tensor_core_bf12_33_load_bb_one;
+  wire                tensor_core_bf12_33_load_bb_two;
   reg                 AccuDelayInst_io_pop_ready;
   wire       [23:0]   tcEntry_bf24_col_1;
   wire       [23:0]   tcEntry_bf24_col_2;
@@ -228162,237 +228512,237 @@ module TensorCoreChain (
   wire       [31:0]   tcAccu_cascade_data_out_col_1;
   wire       [31:0]   tcAccu_cascade_data_out_col_2;
   wire       [31:0]   tcAccu_cascade_data_out_col_3;
-  wire       [23:0]   tensor_core_1_bf24_col_1;
-  wire       [23:0]   tensor_core_1_bf24_col_2;
-  wire       [23:0]   tensor_core_1_bf24_col_3;
-  wire       [87:0]   tensor_core_1_cascade_weight_out;
-  wire       [31:0]   tensor_core_1_cascade_data_out_col_1;
-  wire       [31:0]   tensor_core_1_cascade_data_out_col_2;
-  wire       [31:0]   tensor_core_1_cascade_data_out_col_3;
-  wire       [23:0]   tensor_core_2_bf24_col_1;
-  wire       [23:0]   tensor_core_2_bf24_col_2;
-  wire       [23:0]   tensor_core_2_bf24_col_3;
-  wire       [87:0]   tensor_core_2_cascade_weight_out;
-  wire       [31:0]   tensor_core_2_cascade_data_out_col_1;
-  wire       [31:0]   tensor_core_2_cascade_data_out_col_2;
-  wire       [31:0]   tensor_core_2_cascade_data_out_col_3;
-  wire       [23:0]   tensor_core_3_bf24_col_1;
-  wire       [23:0]   tensor_core_3_bf24_col_2;
-  wire       [23:0]   tensor_core_3_bf24_col_3;
-  wire       [87:0]   tensor_core_3_cascade_weight_out;
-  wire       [31:0]   tensor_core_3_cascade_data_out_col_1;
-  wire       [31:0]   tensor_core_3_cascade_data_out_col_2;
-  wire       [31:0]   tensor_core_3_cascade_data_out_col_3;
-  wire       [23:0]   tensor_core_4_bf24_col_1;
-  wire       [23:0]   tensor_core_4_bf24_col_2;
-  wire       [23:0]   tensor_core_4_bf24_col_3;
-  wire       [87:0]   tensor_core_4_cascade_weight_out;
-  wire       [31:0]   tensor_core_4_cascade_data_out_col_1;
-  wire       [31:0]   tensor_core_4_cascade_data_out_col_2;
-  wire       [31:0]   tensor_core_4_cascade_data_out_col_3;
-  wire       [23:0]   tensor_core_5_bf24_col_1;
-  wire       [23:0]   tensor_core_5_bf24_col_2;
-  wire       [23:0]   tensor_core_5_bf24_col_3;
-  wire       [87:0]   tensor_core_5_cascade_weight_out;
-  wire       [31:0]   tensor_core_5_cascade_data_out_col_1;
-  wire       [31:0]   tensor_core_5_cascade_data_out_col_2;
-  wire       [31:0]   tensor_core_5_cascade_data_out_col_3;
-  wire       [23:0]   tensor_core_6_bf24_col_1;
-  wire       [23:0]   tensor_core_6_bf24_col_2;
-  wire       [23:0]   tensor_core_6_bf24_col_3;
-  wire       [87:0]   tensor_core_6_cascade_weight_out;
-  wire       [31:0]   tensor_core_6_cascade_data_out_col_1;
-  wire       [31:0]   tensor_core_6_cascade_data_out_col_2;
-  wire       [31:0]   tensor_core_6_cascade_data_out_col_3;
-  wire       [23:0]   tensor_core_7_bf24_col_1;
-  wire       [23:0]   tensor_core_7_bf24_col_2;
-  wire       [23:0]   tensor_core_7_bf24_col_3;
-  wire       [87:0]   tensor_core_7_cascade_weight_out;
-  wire       [31:0]   tensor_core_7_cascade_data_out_col_1;
-  wire       [31:0]   tensor_core_7_cascade_data_out_col_2;
-  wire       [31:0]   tensor_core_7_cascade_data_out_col_3;
-  wire       [23:0]   tensor_core_8_bf24_col_1;
-  wire       [23:0]   tensor_core_8_bf24_col_2;
-  wire       [23:0]   tensor_core_8_bf24_col_3;
-  wire       [87:0]   tensor_core_8_cascade_weight_out;
-  wire       [31:0]   tensor_core_8_cascade_data_out_col_1;
-  wire       [31:0]   tensor_core_8_cascade_data_out_col_2;
-  wire       [31:0]   tensor_core_8_cascade_data_out_col_3;
-  wire       [23:0]   tensor_core_9_bf24_col_1;
-  wire       [23:0]   tensor_core_9_bf24_col_2;
-  wire       [23:0]   tensor_core_9_bf24_col_3;
-  wire       [87:0]   tensor_core_9_cascade_weight_out;
-  wire       [31:0]   tensor_core_9_cascade_data_out_col_1;
-  wire       [31:0]   tensor_core_9_cascade_data_out_col_2;
-  wire       [31:0]   tensor_core_9_cascade_data_out_col_3;
-  wire       [23:0]   tensor_core_10_bf24_col_1;
-  wire       [23:0]   tensor_core_10_bf24_col_2;
-  wire       [23:0]   tensor_core_10_bf24_col_3;
-  wire       [87:0]   tensor_core_10_cascade_weight_out;
-  wire       [31:0]   tensor_core_10_cascade_data_out_col_1;
-  wire       [31:0]   tensor_core_10_cascade_data_out_col_2;
-  wire       [31:0]   tensor_core_10_cascade_data_out_col_3;
-  wire       [23:0]   tensor_core_11_bf24_col_1;
-  wire       [23:0]   tensor_core_11_bf24_col_2;
-  wire       [23:0]   tensor_core_11_bf24_col_3;
-  wire       [87:0]   tensor_core_11_cascade_weight_out;
-  wire       [31:0]   tensor_core_11_cascade_data_out_col_1;
-  wire       [31:0]   tensor_core_11_cascade_data_out_col_2;
-  wire       [31:0]   tensor_core_11_cascade_data_out_col_3;
-  wire       [23:0]   tensor_core_12_bf24_col_1;
-  wire       [23:0]   tensor_core_12_bf24_col_2;
-  wire       [23:0]   tensor_core_12_bf24_col_3;
-  wire       [87:0]   tensor_core_12_cascade_weight_out;
-  wire       [31:0]   tensor_core_12_cascade_data_out_col_1;
-  wire       [31:0]   tensor_core_12_cascade_data_out_col_2;
-  wire       [31:0]   tensor_core_12_cascade_data_out_col_3;
-  wire       [23:0]   tensor_core_13_bf24_col_1;
-  wire       [23:0]   tensor_core_13_bf24_col_2;
-  wire       [23:0]   tensor_core_13_bf24_col_3;
-  wire       [87:0]   tensor_core_13_cascade_weight_out;
-  wire       [31:0]   tensor_core_13_cascade_data_out_col_1;
-  wire       [31:0]   tensor_core_13_cascade_data_out_col_2;
-  wire       [31:0]   tensor_core_13_cascade_data_out_col_3;
-  wire       [23:0]   tensor_core_14_bf24_col_1;
-  wire       [23:0]   tensor_core_14_bf24_col_2;
-  wire       [23:0]   tensor_core_14_bf24_col_3;
-  wire       [87:0]   tensor_core_14_cascade_weight_out;
-  wire       [31:0]   tensor_core_14_cascade_data_out_col_1;
-  wire       [31:0]   tensor_core_14_cascade_data_out_col_2;
-  wire       [31:0]   tensor_core_14_cascade_data_out_col_3;
-  wire       [23:0]   tensor_core_15_bf24_col_1;
-  wire       [23:0]   tensor_core_15_bf24_col_2;
-  wire       [23:0]   tensor_core_15_bf24_col_3;
-  wire       [87:0]   tensor_core_15_cascade_weight_out;
-  wire       [31:0]   tensor_core_15_cascade_data_out_col_1;
-  wire       [31:0]   tensor_core_15_cascade_data_out_col_2;
-  wire       [31:0]   tensor_core_15_cascade_data_out_col_3;
-  wire       [23:0]   tensor_core_16_bf24_col_1;
-  wire       [23:0]   tensor_core_16_bf24_col_2;
-  wire       [23:0]   tensor_core_16_bf24_col_3;
-  wire       [87:0]   tensor_core_16_cascade_weight_out;
-  wire       [31:0]   tensor_core_16_cascade_data_out_col_1;
-  wire       [31:0]   tensor_core_16_cascade_data_out_col_2;
-  wire       [31:0]   tensor_core_16_cascade_data_out_col_3;
-  wire       [23:0]   tensor_core_17_bf24_col_1;
-  wire       [23:0]   tensor_core_17_bf24_col_2;
-  wire       [23:0]   tensor_core_17_bf24_col_3;
-  wire       [87:0]   tensor_core_17_cascade_weight_out;
-  wire       [31:0]   tensor_core_17_cascade_data_out_col_1;
-  wire       [31:0]   tensor_core_17_cascade_data_out_col_2;
-  wire       [31:0]   tensor_core_17_cascade_data_out_col_3;
-  wire       [23:0]   tensor_core_18_bf24_col_1;
-  wire       [23:0]   tensor_core_18_bf24_col_2;
-  wire       [23:0]   tensor_core_18_bf24_col_3;
-  wire       [87:0]   tensor_core_18_cascade_weight_out;
-  wire       [31:0]   tensor_core_18_cascade_data_out_col_1;
-  wire       [31:0]   tensor_core_18_cascade_data_out_col_2;
-  wire       [31:0]   tensor_core_18_cascade_data_out_col_3;
-  wire       [23:0]   tensor_core_19_bf24_col_1;
-  wire       [23:0]   tensor_core_19_bf24_col_2;
-  wire       [23:0]   tensor_core_19_bf24_col_3;
-  wire       [87:0]   tensor_core_19_cascade_weight_out;
-  wire       [31:0]   tensor_core_19_cascade_data_out_col_1;
-  wire       [31:0]   tensor_core_19_cascade_data_out_col_2;
-  wire       [31:0]   tensor_core_19_cascade_data_out_col_3;
-  wire       [23:0]   tensor_core_20_bf24_col_1;
-  wire       [23:0]   tensor_core_20_bf24_col_2;
-  wire       [23:0]   tensor_core_20_bf24_col_3;
-  wire       [87:0]   tensor_core_20_cascade_weight_out;
-  wire       [31:0]   tensor_core_20_cascade_data_out_col_1;
-  wire       [31:0]   tensor_core_20_cascade_data_out_col_2;
-  wire       [31:0]   tensor_core_20_cascade_data_out_col_3;
-  wire       [23:0]   tensor_core_21_bf24_col_1;
-  wire       [23:0]   tensor_core_21_bf24_col_2;
-  wire       [23:0]   tensor_core_21_bf24_col_3;
-  wire       [87:0]   tensor_core_21_cascade_weight_out;
-  wire       [31:0]   tensor_core_21_cascade_data_out_col_1;
-  wire       [31:0]   tensor_core_21_cascade_data_out_col_2;
-  wire       [31:0]   tensor_core_21_cascade_data_out_col_3;
-  wire       [23:0]   tensor_core_22_bf24_col_1;
-  wire       [23:0]   tensor_core_22_bf24_col_2;
-  wire       [23:0]   tensor_core_22_bf24_col_3;
-  wire       [87:0]   tensor_core_22_cascade_weight_out;
-  wire       [31:0]   tensor_core_22_cascade_data_out_col_1;
-  wire       [31:0]   tensor_core_22_cascade_data_out_col_2;
-  wire       [31:0]   tensor_core_22_cascade_data_out_col_3;
-  wire       [23:0]   tensor_core_23_bf24_col_1;
-  wire       [23:0]   tensor_core_23_bf24_col_2;
-  wire       [23:0]   tensor_core_23_bf24_col_3;
-  wire       [87:0]   tensor_core_23_cascade_weight_out;
-  wire       [31:0]   tensor_core_23_cascade_data_out_col_1;
-  wire       [31:0]   tensor_core_23_cascade_data_out_col_2;
-  wire       [31:0]   tensor_core_23_cascade_data_out_col_3;
-  wire       [23:0]   tensor_core_24_bf24_col_1;
-  wire       [23:0]   tensor_core_24_bf24_col_2;
-  wire       [23:0]   tensor_core_24_bf24_col_3;
-  wire       [87:0]   tensor_core_24_cascade_weight_out;
-  wire       [31:0]   tensor_core_24_cascade_data_out_col_1;
-  wire       [31:0]   tensor_core_24_cascade_data_out_col_2;
-  wire       [31:0]   tensor_core_24_cascade_data_out_col_3;
-  wire       [23:0]   tensor_core_25_bf24_col_1;
-  wire       [23:0]   tensor_core_25_bf24_col_2;
-  wire       [23:0]   tensor_core_25_bf24_col_3;
-  wire       [87:0]   tensor_core_25_cascade_weight_out;
-  wire       [31:0]   tensor_core_25_cascade_data_out_col_1;
-  wire       [31:0]   tensor_core_25_cascade_data_out_col_2;
-  wire       [31:0]   tensor_core_25_cascade_data_out_col_3;
-  wire       [23:0]   tensor_core_26_bf24_col_1;
-  wire       [23:0]   tensor_core_26_bf24_col_2;
-  wire       [23:0]   tensor_core_26_bf24_col_3;
-  wire       [87:0]   tensor_core_26_cascade_weight_out;
-  wire       [31:0]   tensor_core_26_cascade_data_out_col_1;
-  wire       [31:0]   tensor_core_26_cascade_data_out_col_2;
-  wire       [31:0]   tensor_core_26_cascade_data_out_col_3;
-  wire       [23:0]   tensor_core_27_bf24_col_1;
-  wire       [23:0]   tensor_core_27_bf24_col_2;
-  wire       [23:0]   tensor_core_27_bf24_col_3;
-  wire       [87:0]   tensor_core_27_cascade_weight_out;
-  wire       [31:0]   tensor_core_27_cascade_data_out_col_1;
-  wire       [31:0]   tensor_core_27_cascade_data_out_col_2;
-  wire       [31:0]   tensor_core_27_cascade_data_out_col_3;
-  wire       [23:0]   tensor_core_28_bf24_col_1;
-  wire       [23:0]   tensor_core_28_bf24_col_2;
-  wire       [23:0]   tensor_core_28_bf24_col_3;
-  wire       [87:0]   tensor_core_28_cascade_weight_out;
-  wire       [31:0]   tensor_core_28_cascade_data_out_col_1;
-  wire       [31:0]   tensor_core_28_cascade_data_out_col_2;
-  wire       [31:0]   tensor_core_28_cascade_data_out_col_3;
-  wire       [23:0]   tensor_core_29_bf24_col_1;
-  wire       [23:0]   tensor_core_29_bf24_col_2;
-  wire       [23:0]   tensor_core_29_bf24_col_3;
-  wire       [87:0]   tensor_core_29_cascade_weight_out;
-  wire       [31:0]   tensor_core_29_cascade_data_out_col_1;
-  wire       [31:0]   tensor_core_29_cascade_data_out_col_2;
-  wire       [31:0]   tensor_core_29_cascade_data_out_col_3;
-  wire       [23:0]   tensor_core_30_bf24_col_1;
-  wire       [23:0]   tensor_core_30_bf24_col_2;
-  wire       [23:0]   tensor_core_30_bf24_col_3;
-  wire       [87:0]   tensor_core_30_cascade_weight_out;
-  wire       [31:0]   tensor_core_30_cascade_data_out_col_1;
-  wire       [31:0]   tensor_core_30_cascade_data_out_col_2;
-  wire       [31:0]   tensor_core_30_cascade_data_out_col_3;
-  wire       [23:0]   tensor_core_31_bf24_col_1;
-  wire       [23:0]   tensor_core_31_bf24_col_2;
-  wire       [23:0]   tensor_core_31_bf24_col_3;
-  wire       [87:0]   tensor_core_31_cascade_weight_out;
-  wire       [31:0]   tensor_core_31_cascade_data_out_col_1;
-  wire       [31:0]   tensor_core_31_cascade_data_out_col_2;
-  wire       [31:0]   tensor_core_31_cascade_data_out_col_3;
-  wire       [23:0]   tensor_core_32_bf24_col_1;
-  wire       [23:0]   tensor_core_32_bf24_col_2;
-  wire       [23:0]   tensor_core_32_bf24_col_3;
-  wire       [87:0]   tensor_core_32_cascade_weight_out;
-  wire       [31:0]   tensor_core_32_cascade_data_out_col_1;
-  wire       [31:0]   tensor_core_32_cascade_data_out_col_2;
-  wire       [31:0]   tensor_core_32_cascade_data_out_col_3;
-  wire       [23:0]   tensor_core_33_bf24_col_1;
-  wire       [23:0]   tensor_core_33_bf24_col_2;
-  wire       [23:0]   tensor_core_33_bf24_col_3;
-  wire       [87:0]   tensor_core_33_cascade_weight_out;
-  wire       [31:0]   tensor_core_33_cascade_data_out_col_1;
-  wire       [31:0]   tensor_core_33_cascade_data_out_col_2;
-  wire       [31:0]   tensor_core_33_cascade_data_out_col_3;
+  wire       [23:0]   tensor_core_bf12_1_bf24_col_1;
+  wire       [23:0]   tensor_core_bf12_1_bf24_col_2;
+  wire       [23:0]   tensor_core_bf12_1_bf24_col_3;
+  wire       [87:0]   tensor_core_bf12_1_cascade_weight_out;
+  wire       [31:0]   tensor_core_bf12_1_cascade_data_out_col_1;
+  wire       [31:0]   tensor_core_bf12_1_cascade_data_out_col_2;
+  wire       [31:0]   tensor_core_bf12_1_cascade_data_out_col_3;
+  wire       [23:0]   tensor_core_bf12_2_bf24_col_1;
+  wire       [23:0]   tensor_core_bf12_2_bf24_col_2;
+  wire       [23:0]   tensor_core_bf12_2_bf24_col_3;
+  wire       [87:0]   tensor_core_bf12_2_cascade_weight_out;
+  wire       [31:0]   tensor_core_bf12_2_cascade_data_out_col_1;
+  wire       [31:0]   tensor_core_bf12_2_cascade_data_out_col_2;
+  wire       [31:0]   tensor_core_bf12_2_cascade_data_out_col_3;
+  wire       [23:0]   tensor_core_bf12_3_bf24_col_1;
+  wire       [23:0]   tensor_core_bf12_3_bf24_col_2;
+  wire       [23:0]   tensor_core_bf12_3_bf24_col_3;
+  wire       [87:0]   tensor_core_bf12_3_cascade_weight_out;
+  wire       [31:0]   tensor_core_bf12_3_cascade_data_out_col_1;
+  wire       [31:0]   tensor_core_bf12_3_cascade_data_out_col_2;
+  wire       [31:0]   tensor_core_bf12_3_cascade_data_out_col_3;
+  wire       [23:0]   tensor_core_bf12_4_bf24_col_1;
+  wire       [23:0]   tensor_core_bf12_4_bf24_col_2;
+  wire       [23:0]   tensor_core_bf12_4_bf24_col_3;
+  wire       [87:0]   tensor_core_bf12_4_cascade_weight_out;
+  wire       [31:0]   tensor_core_bf12_4_cascade_data_out_col_1;
+  wire       [31:0]   tensor_core_bf12_4_cascade_data_out_col_2;
+  wire       [31:0]   tensor_core_bf12_4_cascade_data_out_col_3;
+  wire       [23:0]   tensor_core_bf12_5_bf24_col_1;
+  wire       [23:0]   tensor_core_bf12_5_bf24_col_2;
+  wire       [23:0]   tensor_core_bf12_5_bf24_col_3;
+  wire       [87:0]   tensor_core_bf12_5_cascade_weight_out;
+  wire       [31:0]   tensor_core_bf12_5_cascade_data_out_col_1;
+  wire       [31:0]   tensor_core_bf12_5_cascade_data_out_col_2;
+  wire       [31:0]   tensor_core_bf12_5_cascade_data_out_col_3;
+  wire       [23:0]   tensor_core_bf12_6_bf24_col_1;
+  wire       [23:0]   tensor_core_bf12_6_bf24_col_2;
+  wire       [23:0]   tensor_core_bf12_6_bf24_col_3;
+  wire       [87:0]   tensor_core_bf12_6_cascade_weight_out;
+  wire       [31:0]   tensor_core_bf12_6_cascade_data_out_col_1;
+  wire       [31:0]   tensor_core_bf12_6_cascade_data_out_col_2;
+  wire       [31:0]   tensor_core_bf12_6_cascade_data_out_col_3;
+  wire       [23:0]   tensor_core_bf12_7_bf24_col_1;
+  wire       [23:0]   tensor_core_bf12_7_bf24_col_2;
+  wire       [23:0]   tensor_core_bf12_7_bf24_col_3;
+  wire       [87:0]   tensor_core_bf12_7_cascade_weight_out;
+  wire       [31:0]   tensor_core_bf12_7_cascade_data_out_col_1;
+  wire       [31:0]   tensor_core_bf12_7_cascade_data_out_col_2;
+  wire       [31:0]   tensor_core_bf12_7_cascade_data_out_col_3;
+  wire       [23:0]   tensor_core_bf12_8_bf24_col_1;
+  wire       [23:0]   tensor_core_bf12_8_bf24_col_2;
+  wire       [23:0]   tensor_core_bf12_8_bf24_col_3;
+  wire       [87:0]   tensor_core_bf12_8_cascade_weight_out;
+  wire       [31:0]   tensor_core_bf12_8_cascade_data_out_col_1;
+  wire       [31:0]   tensor_core_bf12_8_cascade_data_out_col_2;
+  wire       [31:0]   tensor_core_bf12_8_cascade_data_out_col_3;
+  wire       [23:0]   tensor_core_bf12_9_bf24_col_1;
+  wire       [23:0]   tensor_core_bf12_9_bf24_col_2;
+  wire       [23:0]   tensor_core_bf12_9_bf24_col_3;
+  wire       [87:0]   tensor_core_bf12_9_cascade_weight_out;
+  wire       [31:0]   tensor_core_bf12_9_cascade_data_out_col_1;
+  wire       [31:0]   tensor_core_bf12_9_cascade_data_out_col_2;
+  wire       [31:0]   tensor_core_bf12_9_cascade_data_out_col_3;
+  wire       [23:0]   tensor_core_bf12_10_bf24_col_1;
+  wire       [23:0]   tensor_core_bf12_10_bf24_col_2;
+  wire       [23:0]   tensor_core_bf12_10_bf24_col_3;
+  wire       [87:0]   tensor_core_bf12_10_cascade_weight_out;
+  wire       [31:0]   tensor_core_bf12_10_cascade_data_out_col_1;
+  wire       [31:0]   tensor_core_bf12_10_cascade_data_out_col_2;
+  wire       [31:0]   tensor_core_bf12_10_cascade_data_out_col_3;
+  wire       [23:0]   tensor_core_bf12_11_bf24_col_1;
+  wire       [23:0]   tensor_core_bf12_11_bf24_col_2;
+  wire       [23:0]   tensor_core_bf12_11_bf24_col_3;
+  wire       [87:0]   tensor_core_bf12_11_cascade_weight_out;
+  wire       [31:0]   tensor_core_bf12_11_cascade_data_out_col_1;
+  wire       [31:0]   tensor_core_bf12_11_cascade_data_out_col_2;
+  wire       [31:0]   tensor_core_bf12_11_cascade_data_out_col_3;
+  wire       [23:0]   tensor_core_bf12_12_bf24_col_1;
+  wire       [23:0]   tensor_core_bf12_12_bf24_col_2;
+  wire       [23:0]   tensor_core_bf12_12_bf24_col_3;
+  wire       [87:0]   tensor_core_bf12_12_cascade_weight_out;
+  wire       [31:0]   tensor_core_bf12_12_cascade_data_out_col_1;
+  wire       [31:0]   tensor_core_bf12_12_cascade_data_out_col_2;
+  wire       [31:0]   tensor_core_bf12_12_cascade_data_out_col_3;
+  wire       [23:0]   tensor_core_bf12_13_bf24_col_1;
+  wire       [23:0]   tensor_core_bf12_13_bf24_col_2;
+  wire       [23:0]   tensor_core_bf12_13_bf24_col_3;
+  wire       [87:0]   tensor_core_bf12_13_cascade_weight_out;
+  wire       [31:0]   tensor_core_bf12_13_cascade_data_out_col_1;
+  wire       [31:0]   tensor_core_bf12_13_cascade_data_out_col_2;
+  wire       [31:0]   tensor_core_bf12_13_cascade_data_out_col_3;
+  wire       [23:0]   tensor_core_bf12_14_bf24_col_1;
+  wire       [23:0]   tensor_core_bf12_14_bf24_col_2;
+  wire       [23:0]   tensor_core_bf12_14_bf24_col_3;
+  wire       [87:0]   tensor_core_bf12_14_cascade_weight_out;
+  wire       [31:0]   tensor_core_bf12_14_cascade_data_out_col_1;
+  wire       [31:0]   tensor_core_bf12_14_cascade_data_out_col_2;
+  wire       [31:0]   tensor_core_bf12_14_cascade_data_out_col_3;
+  wire       [23:0]   tensor_core_bf12_15_bf24_col_1;
+  wire       [23:0]   tensor_core_bf12_15_bf24_col_2;
+  wire       [23:0]   tensor_core_bf12_15_bf24_col_3;
+  wire       [87:0]   tensor_core_bf12_15_cascade_weight_out;
+  wire       [31:0]   tensor_core_bf12_15_cascade_data_out_col_1;
+  wire       [31:0]   tensor_core_bf12_15_cascade_data_out_col_2;
+  wire       [31:0]   tensor_core_bf12_15_cascade_data_out_col_3;
+  wire       [23:0]   tensor_core_bf12_16_bf24_col_1;
+  wire       [23:0]   tensor_core_bf12_16_bf24_col_2;
+  wire       [23:0]   tensor_core_bf12_16_bf24_col_3;
+  wire       [87:0]   tensor_core_bf12_16_cascade_weight_out;
+  wire       [31:0]   tensor_core_bf12_16_cascade_data_out_col_1;
+  wire       [31:0]   tensor_core_bf12_16_cascade_data_out_col_2;
+  wire       [31:0]   tensor_core_bf12_16_cascade_data_out_col_3;
+  wire       [23:0]   tensor_core_bf12_17_bf24_col_1;
+  wire       [23:0]   tensor_core_bf12_17_bf24_col_2;
+  wire       [23:0]   tensor_core_bf12_17_bf24_col_3;
+  wire       [87:0]   tensor_core_bf12_17_cascade_weight_out;
+  wire       [31:0]   tensor_core_bf12_17_cascade_data_out_col_1;
+  wire       [31:0]   tensor_core_bf12_17_cascade_data_out_col_2;
+  wire       [31:0]   tensor_core_bf12_17_cascade_data_out_col_3;
+  wire       [23:0]   tensor_core_bf12_18_bf24_col_1;
+  wire       [23:0]   tensor_core_bf12_18_bf24_col_2;
+  wire       [23:0]   tensor_core_bf12_18_bf24_col_3;
+  wire       [87:0]   tensor_core_bf12_18_cascade_weight_out;
+  wire       [31:0]   tensor_core_bf12_18_cascade_data_out_col_1;
+  wire       [31:0]   tensor_core_bf12_18_cascade_data_out_col_2;
+  wire       [31:0]   tensor_core_bf12_18_cascade_data_out_col_3;
+  wire       [23:0]   tensor_core_bf12_19_bf24_col_1;
+  wire       [23:0]   tensor_core_bf12_19_bf24_col_2;
+  wire       [23:0]   tensor_core_bf12_19_bf24_col_3;
+  wire       [87:0]   tensor_core_bf12_19_cascade_weight_out;
+  wire       [31:0]   tensor_core_bf12_19_cascade_data_out_col_1;
+  wire       [31:0]   tensor_core_bf12_19_cascade_data_out_col_2;
+  wire       [31:0]   tensor_core_bf12_19_cascade_data_out_col_3;
+  wire       [23:0]   tensor_core_bf12_20_bf24_col_1;
+  wire       [23:0]   tensor_core_bf12_20_bf24_col_2;
+  wire       [23:0]   tensor_core_bf12_20_bf24_col_3;
+  wire       [87:0]   tensor_core_bf12_20_cascade_weight_out;
+  wire       [31:0]   tensor_core_bf12_20_cascade_data_out_col_1;
+  wire       [31:0]   tensor_core_bf12_20_cascade_data_out_col_2;
+  wire       [31:0]   tensor_core_bf12_20_cascade_data_out_col_3;
+  wire       [23:0]   tensor_core_bf12_21_bf24_col_1;
+  wire       [23:0]   tensor_core_bf12_21_bf24_col_2;
+  wire       [23:0]   tensor_core_bf12_21_bf24_col_3;
+  wire       [87:0]   tensor_core_bf12_21_cascade_weight_out;
+  wire       [31:0]   tensor_core_bf12_21_cascade_data_out_col_1;
+  wire       [31:0]   tensor_core_bf12_21_cascade_data_out_col_2;
+  wire       [31:0]   tensor_core_bf12_21_cascade_data_out_col_3;
+  wire       [23:0]   tensor_core_bf12_22_bf24_col_1;
+  wire       [23:0]   tensor_core_bf12_22_bf24_col_2;
+  wire       [23:0]   tensor_core_bf12_22_bf24_col_3;
+  wire       [87:0]   tensor_core_bf12_22_cascade_weight_out;
+  wire       [31:0]   tensor_core_bf12_22_cascade_data_out_col_1;
+  wire       [31:0]   tensor_core_bf12_22_cascade_data_out_col_2;
+  wire       [31:0]   tensor_core_bf12_22_cascade_data_out_col_3;
+  wire       [23:0]   tensor_core_bf12_23_bf24_col_1;
+  wire       [23:0]   tensor_core_bf12_23_bf24_col_2;
+  wire       [23:0]   tensor_core_bf12_23_bf24_col_3;
+  wire       [87:0]   tensor_core_bf12_23_cascade_weight_out;
+  wire       [31:0]   tensor_core_bf12_23_cascade_data_out_col_1;
+  wire       [31:0]   tensor_core_bf12_23_cascade_data_out_col_2;
+  wire       [31:0]   tensor_core_bf12_23_cascade_data_out_col_3;
+  wire       [23:0]   tensor_core_bf12_24_bf24_col_1;
+  wire       [23:0]   tensor_core_bf12_24_bf24_col_2;
+  wire       [23:0]   tensor_core_bf12_24_bf24_col_3;
+  wire       [87:0]   tensor_core_bf12_24_cascade_weight_out;
+  wire       [31:0]   tensor_core_bf12_24_cascade_data_out_col_1;
+  wire       [31:0]   tensor_core_bf12_24_cascade_data_out_col_2;
+  wire       [31:0]   tensor_core_bf12_24_cascade_data_out_col_3;
+  wire       [23:0]   tensor_core_bf12_25_bf24_col_1;
+  wire       [23:0]   tensor_core_bf12_25_bf24_col_2;
+  wire       [23:0]   tensor_core_bf12_25_bf24_col_3;
+  wire       [87:0]   tensor_core_bf12_25_cascade_weight_out;
+  wire       [31:0]   tensor_core_bf12_25_cascade_data_out_col_1;
+  wire       [31:0]   tensor_core_bf12_25_cascade_data_out_col_2;
+  wire       [31:0]   tensor_core_bf12_25_cascade_data_out_col_3;
+  wire       [23:0]   tensor_core_bf12_26_bf24_col_1;
+  wire       [23:0]   tensor_core_bf12_26_bf24_col_2;
+  wire       [23:0]   tensor_core_bf12_26_bf24_col_3;
+  wire       [87:0]   tensor_core_bf12_26_cascade_weight_out;
+  wire       [31:0]   tensor_core_bf12_26_cascade_data_out_col_1;
+  wire       [31:0]   tensor_core_bf12_26_cascade_data_out_col_2;
+  wire       [31:0]   tensor_core_bf12_26_cascade_data_out_col_3;
+  wire       [23:0]   tensor_core_bf12_27_bf24_col_1;
+  wire       [23:0]   tensor_core_bf12_27_bf24_col_2;
+  wire       [23:0]   tensor_core_bf12_27_bf24_col_3;
+  wire       [87:0]   tensor_core_bf12_27_cascade_weight_out;
+  wire       [31:0]   tensor_core_bf12_27_cascade_data_out_col_1;
+  wire       [31:0]   tensor_core_bf12_27_cascade_data_out_col_2;
+  wire       [31:0]   tensor_core_bf12_27_cascade_data_out_col_3;
+  wire       [23:0]   tensor_core_bf12_28_bf24_col_1;
+  wire       [23:0]   tensor_core_bf12_28_bf24_col_2;
+  wire       [23:0]   tensor_core_bf12_28_bf24_col_3;
+  wire       [87:0]   tensor_core_bf12_28_cascade_weight_out;
+  wire       [31:0]   tensor_core_bf12_28_cascade_data_out_col_1;
+  wire       [31:0]   tensor_core_bf12_28_cascade_data_out_col_2;
+  wire       [31:0]   tensor_core_bf12_28_cascade_data_out_col_3;
+  wire       [23:0]   tensor_core_bf12_29_bf24_col_1;
+  wire       [23:0]   tensor_core_bf12_29_bf24_col_2;
+  wire       [23:0]   tensor_core_bf12_29_bf24_col_3;
+  wire       [87:0]   tensor_core_bf12_29_cascade_weight_out;
+  wire       [31:0]   tensor_core_bf12_29_cascade_data_out_col_1;
+  wire       [31:0]   tensor_core_bf12_29_cascade_data_out_col_2;
+  wire       [31:0]   tensor_core_bf12_29_cascade_data_out_col_3;
+  wire       [23:0]   tensor_core_bf12_30_bf24_col_1;
+  wire       [23:0]   tensor_core_bf12_30_bf24_col_2;
+  wire       [23:0]   tensor_core_bf12_30_bf24_col_3;
+  wire       [87:0]   tensor_core_bf12_30_cascade_weight_out;
+  wire       [31:0]   tensor_core_bf12_30_cascade_data_out_col_1;
+  wire       [31:0]   tensor_core_bf12_30_cascade_data_out_col_2;
+  wire       [31:0]   tensor_core_bf12_30_cascade_data_out_col_3;
+  wire       [23:0]   tensor_core_bf12_31_bf24_col_1;
+  wire       [23:0]   tensor_core_bf12_31_bf24_col_2;
+  wire       [23:0]   tensor_core_bf12_31_bf24_col_3;
+  wire       [87:0]   tensor_core_bf12_31_cascade_weight_out;
+  wire       [31:0]   tensor_core_bf12_31_cascade_data_out_col_1;
+  wire       [31:0]   tensor_core_bf12_31_cascade_data_out_col_2;
+  wire       [31:0]   tensor_core_bf12_31_cascade_data_out_col_3;
+  wire       [23:0]   tensor_core_bf12_32_bf24_col_1;
+  wire       [23:0]   tensor_core_bf12_32_bf24_col_2;
+  wire       [23:0]   tensor_core_bf12_32_bf24_col_3;
+  wire       [87:0]   tensor_core_bf12_32_cascade_weight_out;
+  wire       [31:0]   tensor_core_bf12_32_cascade_data_out_col_1;
+  wire       [31:0]   tensor_core_bf12_32_cascade_data_out_col_2;
+  wire       [31:0]   tensor_core_bf12_32_cascade_data_out_col_3;
+  wire       [23:0]   tensor_core_bf12_33_bf24_col_1;
+  wire       [23:0]   tensor_core_bf12_33_bf24_col_2;
+  wire       [23:0]   tensor_core_bf12_33_bf24_col_3;
+  wire       [87:0]   tensor_core_bf12_33_cascade_weight_out;
+  wire       [31:0]   tensor_core_bf12_33_cascade_data_out_col_1;
+  wire       [31:0]   tensor_core_bf12_33_cascade_data_out_col_2;
+  wire       [31:0]   tensor_core_bf12_33_cascade_data_out_col_3;
   wire                AccuDelayInst_io_push_ready;
   wire                AccuDelayInst_io_pop_valid;
   wire       [23:0]   AccuDelayInst_io_pop_payload_0;
@@ -228635,7 +228985,7 @@ module TensorCoreChain (
   assign _zz_outValidCounter_valueNext = {7'd0, _zz_outValidCounter_valueNext_1};
   assign _zz_resValidCounter_valueNext_1 = resValidCounter_willIncrement;
   assign _zz_resValidCounter_valueNext = {7'd0, _zz_resValidCounter_valueNext_1};
-  tensor_core_entry tcEntry (
+  tensor_core_entry_bf12 tcEntry (
     .clk                       (clk                             ), //i
     .data_in_1                 (tcEntry_data_in_1               ), //i
     .data_in_2                 (tcEntry_data_in_2               ), //i
@@ -228647,8 +228997,20 @@ module TensorCoreChain (
     .data_in_8                 (tcEntry_data_in_8               ), //i
     .data_in_9                 (tcEntry_data_in_9               ), //i
     .data_in_10                (tcEntry_data_in_10              ), //i
-    .side_in_1                 (8'h0                            ), //i
-    .side_in_2                 (8'h0                            ), //i
+    .data_in_11                (tcEntry_data_in_11              ), //i
+    .data_in_12                (tcEntry_data_in_12              ), //i
+    .data_in_13                (tcEntry_data_in_13              ), //i
+    .data_in_14                (tcEntry_data_in_14              ), //i
+    .data_in_15                (tcEntry_data_in_15              ), //i
+    .data_in_16                (tcEntry_data_in_16              ), //i
+    .data_in_17                (tcEntry_data_in_17              ), //i
+    .data_in_18                (tcEntry_data_in_18              ), //i
+    .data_in_19                (tcEntry_data_in_19              ), //i
+    .data_in_20                (tcEntry_data_in_20              ), //i
+    .side_in_1                 (4'b0000                         ), //i
+    .side_in_2                 (4'b0000                         ), //i
+    .side_in_3                 (4'b0000                         ), //i
+    .side_in_4                 (4'b0000                         ), //i
     .shared_exponent_data      (io_expCascadeIn                 ), //i
     .feed_sel                  (2'b00                           ), //i
     .load_bb_one               (1'b1                            ), //i
@@ -228657,12 +229019,14 @@ module TensorCoreChain (
     .bf24_col_1                (tcEntry_bf24_col_1              ), //o
     .bf24_col_2                (tcEntry_bf24_col_2              ), //o
     .bf24_col_3                (tcEntry_bf24_col_3              ), //o
+    .clr0                      (1'b0                            ), //i
+    .clr1                      (1'b0                            ), //i
     .cascade_weight_out        (tcEntry_cascade_weight_out      ), //o
     .cascade_data_out_col_1    (tcEntry_cascade_data_out_col_1  ), //o
     .cascade_data_out_col_2    (tcEntry_cascade_data_out_col_2  ), //o
     .cascade_data_out_col_3    (tcEntry_cascade_data_out_col_3  )  //o
   );
-  tensor_core_start tcStartPoint (
+  tensor_core_start_bf12 tcStartPoint (
     .clk                       (clk                                  ), //i
     .data_in_1                 (tcStartPoint_data_in_1               ), //i
     .data_in_2                 (tcStartPoint_data_in_2               ), //i
@@ -228674,8 +229038,20 @@ module TensorCoreChain (
     .data_in_8                 (tcStartPoint_data_in_8               ), //i
     .data_in_9                 (tcStartPoint_data_in_9               ), //i
     .data_in_10                (tcStartPoint_data_in_10              ), //i
-    .side_in_1                 (8'h0                                 ), //i
-    .side_in_2                 (8'h0                                 ), //i
+    .data_in_11                (tcStartPoint_data_in_11              ), //i
+    .data_in_12                (tcStartPoint_data_in_12              ), //i
+    .data_in_13                (tcStartPoint_data_in_13              ), //i
+    .data_in_14                (tcStartPoint_data_in_14              ), //i
+    .data_in_15                (tcStartPoint_data_in_15              ), //i
+    .data_in_16                (tcStartPoint_data_in_16              ), //i
+    .data_in_17                (tcStartPoint_data_in_17              ), //i
+    .data_in_18                (tcStartPoint_data_in_18              ), //i
+    .data_in_19                (tcStartPoint_data_in_19              ), //i
+    .data_in_20                (tcStartPoint_data_in_20              ), //i
+    .side_in_1                 (4'b0000                              ), //i
+    .side_in_2                 (4'b0000                              ), //i
+    .side_in_3                 (4'b0000                              ), //i
+    .side_in_4                 (4'b0000                              ), //i
     .shared_exponent_data      (io_expIn_0                           ), //i
     .feed_sel                  (2'b01                                ), //i
     .load_bb_one               (tcStartPoint_load_bb_one             ), //i
@@ -228684,6 +229060,8 @@ module TensorCoreChain (
     .bf24_col_1                (tcStartPoint_bf24_col_1              ), //o
     .bf24_col_2                (tcStartPoint_bf24_col_2              ), //o
     .bf24_col_3                (tcStartPoint_bf24_col_3              ), //o
+    .clr0                      (1'b0                                 ), //i
+    .clr1                      (1'b0                                 ), //i
     .cascade_weight_in         (tcEntry_cascade_weight_out           ), //i
     .cascade_weight_out        (tcStartPoint_cascade_weight_out      ), //o
     .cascade_data_out_col_1    (tcStartPoint_cascade_data_out_col_1  ), //o
@@ -228691,1111 +229069,1573 @@ module TensorCoreChain (
     .cascade_data_out_col_3    (tcStartPoint_cascade_data_out_col_3  )  //o
   );
   tensor_core_accu tcAccu (
-    .clk                       (clk                                     ), //i
-    .acc_en                    (1'b0                                    ), //i
-    .zero_en                   (1'b0                                    ), //i
-    .clr0                      (resValidCounter_willOverflowIfInc       ), //i
-    .bf24_a1                   (AccuDelayInst_io_pop_payload_0_delay_2  ), //i
-    .bf24_a2                   (AccuDelayInst_io_pop_payload_1_delay_2  ), //i
-    .bf24_a3                   (AccuDelayInst_io_pop_payload_2_delay_2  ), //i
-    .cascade_data_in_col_1     (tensor_core_33_cascade_data_out_col_1   ), //i
-    .cascade_data_in_col_2     (tensor_core_33_cascade_data_out_col_2   ), //i
-    .cascade_data_in_col_3     (tensor_core_33_cascade_data_out_col_3   ), //i
-    .bf24_col_1                (tcAccu_bf24_col_1                       ), //o
-    .bf24_col_2                (tcAccu_bf24_col_2                       ), //o
-    .bf24_col_3                (tcAccu_bf24_col_3                       ), //o
-    .cascade_data_out_col_1    (tcAccu_cascade_data_out_col_1           ), //o
-    .cascade_data_out_col_2    (tcAccu_cascade_data_out_col_2           ), //o
-    .cascade_data_out_col_3    (tcAccu_cascade_data_out_col_3           )  //o
+    .clk                       (clk                                         ), //i
+    .acc_en                    (1'b0                                        ), //i
+    .zero_en                   (1'b0                                        ), //i
+    .clr0                      (resValidCounter_willOverflowIfInc           ), //i
+    .bf24_a1                   (AccuDelayInst_io_pop_payload_0_delay_2      ), //i
+    .bf24_a2                   (AccuDelayInst_io_pop_payload_1_delay_2      ), //i
+    .bf24_a3                   (AccuDelayInst_io_pop_payload_2_delay_2      ), //i
+    .cascade_data_in_col_1     (tensor_core_bf12_33_cascade_data_out_col_1  ), //i
+    .cascade_data_in_col_2     (tensor_core_bf12_33_cascade_data_out_col_2  ), //i
+    .cascade_data_in_col_3     (tensor_core_bf12_33_cascade_data_out_col_3  ), //i
+    .bf24_col_1                (tcAccu_bf24_col_1                           ), //o
+    .bf24_col_2                (tcAccu_bf24_col_2                           ), //o
+    .bf24_col_3                (tcAccu_bf24_col_3                           ), //o
+    .cascade_data_out_col_1    (tcAccu_cascade_data_out_col_1               ), //o
+    .cascade_data_out_col_2    (tcAccu_cascade_data_out_col_2               ), //o
+    .cascade_data_out_col_3    (tcAccu_cascade_data_out_col_3               )  //o
   );
-  tensor_core tensor_core_1 (
-    .clk                       (clk                                   ), //i
-    .data_in_1                 (tensor_core_1_data_in_1               ), //i
-    .data_in_2                 (tensor_core_1_data_in_2               ), //i
-    .data_in_3                 (tensor_core_1_data_in_3               ), //i
-    .data_in_4                 (tensor_core_1_data_in_4               ), //i
-    .data_in_5                 (tensor_core_1_data_in_5               ), //i
-    .data_in_6                 (tensor_core_1_data_in_6               ), //i
-    .data_in_7                 (tensor_core_1_data_in_7               ), //i
-    .data_in_8                 (tensor_core_1_data_in_8               ), //i
-    .data_in_9                 (tensor_core_1_data_in_9               ), //i
-    .data_in_10                (tensor_core_1_data_in_10              ), //i
-    .side_in_1                 (8'h0                                  ), //i
-    .side_in_2                 (8'h0                                  ), //i
-    .shared_exponent_data      (io_expIn_1                            ), //i
-    .feed_sel                  (2'b01                                 ), //i
-    .load_bb_one               (tensor_core_1_load_bb_one             ), //i
-    .load_bb_two               (tensor_core_1_load_bb_two             ), //i
-    .load_buf_sel              (loadBufSel                            ), //i
-    .bf24_col_1                (tensor_core_1_bf24_col_1              ), //o
-    .bf24_col_2                (tensor_core_1_bf24_col_2              ), //o
-    .bf24_col_3                (tensor_core_1_bf24_col_3              ), //o
-    .acc_en                    (1'b0                                  ), //i
-    .zero_en                   (1'b0                                  ), //i
-    .cascade_weight_in         (tcStartPoint_cascade_weight_out       ), //i
-    .cascade_weight_out        (tensor_core_1_cascade_weight_out      ), //o
-    .cascade_data_in_col_1     (tcStartPoint_cascade_data_out_col_1   ), //i
-    .cascade_data_in_col_2     (tcStartPoint_cascade_data_out_col_2   ), //i
-    .cascade_data_in_col_3     (tcStartPoint_cascade_data_out_col_3   ), //i
-    .cascade_data_out_col_1    (tensor_core_1_cascade_data_out_col_1  ), //o
-    .cascade_data_out_col_2    (tensor_core_1_cascade_data_out_col_2  ), //o
-    .cascade_data_out_col_3    (tensor_core_1_cascade_data_out_col_3  )  //o
+  tensor_core_bf12 tensor_core_bf12_1 (
+    .clk                       (clk                                        ), //i
+    .data_in_1                 (tensor_core_bf12_1_data_in_1               ), //i
+    .data_in_2                 (tensor_core_bf12_1_data_in_2               ), //i
+    .data_in_3                 (tensor_core_bf12_1_data_in_3               ), //i
+    .data_in_4                 (tensor_core_bf12_1_data_in_4               ), //i
+    .data_in_5                 (tensor_core_bf12_1_data_in_5               ), //i
+    .data_in_6                 (tensor_core_bf12_1_data_in_6               ), //i
+    .data_in_7                 (tensor_core_bf12_1_data_in_7               ), //i
+    .data_in_8                 (tensor_core_bf12_1_data_in_8               ), //i
+    .data_in_9                 (tensor_core_bf12_1_data_in_9               ), //i
+    .data_in_10                (tensor_core_bf12_1_data_in_10              ), //i
+    .data_in_11                (tensor_core_bf12_1_data_in_11              ), //i
+    .data_in_12                (tensor_core_bf12_1_data_in_12              ), //i
+    .data_in_13                (tensor_core_bf12_1_data_in_13              ), //i
+    .data_in_14                (tensor_core_bf12_1_data_in_14              ), //i
+    .data_in_15                (tensor_core_bf12_1_data_in_15              ), //i
+    .data_in_16                (tensor_core_bf12_1_data_in_16              ), //i
+    .data_in_17                (tensor_core_bf12_1_data_in_17              ), //i
+    .data_in_18                (tensor_core_bf12_1_data_in_18              ), //i
+    .data_in_19                (tensor_core_bf12_1_data_in_19              ), //i
+    .data_in_20                (tensor_core_bf12_1_data_in_20              ), //i
+    .side_in_1                 (4'b0000                                    ), //i
+    .side_in_2                 (4'b0000                                    ), //i
+    .side_in_3                 (4'b0000                                    ), //i
+    .side_in_4                 (4'b0000                                    ), //i
+    .shared_exponent_data      (io_expIn_1                                 ), //i
+    .feed_sel                  (2'b01                                      ), //i
+    .load_bb_one               (tensor_core_bf12_1_load_bb_one             ), //i
+    .load_bb_two               (tensor_core_bf12_1_load_bb_two             ), //i
+    .load_buf_sel              (loadBufSel                                 ), //i
+    .bf24_col_1                (tensor_core_bf12_1_bf24_col_1              ), //o
+    .bf24_col_2                (tensor_core_bf12_1_bf24_col_2              ), //o
+    .bf24_col_3                (tensor_core_bf12_1_bf24_col_3              ), //o
+    .acc_en                    (1'b0                                       ), //i
+    .zero_en                   (1'b0                                       ), //i
+    .clr0                      (1'b0                                       ), //i
+    .clr1                      (1'b0                                       ), //i
+    .cascade_weight_in         (tcStartPoint_cascade_weight_out            ), //i
+    .cascade_weight_out        (tensor_core_bf12_1_cascade_weight_out      ), //o
+    .cascade_data_in_col_1     (tcStartPoint_cascade_data_out_col_1        ), //i
+    .cascade_data_in_col_2     (tcStartPoint_cascade_data_out_col_2        ), //i
+    .cascade_data_in_col_3     (tcStartPoint_cascade_data_out_col_3        ), //i
+    .cascade_data_out_col_1    (tensor_core_bf12_1_cascade_data_out_col_1  ), //o
+    .cascade_data_out_col_2    (tensor_core_bf12_1_cascade_data_out_col_2  ), //o
+    .cascade_data_out_col_3    (tensor_core_bf12_1_cascade_data_out_col_3  )  //o
   );
-  tensor_core tensor_core_2 (
-    .clk                       (clk                                   ), //i
-    .data_in_1                 (tensor_core_2_data_in_1               ), //i
-    .data_in_2                 (tensor_core_2_data_in_2               ), //i
-    .data_in_3                 (tensor_core_2_data_in_3               ), //i
-    .data_in_4                 (tensor_core_2_data_in_4               ), //i
-    .data_in_5                 (tensor_core_2_data_in_5               ), //i
-    .data_in_6                 (tensor_core_2_data_in_6               ), //i
-    .data_in_7                 (tensor_core_2_data_in_7               ), //i
-    .data_in_8                 (tensor_core_2_data_in_8               ), //i
-    .data_in_9                 (tensor_core_2_data_in_9               ), //i
-    .data_in_10                (tensor_core_2_data_in_10              ), //i
-    .side_in_1                 (8'h0                                  ), //i
-    .side_in_2                 (8'h0                                  ), //i
-    .shared_exponent_data      (io_expIn_2                            ), //i
-    .feed_sel                  (2'b01                                 ), //i
-    .load_bb_one               (tensor_core_2_load_bb_one             ), //i
-    .load_bb_two               (tensor_core_2_load_bb_two             ), //i
-    .load_buf_sel              (loadBufSel                            ), //i
-    .bf24_col_1                (tensor_core_2_bf24_col_1              ), //o
-    .bf24_col_2                (tensor_core_2_bf24_col_2              ), //o
-    .bf24_col_3                (tensor_core_2_bf24_col_3              ), //o
-    .acc_en                    (1'b0                                  ), //i
-    .zero_en                   (1'b0                                  ), //i
-    .cascade_weight_in         (tensor_core_1_cascade_weight_out      ), //i
-    .cascade_weight_out        (tensor_core_2_cascade_weight_out      ), //o
-    .cascade_data_in_col_1     (tensor_core_1_cascade_data_out_col_1  ), //i
-    .cascade_data_in_col_2     (tensor_core_1_cascade_data_out_col_2  ), //i
-    .cascade_data_in_col_3     (tensor_core_1_cascade_data_out_col_3  ), //i
-    .cascade_data_out_col_1    (tensor_core_2_cascade_data_out_col_1  ), //o
-    .cascade_data_out_col_2    (tensor_core_2_cascade_data_out_col_2  ), //o
-    .cascade_data_out_col_3    (tensor_core_2_cascade_data_out_col_3  )  //o
+  tensor_core_bf12 tensor_core_bf12_2 (
+    .clk                       (clk                                        ), //i
+    .data_in_1                 (tensor_core_bf12_2_data_in_1               ), //i
+    .data_in_2                 (tensor_core_bf12_2_data_in_2               ), //i
+    .data_in_3                 (tensor_core_bf12_2_data_in_3               ), //i
+    .data_in_4                 (tensor_core_bf12_2_data_in_4               ), //i
+    .data_in_5                 (tensor_core_bf12_2_data_in_5               ), //i
+    .data_in_6                 (tensor_core_bf12_2_data_in_6               ), //i
+    .data_in_7                 (tensor_core_bf12_2_data_in_7               ), //i
+    .data_in_8                 (tensor_core_bf12_2_data_in_8               ), //i
+    .data_in_9                 (tensor_core_bf12_2_data_in_9               ), //i
+    .data_in_10                (tensor_core_bf12_2_data_in_10              ), //i
+    .data_in_11                (tensor_core_bf12_2_data_in_11              ), //i
+    .data_in_12                (tensor_core_bf12_2_data_in_12              ), //i
+    .data_in_13                (tensor_core_bf12_2_data_in_13              ), //i
+    .data_in_14                (tensor_core_bf12_2_data_in_14              ), //i
+    .data_in_15                (tensor_core_bf12_2_data_in_15              ), //i
+    .data_in_16                (tensor_core_bf12_2_data_in_16              ), //i
+    .data_in_17                (tensor_core_bf12_2_data_in_17              ), //i
+    .data_in_18                (tensor_core_bf12_2_data_in_18              ), //i
+    .data_in_19                (tensor_core_bf12_2_data_in_19              ), //i
+    .data_in_20                (tensor_core_bf12_2_data_in_20              ), //i
+    .side_in_1                 (4'b0000                                    ), //i
+    .side_in_2                 (4'b0000                                    ), //i
+    .side_in_3                 (4'b0000                                    ), //i
+    .side_in_4                 (4'b0000                                    ), //i
+    .shared_exponent_data      (io_expIn_2                                 ), //i
+    .feed_sel                  (2'b01                                      ), //i
+    .load_bb_one               (tensor_core_bf12_2_load_bb_one             ), //i
+    .load_bb_two               (tensor_core_bf12_2_load_bb_two             ), //i
+    .load_buf_sel              (loadBufSel                                 ), //i
+    .bf24_col_1                (tensor_core_bf12_2_bf24_col_1              ), //o
+    .bf24_col_2                (tensor_core_bf12_2_bf24_col_2              ), //o
+    .bf24_col_3                (tensor_core_bf12_2_bf24_col_3              ), //o
+    .acc_en                    (1'b0                                       ), //i
+    .zero_en                   (1'b0                                       ), //i
+    .clr0                      (1'b0                                       ), //i
+    .clr1                      (1'b0                                       ), //i
+    .cascade_weight_in         (tensor_core_bf12_1_cascade_weight_out      ), //i
+    .cascade_weight_out        (tensor_core_bf12_2_cascade_weight_out      ), //o
+    .cascade_data_in_col_1     (tensor_core_bf12_1_cascade_data_out_col_1  ), //i
+    .cascade_data_in_col_2     (tensor_core_bf12_1_cascade_data_out_col_2  ), //i
+    .cascade_data_in_col_3     (tensor_core_bf12_1_cascade_data_out_col_3  ), //i
+    .cascade_data_out_col_1    (tensor_core_bf12_2_cascade_data_out_col_1  ), //o
+    .cascade_data_out_col_2    (tensor_core_bf12_2_cascade_data_out_col_2  ), //o
+    .cascade_data_out_col_3    (tensor_core_bf12_2_cascade_data_out_col_3  )  //o
   );
-  tensor_core tensor_core_3 (
-    .clk                       (clk                                   ), //i
-    .data_in_1                 (tensor_core_3_data_in_1               ), //i
-    .data_in_2                 (tensor_core_3_data_in_2               ), //i
-    .data_in_3                 (tensor_core_3_data_in_3               ), //i
-    .data_in_4                 (tensor_core_3_data_in_4               ), //i
-    .data_in_5                 (tensor_core_3_data_in_5               ), //i
-    .data_in_6                 (tensor_core_3_data_in_6               ), //i
-    .data_in_7                 (tensor_core_3_data_in_7               ), //i
-    .data_in_8                 (tensor_core_3_data_in_8               ), //i
-    .data_in_9                 (tensor_core_3_data_in_9               ), //i
-    .data_in_10                (tensor_core_3_data_in_10              ), //i
-    .side_in_1                 (8'h0                                  ), //i
-    .side_in_2                 (8'h0                                  ), //i
-    .shared_exponent_data      (io_expIn_3                            ), //i
-    .feed_sel                  (2'b01                                 ), //i
-    .load_bb_one               (tensor_core_3_load_bb_one             ), //i
-    .load_bb_two               (tensor_core_3_load_bb_two             ), //i
-    .load_buf_sel              (loadBufSel                            ), //i
-    .bf24_col_1                (tensor_core_3_bf24_col_1              ), //o
-    .bf24_col_2                (tensor_core_3_bf24_col_2              ), //o
-    .bf24_col_3                (tensor_core_3_bf24_col_3              ), //o
-    .acc_en                    (1'b0                                  ), //i
-    .zero_en                   (1'b0                                  ), //i
-    .cascade_weight_in         (tensor_core_2_cascade_weight_out      ), //i
-    .cascade_weight_out        (tensor_core_3_cascade_weight_out      ), //o
-    .cascade_data_in_col_1     (tensor_core_2_cascade_data_out_col_1  ), //i
-    .cascade_data_in_col_2     (tensor_core_2_cascade_data_out_col_2  ), //i
-    .cascade_data_in_col_3     (tensor_core_2_cascade_data_out_col_3  ), //i
-    .cascade_data_out_col_1    (tensor_core_3_cascade_data_out_col_1  ), //o
-    .cascade_data_out_col_2    (tensor_core_3_cascade_data_out_col_2  ), //o
-    .cascade_data_out_col_3    (tensor_core_3_cascade_data_out_col_3  )  //o
+  tensor_core_bf12 tensor_core_bf12_3 (
+    .clk                       (clk                                        ), //i
+    .data_in_1                 (tensor_core_bf12_3_data_in_1               ), //i
+    .data_in_2                 (tensor_core_bf12_3_data_in_2               ), //i
+    .data_in_3                 (tensor_core_bf12_3_data_in_3               ), //i
+    .data_in_4                 (tensor_core_bf12_3_data_in_4               ), //i
+    .data_in_5                 (tensor_core_bf12_3_data_in_5               ), //i
+    .data_in_6                 (tensor_core_bf12_3_data_in_6               ), //i
+    .data_in_7                 (tensor_core_bf12_3_data_in_7               ), //i
+    .data_in_8                 (tensor_core_bf12_3_data_in_8               ), //i
+    .data_in_9                 (tensor_core_bf12_3_data_in_9               ), //i
+    .data_in_10                (tensor_core_bf12_3_data_in_10              ), //i
+    .data_in_11                (tensor_core_bf12_3_data_in_11              ), //i
+    .data_in_12                (tensor_core_bf12_3_data_in_12              ), //i
+    .data_in_13                (tensor_core_bf12_3_data_in_13              ), //i
+    .data_in_14                (tensor_core_bf12_3_data_in_14              ), //i
+    .data_in_15                (tensor_core_bf12_3_data_in_15              ), //i
+    .data_in_16                (tensor_core_bf12_3_data_in_16              ), //i
+    .data_in_17                (tensor_core_bf12_3_data_in_17              ), //i
+    .data_in_18                (tensor_core_bf12_3_data_in_18              ), //i
+    .data_in_19                (tensor_core_bf12_3_data_in_19              ), //i
+    .data_in_20                (tensor_core_bf12_3_data_in_20              ), //i
+    .side_in_1                 (4'b0000                                    ), //i
+    .side_in_2                 (4'b0000                                    ), //i
+    .side_in_3                 (4'b0000                                    ), //i
+    .side_in_4                 (4'b0000                                    ), //i
+    .shared_exponent_data      (io_expIn_3                                 ), //i
+    .feed_sel                  (2'b01                                      ), //i
+    .load_bb_one               (tensor_core_bf12_3_load_bb_one             ), //i
+    .load_bb_two               (tensor_core_bf12_3_load_bb_two             ), //i
+    .load_buf_sel              (loadBufSel                                 ), //i
+    .bf24_col_1                (tensor_core_bf12_3_bf24_col_1              ), //o
+    .bf24_col_2                (tensor_core_bf12_3_bf24_col_2              ), //o
+    .bf24_col_3                (tensor_core_bf12_3_bf24_col_3              ), //o
+    .acc_en                    (1'b0                                       ), //i
+    .zero_en                   (1'b0                                       ), //i
+    .clr0                      (1'b0                                       ), //i
+    .clr1                      (1'b0                                       ), //i
+    .cascade_weight_in         (tensor_core_bf12_2_cascade_weight_out      ), //i
+    .cascade_weight_out        (tensor_core_bf12_3_cascade_weight_out      ), //o
+    .cascade_data_in_col_1     (tensor_core_bf12_2_cascade_data_out_col_1  ), //i
+    .cascade_data_in_col_2     (tensor_core_bf12_2_cascade_data_out_col_2  ), //i
+    .cascade_data_in_col_3     (tensor_core_bf12_2_cascade_data_out_col_3  ), //i
+    .cascade_data_out_col_1    (tensor_core_bf12_3_cascade_data_out_col_1  ), //o
+    .cascade_data_out_col_2    (tensor_core_bf12_3_cascade_data_out_col_2  ), //o
+    .cascade_data_out_col_3    (tensor_core_bf12_3_cascade_data_out_col_3  )  //o
   );
-  tensor_core tensor_core_4 (
-    .clk                       (clk                                   ), //i
-    .data_in_1                 (tensor_core_4_data_in_1               ), //i
-    .data_in_2                 (tensor_core_4_data_in_2               ), //i
-    .data_in_3                 (tensor_core_4_data_in_3               ), //i
-    .data_in_4                 (tensor_core_4_data_in_4               ), //i
-    .data_in_5                 (tensor_core_4_data_in_5               ), //i
-    .data_in_6                 (tensor_core_4_data_in_6               ), //i
-    .data_in_7                 (tensor_core_4_data_in_7               ), //i
-    .data_in_8                 (tensor_core_4_data_in_8               ), //i
-    .data_in_9                 (tensor_core_4_data_in_9               ), //i
-    .data_in_10                (tensor_core_4_data_in_10              ), //i
-    .side_in_1                 (8'h0                                  ), //i
-    .side_in_2                 (8'h0                                  ), //i
-    .shared_exponent_data      (io_expIn_4                            ), //i
-    .feed_sel                  (2'b01                                 ), //i
-    .load_bb_one               (tensor_core_4_load_bb_one             ), //i
-    .load_bb_two               (tensor_core_4_load_bb_two             ), //i
-    .load_buf_sel              (loadBufSel                            ), //i
-    .bf24_col_1                (tensor_core_4_bf24_col_1              ), //o
-    .bf24_col_2                (tensor_core_4_bf24_col_2              ), //o
-    .bf24_col_3                (tensor_core_4_bf24_col_3              ), //o
-    .acc_en                    (1'b0                                  ), //i
-    .zero_en                   (1'b0                                  ), //i
-    .cascade_weight_in         (tensor_core_3_cascade_weight_out      ), //i
-    .cascade_weight_out        (tensor_core_4_cascade_weight_out      ), //o
-    .cascade_data_in_col_1     (tensor_core_3_cascade_data_out_col_1  ), //i
-    .cascade_data_in_col_2     (tensor_core_3_cascade_data_out_col_2  ), //i
-    .cascade_data_in_col_3     (tensor_core_3_cascade_data_out_col_3  ), //i
-    .cascade_data_out_col_1    (tensor_core_4_cascade_data_out_col_1  ), //o
-    .cascade_data_out_col_2    (tensor_core_4_cascade_data_out_col_2  ), //o
-    .cascade_data_out_col_3    (tensor_core_4_cascade_data_out_col_3  )  //o
+  tensor_core_bf12 tensor_core_bf12_4 (
+    .clk                       (clk                                        ), //i
+    .data_in_1                 (tensor_core_bf12_4_data_in_1               ), //i
+    .data_in_2                 (tensor_core_bf12_4_data_in_2               ), //i
+    .data_in_3                 (tensor_core_bf12_4_data_in_3               ), //i
+    .data_in_4                 (tensor_core_bf12_4_data_in_4               ), //i
+    .data_in_5                 (tensor_core_bf12_4_data_in_5               ), //i
+    .data_in_6                 (tensor_core_bf12_4_data_in_6               ), //i
+    .data_in_7                 (tensor_core_bf12_4_data_in_7               ), //i
+    .data_in_8                 (tensor_core_bf12_4_data_in_8               ), //i
+    .data_in_9                 (tensor_core_bf12_4_data_in_9               ), //i
+    .data_in_10                (tensor_core_bf12_4_data_in_10              ), //i
+    .data_in_11                (tensor_core_bf12_4_data_in_11              ), //i
+    .data_in_12                (tensor_core_bf12_4_data_in_12              ), //i
+    .data_in_13                (tensor_core_bf12_4_data_in_13              ), //i
+    .data_in_14                (tensor_core_bf12_4_data_in_14              ), //i
+    .data_in_15                (tensor_core_bf12_4_data_in_15              ), //i
+    .data_in_16                (tensor_core_bf12_4_data_in_16              ), //i
+    .data_in_17                (tensor_core_bf12_4_data_in_17              ), //i
+    .data_in_18                (tensor_core_bf12_4_data_in_18              ), //i
+    .data_in_19                (tensor_core_bf12_4_data_in_19              ), //i
+    .data_in_20                (tensor_core_bf12_4_data_in_20              ), //i
+    .side_in_1                 (4'b0000                                    ), //i
+    .side_in_2                 (4'b0000                                    ), //i
+    .side_in_3                 (4'b0000                                    ), //i
+    .side_in_4                 (4'b0000                                    ), //i
+    .shared_exponent_data      (io_expIn_4                                 ), //i
+    .feed_sel                  (2'b01                                      ), //i
+    .load_bb_one               (tensor_core_bf12_4_load_bb_one             ), //i
+    .load_bb_two               (tensor_core_bf12_4_load_bb_two             ), //i
+    .load_buf_sel              (loadBufSel                                 ), //i
+    .bf24_col_1                (tensor_core_bf12_4_bf24_col_1              ), //o
+    .bf24_col_2                (tensor_core_bf12_4_bf24_col_2              ), //o
+    .bf24_col_3                (tensor_core_bf12_4_bf24_col_3              ), //o
+    .acc_en                    (1'b0                                       ), //i
+    .zero_en                   (1'b0                                       ), //i
+    .clr0                      (1'b0                                       ), //i
+    .clr1                      (1'b0                                       ), //i
+    .cascade_weight_in         (tensor_core_bf12_3_cascade_weight_out      ), //i
+    .cascade_weight_out        (tensor_core_bf12_4_cascade_weight_out      ), //o
+    .cascade_data_in_col_1     (tensor_core_bf12_3_cascade_data_out_col_1  ), //i
+    .cascade_data_in_col_2     (tensor_core_bf12_3_cascade_data_out_col_2  ), //i
+    .cascade_data_in_col_3     (tensor_core_bf12_3_cascade_data_out_col_3  ), //i
+    .cascade_data_out_col_1    (tensor_core_bf12_4_cascade_data_out_col_1  ), //o
+    .cascade_data_out_col_2    (tensor_core_bf12_4_cascade_data_out_col_2  ), //o
+    .cascade_data_out_col_3    (tensor_core_bf12_4_cascade_data_out_col_3  )  //o
   );
-  tensor_core tensor_core_5 (
-    .clk                       (clk                                   ), //i
-    .data_in_1                 (tensor_core_5_data_in_1               ), //i
-    .data_in_2                 (tensor_core_5_data_in_2               ), //i
-    .data_in_3                 (tensor_core_5_data_in_3               ), //i
-    .data_in_4                 (tensor_core_5_data_in_4               ), //i
-    .data_in_5                 (tensor_core_5_data_in_5               ), //i
-    .data_in_6                 (tensor_core_5_data_in_6               ), //i
-    .data_in_7                 (tensor_core_5_data_in_7               ), //i
-    .data_in_8                 (tensor_core_5_data_in_8               ), //i
-    .data_in_9                 (tensor_core_5_data_in_9               ), //i
-    .data_in_10                (tensor_core_5_data_in_10              ), //i
-    .side_in_1                 (8'h0                                  ), //i
-    .side_in_2                 (8'h0                                  ), //i
-    .shared_exponent_data      (io_expIn_5                            ), //i
-    .feed_sel                  (2'b01                                 ), //i
-    .load_bb_one               (tensor_core_5_load_bb_one             ), //i
-    .load_bb_two               (tensor_core_5_load_bb_two             ), //i
-    .load_buf_sel              (loadBufSel                            ), //i
-    .bf24_col_1                (tensor_core_5_bf24_col_1              ), //o
-    .bf24_col_2                (tensor_core_5_bf24_col_2              ), //o
-    .bf24_col_3                (tensor_core_5_bf24_col_3              ), //o
-    .acc_en                    (1'b0                                  ), //i
-    .zero_en                   (1'b0                                  ), //i
-    .cascade_weight_in         (tensor_core_4_cascade_weight_out      ), //i
-    .cascade_weight_out        (tensor_core_5_cascade_weight_out      ), //o
-    .cascade_data_in_col_1     (tensor_core_4_cascade_data_out_col_1  ), //i
-    .cascade_data_in_col_2     (tensor_core_4_cascade_data_out_col_2  ), //i
-    .cascade_data_in_col_3     (tensor_core_4_cascade_data_out_col_3  ), //i
-    .cascade_data_out_col_1    (tensor_core_5_cascade_data_out_col_1  ), //o
-    .cascade_data_out_col_2    (tensor_core_5_cascade_data_out_col_2  ), //o
-    .cascade_data_out_col_3    (tensor_core_5_cascade_data_out_col_3  )  //o
+  tensor_core_bf12 tensor_core_bf12_5 (
+    .clk                       (clk                                        ), //i
+    .data_in_1                 (tensor_core_bf12_5_data_in_1               ), //i
+    .data_in_2                 (tensor_core_bf12_5_data_in_2               ), //i
+    .data_in_3                 (tensor_core_bf12_5_data_in_3               ), //i
+    .data_in_4                 (tensor_core_bf12_5_data_in_4               ), //i
+    .data_in_5                 (tensor_core_bf12_5_data_in_5               ), //i
+    .data_in_6                 (tensor_core_bf12_5_data_in_6               ), //i
+    .data_in_7                 (tensor_core_bf12_5_data_in_7               ), //i
+    .data_in_8                 (tensor_core_bf12_5_data_in_8               ), //i
+    .data_in_9                 (tensor_core_bf12_5_data_in_9               ), //i
+    .data_in_10                (tensor_core_bf12_5_data_in_10              ), //i
+    .data_in_11                (tensor_core_bf12_5_data_in_11              ), //i
+    .data_in_12                (tensor_core_bf12_5_data_in_12              ), //i
+    .data_in_13                (tensor_core_bf12_5_data_in_13              ), //i
+    .data_in_14                (tensor_core_bf12_5_data_in_14              ), //i
+    .data_in_15                (tensor_core_bf12_5_data_in_15              ), //i
+    .data_in_16                (tensor_core_bf12_5_data_in_16              ), //i
+    .data_in_17                (tensor_core_bf12_5_data_in_17              ), //i
+    .data_in_18                (tensor_core_bf12_5_data_in_18              ), //i
+    .data_in_19                (tensor_core_bf12_5_data_in_19              ), //i
+    .data_in_20                (tensor_core_bf12_5_data_in_20              ), //i
+    .side_in_1                 (4'b0000                                    ), //i
+    .side_in_2                 (4'b0000                                    ), //i
+    .side_in_3                 (4'b0000                                    ), //i
+    .side_in_4                 (4'b0000                                    ), //i
+    .shared_exponent_data      (io_expIn_5                                 ), //i
+    .feed_sel                  (2'b01                                      ), //i
+    .load_bb_one               (tensor_core_bf12_5_load_bb_one             ), //i
+    .load_bb_two               (tensor_core_bf12_5_load_bb_two             ), //i
+    .load_buf_sel              (loadBufSel                                 ), //i
+    .bf24_col_1                (tensor_core_bf12_5_bf24_col_1              ), //o
+    .bf24_col_2                (tensor_core_bf12_5_bf24_col_2              ), //o
+    .bf24_col_3                (tensor_core_bf12_5_bf24_col_3              ), //o
+    .acc_en                    (1'b0                                       ), //i
+    .zero_en                   (1'b0                                       ), //i
+    .clr0                      (1'b0                                       ), //i
+    .clr1                      (1'b0                                       ), //i
+    .cascade_weight_in         (tensor_core_bf12_4_cascade_weight_out      ), //i
+    .cascade_weight_out        (tensor_core_bf12_5_cascade_weight_out      ), //o
+    .cascade_data_in_col_1     (tensor_core_bf12_4_cascade_data_out_col_1  ), //i
+    .cascade_data_in_col_2     (tensor_core_bf12_4_cascade_data_out_col_2  ), //i
+    .cascade_data_in_col_3     (tensor_core_bf12_4_cascade_data_out_col_3  ), //i
+    .cascade_data_out_col_1    (tensor_core_bf12_5_cascade_data_out_col_1  ), //o
+    .cascade_data_out_col_2    (tensor_core_bf12_5_cascade_data_out_col_2  ), //o
+    .cascade_data_out_col_3    (tensor_core_bf12_5_cascade_data_out_col_3  )  //o
   );
-  tensor_core tensor_core_6 (
-    .clk                       (clk                                   ), //i
-    .data_in_1                 (tensor_core_6_data_in_1               ), //i
-    .data_in_2                 (tensor_core_6_data_in_2               ), //i
-    .data_in_3                 (tensor_core_6_data_in_3               ), //i
-    .data_in_4                 (tensor_core_6_data_in_4               ), //i
-    .data_in_5                 (tensor_core_6_data_in_5               ), //i
-    .data_in_6                 (tensor_core_6_data_in_6               ), //i
-    .data_in_7                 (tensor_core_6_data_in_7               ), //i
-    .data_in_8                 (tensor_core_6_data_in_8               ), //i
-    .data_in_9                 (tensor_core_6_data_in_9               ), //i
-    .data_in_10                (tensor_core_6_data_in_10              ), //i
-    .side_in_1                 (8'h0                                  ), //i
-    .side_in_2                 (8'h0                                  ), //i
-    .shared_exponent_data      (io_expIn_6                            ), //i
-    .feed_sel                  (2'b01                                 ), //i
-    .load_bb_one               (tensor_core_6_load_bb_one             ), //i
-    .load_bb_two               (tensor_core_6_load_bb_two             ), //i
-    .load_buf_sel              (loadBufSel                            ), //i
-    .bf24_col_1                (tensor_core_6_bf24_col_1              ), //o
-    .bf24_col_2                (tensor_core_6_bf24_col_2              ), //o
-    .bf24_col_3                (tensor_core_6_bf24_col_3              ), //o
-    .acc_en                    (1'b0                                  ), //i
-    .zero_en                   (1'b0                                  ), //i
-    .cascade_weight_in         (tensor_core_5_cascade_weight_out      ), //i
-    .cascade_weight_out        (tensor_core_6_cascade_weight_out      ), //o
-    .cascade_data_in_col_1     (tensor_core_5_cascade_data_out_col_1  ), //i
-    .cascade_data_in_col_2     (tensor_core_5_cascade_data_out_col_2  ), //i
-    .cascade_data_in_col_3     (tensor_core_5_cascade_data_out_col_3  ), //i
-    .cascade_data_out_col_1    (tensor_core_6_cascade_data_out_col_1  ), //o
-    .cascade_data_out_col_2    (tensor_core_6_cascade_data_out_col_2  ), //o
-    .cascade_data_out_col_3    (tensor_core_6_cascade_data_out_col_3  )  //o
+  tensor_core_bf12 tensor_core_bf12_6 (
+    .clk                       (clk                                        ), //i
+    .data_in_1                 (tensor_core_bf12_6_data_in_1               ), //i
+    .data_in_2                 (tensor_core_bf12_6_data_in_2               ), //i
+    .data_in_3                 (tensor_core_bf12_6_data_in_3               ), //i
+    .data_in_4                 (tensor_core_bf12_6_data_in_4               ), //i
+    .data_in_5                 (tensor_core_bf12_6_data_in_5               ), //i
+    .data_in_6                 (tensor_core_bf12_6_data_in_6               ), //i
+    .data_in_7                 (tensor_core_bf12_6_data_in_7               ), //i
+    .data_in_8                 (tensor_core_bf12_6_data_in_8               ), //i
+    .data_in_9                 (tensor_core_bf12_6_data_in_9               ), //i
+    .data_in_10                (tensor_core_bf12_6_data_in_10              ), //i
+    .data_in_11                (tensor_core_bf12_6_data_in_11              ), //i
+    .data_in_12                (tensor_core_bf12_6_data_in_12              ), //i
+    .data_in_13                (tensor_core_bf12_6_data_in_13              ), //i
+    .data_in_14                (tensor_core_bf12_6_data_in_14              ), //i
+    .data_in_15                (tensor_core_bf12_6_data_in_15              ), //i
+    .data_in_16                (tensor_core_bf12_6_data_in_16              ), //i
+    .data_in_17                (tensor_core_bf12_6_data_in_17              ), //i
+    .data_in_18                (tensor_core_bf12_6_data_in_18              ), //i
+    .data_in_19                (tensor_core_bf12_6_data_in_19              ), //i
+    .data_in_20                (tensor_core_bf12_6_data_in_20              ), //i
+    .side_in_1                 (4'b0000                                    ), //i
+    .side_in_2                 (4'b0000                                    ), //i
+    .side_in_3                 (4'b0000                                    ), //i
+    .side_in_4                 (4'b0000                                    ), //i
+    .shared_exponent_data      (io_expIn_6                                 ), //i
+    .feed_sel                  (2'b01                                      ), //i
+    .load_bb_one               (tensor_core_bf12_6_load_bb_one             ), //i
+    .load_bb_two               (tensor_core_bf12_6_load_bb_two             ), //i
+    .load_buf_sel              (loadBufSel                                 ), //i
+    .bf24_col_1                (tensor_core_bf12_6_bf24_col_1              ), //o
+    .bf24_col_2                (tensor_core_bf12_6_bf24_col_2              ), //o
+    .bf24_col_3                (tensor_core_bf12_6_bf24_col_3              ), //o
+    .acc_en                    (1'b0                                       ), //i
+    .zero_en                   (1'b0                                       ), //i
+    .clr0                      (1'b0                                       ), //i
+    .clr1                      (1'b0                                       ), //i
+    .cascade_weight_in         (tensor_core_bf12_5_cascade_weight_out      ), //i
+    .cascade_weight_out        (tensor_core_bf12_6_cascade_weight_out      ), //o
+    .cascade_data_in_col_1     (tensor_core_bf12_5_cascade_data_out_col_1  ), //i
+    .cascade_data_in_col_2     (tensor_core_bf12_5_cascade_data_out_col_2  ), //i
+    .cascade_data_in_col_3     (tensor_core_bf12_5_cascade_data_out_col_3  ), //i
+    .cascade_data_out_col_1    (tensor_core_bf12_6_cascade_data_out_col_1  ), //o
+    .cascade_data_out_col_2    (tensor_core_bf12_6_cascade_data_out_col_2  ), //o
+    .cascade_data_out_col_3    (tensor_core_bf12_6_cascade_data_out_col_3  )  //o
   );
-  tensor_core tensor_core_7 (
-    .clk                       (clk                                   ), //i
-    .data_in_1                 (tensor_core_7_data_in_1               ), //i
-    .data_in_2                 (tensor_core_7_data_in_2               ), //i
-    .data_in_3                 (tensor_core_7_data_in_3               ), //i
-    .data_in_4                 (tensor_core_7_data_in_4               ), //i
-    .data_in_5                 (tensor_core_7_data_in_5               ), //i
-    .data_in_6                 (tensor_core_7_data_in_6               ), //i
-    .data_in_7                 (tensor_core_7_data_in_7               ), //i
-    .data_in_8                 (tensor_core_7_data_in_8               ), //i
-    .data_in_9                 (tensor_core_7_data_in_9               ), //i
-    .data_in_10                (tensor_core_7_data_in_10              ), //i
-    .side_in_1                 (8'h0                                  ), //i
-    .side_in_2                 (8'h0                                  ), //i
-    .shared_exponent_data      (io_expIn_7                            ), //i
-    .feed_sel                  (2'b01                                 ), //i
-    .load_bb_one               (tensor_core_7_load_bb_one             ), //i
-    .load_bb_two               (tensor_core_7_load_bb_two             ), //i
-    .load_buf_sel              (loadBufSel                            ), //i
-    .bf24_col_1                (tensor_core_7_bf24_col_1              ), //o
-    .bf24_col_2                (tensor_core_7_bf24_col_2              ), //o
-    .bf24_col_3                (tensor_core_7_bf24_col_3              ), //o
-    .acc_en                    (1'b0                                  ), //i
-    .zero_en                   (1'b0                                  ), //i
-    .cascade_weight_in         (tensor_core_6_cascade_weight_out      ), //i
-    .cascade_weight_out        (tensor_core_7_cascade_weight_out      ), //o
-    .cascade_data_in_col_1     (tensor_core_6_cascade_data_out_col_1  ), //i
-    .cascade_data_in_col_2     (tensor_core_6_cascade_data_out_col_2  ), //i
-    .cascade_data_in_col_3     (tensor_core_6_cascade_data_out_col_3  ), //i
-    .cascade_data_out_col_1    (tensor_core_7_cascade_data_out_col_1  ), //o
-    .cascade_data_out_col_2    (tensor_core_7_cascade_data_out_col_2  ), //o
-    .cascade_data_out_col_3    (tensor_core_7_cascade_data_out_col_3  )  //o
+  tensor_core_bf12 tensor_core_bf12_7 (
+    .clk                       (clk                                        ), //i
+    .data_in_1                 (tensor_core_bf12_7_data_in_1               ), //i
+    .data_in_2                 (tensor_core_bf12_7_data_in_2               ), //i
+    .data_in_3                 (tensor_core_bf12_7_data_in_3               ), //i
+    .data_in_4                 (tensor_core_bf12_7_data_in_4               ), //i
+    .data_in_5                 (tensor_core_bf12_7_data_in_5               ), //i
+    .data_in_6                 (tensor_core_bf12_7_data_in_6               ), //i
+    .data_in_7                 (tensor_core_bf12_7_data_in_7               ), //i
+    .data_in_8                 (tensor_core_bf12_7_data_in_8               ), //i
+    .data_in_9                 (tensor_core_bf12_7_data_in_9               ), //i
+    .data_in_10                (tensor_core_bf12_7_data_in_10              ), //i
+    .data_in_11                (tensor_core_bf12_7_data_in_11              ), //i
+    .data_in_12                (tensor_core_bf12_7_data_in_12              ), //i
+    .data_in_13                (tensor_core_bf12_7_data_in_13              ), //i
+    .data_in_14                (tensor_core_bf12_7_data_in_14              ), //i
+    .data_in_15                (tensor_core_bf12_7_data_in_15              ), //i
+    .data_in_16                (tensor_core_bf12_7_data_in_16              ), //i
+    .data_in_17                (tensor_core_bf12_7_data_in_17              ), //i
+    .data_in_18                (tensor_core_bf12_7_data_in_18              ), //i
+    .data_in_19                (tensor_core_bf12_7_data_in_19              ), //i
+    .data_in_20                (tensor_core_bf12_7_data_in_20              ), //i
+    .side_in_1                 (4'b0000                                    ), //i
+    .side_in_2                 (4'b0000                                    ), //i
+    .side_in_3                 (4'b0000                                    ), //i
+    .side_in_4                 (4'b0000                                    ), //i
+    .shared_exponent_data      (io_expIn_7                                 ), //i
+    .feed_sel                  (2'b01                                      ), //i
+    .load_bb_one               (tensor_core_bf12_7_load_bb_one             ), //i
+    .load_bb_two               (tensor_core_bf12_7_load_bb_two             ), //i
+    .load_buf_sel              (loadBufSel                                 ), //i
+    .bf24_col_1                (tensor_core_bf12_7_bf24_col_1              ), //o
+    .bf24_col_2                (tensor_core_bf12_7_bf24_col_2              ), //o
+    .bf24_col_3                (tensor_core_bf12_7_bf24_col_3              ), //o
+    .acc_en                    (1'b0                                       ), //i
+    .zero_en                   (1'b0                                       ), //i
+    .clr0                      (1'b0                                       ), //i
+    .clr1                      (1'b0                                       ), //i
+    .cascade_weight_in         (tensor_core_bf12_6_cascade_weight_out      ), //i
+    .cascade_weight_out        (tensor_core_bf12_7_cascade_weight_out      ), //o
+    .cascade_data_in_col_1     (tensor_core_bf12_6_cascade_data_out_col_1  ), //i
+    .cascade_data_in_col_2     (tensor_core_bf12_6_cascade_data_out_col_2  ), //i
+    .cascade_data_in_col_3     (tensor_core_bf12_6_cascade_data_out_col_3  ), //i
+    .cascade_data_out_col_1    (tensor_core_bf12_7_cascade_data_out_col_1  ), //o
+    .cascade_data_out_col_2    (tensor_core_bf12_7_cascade_data_out_col_2  ), //o
+    .cascade_data_out_col_3    (tensor_core_bf12_7_cascade_data_out_col_3  )  //o
   );
-  tensor_core tensor_core_8 (
-    .clk                       (clk                                   ), //i
-    .data_in_1                 (tensor_core_8_data_in_1               ), //i
-    .data_in_2                 (tensor_core_8_data_in_2               ), //i
-    .data_in_3                 (tensor_core_8_data_in_3               ), //i
-    .data_in_4                 (tensor_core_8_data_in_4               ), //i
-    .data_in_5                 (tensor_core_8_data_in_5               ), //i
-    .data_in_6                 (tensor_core_8_data_in_6               ), //i
-    .data_in_7                 (tensor_core_8_data_in_7               ), //i
-    .data_in_8                 (tensor_core_8_data_in_8               ), //i
-    .data_in_9                 (tensor_core_8_data_in_9               ), //i
-    .data_in_10                (tensor_core_8_data_in_10              ), //i
-    .side_in_1                 (8'h0                                  ), //i
-    .side_in_2                 (8'h0                                  ), //i
-    .shared_exponent_data      (io_expIn_8                            ), //i
-    .feed_sel                  (2'b01                                 ), //i
-    .load_bb_one               (tensor_core_8_load_bb_one             ), //i
-    .load_bb_two               (tensor_core_8_load_bb_two             ), //i
-    .load_buf_sel              (loadBufSel                            ), //i
-    .bf24_col_1                (tensor_core_8_bf24_col_1              ), //o
-    .bf24_col_2                (tensor_core_8_bf24_col_2              ), //o
-    .bf24_col_3                (tensor_core_8_bf24_col_3              ), //o
-    .acc_en                    (1'b0                                  ), //i
-    .zero_en                   (1'b0                                  ), //i
-    .cascade_weight_in         (tensor_core_7_cascade_weight_out      ), //i
-    .cascade_weight_out        (tensor_core_8_cascade_weight_out      ), //o
-    .cascade_data_in_col_1     (tensor_core_7_cascade_data_out_col_1  ), //i
-    .cascade_data_in_col_2     (tensor_core_7_cascade_data_out_col_2  ), //i
-    .cascade_data_in_col_3     (tensor_core_7_cascade_data_out_col_3  ), //i
-    .cascade_data_out_col_1    (tensor_core_8_cascade_data_out_col_1  ), //o
-    .cascade_data_out_col_2    (tensor_core_8_cascade_data_out_col_2  ), //o
-    .cascade_data_out_col_3    (tensor_core_8_cascade_data_out_col_3  )  //o
+  tensor_core_bf12 tensor_core_bf12_8 (
+    .clk                       (clk                                        ), //i
+    .data_in_1                 (tensor_core_bf12_8_data_in_1               ), //i
+    .data_in_2                 (tensor_core_bf12_8_data_in_2               ), //i
+    .data_in_3                 (tensor_core_bf12_8_data_in_3               ), //i
+    .data_in_4                 (tensor_core_bf12_8_data_in_4               ), //i
+    .data_in_5                 (tensor_core_bf12_8_data_in_5               ), //i
+    .data_in_6                 (tensor_core_bf12_8_data_in_6               ), //i
+    .data_in_7                 (tensor_core_bf12_8_data_in_7               ), //i
+    .data_in_8                 (tensor_core_bf12_8_data_in_8               ), //i
+    .data_in_9                 (tensor_core_bf12_8_data_in_9               ), //i
+    .data_in_10                (tensor_core_bf12_8_data_in_10              ), //i
+    .data_in_11                (tensor_core_bf12_8_data_in_11              ), //i
+    .data_in_12                (tensor_core_bf12_8_data_in_12              ), //i
+    .data_in_13                (tensor_core_bf12_8_data_in_13              ), //i
+    .data_in_14                (tensor_core_bf12_8_data_in_14              ), //i
+    .data_in_15                (tensor_core_bf12_8_data_in_15              ), //i
+    .data_in_16                (tensor_core_bf12_8_data_in_16              ), //i
+    .data_in_17                (tensor_core_bf12_8_data_in_17              ), //i
+    .data_in_18                (tensor_core_bf12_8_data_in_18              ), //i
+    .data_in_19                (tensor_core_bf12_8_data_in_19              ), //i
+    .data_in_20                (tensor_core_bf12_8_data_in_20              ), //i
+    .side_in_1                 (4'b0000                                    ), //i
+    .side_in_2                 (4'b0000                                    ), //i
+    .side_in_3                 (4'b0000                                    ), //i
+    .side_in_4                 (4'b0000                                    ), //i
+    .shared_exponent_data      (io_expIn_8                                 ), //i
+    .feed_sel                  (2'b01                                      ), //i
+    .load_bb_one               (tensor_core_bf12_8_load_bb_one             ), //i
+    .load_bb_two               (tensor_core_bf12_8_load_bb_two             ), //i
+    .load_buf_sel              (loadBufSel                                 ), //i
+    .bf24_col_1                (tensor_core_bf12_8_bf24_col_1              ), //o
+    .bf24_col_2                (tensor_core_bf12_8_bf24_col_2              ), //o
+    .bf24_col_3                (tensor_core_bf12_8_bf24_col_3              ), //o
+    .acc_en                    (1'b0                                       ), //i
+    .zero_en                   (1'b0                                       ), //i
+    .clr0                      (1'b0                                       ), //i
+    .clr1                      (1'b0                                       ), //i
+    .cascade_weight_in         (tensor_core_bf12_7_cascade_weight_out      ), //i
+    .cascade_weight_out        (tensor_core_bf12_8_cascade_weight_out      ), //o
+    .cascade_data_in_col_1     (tensor_core_bf12_7_cascade_data_out_col_1  ), //i
+    .cascade_data_in_col_2     (tensor_core_bf12_7_cascade_data_out_col_2  ), //i
+    .cascade_data_in_col_3     (tensor_core_bf12_7_cascade_data_out_col_3  ), //i
+    .cascade_data_out_col_1    (tensor_core_bf12_8_cascade_data_out_col_1  ), //o
+    .cascade_data_out_col_2    (tensor_core_bf12_8_cascade_data_out_col_2  ), //o
+    .cascade_data_out_col_3    (tensor_core_bf12_8_cascade_data_out_col_3  )  //o
   );
-  tensor_core tensor_core_9 (
-    .clk                       (clk                                   ), //i
-    .data_in_1                 (tensor_core_9_data_in_1               ), //i
-    .data_in_2                 (tensor_core_9_data_in_2               ), //i
-    .data_in_3                 (tensor_core_9_data_in_3               ), //i
-    .data_in_4                 (tensor_core_9_data_in_4               ), //i
-    .data_in_5                 (tensor_core_9_data_in_5               ), //i
-    .data_in_6                 (tensor_core_9_data_in_6               ), //i
-    .data_in_7                 (tensor_core_9_data_in_7               ), //i
-    .data_in_8                 (tensor_core_9_data_in_8               ), //i
-    .data_in_9                 (tensor_core_9_data_in_9               ), //i
-    .data_in_10                (tensor_core_9_data_in_10              ), //i
-    .side_in_1                 (8'h0                                  ), //i
-    .side_in_2                 (8'h0                                  ), //i
-    .shared_exponent_data      (io_expIn_9                            ), //i
-    .feed_sel                  (2'b01                                 ), //i
-    .load_bb_one               (tensor_core_9_load_bb_one             ), //i
-    .load_bb_two               (tensor_core_9_load_bb_two             ), //i
-    .load_buf_sel              (loadBufSel                            ), //i
-    .bf24_col_1                (tensor_core_9_bf24_col_1              ), //o
-    .bf24_col_2                (tensor_core_9_bf24_col_2              ), //o
-    .bf24_col_3                (tensor_core_9_bf24_col_3              ), //o
-    .acc_en                    (1'b0                                  ), //i
-    .zero_en                   (1'b0                                  ), //i
-    .cascade_weight_in         (tensor_core_8_cascade_weight_out      ), //i
-    .cascade_weight_out        (tensor_core_9_cascade_weight_out      ), //o
-    .cascade_data_in_col_1     (tensor_core_8_cascade_data_out_col_1  ), //i
-    .cascade_data_in_col_2     (tensor_core_8_cascade_data_out_col_2  ), //i
-    .cascade_data_in_col_3     (tensor_core_8_cascade_data_out_col_3  ), //i
-    .cascade_data_out_col_1    (tensor_core_9_cascade_data_out_col_1  ), //o
-    .cascade_data_out_col_2    (tensor_core_9_cascade_data_out_col_2  ), //o
-    .cascade_data_out_col_3    (tensor_core_9_cascade_data_out_col_3  )  //o
+  tensor_core_bf12 tensor_core_bf12_9 (
+    .clk                       (clk                                        ), //i
+    .data_in_1                 (tensor_core_bf12_9_data_in_1               ), //i
+    .data_in_2                 (tensor_core_bf12_9_data_in_2               ), //i
+    .data_in_3                 (tensor_core_bf12_9_data_in_3               ), //i
+    .data_in_4                 (tensor_core_bf12_9_data_in_4               ), //i
+    .data_in_5                 (tensor_core_bf12_9_data_in_5               ), //i
+    .data_in_6                 (tensor_core_bf12_9_data_in_6               ), //i
+    .data_in_7                 (tensor_core_bf12_9_data_in_7               ), //i
+    .data_in_8                 (tensor_core_bf12_9_data_in_8               ), //i
+    .data_in_9                 (tensor_core_bf12_9_data_in_9               ), //i
+    .data_in_10                (tensor_core_bf12_9_data_in_10              ), //i
+    .data_in_11                (tensor_core_bf12_9_data_in_11              ), //i
+    .data_in_12                (tensor_core_bf12_9_data_in_12              ), //i
+    .data_in_13                (tensor_core_bf12_9_data_in_13              ), //i
+    .data_in_14                (tensor_core_bf12_9_data_in_14              ), //i
+    .data_in_15                (tensor_core_bf12_9_data_in_15              ), //i
+    .data_in_16                (tensor_core_bf12_9_data_in_16              ), //i
+    .data_in_17                (tensor_core_bf12_9_data_in_17              ), //i
+    .data_in_18                (tensor_core_bf12_9_data_in_18              ), //i
+    .data_in_19                (tensor_core_bf12_9_data_in_19              ), //i
+    .data_in_20                (tensor_core_bf12_9_data_in_20              ), //i
+    .side_in_1                 (4'b0000                                    ), //i
+    .side_in_2                 (4'b0000                                    ), //i
+    .side_in_3                 (4'b0000                                    ), //i
+    .side_in_4                 (4'b0000                                    ), //i
+    .shared_exponent_data      (io_expIn_9                                 ), //i
+    .feed_sel                  (2'b01                                      ), //i
+    .load_bb_one               (tensor_core_bf12_9_load_bb_one             ), //i
+    .load_bb_two               (tensor_core_bf12_9_load_bb_two             ), //i
+    .load_buf_sel              (loadBufSel                                 ), //i
+    .bf24_col_1                (tensor_core_bf12_9_bf24_col_1              ), //o
+    .bf24_col_2                (tensor_core_bf12_9_bf24_col_2              ), //o
+    .bf24_col_3                (tensor_core_bf12_9_bf24_col_3              ), //o
+    .acc_en                    (1'b0                                       ), //i
+    .zero_en                   (1'b0                                       ), //i
+    .clr0                      (1'b0                                       ), //i
+    .clr1                      (1'b0                                       ), //i
+    .cascade_weight_in         (tensor_core_bf12_8_cascade_weight_out      ), //i
+    .cascade_weight_out        (tensor_core_bf12_9_cascade_weight_out      ), //o
+    .cascade_data_in_col_1     (tensor_core_bf12_8_cascade_data_out_col_1  ), //i
+    .cascade_data_in_col_2     (tensor_core_bf12_8_cascade_data_out_col_2  ), //i
+    .cascade_data_in_col_3     (tensor_core_bf12_8_cascade_data_out_col_3  ), //i
+    .cascade_data_out_col_1    (tensor_core_bf12_9_cascade_data_out_col_1  ), //o
+    .cascade_data_out_col_2    (tensor_core_bf12_9_cascade_data_out_col_2  ), //o
+    .cascade_data_out_col_3    (tensor_core_bf12_9_cascade_data_out_col_3  )  //o
   );
-  tensor_core tensor_core_10 (
-    .clk                       (clk                                    ), //i
-    .data_in_1                 (tensor_core_10_data_in_1               ), //i
-    .data_in_2                 (tensor_core_10_data_in_2               ), //i
-    .data_in_3                 (tensor_core_10_data_in_3               ), //i
-    .data_in_4                 (tensor_core_10_data_in_4               ), //i
-    .data_in_5                 (tensor_core_10_data_in_5               ), //i
-    .data_in_6                 (tensor_core_10_data_in_6               ), //i
-    .data_in_7                 (tensor_core_10_data_in_7               ), //i
-    .data_in_8                 (tensor_core_10_data_in_8               ), //i
-    .data_in_9                 (tensor_core_10_data_in_9               ), //i
-    .data_in_10                (tensor_core_10_data_in_10              ), //i
-    .side_in_1                 (8'h0                                   ), //i
-    .side_in_2                 (8'h0                                   ), //i
-    .shared_exponent_data      (io_expIn_10                            ), //i
-    .feed_sel                  (2'b01                                  ), //i
-    .load_bb_one               (tensor_core_10_load_bb_one             ), //i
-    .load_bb_two               (tensor_core_10_load_bb_two             ), //i
-    .load_buf_sel              (loadBufSel                             ), //i
-    .bf24_col_1                (tensor_core_10_bf24_col_1              ), //o
-    .bf24_col_2                (tensor_core_10_bf24_col_2              ), //o
-    .bf24_col_3                (tensor_core_10_bf24_col_3              ), //o
-    .acc_en                    (1'b0                                   ), //i
-    .zero_en                   (1'b0                                   ), //i
-    .cascade_weight_in         (tensor_core_9_cascade_weight_out       ), //i
-    .cascade_weight_out        (tensor_core_10_cascade_weight_out      ), //o
-    .cascade_data_in_col_1     (tensor_core_9_cascade_data_out_col_1   ), //i
-    .cascade_data_in_col_2     (tensor_core_9_cascade_data_out_col_2   ), //i
-    .cascade_data_in_col_3     (tensor_core_9_cascade_data_out_col_3   ), //i
-    .cascade_data_out_col_1    (tensor_core_10_cascade_data_out_col_1  ), //o
-    .cascade_data_out_col_2    (tensor_core_10_cascade_data_out_col_2  ), //o
-    .cascade_data_out_col_3    (tensor_core_10_cascade_data_out_col_3  )  //o
+  tensor_core_bf12 tensor_core_bf12_10 (
+    .clk                       (clk                                         ), //i
+    .data_in_1                 (tensor_core_bf12_10_data_in_1               ), //i
+    .data_in_2                 (tensor_core_bf12_10_data_in_2               ), //i
+    .data_in_3                 (tensor_core_bf12_10_data_in_3               ), //i
+    .data_in_4                 (tensor_core_bf12_10_data_in_4               ), //i
+    .data_in_5                 (tensor_core_bf12_10_data_in_5               ), //i
+    .data_in_6                 (tensor_core_bf12_10_data_in_6               ), //i
+    .data_in_7                 (tensor_core_bf12_10_data_in_7               ), //i
+    .data_in_8                 (tensor_core_bf12_10_data_in_8               ), //i
+    .data_in_9                 (tensor_core_bf12_10_data_in_9               ), //i
+    .data_in_10                (tensor_core_bf12_10_data_in_10              ), //i
+    .data_in_11                (tensor_core_bf12_10_data_in_11              ), //i
+    .data_in_12                (tensor_core_bf12_10_data_in_12              ), //i
+    .data_in_13                (tensor_core_bf12_10_data_in_13              ), //i
+    .data_in_14                (tensor_core_bf12_10_data_in_14              ), //i
+    .data_in_15                (tensor_core_bf12_10_data_in_15              ), //i
+    .data_in_16                (tensor_core_bf12_10_data_in_16              ), //i
+    .data_in_17                (tensor_core_bf12_10_data_in_17              ), //i
+    .data_in_18                (tensor_core_bf12_10_data_in_18              ), //i
+    .data_in_19                (tensor_core_bf12_10_data_in_19              ), //i
+    .data_in_20                (tensor_core_bf12_10_data_in_20              ), //i
+    .side_in_1                 (4'b0000                                     ), //i
+    .side_in_2                 (4'b0000                                     ), //i
+    .side_in_3                 (4'b0000                                     ), //i
+    .side_in_4                 (4'b0000                                     ), //i
+    .shared_exponent_data      (io_expIn_10                                 ), //i
+    .feed_sel                  (2'b01                                       ), //i
+    .load_bb_one               (tensor_core_bf12_10_load_bb_one             ), //i
+    .load_bb_two               (tensor_core_bf12_10_load_bb_two             ), //i
+    .load_buf_sel              (loadBufSel                                  ), //i
+    .bf24_col_1                (tensor_core_bf12_10_bf24_col_1              ), //o
+    .bf24_col_2                (tensor_core_bf12_10_bf24_col_2              ), //o
+    .bf24_col_3                (tensor_core_bf12_10_bf24_col_3              ), //o
+    .acc_en                    (1'b0                                        ), //i
+    .zero_en                   (1'b0                                        ), //i
+    .clr0                      (1'b0                                        ), //i
+    .clr1                      (1'b0                                        ), //i
+    .cascade_weight_in         (tensor_core_bf12_9_cascade_weight_out       ), //i
+    .cascade_weight_out        (tensor_core_bf12_10_cascade_weight_out      ), //o
+    .cascade_data_in_col_1     (tensor_core_bf12_9_cascade_data_out_col_1   ), //i
+    .cascade_data_in_col_2     (tensor_core_bf12_9_cascade_data_out_col_2   ), //i
+    .cascade_data_in_col_3     (tensor_core_bf12_9_cascade_data_out_col_3   ), //i
+    .cascade_data_out_col_1    (tensor_core_bf12_10_cascade_data_out_col_1  ), //o
+    .cascade_data_out_col_2    (tensor_core_bf12_10_cascade_data_out_col_2  ), //o
+    .cascade_data_out_col_3    (tensor_core_bf12_10_cascade_data_out_col_3  )  //o
   );
-  tensor_core tensor_core_11 (
-    .clk                       (clk                                    ), //i
-    .data_in_1                 (tensor_core_11_data_in_1               ), //i
-    .data_in_2                 (tensor_core_11_data_in_2               ), //i
-    .data_in_3                 (tensor_core_11_data_in_3               ), //i
-    .data_in_4                 (tensor_core_11_data_in_4               ), //i
-    .data_in_5                 (tensor_core_11_data_in_5               ), //i
-    .data_in_6                 (tensor_core_11_data_in_6               ), //i
-    .data_in_7                 (tensor_core_11_data_in_7               ), //i
-    .data_in_8                 (tensor_core_11_data_in_8               ), //i
-    .data_in_9                 (tensor_core_11_data_in_9               ), //i
-    .data_in_10                (tensor_core_11_data_in_10              ), //i
-    .side_in_1                 (8'h0                                   ), //i
-    .side_in_2                 (8'h0                                   ), //i
-    .shared_exponent_data      (io_expIn_11                            ), //i
-    .feed_sel                  (2'b01                                  ), //i
-    .load_bb_one               (tensor_core_11_load_bb_one             ), //i
-    .load_bb_two               (tensor_core_11_load_bb_two             ), //i
-    .load_buf_sel              (loadBufSel                             ), //i
-    .bf24_col_1                (tensor_core_11_bf24_col_1              ), //o
-    .bf24_col_2                (tensor_core_11_bf24_col_2              ), //o
-    .bf24_col_3                (tensor_core_11_bf24_col_3              ), //o
-    .acc_en                    (1'b0                                   ), //i
-    .zero_en                   (1'b0                                   ), //i
-    .cascade_weight_in         (tensor_core_10_cascade_weight_out      ), //i
-    .cascade_weight_out        (tensor_core_11_cascade_weight_out      ), //o
-    .cascade_data_in_col_1     (tensor_core_10_cascade_data_out_col_1  ), //i
-    .cascade_data_in_col_2     (tensor_core_10_cascade_data_out_col_2  ), //i
-    .cascade_data_in_col_3     (tensor_core_10_cascade_data_out_col_3  ), //i
-    .cascade_data_out_col_1    (tensor_core_11_cascade_data_out_col_1  ), //o
-    .cascade_data_out_col_2    (tensor_core_11_cascade_data_out_col_2  ), //o
-    .cascade_data_out_col_3    (tensor_core_11_cascade_data_out_col_3  )  //o
+  tensor_core_bf12 tensor_core_bf12_11 (
+    .clk                       (clk                                         ), //i
+    .data_in_1                 (tensor_core_bf12_11_data_in_1               ), //i
+    .data_in_2                 (tensor_core_bf12_11_data_in_2               ), //i
+    .data_in_3                 (tensor_core_bf12_11_data_in_3               ), //i
+    .data_in_4                 (tensor_core_bf12_11_data_in_4               ), //i
+    .data_in_5                 (tensor_core_bf12_11_data_in_5               ), //i
+    .data_in_6                 (tensor_core_bf12_11_data_in_6               ), //i
+    .data_in_7                 (tensor_core_bf12_11_data_in_7               ), //i
+    .data_in_8                 (tensor_core_bf12_11_data_in_8               ), //i
+    .data_in_9                 (tensor_core_bf12_11_data_in_9               ), //i
+    .data_in_10                (tensor_core_bf12_11_data_in_10              ), //i
+    .data_in_11                (tensor_core_bf12_11_data_in_11              ), //i
+    .data_in_12                (tensor_core_bf12_11_data_in_12              ), //i
+    .data_in_13                (tensor_core_bf12_11_data_in_13              ), //i
+    .data_in_14                (tensor_core_bf12_11_data_in_14              ), //i
+    .data_in_15                (tensor_core_bf12_11_data_in_15              ), //i
+    .data_in_16                (tensor_core_bf12_11_data_in_16              ), //i
+    .data_in_17                (tensor_core_bf12_11_data_in_17              ), //i
+    .data_in_18                (tensor_core_bf12_11_data_in_18              ), //i
+    .data_in_19                (tensor_core_bf12_11_data_in_19              ), //i
+    .data_in_20                (tensor_core_bf12_11_data_in_20              ), //i
+    .side_in_1                 (4'b0000                                     ), //i
+    .side_in_2                 (4'b0000                                     ), //i
+    .side_in_3                 (4'b0000                                     ), //i
+    .side_in_4                 (4'b0000                                     ), //i
+    .shared_exponent_data      (io_expIn_11                                 ), //i
+    .feed_sel                  (2'b01                                       ), //i
+    .load_bb_one               (tensor_core_bf12_11_load_bb_one             ), //i
+    .load_bb_two               (tensor_core_bf12_11_load_bb_two             ), //i
+    .load_buf_sel              (loadBufSel                                  ), //i
+    .bf24_col_1                (tensor_core_bf12_11_bf24_col_1              ), //o
+    .bf24_col_2                (tensor_core_bf12_11_bf24_col_2              ), //o
+    .bf24_col_3                (tensor_core_bf12_11_bf24_col_3              ), //o
+    .acc_en                    (1'b0                                        ), //i
+    .zero_en                   (1'b0                                        ), //i
+    .clr0                      (1'b0                                        ), //i
+    .clr1                      (1'b0                                        ), //i
+    .cascade_weight_in         (tensor_core_bf12_10_cascade_weight_out      ), //i
+    .cascade_weight_out        (tensor_core_bf12_11_cascade_weight_out      ), //o
+    .cascade_data_in_col_1     (tensor_core_bf12_10_cascade_data_out_col_1  ), //i
+    .cascade_data_in_col_2     (tensor_core_bf12_10_cascade_data_out_col_2  ), //i
+    .cascade_data_in_col_3     (tensor_core_bf12_10_cascade_data_out_col_3  ), //i
+    .cascade_data_out_col_1    (tensor_core_bf12_11_cascade_data_out_col_1  ), //o
+    .cascade_data_out_col_2    (tensor_core_bf12_11_cascade_data_out_col_2  ), //o
+    .cascade_data_out_col_3    (tensor_core_bf12_11_cascade_data_out_col_3  )  //o
   );
-  tensor_core tensor_core_12 (
-    .clk                       (clk                                    ), //i
-    .data_in_1                 (tensor_core_12_data_in_1               ), //i
-    .data_in_2                 (tensor_core_12_data_in_2               ), //i
-    .data_in_3                 (tensor_core_12_data_in_3               ), //i
-    .data_in_4                 (tensor_core_12_data_in_4               ), //i
-    .data_in_5                 (tensor_core_12_data_in_5               ), //i
-    .data_in_6                 (tensor_core_12_data_in_6               ), //i
-    .data_in_7                 (tensor_core_12_data_in_7               ), //i
-    .data_in_8                 (tensor_core_12_data_in_8               ), //i
-    .data_in_9                 (tensor_core_12_data_in_9               ), //i
-    .data_in_10                (tensor_core_12_data_in_10              ), //i
-    .side_in_1                 (8'h0                                   ), //i
-    .side_in_2                 (8'h0                                   ), //i
-    .shared_exponent_data      (io_expIn_12                            ), //i
-    .feed_sel                  (2'b01                                  ), //i
-    .load_bb_one               (tensor_core_12_load_bb_one             ), //i
-    .load_bb_two               (tensor_core_12_load_bb_two             ), //i
-    .load_buf_sel              (loadBufSel                             ), //i
-    .bf24_col_1                (tensor_core_12_bf24_col_1              ), //o
-    .bf24_col_2                (tensor_core_12_bf24_col_2              ), //o
-    .bf24_col_3                (tensor_core_12_bf24_col_3              ), //o
-    .acc_en                    (1'b0                                   ), //i
-    .zero_en                   (1'b0                                   ), //i
-    .cascade_weight_in         (tensor_core_11_cascade_weight_out      ), //i
-    .cascade_weight_out        (tensor_core_12_cascade_weight_out      ), //o
-    .cascade_data_in_col_1     (tensor_core_11_cascade_data_out_col_1  ), //i
-    .cascade_data_in_col_2     (tensor_core_11_cascade_data_out_col_2  ), //i
-    .cascade_data_in_col_3     (tensor_core_11_cascade_data_out_col_3  ), //i
-    .cascade_data_out_col_1    (tensor_core_12_cascade_data_out_col_1  ), //o
-    .cascade_data_out_col_2    (tensor_core_12_cascade_data_out_col_2  ), //o
-    .cascade_data_out_col_3    (tensor_core_12_cascade_data_out_col_3  )  //o
+  tensor_core_bf12 tensor_core_bf12_12 (
+    .clk                       (clk                                         ), //i
+    .data_in_1                 (tensor_core_bf12_12_data_in_1               ), //i
+    .data_in_2                 (tensor_core_bf12_12_data_in_2               ), //i
+    .data_in_3                 (tensor_core_bf12_12_data_in_3               ), //i
+    .data_in_4                 (tensor_core_bf12_12_data_in_4               ), //i
+    .data_in_5                 (tensor_core_bf12_12_data_in_5               ), //i
+    .data_in_6                 (tensor_core_bf12_12_data_in_6               ), //i
+    .data_in_7                 (tensor_core_bf12_12_data_in_7               ), //i
+    .data_in_8                 (tensor_core_bf12_12_data_in_8               ), //i
+    .data_in_9                 (tensor_core_bf12_12_data_in_9               ), //i
+    .data_in_10                (tensor_core_bf12_12_data_in_10              ), //i
+    .data_in_11                (tensor_core_bf12_12_data_in_11              ), //i
+    .data_in_12                (tensor_core_bf12_12_data_in_12              ), //i
+    .data_in_13                (tensor_core_bf12_12_data_in_13              ), //i
+    .data_in_14                (tensor_core_bf12_12_data_in_14              ), //i
+    .data_in_15                (tensor_core_bf12_12_data_in_15              ), //i
+    .data_in_16                (tensor_core_bf12_12_data_in_16              ), //i
+    .data_in_17                (tensor_core_bf12_12_data_in_17              ), //i
+    .data_in_18                (tensor_core_bf12_12_data_in_18              ), //i
+    .data_in_19                (tensor_core_bf12_12_data_in_19              ), //i
+    .data_in_20                (tensor_core_bf12_12_data_in_20              ), //i
+    .side_in_1                 (4'b0000                                     ), //i
+    .side_in_2                 (4'b0000                                     ), //i
+    .side_in_3                 (4'b0000                                     ), //i
+    .side_in_4                 (4'b0000                                     ), //i
+    .shared_exponent_data      (io_expIn_12                                 ), //i
+    .feed_sel                  (2'b01                                       ), //i
+    .load_bb_one               (tensor_core_bf12_12_load_bb_one             ), //i
+    .load_bb_two               (tensor_core_bf12_12_load_bb_two             ), //i
+    .load_buf_sel              (loadBufSel                                  ), //i
+    .bf24_col_1                (tensor_core_bf12_12_bf24_col_1              ), //o
+    .bf24_col_2                (tensor_core_bf12_12_bf24_col_2              ), //o
+    .bf24_col_3                (tensor_core_bf12_12_bf24_col_3              ), //o
+    .acc_en                    (1'b0                                        ), //i
+    .zero_en                   (1'b0                                        ), //i
+    .clr0                      (1'b0                                        ), //i
+    .clr1                      (1'b0                                        ), //i
+    .cascade_weight_in         (tensor_core_bf12_11_cascade_weight_out      ), //i
+    .cascade_weight_out        (tensor_core_bf12_12_cascade_weight_out      ), //o
+    .cascade_data_in_col_1     (tensor_core_bf12_11_cascade_data_out_col_1  ), //i
+    .cascade_data_in_col_2     (tensor_core_bf12_11_cascade_data_out_col_2  ), //i
+    .cascade_data_in_col_3     (tensor_core_bf12_11_cascade_data_out_col_3  ), //i
+    .cascade_data_out_col_1    (tensor_core_bf12_12_cascade_data_out_col_1  ), //o
+    .cascade_data_out_col_2    (tensor_core_bf12_12_cascade_data_out_col_2  ), //o
+    .cascade_data_out_col_3    (tensor_core_bf12_12_cascade_data_out_col_3  )  //o
   );
-  tensor_core tensor_core_13 (
-    .clk                       (clk                                    ), //i
-    .data_in_1                 (tensor_core_13_data_in_1               ), //i
-    .data_in_2                 (tensor_core_13_data_in_2               ), //i
-    .data_in_3                 (tensor_core_13_data_in_3               ), //i
-    .data_in_4                 (tensor_core_13_data_in_4               ), //i
-    .data_in_5                 (tensor_core_13_data_in_5               ), //i
-    .data_in_6                 (tensor_core_13_data_in_6               ), //i
-    .data_in_7                 (tensor_core_13_data_in_7               ), //i
-    .data_in_8                 (tensor_core_13_data_in_8               ), //i
-    .data_in_9                 (tensor_core_13_data_in_9               ), //i
-    .data_in_10                (tensor_core_13_data_in_10              ), //i
-    .side_in_1                 (8'h0                                   ), //i
-    .side_in_2                 (8'h0                                   ), //i
-    .shared_exponent_data      (io_expIn_13                            ), //i
-    .feed_sel                  (2'b01                                  ), //i
-    .load_bb_one               (tensor_core_13_load_bb_one             ), //i
-    .load_bb_two               (tensor_core_13_load_bb_two             ), //i
-    .load_buf_sel              (loadBufSel                             ), //i
-    .bf24_col_1                (tensor_core_13_bf24_col_1              ), //o
-    .bf24_col_2                (tensor_core_13_bf24_col_2              ), //o
-    .bf24_col_3                (tensor_core_13_bf24_col_3              ), //o
-    .acc_en                    (1'b0                                   ), //i
-    .zero_en                   (1'b0                                   ), //i
-    .cascade_weight_in         (tensor_core_12_cascade_weight_out      ), //i
-    .cascade_weight_out        (tensor_core_13_cascade_weight_out      ), //o
-    .cascade_data_in_col_1     (tensor_core_12_cascade_data_out_col_1  ), //i
-    .cascade_data_in_col_2     (tensor_core_12_cascade_data_out_col_2  ), //i
-    .cascade_data_in_col_3     (tensor_core_12_cascade_data_out_col_3  ), //i
-    .cascade_data_out_col_1    (tensor_core_13_cascade_data_out_col_1  ), //o
-    .cascade_data_out_col_2    (tensor_core_13_cascade_data_out_col_2  ), //o
-    .cascade_data_out_col_3    (tensor_core_13_cascade_data_out_col_3  )  //o
+  tensor_core_bf12 tensor_core_bf12_13 (
+    .clk                       (clk                                         ), //i
+    .data_in_1                 (tensor_core_bf12_13_data_in_1               ), //i
+    .data_in_2                 (tensor_core_bf12_13_data_in_2               ), //i
+    .data_in_3                 (tensor_core_bf12_13_data_in_3               ), //i
+    .data_in_4                 (tensor_core_bf12_13_data_in_4               ), //i
+    .data_in_5                 (tensor_core_bf12_13_data_in_5               ), //i
+    .data_in_6                 (tensor_core_bf12_13_data_in_6               ), //i
+    .data_in_7                 (tensor_core_bf12_13_data_in_7               ), //i
+    .data_in_8                 (tensor_core_bf12_13_data_in_8               ), //i
+    .data_in_9                 (tensor_core_bf12_13_data_in_9               ), //i
+    .data_in_10                (tensor_core_bf12_13_data_in_10              ), //i
+    .data_in_11                (tensor_core_bf12_13_data_in_11              ), //i
+    .data_in_12                (tensor_core_bf12_13_data_in_12              ), //i
+    .data_in_13                (tensor_core_bf12_13_data_in_13              ), //i
+    .data_in_14                (tensor_core_bf12_13_data_in_14              ), //i
+    .data_in_15                (tensor_core_bf12_13_data_in_15              ), //i
+    .data_in_16                (tensor_core_bf12_13_data_in_16              ), //i
+    .data_in_17                (tensor_core_bf12_13_data_in_17              ), //i
+    .data_in_18                (tensor_core_bf12_13_data_in_18              ), //i
+    .data_in_19                (tensor_core_bf12_13_data_in_19              ), //i
+    .data_in_20                (tensor_core_bf12_13_data_in_20              ), //i
+    .side_in_1                 (4'b0000                                     ), //i
+    .side_in_2                 (4'b0000                                     ), //i
+    .side_in_3                 (4'b0000                                     ), //i
+    .side_in_4                 (4'b0000                                     ), //i
+    .shared_exponent_data      (io_expIn_13                                 ), //i
+    .feed_sel                  (2'b01                                       ), //i
+    .load_bb_one               (tensor_core_bf12_13_load_bb_one             ), //i
+    .load_bb_two               (tensor_core_bf12_13_load_bb_two             ), //i
+    .load_buf_sel              (loadBufSel                                  ), //i
+    .bf24_col_1                (tensor_core_bf12_13_bf24_col_1              ), //o
+    .bf24_col_2                (tensor_core_bf12_13_bf24_col_2              ), //o
+    .bf24_col_3                (tensor_core_bf12_13_bf24_col_3              ), //o
+    .acc_en                    (1'b0                                        ), //i
+    .zero_en                   (1'b0                                        ), //i
+    .clr0                      (1'b0                                        ), //i
+    .clr1                      (1'b0                                        ), //i
+    .cascade_weight_in         (tensor_core_bf12_12_cascade_weight_out      ), //i
+    .cascade_weight_out        (tensor_core_bf12_13_cascade_weight_out      ), //o
+    .cascade_data_in_col_1     (tensor_core_bf12_12_cascade_data_out_col_1  ), //i
+    .cascade_data_in_col_2     (tensor_core_bf12_12_cascade_data_out_col_2  ), //i
+    .cascade_data_in_col_3     (tensor_core_bf12_12_cascade_data_out_col_3  ), //i
+    .cascade_data_out_col_1    (tensor_core_bf12_13_cascade_data_out_col_1  ), //o
+    .cascade_data_out_col_2    (tensor_core_bf12_13_cascade_data_out_col_2  ), //o
+    .cascade_data_out_col_3    (tensor_core_bf12_13_cascade_data_out_col_3  )  //o
   );
-  tensor_core tensor_core_14 (
-    .clk                       (clk                                    ), //i
-    .data_in_1                 (tensor_core_14_data_in_1               ), //i
-    .data_in_2                 (tensor_core_14_data_in_2               ), //i
-    .data_in_3                 (tensor_core_14_data_in_3               ), //i
-    .data_in_4                 (tensor_core_14_data_in_4               ), //i
-    .data_in_5                 (tensor_core_14_data_in_5               ), //i
-    .data_in_6                 (tensor_core_14_data_in_6               ), //i
-    .data_in_7                 (tensor_core_14_data_in_7               ), //i
-    .data_in_8                 (tensor_core_14_data_in_8               ), //i
-    .data_in_9                 (tensor_core_14_data_in_9               ), //i
-    .data_in_10                (tensor_core_14_data_in_10              ), //i
-    .side_in_1                 (8'h0                                   ), //i
-    .side_in_2                 (8'h0                                   ), //i
-    .shared_exponent_data      (io_expIn_14                            ), //i
-    .feed_sel                  (2'b01                                  ), //i
-    .load_bb_one               (tensor_core_14_load_bb_one             ), //i
-    .load_bb_two               (tensor_core_14_load_bb_two             ), //i
-    .load_buf_sel              (loadBufSel                             ), //i
-    .bf24_col_1                (tensor_core_14_bf24_col_1              ), //o
-    .bf24_col_2                (tensor_core_14_bf24_col_2              ), //o
-    .bf24_col_3                (tensor_core_14_bf24_col_3              ), //o
-    .acc_en                    (1'b0                                   ), //i
-    .zero_en                   (1'b0                                   ), //i
-    .cascade_weight_in         (tensor_core_13_cascade_weight_out      ), //i
-    .cascade_weight_out        (tensor_core_14_cascade_weight_out      ), //o
-    .cascade_data_in_col_1     (tensor_core_13_cascade_data_out_col_1  ), //i
-    .cascade_data_in_col_2     (tensor_core_13_cascade_data_out_col_2  ), //i
-    .cascade_data_in_col_3     (tensor_core_13_cascade_data_out_col_3  ), //i
-    .cascade_data_out_col_1    (tensor_core_14_cascade_data_out_col_1  ), //o
-    .cascade_data_out_col_2    (tensor_core_14_cascade_data_out_col_2  ), //o
-    .cascade_data_out_col_3    (tensor_core_14_cascade_data_out_col_3  )  //o
+  tensor_core_bf12 tensor_core_bf12_14 (
+    .clk                       (clk                                         ), //i
+    .data_in_1                 (tensor_core_bf12_14_data_in_1               ), //i
+    .data_in_2                 (tensor_core_bf12_14_data_in_2               ), //i
+    .data_in_3                 (tensor_core_bf12_14_data_in_3               ), //i
+    .data_in_4                 (tensor_core_bf12_14_data_in_4               ), //i
+    .data_in_5                 (tensor_core_bf12_14_data_in_5               ), //i
+    .data_in_6                 (tensor_core_bf12_14_data_in_6               ), //i
+    .data_in_7                 (tensor_core_bf12_14_data_in_7               ), //i
+    .data_in_8                 (tensor_core_bf12_14_data_in_8               ), //i
+    .data_in_9                 (tensor_core_bf12_14_data_in_9               ), //i
+    .data_in_10                (tensor_core_bf12_14_data_in_10              ), //i
+    .data_in_11                (tensor_core_bf12_14_data_in_11              ), //i
+    .data_in_12                (tensor_core_bf12_14_data_in_12              ), //i
+    .data_in_13                (tensor_core_bf12_14_data_in_13              ), //i
+    .data_in_14                (tensor_core_bf12_14_data_in_14              ), //i
+    .data_in_15                (tensor_core_bf12_14_data_in_15              ), //i
+    .data_in_16                (tensor_core_bf12_14_data_in_16              ), //i
+    .data_in_17                (tensor_core_bf12_14_data_in_17              ), //i
+    .data_in_18                (tensor_core_bf12_14_data_in_18              ), //i
+    .data_in_19                (tensor_core_bf12_14_data_in_19              ), //i
+    .data_in_20                (tensor_core_bf12_14_data_in_20              ), //i
+    .side_in_1                 (4'b0000                                     ), //i
+    .side_in_2                 (4'b0000                                     ), //i
+    .side_in_3                 (4'b0000                                     ), //i
+    .side_in_4                 (4'b0000                                     ), //i
+    .shared_exponent_data      (io_expIn_14                                 ), //i
+    .feed_sel                  (2'b01                                       ), //i
+    .load_bb_one               (tensor_core_bf12_14_load_bb_one             ), //i
+    .load_bb_two               (tensor_core_bf12_14_load_bb_two             ), //i
+    .load_buf_sel              (loadBufSel                                  ), //i
+    .bf24_col_1                (tensor_core_bf12_14_bf24_col_1              ), //o
+    .bf24_col_2                (tensor_core_bf12_14_bf24_col_2              ), //o
+    .bf24_col_3                (tensor_core_bf12_14_bf24_col_3              ), //o
+    .acc_en                    (1'b0                                        ), //i
+    .zero_en                   (1'b0                                        ), //i
+    .clr0                      (1'b0                                        ), //i
+    .clr1                      (1'b0                                        ), //i
+    .cascade_weight_in         (tensor_core_bf12_13_cascade_weight_out      ), //i
+    .cascade_weight_out        (tensor_core_bf12_14_cascade_weight_out      ), //o
+    .cascade_data_in_col_1     (tensor_core_bf12_13_cascade_data_out_col_1  ), //i
+    .cascade_data_in_col_2     (tensor_core_bf12_13_cascade_data_out_col_2  ), //i
+    .cascade_data_in_col_3     (tensor_core_bf12_13_cascade_data_out_col_3  ), //i
+    .cascade_data_out_col_1    (tensor_core_bf12_14_cascade_data_out_col_1  ), //o
+    .cascade_data_out_col_2    (tensor_core_bf12_14_cascade_data_out_col_2  ), //o
+    .cascade_data_out_col_3    (tensor_core_bf12_14_cascade_data_out_col_3  )  //o
   );
-  tensor_core tensor_core_15 (
-    .clk                       (clk                                    ), //i
-    .data_in_1                 (tensor_core_15_data_in_1               ), //i
-    .data_in_2                 (tensor_core_15_data_in_2               ), //i
-    .data_in_3                 (tensor_core_15_data_in_3               ), //i
-    .data_in_4                 (tensor_core_15_data_in_4               ), //i
-    .data_in_5                 (tensor_core_15_data_in_5               ), //i
-    .data_in_6                 (tensor_core_15_data_in_6               ), //i
-    .data_in_7                 (tensor_core_15_data_in_7               ), //i
-    .data_in_8                 (tensor_core_15_data_in_8               ), //i
-    .data_in_9                 (tensor_core_15_data_in_9               ), //i
-    .data_in_10                (tensor_core_15_data_in_10              ), //i
-    .side_in_1                 (8'h0                                   ), //i
-    .side_in_2                 (8'h0                                   ), //i
-    .shared_exponent_data      (io_expIn_15                            ), //i
-    .feed_sel                  (2'b01                                  ), //i
-    .load_bb_one               (tensor_core_15_load_bb_one             ), //i
-    .load_bb_two               (tensor_core_15_load_bb_two             ), //i
-    .load_buf_sel              (loadBufSel                             ), //i
-    .bf24_col_1                (tensor_core_15_bf24_col_1              ), //o
-    .bf24_col_2                (tensor_core_15_bf24_col_2              ), //o
-    .bf24_col_3                (tensor_core_15_bf24_col_3              ), //o
-    .acc_en                    (1'b0                                   ), //i
-    .zero_en                   (1'b0                                   ), //i
-    .cascade_weight_in         (tensor_core_14_cascade_weight_out      ), //i
-    .cascade_weight_out        (tensor_core_15_cascade_weight_out      ), //o
-    .cascade_data_in_col_1     (tensor_core_14_cascade_data_out_col_1  ), //i
-    .cascade_data_in_col_2     (tensor_core_14_cascade_data_out_col_2  ), //i
-    .cascade_data_in_col_3     (tensor_core_14_cascade_data_out_col_3  ), //i
-    .cascade_data_out_col_1    (tensor_core_15_cascade_data_out_col_1  ), //o
-    .cascade_data_out_col_2    (tensor_core_15_cascade_data_out_col_2  ), //o
-    .cascade_data_out_col_3    (tensor_core_15_cascade_data_out_col_3  )  //o
+  tensor_core_bf12 tensor_core_bf12_15 (
+    .clk                       (clk                                         ), //i
+    .data_in_1                 (tensor_core_bf12_15_data_in_1               ), //i
+    .data_in_2                 (tensor_core_bf12_15_data_in_2               ), //i
+    .data_in_3                 (tensor_core_bf12_15_data_in_3               ), //i
+    .data_in_4                 (tensor_core_bf12_15_data_in_4               ), //i
+    .data_in_5                 (tensor_core_bf12_15_data_in_5               ), //i
+    .data_in_6                 (tensor_core_bf12_15_data_in_6               ), //i
+    .data_in_7                 (tensor_core_bf12_15_data_in_7               ), //i
+    .data_in_8                 (tensor_core_bf12_15_data_in_8               ), //i
+    .data_in_9                 (tensor_core_bf12_15_data_in_9               ), //i
+    .data_in_10                (tensor_core_bf12_15_data_in_10              ), //i
+    .data_in_11                (tensor_core_bf12_15_data_in_11              ), //i
+    .data_in_12                (tensor_core_bf12_15_data_in_12              ), //i
+    .data_in_13                (tensor_core_bf12_15_data_in_13              ), //i
+    .data_in_14                (tensor_core_bf12_15_data_in_14              ), //i
+    .data_in_15                (tensor_core_bf12_15_data_in_15              ), //i
+    .data_in_16                (tensor_core_bf12_15_data_in_16              ), //i
+    .data_in_17                (tensor_core_bf12_15_data_in_17              ), //i
+    .data_in_18                (tensor_core_bf12_15_data_in_18              ), //i
+    .data_in_19                (tensor_core_bf12_15_data_in_19              ), //i
+    .data_in_20                (tensor_core_bf12_15_data_in_20              ), //i
+    .side_in_1                 (4'b0000                                     ), //i
+    .side_in_2                 (4'b0000                                     ), //i
+    .side_in_3                 (4'b0000                                     ), //i
+    .side_in_4                 (4'b0000                                     ), //i
+    .shared_exponent_data      (io_expIn_15                                 ), //i
+    .feed_sel                  (2'b01                                       ), //i
+    .load_bb_one               (tensor_core_bf12_15_load_bb_one             ), //i
+    .load_bb_two               (tensor_core_bf12_15_load_bb_two             ), //i
+    .load_buf_sel              (loadBufSel                                  ), //i
+    .bf24_col_1                (tensor_core_bf12_15_bf24_col_1              ), //o
+    .bf24_col_2                (tensor_core_bf12_15_bf24_col_2              ), //o
+    .bf24_col_3                (tensor_core_bf12_15_bf24_col_3              ), //o
+    .acc_en                    (1'b0                                        ), //i
+    .zero_en                   (1'b0                                        ), //i
+    .clr0                      (1'b0                                        ), //i
+    .clr1                      (1'b0                                        ), //i
+    .cascade_weight_in         (tensor_core_bf12_14_cascade_weight_out      ), //i
+    .cascade_weight_out        (tensor_core_bf12_15_cascade_weight_out      ), //o
+    .cascade_data_in_col_1     (tensor_core_bf12_14_cascade_data_out_col_1  ), //i
+    .cascade_data_in_col_2     (tensor_core_bf12_14_cascade_data_out_col_2  ), //i
+    .cascade_data_in_col_3     (tensor_core_bf12_14_cascade_data_out_col_3  ), //i
+    .cascade_data_out_col_1    (tensor_core_bf12_15_cascade_data_out_col_1  ), //o
+    .cascade_data_out_col_2    (tensor_core_bf12_15_cascade_data_out_col_2  ), //o
+    .cascade_data_out_col_3    (tensor_core_bf12_15_cascade_data_out_col_3  )  //o
   );
-  tensor_core tensor_core_16 (
-    .clk                       (clk                                    ), //i
-    .data_in_1                 (tensor_core_16_data_in_1               ), //i
-    .data_in_2                 (tensor_core_16_data_in_2               ), //i
-    .data_in_3                 (tensor_core_16_data_in_3               ), //i
-    .data_in_4                 (tensor_core_16_data_in_4               ), //i
-    .data_in_5                 (tensor_core_16_data_in_5               ), //i
-    .data_in_6                 (tensor_core_16_data_in_6               ), //i
-    .data_in_7                 (tensor_core_16_data_in_7               ), //i
-    .data_in_8                 (tensor_core_16_data_in_8               ), //i
-    .data_in_9                 (tensor_core_16_data_in_9               ), //i
-    .data_in_10                (tensor_core_16_data_in_10              ), //i
-    .side_in_1                 (8'h0                                   ), //i
-    .side_in_2                 (8'h0                                   ), //i
-    .shared_exponent_data      (io_expIn_16                            ), //i
-    .feed_sel                  (2'b01                                  ), //i
-    .load_bb_one               (tensor_core_16_load_bb_one             ), //i
-    .load_bb_two               (tensor_core_16_load_bb_two             ), //i
-    .load_buf_sel              (loadBufSel                             ), //i
-    .bf24_col_1                (tensor_core_16_bf24_col_1              ), //o
-    .bf24_col_2                (tensor_core_16_bf24_col_2              ), //o
-    .bf24_col_3                (tensor_core_16_bf24_col_3              ), //o
-    .acc_en                    (1'b0                                   ), //i
-    .zero_en                   (1'b0                                   ), //i
-    .cascade_weight_in         (tensor_core_15_cascade_weight_out      ), //i
-    .cascade_weight_out        (tensor_core_16_cascade_weight_out      ), //o
-    .cascade_data_in_col_1     (tensor_core_15_cascade_data_out_col_1  ), //i
-    .cascade_data_in_col_2     (tensor_core_15_cascade_data_out_col_2  ), //i
-    .cascade_data_in_col_3     (tensor_core_15_cascade_data_out_col_3  ), //i
-    .cascade_data_out_col_1    (tensor_core_16_cascade_data_out_col_1  ), //o
-    .cascade_data_out_col_2    (tensor_core_16_cascade_data_out_col_2  ), //o
-    .cascade_data_out_col_3    (tensor_core_16_cascade_data_out_col_3  )  //o
+  tensor_core_bf12 tensor_core_bf12_16 (
+    .clk                       (clk                                         ), //i
+    .data_in_1                 (tensor_core_bf12_16_data_in_1               ), //i
+    .data_in_2                 (tensor_core_bf12_16_data_in_2               ), //i
+    .data_in_3                 (tensor_core_bf12_16_data_in_3               ), //i
+    .data_in_4                 (tensor_core_bf12_16_data_in_4               ), //i
+    .data_in_5                 (tensor_core_bf12_16_data_in_5               ), //i
+    .data_in_6                 (tensor_core_bf12_16_data_in_6               ), //i
+    .data_in_7                 (tensor_core_bf12_16_data_in_7               ), //i
+    .data_in_8                 (tensor_core_bf12_16_data_in_8               ), //i
+    .data_in_9                 (tensor_core_bf12_16_data_in_9               ), //i
+    .data_in_10                (tensor_core_bf12_16_data_in_10              ), //i
+    .data_in_11                (tensor_core_bf12_16_data_in_11              ), //i
+    .data_in_12                (tensor_core_bf12_16_data_in_12              ), //i
+    .data_in_13                (tensor_core_bf12_16_data_in_13              ), //i
+    .data_in_14                (tensor_core_bf12_16_data_in_14              ), //i
+    .data_in_15                (tensor_core_bf12_16_data_in_15              ), //i
+    .data_in_16                (tensor_core_bf12_16_data_in_16              ), //i
+    .data_in_17                (tensor_core_bf12_16_data_in_17              ), //i
+    .data_in_18                (tensor_core_bf12_16_data_in_18              ), //i
+    .data_in_19                (tensor_core_bf12_16_data_in_19              ), //i
+    .data_in_20                (tensor_core_bf12_16_data_in_20              ), //i
+    .side_in_1                 (4'b0000                                     ), //i
+    .side_in_2                 (4'b0000                                     ), //i
+    .side_in_3                 (4'b0000                                     ), //i
+    .side_in_4                 (4'b0000                                     ), //i
+    .shared_exponent_data      (io_expIn_16                                 ), //i
+    .feed_sel                  (2'b01                                       ), //i
+    .load_bb_one               (tensor_core_bf12_16_load_bb_one             ), //i
+    .load_bb_two               (tensor_core_bf12_16_load_bb_two             ), //i
+    .load_buf_sel              (loadBufSel                                  ), //i
+    .bf24_col_1                (tensor_core_bf12_16_bf24_col_1              ), //o
+    .bf24_col_2                (tensor_core_bf12_16_bf24_col_2              ), //o
+    .bf24_col_3                (tensor_core_bf12_16_bf24_col_3              ), //o
+    .acc_en                    (1'b0                                        ), //i
+    .zero_en                   (1'b0                                        ), //i
+    .clr0                      (1'b0                                        ), //i
+    .clr1                      (1'b0                                        ), //i
+    .cascade_weight_in         (tensor_core_bf12_15_cascade_weight_out      ), //i
+    .cascade_weight_out        (tensor_core_bf12_16_cascade_weight_out      ), //o
+    .cascade_data_in_col_1     (tensor_core_bf12_15_cascade_data_out_col_1  ), //i
+    .cascade_data_in_col_2     (tensor_core_bf12_15_cascade_data_out_col_2  ), //i
+    .cascade_data_in_col_3     (tensor_core_bf12_15_cascade_data_out_col_3  ), //i
+    .cascade_data_out_col_1    (tensor_core_bf12_16_cascade_data_out_col_1  ), //o
+    .cascade_data_out_col_2    (tensor_core_bf12_16_cascade_data_out_col_2  ), //o
+    .cascade_data_out_col_3    (tensor_core_bf12_16_cascade_data_out_col_3  )  //o
   );
-  tensor_core tensor_core_17 (
-    .clk                       (clk                                    ), //i
-    .data_in_1                 (tensor_core_17_data_in_1               ), //i
-    .data_in_2                 (tensor_core_17_data_in_2               ), //i
-    .data_in_3                 (tensor_core_17_data_in_3               ), //i
-    .data_in_4                 (tensor_core_17_data_in_4               ), //i
-    .data_in_5                 (tensor_core_17_data_in_5               ), //i
-    .data_in_6                 (tensor_core_17_data_in_6               ), //i
-    .data_in_7                 (tensor_core_17_data_in_7               ), //i
-    .data_in_8                 (tensor_core_17_data_in_8               ), //i
-    .data_in_9                 (tensor_core_17_data_in_9               ), //i
-    .data_in_10                (tensor_core_17_data_in_10              ), //i
-    .side_in_1                 (8'h0                                   ), //i
-    .side_in_2                 (8'h0                                   ), //i
-    .shared_exponent_data      (io_expIn_17                            ), //i
-    .feed_sel                  (2'b01                                  ), //i
-    .load_bb_one               (tensor_core_17_load_bb_one             ), //i
-    .load_bb_two               (tensor_core_17_load_bb_two             ), //i
-    .load_buf_sel              (loadBufSel                             ), //i
-    .bf24_col_1                (tensor_core_17_bf24_col_1              ), //o
-    .bf24_col_2                (tensor_core_17_bf24_col_2              ), //o
-    .bf24_col_3                (tensor_core_17_bf24_col_3              ), //o
-    .acc_en                    (1'b0                                   ), //i
-    .zero_en                   (1'b0                                   ), //i
-    .cascade_weight_in         (tensor_core_16_cascade_weight_out      ), //i
-    .cascade_weight_out        (tensor_core_17_cascade_weight_out      ), //o
-    .cascade_data_in_col_1     (tensor_core_16_cascade_data_out_col_1  ), //i
-    .cascade_data_in_col_2     (tensor_core_16_cascade_data_out_col_2  ), //i
-    .cascade_data_in_col_3     (tensor_core_16_cascade_data_out_col_3  ), //i
-    .cascade_data_out_col_1    (tensor_core_17_cascade_data_out_col_1  ), //o
-    .cascade_data_out_col_2    (tensor_core_17_cascade_data_out_col_2  ), //o
-    .cascade_data_out_col_3    (tensor_core_17_cascade_data_out_col_3  )  //o
+  tensor_core_bf12 tensor_core_bf12_17 (
+    .clk                       (clk                                         ), //i
+    .data_in_1                 (tensor_core_bf12_17_data_in_1               ), //i
+    .data_in_2                 (tensor_core_bf12_17_data_in_2               ), //i
+    .data_in_3                 (tensor_core_bf12_17_data_in_3               ), //i
+    .data_in_4                 (tensor_core_bf12_17_data_in_4               ), //i
+    .data_in_5                 (tensor_core_bf12_17_data_in_5               ), //i
+    .data_in_6                 (tensor_core_bf12_17_data_in_6               ), //i
+    .data_in_7                 (tensor_core_bf12_17_data_in_7               ), //i
+    .data_in_8                 (tensor_core_bf12_17_data_in_8               ), //i
+    .data_in_9                 (tensor_core_bf12_17_data_in_9               ), //i
+    .data_in_10                (tensor_core_bf12_17_data_in_10              ), //i
+    .data_in_11                (tensor_core_bf12_17_data_in_11              ), //i
+    .data_in_12                (tensor_core_bf12_17_data_in_12              ), //i
+    .data_in_13                (tensor_core_bf12_17_data_in_13              ), //i
+    .data_in_14                (tensor_core_bf12_17_data_in_14              ), //i
+    .data_in_15                (tensor_core_bf12_17_data_in_15              ), //i
+    .data_in_16                (tensor_core_bf12_17_data_in_16              ), //i
+    .data_in_17                (tensor_core_bf12_17_data_in_17              ), //i
+    .data_in_18                (tensor_core_bf12_17_data_in_18              ), //i
+    .data_in_19                (tensor_core_bf12_17_data_in_19              ), //i
+    .data_in_20                (tensor_core_bf12_17_data_in_20              ), //i
+    .side_in_1                 (4'b0000                                     ), //i
+    .side_in_2                 (4'b0000                                     ), //i
+    .side_in_3                 (4'b0000                                     ), //i
+    .side_in_4                 (4'b0000                                     ), //i
+    .shared_exponent_data      (io_expIn_17                                 ), //i
+    .feed_sel                  (2'b01                                       ), //i
+    .load_bb_one               (tensor_core_bf12_17_load_bb_one             ), //i
+    .load_bb_two               (tensor_core_bf12_17_load_bb_two             ), //i
+    .load_buf_sel              (loadBufSel                                  ), //i
+    .bf24_col_1                (tensor_core_bf12_17_bf24_col_1              ), //o
+    .bf24_col_2                (tensor_core_bf12_17_bf24_col_2              ), //o
+    .bf24_col_3                (tensor_core_bf12_17_bf24_col_3              ), //o
+    .acc_en                    (1'b0                                        ), //i
+    .zero_en                   (1'b0                                        ), //i
+    .clr0                      (1'b0                                        ), //i
+    .clr1                      (1'b0                                        ), //i
+    .cascade_weight_in         (tensor_core_bf12_16_cascade_weight_out      ), //i
+    .cascade_weight_out        (tensor_core_bf12_17_cascade_weight_out      ), //o
+    .cascade_data_in_col_1     (tensor_core_bf12_16_cascade_data_out_col_1  ), //i
+    .cascade_data_in_col_2     (tensor_core_bf12_16_cascade_data_out_col_2  ), //i
+    .cascade_data_in_col_3     (tensor_core_bf12_16_cascade_data_out_col_3  ), //i
+    .cascade_data_out_col_1    (tensor_core_bf12_17_cascade_data_out_col_1  ), //o
+    .cascade_data_out_col_2    (tensor_core_bf12_17_cascade_data_out_col_2  ), //o
+    .cascade_data_out_col_3    (tensor_core_bf12_17_cascade_data_out_col_3  )  //o
   );
-  tensor_core tensor_core_18 (
-    .clk                       (clk                                    ), //i
-    .data_in_1                 (tensor_core_18_data_in_1               ), //i
-    .data_in_2                 (tensor_core_18_data_in_2               ), //i
-    .data_in_3                 (tensor_core_18_data_in_3               ), //i
-    .data_in_4                 (tensor_core_18_data_in_4               ), //i
-    .data_in_5                 (tensor_core_18_data_in_5               ), //i
-    .data_in_6                 (tensor_core_18_data_in_6               ), //i
-    .data_in_7                 (tensor_core_18_data_in_7               ), //i
-    .data_in_8                 (tensor_core_18_data_in_8               ), //i
-    .data_in_9                 (tensor_core_18_data_in_9               ), //i
-    .data_in_10                (tensor_core_18_data_in_10              ), //i
-    .side_in_1                 (8'h0                                   ), //i
-    .side_in_2                 (8'h0                                   ), //i
-    .shared_exponent_data      (io_expIn_18                            ), //i
-    .feed_sel                  (2'b01                                  ), //i
-    .load_bb_one               (tensor_core_18_load_bb_one             ), //i
-    .load_bb_two               (tensor_core_18_load_bb_two             ), //i
-    .load_buf_sel              (loadBufSel                             ), //i
-    .bf24_col_1                (tensor_core_18_bf24_col_1              ), //o
-    .bf24_col_2                (tensor_core_18_bf24_col_2              ), //o
-    .bf24_col_3                (tensor_core_18_bf24_col_3              ), //o
-    .acc_en                    (1'b0                                   ), //i
-    .zero_en                   (1'b0                                   ), //i
-    .cascade_weight_in         (tensor_core_17_cascade_weight_out      ), //i
-    .cascade_weight_out        (tensor_core_18_cascade_weight_out      ), //o
-    .cascade_data_in_col_1     (tensor_core_17_cascade_data_out_col_1  ), //i
-    .cascade_data_in_col_2     (tensor_core_17_cascade_data_out_col_2  ), //i
-    .cascade_data_in_col_3     (tensor_core_17_cascade_data_out_col_3  ), //i
-    .cascade_data_out_col_1    (tensor_core_18_cascade_data_out_col_1  ), //o
-    .cascade_data_out_col_2    (tensor_core_18_cascade_data_out_col_2  ), //o
-    .cascade_data_out_col_3    (tensor_core_18_cascade_data_out_col_3  )  //o
+  tensor_core_bf12 tensor_core_bf12_18 (
+    .clk                       (clk                                         ), //i
+    .data_in_1                 (tensor_core_bf12_18_data_in_1               ), //i
+    .data_in_2                 (tensor_core_bf12_18_data_in_2               ), //i
+    .data_in_3                 (tensor_core_bf12_18_data_in_3               ), //i
+    .data_in_4                 (tensor_core_bf12_18_data_in_4               ), //i
+    .data_in_5                 (tensor_core_bf12_18_data_in_5               ), //i
+    .data_in_6                 (tensor_core_bf12_18_data_in_6               ), //i
+    .data_in_7                 (tensor_core_bf12_18_data_in_7               ), //i
+    .data_in_8                 (tensor_core_bf12_18_data_in_8               ), //i
+    .data_in_9                 (tensor_core_bf12_18_data_in_9               ), //i
+    .data_in_10                (tensor_core_bf12_18_data_in_10              ), //i
+    .data_in_11                (tensor_core_bf12_18_data_in_11              ), //i
+    .data_in_12                (tensor_core_bf12_18_data_in_12              ), //i
+    .data_in_13                (tensor_core_bf12_18_data_in_13              ), //i
+    .data_in_14                (tensor_core_bf12_18_data_in_14              ), //i
+    .data_in_15                (tensor_core_bf12_18_data_in_15              ), //i
+    .data_in_16                (tensor_core_bf12_18_data_in_16              ), //i
+    .data_in_17                (tensor_core_bf12_18_data_in_17              ), //i
+    .data_in_18                (tensor_core_bf12_18_data_in_18              ), //i
+    .data_in_19                (tensor_core_bf12_18_data_in_19              ), //i
+    .data_in_20                (tensor_core_bf12_18_data_in_20              ), //i
+    .side_in_1                 (4'b0000                                     ), //i
+    .side_in_2                 (4'b0000                                     ), //i
+    .side_in_3                 (4'b0000                                     ), //i
+    .side_in_4                 (4'b0000                                     ), //i
+    .shared_exponent_data      (io_expIn_18                                 ), //i
+    .feed_sel                  (2'b01                                       ), //i
+    .load_bb_one               (tensor_core_bf12_18_load_bb_one             ), //i
+    .load_bb_two               (tensor_core_bf12_18_load_bb_two             ), //i
+    .load_buf_sel              (loadBufSel                                  ), //i
+    .bf24_col_1                (tensor_core_bf12_18_bf24_col_1              ), //o
+    .bf24_col_2                (tensor_core_bf12_18_bf24_col_2              ), //o
+    .bf24_col_3                (tensor_core_bf12_18_bf24_col_3              ), //o
+    .acc_en                    (1'b0                                        ), //i
+    .zero_en                   (1'b0                                        ), //i
+    .clr0                      (1'b0                                        ), //i
+    .clr1                      (1'b0                                        ), //i
+    .cascade_weight_in         (tensor_core_bf12_17_cascade_weight_out      ), //i
+    .cascade_weight_out        (tensor_core_bf12_18_cascade_weight_out      ), //o
+    .cascade_data_in_col_1     (tensor_core_bf12_17_cascade_data_out_col_1  ), //i
+    .cascade_data_in_col_2     (tensor_core_bf12_17_cascade_data_out_col_2  ), //i
+    .cascade_data_in_col_3     (tensor_core_bf12_17_cascade_data_out_col_3  ), //i
+    .cascade_data_out_col_1    (tensor_core_bf12_18_cascade_data_out_col_1  ), //o
+    .cascade_data_out_col_2    (tensor_core_bf12_18_cascade_data_out_col_2  ), //o
+    .cascade_data_out_col_3    (tensor_core_bf12_18_cascade_data_out_col_3  )  //o
   );
-  tensor_core tensor_core_19 (
-    .clk                       (clk                                    ), //i
-    .data_in_1                 (tensor_core_19_data_in_1               ), //i
-    .data_in_2                 (tensor_core_19_data_in_2               ), //i
-    .data_in_3                 (tensor_core_19_data_in_3               ), //i
-    .data_in_4                 (tensor_core_19_data_in_4               ), //i
-    .data_in_5                 (tensor_core_19_data_in_5               ), //i
-    .data_in_6                 (tensor_core_19_data_in_6               ), //i
-    .data_in_7                 (tensor_core_19_data_in_7               ), //i
-    .data_in_8                 (tensor_core_19_data_in_8               ), //i
-    .data_in_9                 (tensor_core_19_data_in_9               ), //i
-    .data_in_10                (tensor_core_19_data_in_10              ), //i
-    .side_in_1                 (8'h0                                   ), //i
-    .side_in_2                 (8'h0                                   ), //i
-    .shared_exponent_data      (io_expIn_19                            ), //i
-    .feed_sel                  (2'b01                                  ), //i
-    .load_bb_one               (tensor_core_19_load_bb_one             ), //i
-    .load_bb_two               (tensor_core_19_load_bb_two             ), //i
-    .load_buf_sel              (loadBufSel                             ), //i
-    .bf24_col_1                (tensor_core_19_bf24_col_1              ), //o
-    .bf24_col_2                (tensor_core_19_bf24_col_2              ), //o
-    .bf24_col_3                (tensor_core_19_bf24_col_3              ), //o
-    .acc_en                    (1'b0                                   ), //i
-    .zero_en                   (1'b0                                   ), //i
-    .cascade_weight_in         (tensor_core_18_cascade_weight_out      ), //i
-    .cascade_weight_out        (tensor_core_19_cascade_weight_out      ), //o
-    .cascade_data_in_col_1     (tensor_core_18_cascade_data_out_col_1  ), //i
-    .cascade_data_in_col_2     (tensor_core_18_cascade_data_out_col_2  ), //i
-    .cascade_data_in_col_3     (tensor_core_18_cascade_data_out_col_3  ), //i
-    .cascade_data_out_col_1    (tensor_core_19_cascade_data_out_col_1  ), //o
-    .cascade_data_out_col_2    (tensor_core_19_cascade_data_out_col_2  ), //o
-    .cascade_data_out_col_3    (tensor_core_19_cascade_data_out_col_3  )  //o
+  tensor_core_bf12 tensor_core_bf12_19 (
+    .clk                       (clk                                         ), //i
+    .data_in_1                 (tensor_core_bf12_19_data_in_1               ), //i
+    .data_in_2                 (tensor_core_bf12_19_data_in_2               ), //i
+    .data_in_3                 (tensor_core_bf12_19_data_in_3               ), //i
+    .data_in_4                 (tensor_core_bf12_19_data_in_4               ), //i
+    .data_in_5                 (tensor_core_bf12_19_data_in_5               ), //i
+    .data_in_6                 (tensor_core_bf12_19_data_in_6               ), //i
+    .data_in_7                 (tensor_core_bf12_19_data_in_7               ), //i
+    .data_in_8                 (tensor_core_bf12_19_data_in_8               ), //i
+    .data_in_9                 (tensor_core_bf12_19_data_in_9               ), //i
+    .data_in_10                (tensor_core_bf12_19_data_in_10              ), //i
+    .data_in_11                (tensor_core_bf12_19_data_in_11              ), //i
+    .data_in_12                (tensor_core_bf12_19_data_in_12              ), //i
+    .data_in_13                (tensor_core_bf12_19_data_in_13              ), //i
+    .data_in_14                (tensor_core_bf12_19_data_in_14              ), //i
+    .data_in_15                (tensor_core_bf12_19_data_in_15              ), //i
+    .data_in_16                (tensor_core_bf12_19_data_in_16              ), //i
+    .data_in_17                (tensor_core_bf12_19_data_in_17              ), //i
+    .data_in_18                (tensor_core_bf12_19_data_in_18              ), //i
+    .data_in_19                (tensor_core_bf12_19_data_in_19              ), //i
+    .data_in_20                (tensor_core_bf12_19_data_in_20              ), //i
+    .side_in_1                 (4'b0000                                     ), //i
+    .side_in_2                 (4'b0000                                     ), //i
+    .side_in_3                 (4'b0000                                     ), //i
+    .side_in_4                 (4'b0000                                     ), //i
+    .shared_exponent_data      (io_expIn_19                                 ), //i
+    .feed_sel                  (2'b01                                       ), //i
+    .load_bb_one               (tensor_core_bf12_19_load_bb_one             ), //i
+    .load_bb_two               (tensor_core_bf12_19_load_bb_two             ), //i
+    .load_buf_sel              (loadBufSel                                  ), //i
+    .bf24_col_1                (tensor_core_bf12_19_bf24_col_1              ), //o
+    .bf24_col_2                (tensor_core_bf12_19_bf24_col_2              ), //o
+    .bf24_col_3                (tensor_core_bf12_19_bf24_col_3              ), //o
+    .acc_en                    (1'b0                                        ), //i
+    .zero_en                   (1'b0                                        ), //i
+    .clr0                      (1'b0                                        ), //i
+    .clr1                      (1'b0                                        ), //i
+    .cascade_weight_in         (tensor_core_bf12_18_cascade_weight_out      ), //i
+    .cascade_weight_out        (tensor_core_bf12_19_cascade_weight_out      ), //o
+    .cascade_data_in_col_1     (tensor_core_bf12_18_cascade_data_out_col_1  ), //i
+    .cascade_data_in_col_2     (tensor_core_bf12_18_cascade_data_out_col_2  ), //i
+    .cascade_data_in_col_3     (tensor_core_bf12_18_cascade_data_out_col_3  ), //i
+    .cascade_data_out_col_1    (tensor_core_bf12_19_cascade_data_out_col_1  ), //o
+    .cascade_data_out_col_2    (tensor_core_bf12_19_cascade_data_out_col_2  ), //o
+    .cascade_data_out_col_3    (tensor_core_bf12_19_cascade_data_out_col_3  )  //o
   );
-  tensor_core tensor_core_20 (
-    .clk                       (clk                                    ), //i
-    .data_in_1                 (tensor_core_20_data_in_1               ), //i
-    .data_in_2                 (tensor_core_20_data_in_2               ), //i
-    .data_in_3                 (tensor_core_20_data_in_3               ), //i
-    .data_in_4                 (tensor_core_20_data_in_4               ), //i
-    .data_in_5                 (tensor_core_20_data_in_5               ), //i
-    .data_in_6                 (tensor_core_20_data_in_6               ), //i
-    .data_in_7                 (tensor_core_20_data_in_7               ), //i
-    .data_in_8                 (tensor_core_20_data_in_8               ), //i
-    .data_in_9                 (tensor_core_20_data_in_9               ), //i
-    .data_in_10                (tensor_core_20_data_in_10              ), //i
-    .side_in_1                 (8'h0                                   ), //i
-    .side_in_2                 (8'h0                                   ), //i
-    .shared_exponent_data      (io_expIn_20                            ), //i
-    .feed_sel                  (2'b01                                  ), //i
-    .load_bb_one               (tensor_core_20_load_bb_one             ), //i
-    .load_bb_two               (tensor_core_20_load_bb_two             ), //i
-    .load_buf_sel              (loadBufSel                             ), //i
-    .bf24_col_1                (tensor_core_20_bf24_col_1              ), //o
-    .bf24_col_2                (tensor_core_20_bf24_col_2              ), //o
-    .bf24_col_3                (tensor_core_20_bf24_col_3              ), //o
-    .acc_en                    (1'b0                                   ), //i
-    .zero_en                   (1'b0                                   ), //i
-    .cascade_weight_in         (tensor_core_19_cascade_weight_out      ), //i
-    .cascade_weight_out        (tensor_core_20_cascade_weight_out      ), //o
-    .cascade_data_in_col_1     (tensor_core_19_cascade_data_out_col_1  ), //i
-    .cascade_data_in_col_2     (tensor_core_19_cascade_data_out_col_2  ), //i
-    .cascade_data_in_col_3     (tensor_core_19_cascade_data_out_col_3  ), //i
-    .cascade_data_out_col_1    (tensor_core_20_cascade_data_out_col_1  ), //o
-    .cascade_data_out_col_2    (tensor_core_20_cascade_data_out_col_2  ), //o
-    .cascade_data_out_col_3    (tensor_core_20_cascade_data_out_col_3  )  //o
+  tensor_core_bf12 tensor_core_bf12_20 (
+    .clk                       (clk                                         ), //i
+    .data_in_1                 (tensor_core_bf12_20_data_in_1               ), //i
+    .data_in_2                 (tensor_core_bf12_20_data_in_2               ), //i
+    .data_in_3                 (tensor_core_bf12_20_data_in_3               ), //i
+    .data_in_4                 (tensor_core_bf12_20_data_in_4               ), //i
+    .data_in_5                 (tensor_core_bf12_20_data_in_5               ), //i
+    .data_in_6                 (tensor_core_bf12_20_data_in_6               ), //i
+    .data_in_7                 (tensor_core_bf12_20_data_in_7               ), //i
+    .data_in_8                 (tensor_core_bf12_20_data_in_8               ), //i
+    .data_in_9                 (tensor_core_bf12_20_data_in_9               ), //i
+    .data_in_10                (tensor_core_bf12_20_data_in_10              ), //i
+    .data_in_11                (tensor_core_bf12_20_data_in_11              ), //i
+    .data_in_12                (tensor_core_bf12_20_data_in_12              ), //i
+    .data_in_13                (tensor_core_bf12_20_data_in_13              ), //i
+    .data_in_14                (tensor_core_bf12_20_data_in_14              ), //i
+    .data_in_15                (tensor_core_bf12_20_data_in_15              ), //i
+    .data_in_16                (tensor_core_bf12_20_data_in_16              ), //i
+    .data_in_17                (tensor_core_bf12_20_data_in_17              ), //i
+    .data_in_18                (tensor_core_bf12_20_data_in_18              ), //i
+    .data_in_19                (tensor_core_bf12_20_data_in_19              ), //i
+    .data_in_20                (tensor_core_bf12_20_data_in_20              ), //i
+    .side_in_1                 (4'b0000                                     ), //i
+    .side_in_2                 (4'b0000                                     ), //i
+    .side_in_3                 (4'b0000                                     ), //i
+    .side_in_4                 (4'b0000                                     ), //i
+    .shared_exponent_data      (io_expIn_20                                 ), //i
+    .feed_sel                  (2'b01                                       ), //i
+    .load_bb_one               (tensor_core_bf12_20_load_bb_one             ), //i
+    .load_bb_two               (tensor_core_bf12_20_load_bb_two             ), //i
+    .load_buf_sel              (loadBufSel                                  ), //i
+    .bf24_col_1                (tensor_core_bf12_20_bf24_col_1              ), //o
+    .bf24_col_2                (tensor_core_bf12_20_bf24_col_2              ), //o
+    .bf24_col_3                (tensor_core_bf12_20_bf24_col_3              ), //o
+    .acc_en                    (1'b0                                        ), //i
+    .zero_en                   (1'b0                                        ), //i
+    .clr0                      (1'b0                                        ), //i
+    .clr1                      (1'b0                                        ), //i
+    .cascade_weight_in         (tensor_core_bf12_19_cascade_weight_out      ), //i
+    .cascade_weight_out        (tensor_core_bf12_20_cascade_weight_out      ), //o
+    .cascade_data_in_col_1     (tensor_core_bf12_19_cascade_data_out_col_1  ), //i
+    .cascade_data_in_col_2     (tensor_core_bf12_19_cascade_data_out_col_2  ), //i
+    .cascade_data_in_col_3     (tensor_core_bf12_19_cascade_data_out_col_3  ), //i
+    .cascade_data_out_col_1    (tensor_core_bf12_20_cascade_data_out_col_1  ), //o
+    .cascade_data_out_col_2    (tensor_core_bf12_20_cascade_data_out_col_2  ), //o
+    .cascade_data_out_col_3    (tensor_core_bf12_20_cascade_data_out_col_3  )  //o
   );
-  tensor_core tensor_core_21 (
-    .clk                       (clk                                    ), //i
-    .data_in_1                 (tensor_core_21_data_in_1               ), //i
-    .data_in_2                 (tensor_core_21_data_in_2               ), //i
-    .data_in_3                 (tensor_core_21_data_in_3               ), //i
-    .data_in_4                 (tensor_core_21_data_in_4               ), //i
-    .data_in_5                 (tensor_core_21_data_in_5               ), //i
-    .data_in_6                 (tensor_core_21_data_in_6               ), //i
-    .data_in_7                 (tensor_core_21_data_in_7               ), //i
-    .data_in_8                 (tensor_core_21_data_in_8               ), //i
-    .data_in_9                 (tensor_core_21_data_in_9               ), //i
-    .data_in_10                (tensor_core_21_data_in_10              ), //i
-    .side_in_1                 (8'h0                                   ), //i
-    .side_in_2                 (8'h0                                   ), //i
-    .shared_exponent_data      (io_expIn_21                            ), //i
-    .feed_sel                  (2'b01                                  ), //i
-    .load_bb_one               (tensor_core_21_load_bb_one             ), //i
-    .load_bb_two               (tensor_core_21_load_bb_two             ), //i
-    .load_buf_sel              (loadBufSel                             ), //i
-    .bf24_col_1                (tensor_core_21_bf24_col_1              ), //o
-    .bf24_col_2                (tensor_core_21_bf24_col_2              ), //o
-    .bf24_col_3                (tensor_core_21_bf24_col_3              ), //o
-    .acc_en                    (1'b0                                   ), //i
-    .zero_en                   (1'b0                                   ), //i
-    .cascade_weight_in         (tensor_core_20_cascade_weight_out      ), //i
-    .cascade_weight_out        (tensor_core_21_cascade_weight_out      ), //o
-    .cascade_data_in_col_1     (tensor_core_20_cascade_data_out_col_1  ), //i
-    .cascade_data_in_col_2     (tensor_core_20_cascade_data_out_col_2  ), //i
-    .cascade_data_in_col_3     (tensor_core_20_cascade_data_out_col_3  ), //i
-    .cascade_data_out_col_1    (tensor_core_21_cascade_data_out_col_1  ), //o
-    .cascade_data_out_col_2    (tensor_core_21_cascade_data_out_col_2  ), //o
-    .cascade_data_out_col_3    (tensor_core_21_cascade_data_out_col_3  )  //o
+  tensor_core_bf12 tensor_core_bf12_21 (
+    .clk                       (clk                                         ), //i
+    .data_in_1                 (tensor_core_bf12_21_data_in_1               ), //i
+    .data_in_2                 (tensor_core_bf12_21_data_in_2               ), //i
+    .data_in_3                 (tensor_core_bf12_21_data_in_3               ), //i
+    .data_in_4                 (tensor_core_bf12_21_data_in_4               ), //i
+    .data_in_5                 (tensor_core_bf12_21_data_in_5               ), //i
+    .data_in_6                 (tensor_core_bf12_21_data_in_6               ), //i
+    .data_in_7                 (tensor_core_bf12_21_data_in_7               ), //i
+    .data_in_8                 (tensor_core_bf12_21_data_in_8               ), //i
+    .data_in_9                 (tensor_core_bf12_21_data_in_9               ), //i
+    .data_in_10                (tensor_core_bf12_21_data_in_10              ), //i
+    .data_in_11                (tensor_core_bf12_21_data_in_11              ), //i
+    .data_in_12                (tensor_core_bf12_21_data_in_12              ), //i
+    .data_in_13                (tensor_core_bf12_21_data_in_13              ), //i
+    .data_in_14                (tensor_core_bf12_21_data_in_14              ), //i
+    .data_in_15                (tensor_core_bf12_21_data_in_15              ), //i
+    .data_in_16                (tensor_core_bf12_21_data_in_16              ), //i
+    .data_in_17                (tensor_core_bf12_21_data_in_17              ), //i
+    .data_in_18                (tensor_core_bf12_21_data_in_18              ), //i
+    .data_in_19                (tensor_core_bf12_21_data_in_19              ), //i
+    .data_in_20                (tensor_core_bf12_21_data_in_20              ), //i
+    .side_in_1                 (4'b0000                                     ), //i
+    .side_in_2                 (4'b0000                                     ), //i
+    .side_in_3                 (4'b0000                                     ), //i
+    .side_in_4                 (4'b0000                                     ), //i
+    .shared_exponent_data      (io_expIn_21                                 ), //i
+    .feed_sel                  (2'b01                                       ), //i
+    .load_bb_one               (tensor_core_bf12_21_load_bb_one             ), //i
+    .load_bb_two               (tensor_core_bf12_21_load_bb_two             ), //i
+    .load_buf_sel              (loadBufSel                                  ), //i
+    .bf24_col_1                (tensor_core_bf12_21_bf24_col_1              ), //o
+    .bf24_col_2                (tensor_core_bf12_21_bf24_col_2              ), //o
+    .bf24_col_3                (tensor_core_bf12_21_bf24_col_3              ), //o
+    .acc_en                    (1'b0                                        ), //i
+    .zero_en                   (1'b0                                        ), //i
+    .clr0                      (1'b0                                        ), //i
+    .clr1                      (1'b0                                        ), //i
+    .cascade_weight_in         (tensor_core_bf12_20_cascade_weight_out      ), //i
+    .cascade_weight_out        (tensor_core_bf12_21_cascade_weight_out      ), //o
+    .cascade_data_in_col_1     (tensor_core_bf12_20_cascade_data_out_col_1  ), //i
+    .cascade_data_in_col_2     (tensor_core_bf12_20_cascade_data_out_col_2  ), //i
+    .cascade_data_in_col_3     (tensor_core_bf12_20_cascade_data_out_col_3  ), //i
+    .cascade_data_out_col_1    (tensor_core_bf12_21_cascade_data_out_col_1  ), //o
+    .cascade_data_out_col_2    (tensor_core_bf12_21_cascade_data_out_col_2  ), //o
+    .cascade_data_out_col_3    (tensor_core_bf12_21_cascade_data_out_col_3  )  //o
   );
-  tensor_core tensor_core_22 (
-    .clk                       (clk                                    ), //i
-    .data_in_1                 (tensor_core_22_data_in_1               ), //i
-    .data_in_2                 (tensor_core_22_data_in_2               ), //i
-    .data_in_3                 (tensor_core_22_data_in_3               ), //i
-    .data_in_4                 (tensor_core_22_data_in_4               ), //i
-    .data_in_5                 (tensor_core_22_data_in_5               ), //i
-    .data_in_6                 (tensor_core_22_data_in_6               ), //i
-    .data_in_7                 (tensor_core_22_data_in_7               ), //i
-    .data_in_8                 (tensor_core_22_data_in_8               ), //i
-    .data_in_9                 (tensor_core_22_data_in_9               ), //i
-    .data_in_10                (tensor_core_22_data_in_10              ), //i
-    .side_in_1                 (8'h0                                   ), //i
-    .side_in_2                 (8'h0                                   ), //i
-    .shared_exponent_data      (io_expIn_22                            ), //i
-    .feed_sel                  (2'b01                                  ), //i
-    .load_bb_one               (tensor_core_22_load_bb_one             ), //i
-    .load_bb_two               (tensor_core_22_load_bb_two             ), //i
-    .load_buf_sel              (loadBufSel                             ), //i
-    .bf24_col_1                (tensor_core_22_bf24_col_1              ), //o
-    .bf24_col_2                (tensor_core_22_bf24_col_2              ), //o
-    .bf24_col_3                (tensor_core_22_bf24_col_3              ), //o
-    .acc_en                    (1'b0                                   ), //i
-    .zero_en                   (1'b0                                   ), //i
-    .cascade_weight_in         (tensor_core_21_cascade_weight_out      ), //i
-    .cascade_weight_out        (tensor_core_22_cascade_weight_out      ), //o
-    .cascade_data_in_col_1     (tensor_core_21_cascade_data_out_col_1  ), //i
-    .cascade_data_in_col_2     (tensor_core_21_cascade_data_out_col_2  ), //i
-    .cascade_data_in_col_3     (tensor_core_21_cascade_data_out_col_3  ), //i
-    .cascade_data_out_col_1    (tensor_core_22_cascade_data_out_col_1  ), //o
-    .cascade_data_out_col_2    (tensor_core_22_cascade_data_out_col_2  ), //o
-    .cascade_data_out_col_3    (tensor_core_22_cascade_data_out_col_3  )  //o
+  tensor_core_bf12 tensor_core_bf12_22 (
+    .clk                       (clk                                         ), //i
+    .data_in_1                 (tensor_core_bf12_22_data_in_1               ), //i
+    .data_in_2                 (tensor_core_bf12_22_data_in_2               ), //i
+    .data_in_3                 (tensor_core_bf12_22_data_in_3               ), //i
+    .data_in_4                 (tensor_core_bf12_22_data_in_4               ), //i
+    .data_in_5                 (tensor_core_bf12_22_data_in_5               ), //i
+    .data_in_6                 (tensor_core_bf12_22_data_in_6               ), //i
+    .data_in_7                 (tensor_core_bf12_22_data_in_7               ), //i
+    .data_in_8                 (tensor_core_bf12_22_data_in_8               ), //i
+    .data_in_9                 (tensor_core_bf12_22_data_in_9               ), //i
+    .data_in_10                (tensor_core_bf12_22_data_in_10              ), //i
+    .data_in_11                (tensor_core_bf12_22_data_in_11              ), //i
+    .data_in_12                (tensor_core_bf12_22_data_in_12              ), //i
+    .data_in_13                (tensor_core_bf12_22_data_in_13              ), //i
+    .data_in_14                (tensor_core_bf12_22_data_in_14              ), //i
+    .data_in_15                (tensor_core_bf12_22_data_in_15              ), //i
+    .data_in_16                (tensor_core_bf12_22_data_in_16              ), //i
+    .data_in_17                (tensor_core_bf12_22_data_in_17              ), //i
+    .data_in_18                (tensor_core_bf12_22_data_in_18              ), //i
+    .data_in_19                (tensor_core_bf12_22_data_in_19              ), //i
+    .data_in_20                (tensor_core_bf12_22_data_in_20              ), //i
+    .side_in_1                 (4'b0000                                     ), //i
+    .side_in_2                 (4'b0000                                     ), //i
+    .side_in_3                 (4'b0000                                     ), //i
+    .side_in_4                 (4'b0000                                     ), //i
+    .shared_exponent_data      (io_expIn_22                                 ), //i
+    .feed_sel                  (2'b01                                       ), //i
+    .load_bb_one               (tensor_core_bf12_22_load_bb_one             ), //i
+    .load_bb_two               (tensor_core_bf12_22_load_bb_two             ), //i
+    .load_buf_sel              (loadBufSel                                  ), //i
+    .bf24_col_1                (tensor_core_bf12_22_bf24_col_1              ), //o
+    .bf24_col_2                (tensor_core_bf12_22_bf24_col_2              ), //o
+    .bf24_col_3                (tensor_core_bf12_22_bf24_col_3              ), //o
+    .acc_en                    (1'b0                                        ), //i
+    .zero_en                   (1'b0                                        ), //i
+    .clr0                      (1'b0                                        ), //i
+    .clr1                      (1'b0                                        ), //i
+    .cascade_weight_in         (tensor_core_bf12_21_cascade_weight_out      ), //i
+    .cascade_weight_out        (tensor_core_bf12_22_cascade_weight_out      ), //o
+    .cascade_data_in_col_1     (tensor_core_bf12_21_cascade_data_out_col_1  ), //i
+    .cascade_data_in_col_2     (tensor_core_bf12_21_cascade_data_out_col_2  ), //i
+    .cascade_data_in_col_3     (tensor_core_bf12_21_cascade_data_out_col_3  ), //i
+    .cascade_data_out_col_1    (tensor_core_bf12_22_cascade_data_out_col_1  ), //o
+    .cascade_data_out_col_2    (tensor_core_bf12_22_cascade_data_out_col_2  ), //o
+    .cascade_data_out_col_3    (tensor_core_bf12_22_cascade_data_out_col_3  )  //o
   );
-  tensor_core tensor_core_23 (
-    .clk                       (clk                                    ), //i
-    .data_in_1                 (tensor_core_23_data_in_1               ), //i
-    .data_in_2                 (tensor_core_23_data_in_2               ), //i
-    .data_in_3                 (tensor_core_23_data_in_3               ), //i
-    .data_in_4                 (tensor_core_23_data_in_4               ), //i
-    .data_in_5                 (tensor_core_23_data_in_5               ), //i
-    .data_in_6                 (tensor_core_23_data_in_6               ), //i
-    .data_in_7                 (tensor_core_23_data_in_7               ), //i
-    .data_in_8                 (tensor_core_23_data_in_8               ), //i
-    .data_in_9                 (tensor_core_23_data_in_9               ), //i
-    .data_in_10                (tensor_core_23_data_in_10              ), //i
-    .side_in_1                 (8'h0                                   ), //i
-    .side_in_2                 (8'h0                                   ), //i
-    .shared_exponent_data      (io_expIn_23                            ), //i
-    .feed_sel                  (2'b01                                  ), //i
-    .load_bb_one               (tensor_core_23_load_bb_one             ), //i
-    .load_bb_two               (tensor_core_23_load_bb_two             ), //i
-    .load_buf_sel              (loadBufSel                             ), //i
-    .bf24_col_1                (tensor_core_23_bf24_col_1              ), //o
-    .bf24_col_2                (tensor_core_23_bf24_col_2              ), //o
-    .bf24_col_3                (tensor_core_23_bf24_col_3              ), //o
-    .acc_en                    (1'b0                                   ), //i
-    .zero_en                   (1'b0                                   ), //i
-    .cascade_weight_in         (tensor_core_22_cascade_weight_out      ), //i
-    .cascade_weight_out        (tensor_core_23_cascade_weight_out      ), //o
-    .cascade_data_in_col_1     (tensor_core_22_cascade_data_out_col_1  ), //i
-    .cascade_data_in_col_2     (tensor_core_22_cascade_data_out_col_2  ), //i
-    .cascade_data_in_col_3     (tensor_core_22_cascade_data_out_col_3  ), //i
-    .cascade_data_out_col_1    (tensor_core_23_cascade_data_out_col_1  ), //o
-    .cascade_data_out_col_2    (tensor_core_23_cascade_data_out_col_2  ), //o
-    .cascade_data_out_col_3    (tensor_core_23_cascade_data_out_col_3  )  //o
+  tensor_core_bf12 tensor_core_bf12_23 (
+    .clk                       (clk                                         ), //i
+    .data_in_1                 (tensor_core_bf12_23_data_in_1               ), //i
+    .data_in_2                 (tensor_core_bf12_23_data_in_2               ), //i
+    .data_in_3                 (tensor_core_bf12_23_data_in_3               ), //i
+    .data_in_4                 (tensor_core_bf12_23_data_in_4               ), //i
+    .data_in_5                 (tensor_core_bf12_23_data_in_5               ), //i
+    .data_in_6                 (tensor_core_bf12_23_data_in_6               ), //i
+    .data_in_7                 (tensor_core_bf12_23_data_in_7               ), //i
+    .data_in_8                 (tensor_core_bf12_23_data_in_8               ), //i
+    .data_in_9                 (tensor_core_bf12_23_data_in_9               ), //i
+    .data_in_10                (tensor_core_bf12_23_data_in_10              ), //i
+    .data_in_11                (tensor_core_bf12_23_data_in_11              ), //i
+    .data_in_12                (tensor_core_bf12_23_data_in_12              ), //i
+    .data_in_13                (tensor_core_bf12_23_data_in_13              ), //i
+    .data_in_14                (tensor_core_bf12_23_data_in_14              ), //i
+    .data_in_15                (tensor_core_bf12_23_data_in_15              ), //i
+    .data_in_16                (tensor_core_bf12_23_data_in_16              ), //i
+    .data_in_17                (tensor_core_bf12_23_data_in_17              ), //i
+    .data_in_18                (tensor_core_bf12_23_data_in_18              ), //i
+    .data_in_19                (tensor_core_bf12_23_data_in_19              ), //i
+    .data_in_20                (tensor_core_bf12_23_data_in_20              ), //i
+    .side_in_1                 (4'b0000                                     ), //i
+    .side_in_2                 (4'b0000                                     ), //i
+    .side_in_3                 (4'b0000                                     ), //i
+    .side_in_4                 (4'b0000                                     ), //i
+    .shared_exponent_data      (io_expIn_23                                 ), //i
+    .feed_sel                  (2'b01                                       ), //i
+    .load_bb_one               (tensor_core_bf12_23_load_bb_one             ), //i
+    .load_bb_two               (tensor_core_bf12_23_load_bb_two             ), //i
+    .load_buf_sel              (loadBufSel                                  ), //i
+    .bf24_col_1                (tensor_core_bf12_23_bf24_col_1              ), //o
+    .bf24_col_2                (tensor_core_bf12_23_bf24_col_2              ), //o
+    .bf24_col_3                (tensor_core_bf12_23_bf24_col_3              ), //o
+    .acc_en                    (1'b0                                        ), //i
+    .zero_en                   (1'b0                                        ), //i
+    .clr0                      (1'b0                                        ), //i
+    .clr1                      (1'b0                                        ), //i
+    .cascade_weight_in         (tensor_core_bf12_22_cascade_weight_out      ), //i
+    .cascade_weight_out        (tensor_core_bf12_23_cascade_weight_out      ), //o
+    .cascade_data_in_col_1     (tensor_core_bf12_22_cascade_data_out_col_1  ), //i
+    .cascade_data_in_col_2     (tensor_core_bf12_22_cascade_data_out_col_2  ), //i
+    .cascade_data_in_col_3     (tensor_core_bf12_22_cascade_data_out_col_3  ), //i
+    .cascade_data_out_col_1    (tensor_core_bf12_23_cascade_data_out_col_1  ), //o
+    .cascade_data_out_col_2    (tensor_core_bf12_23_cascade_data_out_col_2  ), //o
+    .cascade_data_out_col_3    (tensor_core_bf12_23_cascade_data_out_col_3  )  //o
   );
-  tensor_core tensor_core_24 (
-    .clk                       (clk                                    ), //i
-    .data_in_1                 (tensor_core_24_data_in_1               ), //i
-    .data_in_2                 (tensor_core_24_data_in_2               ), //i
-    .data_in_3                 (tensor_core_24_data_in_3               ), //i
-    .data_in_4                 (tensor_core_24_data_in_4               ), //i
-    .data_in_5                 (tensor_core_24_data_in_5               ), //i
-    .data_in_6                 (tensor_core_24_data_in_6               ), //i
-    .data_in_7                 (tensor_core_24_data_in_7               ), //i
-    .data_in_8                 (tensor_core_24_data_in_8               ), //i
-    .data_in_9                 (tensor_core_24_data_in_9               ), //i
-    .data_in_10                (tensor_core_24_data_in_10              ), //i
-    .side_in_1                 (8'h0                                   ), //i
-    .side_in_2                 (8'h0                                   ), //i
-    .shared_exponent_data      (io_expIn_24                            ), //i
-    .feed_sel                  (2'b01                                  ), //i
-    .load_bb_one               (tensor_core_24_load_bb_one             ), //i
-    .load_bb_two               (tensor_core_24_load_bb_two             ), //i
-    .load_buf_sel              (loadBufSel                             ), //i
-    .bf24_col_1                (tensor_core_24_bf24_col_1              ), //o
-    .bf24_col_2                (tensor_core_24_bf24_col_2              ), //o
-    .bf24_col_3                (tensor_core_24_bf24_col_3              ), //o
-    .acc_en                    (1'b0                                   ), //i
-    .zero_en                   (1'b0                                   ), //i
-    .cascade_weight_in         (tensor_core_23_cascade_weight_out      ), //i
-    .cascade_weight_out        (tensor_core_24_cascade_weight_out      ), //o
-    .cascade_data_in_col_1     (tensor_core_23_cascade_data_out_col_1  ), //i
-    .cascade_data_in_col_2     (tensor_core_23_cascade_data_out_col_2  ), //i
-    .cascade_data_in_col_3     (tensor_core_23_cascade_data_out_col_3  ), //i
-    .cascade_data_out_col_1    (tensor_core_24_cascade_data_out_col_1  ), //o
-    .cascade_data_out_col_2    (tensor_core_24_cascade_data_out_col_2  ), //o
-    .cascade_data_out_col_3    (tensor_core_24_cascade_data_out_col_3  )  //o
+  tensor_core_bf12 tensor_core_bf12_24 (
+    .clk                       (clk                                         ), //i
+    .data_in_1                 (tensor_core_bf12_24_data_in_1               ), //i
+    .data_in_2                 (tensor_core_bf12_24_data_in_2               ), //i
+    .data_in_3                 (tensor_core_bf12_24_data_in_3               ), //i
+    .data_in_4                 (tensor_core_bf12_24_data_in_4               ), //i
+    .data_in_5                 (tensor_core_bf12_24_data_in_5               ), //i
+    .data_in_6                 (tensor_core_bf12_24_data_in_6               ), //i
+    .data_in_7                 (tensor_core_bf12_24_data_in_7               ), //i
+    .data_in_8                 (tensor_core_bf12_24_data_in_8               ), //i
+    .data_in_9                 (tensor_core_bf12_24_data_in_9               ), //i
+    .data_in_10                (tensor_core_bf12_24_data_in_10              ), //i
+    .data_in_11                (tensor_core_bf12_24_data_in_11              ), //i
+    .data_in_12                (tensor_core_bf12_24_data_in_12              ), //i
+    .data_in_13                (tensor_core_bf12_24_data_in_13              ), //i
+    .data_in_14                (tensor_core_bf12_24_data_in_14              ), //i
+    .data_in_15                (tensor_core_bf12_24_data_in_15              ), //i
+    .data_in_16                (tensor_core_bf12_24_data_in_16              ), //i
+    .data_in_17                (tensor_core_bf12_24_data_in_17              ), //i
+    .data_in_18                (tensor_core_bf12_24_data_in_18              ), //i
+    .data_in_19                (tensor_core_bf12_24_data_in_19              ), //i
+    .data_in_20                (tensor_core_bf12_24_data_in_20              ), //i
+    .side_in_1                 (4'b0000                                     ), //i
+    .side_in_2                 (4'b0000                                     ), //i
+    .side_in_3                 (4'b0000                                     ), //i
+    .side_in_4                 (4'b0000                                     ), //i
+    .shared_exponent_data      (io_expIn_24                                 ), //i
+    .feed_sel                  (2'b01                                       ), //i
+    .load_bb_one               (tensor_core_bf12_24_load_bb_one             ), //i
+    .load_bb_two               (tensor_core_bf12_24_load_bb_two             ), //i
+    .load_buf_sel              (loadBufSel                                  ), //i
+    .bf24_col_1                (tensor_core_bf12_24_bf24_col_1              ), //o
+    .bf24_col_2                (tensor_core_bf12_24_bf24_col_2              ), //o
+    .bf24_col_3                (tensor_core_bf12_24_bf24_col_3              ), //o
+    .acc_en                    (1'b0                                        ), //i
+    .zero_en                   (1'b0                                        ), //i
+    .clr0                      (1'b0                                        ), //i
+    .clr1                      (1'b0                                        ), //i
+    .cascade_weight_in         (tensor_core_bf12_23_cascade_weight_out      ), //i
+    .cascade_weight_out        (tensor_core_bf12_24_cascade_weight_out      ), //o
+    .cascade_data_in_col_1     (tensor_core_bf12_23_cascade_data_out_col_1  ), //i
+    .cascade_data_in_col_2     (tensor_core_bf12_23_cascade_data_out_col_2  ), //i
+    .cascade_data_in_col_3     (tensor_core_bf12_23_cascade_data_out_col_3  ), //i
+    .cascade_data_out_col_1    (tensor_core_bf12_24_cascade_data_out_col_1  ), //o
+    .cascade_data_out_col_2    (tensor_core_bf12_24_cascade_data_out_col_2  ), //o
+    .cascade_data_out_col_3    (tensor_core_bf12_24_cascade_data_out_col_3  )  //o
   );
-  tensor_core tensor_core_25 (
-    .clk                       (clk                                    ), //i
-    .data_in_1                 (tensor_core_25_data_in_1               ), //i
-    .data_in_2                 (tensor_core_25_data_in_2               ), //i
-    .data_in_3                 (tensor_core_25_data_in_3               ), //i
-    .data_in_4                 (tensor_core_25_data_in_4               ), //i
-    .data_in_5                 (tensor_core_25_data_in_5               ), //i
-    .data_in_6                 (tensor_core_25_data_in_6               ), //i
-    .data_in_7                 (tensor_core_25_data_in_7               ), //i
-    .data_in_8                 (tensor_core_25_data_in_8               ), //i
-    .data_in_9                 (tensor_core_25_data_in_9               ), //i
-    .data_in_10                (tensor_core_25_data_in_10              ), //i
-    .side_in_1                 (8'h0                                   ), //i
-    .side_in_2                 (8'h0                                   ), //i
-    .shared_exponent_data      (io_expIn_25                            ), //i
-    .feed_sel                  (2'b01                                  ), //i
-    .load_bb_one               (tensor_core_25_load_bb_one             ), //i
-    .load_bb_two               (tensor_core_25_load_bb_two             ), //i
-    .load_buf_sel              (loadBufSel                             ), //i
-    .bf24_col_1                (tensor_core_25_bf24_col_1              ), //o
-    .bf24_col_2                (tensor_core_25_bf24_col_2              ), //o
-    .bf24_col_3                (tensor_core_25_bf24_col_3              ), //o
-    .acc_en                    (1'b0                                   ), //i
-    .zero_en                   (1'b0                                   ), //i
-    .cascade_weight_in         (tensor_core_24_cascade_weight_out      ), //i
-    .cascade_weight_out        (tensor_core_25_cascade_weight_out      ), //o
-    .cascade_data_in_col_1     (tensor_core_24_cascade_data_out_col_1  ), //i
-    .cascade_data_in_col_2     (tensor_core_24_cascade_data_out_col_2  ), //i
-    .cascade_data_in_col_3     (tensor_core_24_cascade_data_out_col_3  ), //i
-    .cascade_data_out_col_1    (tensor_core_25_cascade_data_out_col_1  ), //o
-    .cascade_data_out_col_2    (tensor_core_25_cascade_data_out_col_2  ), //o
-    .cascade_data_out_col_3    (tensor_core_25_cascade_data_out_col_3  )  //o
+  tensor_core_bf12 tensor_core_bf12_25 (
+    .clk                       (clk                                         ), //i
+    .data_in_1                 (tensor_core_bf12_25_data_in_1               ), //i
+    .data_in_2                 (tensor_core_bf12_25_data_in_2               ), //i
+    .data_in_3                 (tensor_core_bf12_25_data_in_3               ), //i
+    .data_in_4                 (tensor_core_bf12_25_data_in_4               ), //i
+    .data_in_5                 (tensor_core_bf12_25_data_in_5               ), //i
+    .data_in_6                 (tensor_core_bf12_25_data_in_6               ), //i
+    .data_in_7                 (tensor_core_bf12_25_data_in_7               ), //i
+    .data_in_8                 (tensor_core_bf12_25_data_in_8               ), //i
+    .data_in_9                 (tensor_core_bf12_25_data_in_9               ), //i
+    .data_in_10                (tensor_core_bf12_25_data_in_10              ), //i
+    .data_in_11                (tensor_core_bf12_25_data_in_11              ), //i
+    .data_in_12                (tensor_core_bf12_25_data_in_12              ), //i
+    .data_in_13                (tensor_core_bf12_25_data_in_13              ), //i
+    .data_in_14                (tensor_core_bf12_25_data_in_14              ), //i
+    .data_in_15                (tensor_core_bf12_25_data_in_15              ), //i
+    .data_in_16                (tensor_core_bf12_25_data_in_16              ), //i
+    .data_in_17                (tensor_core_bf12_25_data_in_17              ), //i
+    .data_in_18                (tensor_core_bf12_25_data_in_18              ), //i
+    .data_in_19                (tensor_core_bf12_25_data_in_19              ), //i
+    .data_in_20                (tensor_core_bf12_25_data_in_20              ), //i
+    .side_in_1                 (4'b0000                                     ), //i
+    .side_in_2                 (4'b0000                                     ), //i
+    .side_in_3                 (4'b0000                                     ), //i
+    .side_in_4                 (4'b0000                                     ), //i
+    .shared_exponent_data      (io_expIn_25                                 ), //i
+    .feed_sel                  (2'b01                                       ), //i
+    .load_bb_one               (tensor_core_bf12_25_load_bb_one             ), //i
+    .load_bb_two               (tensor_core_bf12_25_load_bb_two             ), //i
+    .load_buf_sel              (loadBufSel                                  ), //i
+    .bf24_col_1                (tensor_core_bf12_25_bf24_col_1              ), //o
+    .bf24_col_2                (tensor_core_bf12_25_bf24_col_2              ), //o
+    .bf24_col_3                (tensor_core_bf12_25_bf24_col_3              ), //o
+    .acc_en                    (1'b0                                        ), //i
+    .zero_en                   (1'b0                                        ), //i
+    .clr0                      (1'b0                                        ), //i
+    .clr1                      (1'b0                                        ), //i
+    .cascade_weight_in         (tensor_core_bf12_24_cascade_weight_out      ), //i
+    .cascade_weight_out        (tensor_core_bf12_25_cascade_weight_out      ), //o
+    .cascade_data_in_col_1     (tensor_core_bf12_24_cascade_data_out_col_1  ), //i
+    .cascade_data_in_col_2     (tensor_core_bf12_24_cascade_data_out_col_2  ), //i
+    .cascade_data_in_col_3     (tensor_core_bf12_24_cascade_data_out_col_3  ), //i
+    .cascade_data_out_col_1    (tensor_core_bf12_25_cascade_data_out_col_1  ), //o
+    .cascade_data_out_col_2    (tensor_core_bf12_25_cascade_data_out_col_2  ), //o
+    .cascade_data_out_col_3    (tensor_core_bf12_25_cascade_data_out_col_3  )  //o
   );
-  tensor_core tensor_core_26 (
-    .clk                       (clk                                    ), //i
-    .data_in_1                 (tensor_core_26_data_in_1               ), //i
-    .data_in_2                 (tensor_core_26_data_in_2               ), //i
-    .data_in_3                 (tensor_core_26_data_in_3               ), //i
-    .data_in_4                 (tensor_core_26_data_in_4               ), //i
-    .data_in_5                 (tensor_core_26_data_in_5               ), //i
-    .data_in_6                 (tensor_core_26_data_in_6               ), //i
-    .data_in_7                 (tensor_core_26_data_in_7               ), //i
-    .data_in_8                 (tensor_core_26_data_in_8               ), //i
-    .data_in_9                 (tensor_core_26_data_in_9               ), //i
-    .data_in_10                (tensor_core_26_data_in_10              ), //i
-    .side_in_1                 (8'h0                                   ), //i
-    .side_in_2                 (8'h0                                   ), //i
-    .shared_exponent_data      (io_expIn_26                            ), //i
-    .feed_sel                  (2'b01                                  ), //i
-    .load_bb_one               (tensor_core_26_load_bb_one             ), //i
-    .load_bb_two               (tensor_core_26_load_bb_two             ), //i
-    .load_buf_sel              (loadBufSel                             ), //i
-    .bf24_col_1                (tensor_core_26_bf24_col_1              ), //o
-    .bf24_col_2                (tensor_core_26_bf24_col_2              ), //o
-    .bf24_col_3                (tensor_core_26_bf24_col_3              ), //o
-    .acc_en                    (1'b0                                   ), //i
-    .zero_en                   (1'b0                                   ), //i
-    .cascade_weight_in         (tensor_core_25_cascade_weight_out      ), //i
-    .cascade_weight_out        (tensor_core_26_cascade_weight_out      ), //o
-    .cascade_data_in_col_1     (tensor_core_25_cascade_data_out_col_1  ), //i
-    .cascade_data_in_col_2     (tensor_core_25_cascade_data_out_col_2  ), //i
-    .cascade_data_in_col_3     (tensor_core_25_cascade_data_out_col_3  ), //i
-    .cascade_data_out_col_1    (tensor_core_26_cascade_data_out_col_1  ), //o
-    .cascade_data_out_col_2    (tensor_core_26_cascade_data_out_col_2  ), //o
-    .cascade_data_out_col_3    (tensor_core_26_cascade_data_out_col_3  )  //o
+  tensor_core_bf12 tensor_core_bf12_26 (
+    .clk                       (clk                                         ), //i
+    .data_in_1                 (tensor_core_bf12_26_data_in_1               ), //i
+    .data_in_2                 (tensor_core_bf12_26_data_in_2               ), //i
+    .data_in_3                 (tensor_core_bf12_26_data_in_3               ), //i
+    .data_in_4                 (tensor_core_bf12_26_data_in_4               ), //i
+    .data_in_5                 (tensor_core_bf12_26_data_in_5               ), //i
+    .data_in_6                 (tensor_core_bf12_26_data_in_6               ), //i
+    .data_in_7                 (tensor_core_bf12_26_data_in_7               ), //i
+    .data_in_8                 (tensor_core_bf12_26_data_in_8               ), //i
+    .data_in_9                 (tensor_core_bf12_26_data_in_9               ), //i
+    .data_in_10                (tensor_core_bf12_26_data_in_10              ), //i
+    .data_in_11                (tensor_core_bf12_26_data_in_11              ), //i
+    .data_in_12                (tensor_core_bf12_26_data_in_12              ), //i
+    .data_in_13                (tensor_core_bf12_26_data_in_13              ), //i
+    .data_in_14                (tensor_core_bf12_26_data_in_14              ), //i
+    .data_in_15                (tensor_core_bf12_26_data_in_15              ), //i
+    .data_in_16                (tensor_core_bf12_26_data_in_16              ), //i
+    .data_in_17                (tensor_core_bf12_26_data_in_17              ), //i
+    .data_in_18                (tensor_core_bf12_26_data_in_18              ), //i
+    .data_in_19                (tensor_core_bf12_26_data_in_19              ), //i
+    .data_in_20                (tensor_core_bf12_26_data_in_20              ), //i
+    .side_in_1                 (4'b0000                                     ), //i
+    .side_in_2                 (4'b0000                                     ), //i
+    .side_in_3                 (4'b0000                                     ), //i
+    .side_in_4                 (4'b0000                                     ), //i
+    .shared_exponent_data      (io_expIn_26                                 ), //i
+    .feed_sel                  (2'b01                                       ), //i
+    .load_bb_one               (tensor_core_bf12_26_load_bb_one             ), //i
+    .load_bb_two               (tensor_core_bf12_26_load_bb_two             ), //i
+    .load_buf_sel              (loadBufSel                                  ), //i
+    .bf24_col_1                (tensor_core_bf12_26_bf24_col_1              ), //o
+    .bf24_col_2                (tensor_core_bf12_26_bf24_col_2              ), //o
+    .bf24_col_3                (tensor_core_bf12_26_bf24_col_3              ), //o
+    .acc_en                    (1'b0                                        ), //i
+    .zero_en                   (1'b0                                        ), //i
+    .clr0                      (1'b0                                        ), //i
+    .clr1                      (1'b0                                        ), //i
+    .cascade_weight_in         (tensor_core_bf12_25_cascade_weight_out      ), //i
+    .cascade_weight_out        (tensor_core_bf12_26_cascade_weight_out      ), //o
+    .cascade_data_in_col_1     (tensor_core_bf12_25_cascade_data_out_col_1  ), //i
+    .cascade_data_in_col_2     (tensor_core_bf12_25_cascade_data_out_col_2  ), //i
+    .cascade_data_in_col_3     (tensor_core_bf12_25_cascade_data_out_col_3  ), //i
+    .cascade_data_out_col_1    (tensor_core_bf12_26_cascade_data_out_col_1  ), //o
+    .cascade_data_out_col_2    (tensor_core_bf12_26_cascade_data_out_col_2  ), //o
+    .cascade_data_out_col_3    (tensor_core_bf12_26_cascade_data_out_col_3  )  //o
   );
-  tensor_core tensor_core_27 (
-    .clk                       (clk                                    ), //i
-    .data_in_1                 (tensor_core_27_data_in_1               ), //i
-    .data_in_2                 (tensor_core_27_data_in_2               ), //i
-    .data_in_3                 (tensor_core_27_data_in_3               ), //i
-    .data_in_4                 (tensor_core_27_data_in_4               ), //i
-    .data_in_5                 (tensor_core_27_data_in_5               ), //i
-    .data_in_6                 (tensor_core_27_data_in_6               ), //i
-    .data_in_7                 (tensor_core_27_data_in_7               ), //i
-    .data_in_8                 (tensor_core_27_data_in_8               ), //i
-    .data_in_9                 (tensor_core_27_data_in_9               ), //i
-    .data_in_10                (tensor_core_27_data_in_10              ), //i
-    .side_in_1                 (8'h0                                   ), //i
-    .side_in_2                 (8'h0                                   ), //i
-    .shared_exponent_data      (io_expIn_27                            ), //i
-    .feed_sel                  (2'b01                                  ), //i
-    .load_bb_one               (tensor_core_27_load_bb_one             ), //i
-    .load_bb_two               (tensor_core_27_load_bb_two             ), //i
-    .load_buf_sel              (loadBufSel                             ), //i
-    .bf24_col_1                (tensor_core_27_bf24_col_1              ), //o
-    .bf24_col_2                (tensor_core_27_bf24_col_2              ), //o
-    .bf24_col_3                (tensor_core_27_bf24_col_3              ), //o
-    .acc_en                    (1'b0                                   ), //i
-    .zero_en                   (1'b0                                   ), //i
-    .cascade_weight_in         (tensor_core_26_cascade_weight_out      ), //i
-    .cascade_weight_out        (tensor_core_27_cascade_weight_out      ), //o
-    .cascade_data_in_col_1     (tensor_core_26_cascade_data_out_col_1  ), //i
-    .cascade_data_in_col_2     (tensor_core_26_cascade_data_out_col_2  ), //i
-    .cascade_data_in_col_3     (tensor_core_26_cascade_data_out_col_3  ), //i
-    .cascade_data_out_col_1    (tensor_core_27_cascade_data_out_col_1  ), //o
-    .cascade_data_out_col_2    (tensor_core_27_cascade_data_out_col_2  ), //o
-    .cascade_data_out_col_3    (tensor_core_27_cascade_data_out_col_3  )  //o
+  tensor_core_bf12 tensor_core_bf12_27 (
+    .clk                       (clk                                         ), //i
+    .data_in_1                 (tensor_core_bf12_27_data_in_1               ), //i
+    .data_in_2                 (tensor_core_bf12_27_data_in_2               ), //i
+    .data_in_3                 (tensor_core_bf12_27_data_in_3               ), //i
+    .data_in_4                 (tensor_core_bf12_27_data_in_4               ), //i
+    .data_in_5                 (tensor_core_bf12_27_data_in_5               ), //i
+    .data_in_6                 (tensor_core_bf12_27_data_in_6               ), //i
+    .data_in_7                 (tensor_core_bf12_27_data_in_7               ), //i
+    .data_in_8                 (tensor_core_bf12_27_data_in_8               ), //i
+    .data_in_9                 (tensor_core_bf12_27_data_in_9               ), //i
+    .data_in_10                (tensor_core_bf12_27_data_in_10              ), //i
+    .data_in_11                (tensor_core_bf12_27_data_in_11              ), //i
+    .data_in_12                (tensor_core_bf12_27_data_in_12              ), //i
+    .data_in_13                (tensor_core_bf12_27_data_in_13              ), //i
+    .data_in_14                (tensor_core_bf12_27_data_in_14              ), //i
+    .data_in_15                (tensor_core_bf12_27_data_in_15              ), //i
+    .data_in_16                (tensor_core_bf12_27_data_in_16              ), //i
+    .data_in_17                (tensor_core_bf12_27_data_in_17              ), //i
+    .data_in_18                (tensor_core_bf12_27_data_in_18              ), //i
+    .data_in_19                (tensor_core_bf12_27_data_in_19              ), //i
+    .data_in_20                (tensor_core_bf12_27_data_in_20              ), //i
+    .side_in_1                 (4'b0000                                     ), //i
+    .side_in_2                 (4'b0000                                     ), //i
+    .side_in_3                 (4'b0000                                     ), //i
+    .side_in_4                 (4'b0000                                     ), //i
+    .shared_exponent_data      (io_expIn_27                                 ), //i
+    .feed_sel                  (2'b01                                       ), //i
+    .load_bb_one               (tensor_core_bf12_27_load_bb_one             ), //i
+    .load_bb_two               (tensor_core_bf12_27_load_bb_two             ), //i
+    .load_buf_sel              (loadBufSel                                  ), //i
+    .bf24_col_1                (tensor_core_bf12_27_bf24_col_1              ), //o
+    .bf24_col_2                (tensor_core_bf12_27_bf24_col_2              ), //o
+    .bf24_col_3                (tensor_core_bf12_27_bf24_col_3              ), //o
+    .acc_en                    (1'b0                                        ), //i
+    .zero_en                   (1'b0                                        ), //i
+    .clr0                      (1'b0                                        ), //i
+    .clr1                      (1'b0                                        ), //i
+    .cascade_weight_in         (tensor_core_bf12_26_cascade_weight_out      ), //i
+    .cascade_weight_out        (tensor_core_bf12_27_cascade_weight_out      ), //o
+    .cascade_data_in_col_1     (tensor_core_bf12_26_cascade_data_out_col_1  ), //i
+    .cascade_data_in_col_2     (tensor_core_bf12_26_cascade_data_out_col_2  ), //i
+    .cascade_data_in_col_3     (tensor_core_bf12_26_cascade_data_out_col_3  ), //i
+    .cascade_data_out_col_1    (tensor_core_bf12_27_cascade_data_out_col_1  ), //o
+    .cascade_data_out_col_2    (tensor_core_bf12_27_cascade_data_out_col_2  ), //o
+    .cascade_data_out_col_3    (tensor_core_bf12_27_cascade_data_out_col_3  )  //o
   );
-  tensor_core tensor_core_28 (
-    .clk                       (clk                                    ), //i
-    .data_in_1                 (tensor_core_28_data_in_1               ), //i
-    .data_in_2                 (tensor_core_28_data_in_2               ), //i
-    .data_in_3                 (tensor_core_28_data_in_3               ), //i
-    .data_in_4                 (tensor_core_28_data_in_4               ), //i
-    .data_in_5                 (tensor_core_28_data_in_5               ), //i
-    .data_in_6                 (tensor_core_28_data_in_6               ), //i
-    .data_in_7                 (tensor_core_28_data_in_7               ), //i
-    .data_in_8                 (tensor_core_28_data_in_8               ), //i
-    .data_in_9                 (tensor_core_28_data_in_9               ), //i
-    .data_in_10                (tensor_core_28_data_in_10              ), //i
-    .side_in_1                 (8'h0                                   ), //i
-    .side_in_2                 (8'h0                                   ), //i
-    .shared_exponent_data      (io_expIn_28                            ), //i
-    .feed_sel                  (2'b01                                  ), //i
-    .load_bb_one               (tensor_core_28_load_bb_one             ), //i
-    .load_bb_two               (tensor_core_28_load_bb_two             ), //i
-    .load_buf_sel              (loadBufSel                             ), //i
-    .bf24_col_1                (tensor_core_28_bf24_col_1              ), //o
-    .bf24_col_2                (tensor_core_28_bf24_col_2              ), //o
-    .bf24_col_3                (tensor_core_28_bf24_col_3              ), //o
-    .acc_en                    (1'b0                                   ), //i
-    .zero_en                   (1'b0                                   ), //i
-    .cascade_weight_in         (tensor_core_27_cascade_weight_out      ), //i
-    .cascade_weight_out        (tensor_core_28_cascade_weight_out      ), //o
-    .cascade_data_in_col_1     (tensor_core_27_cascade_data_out_col_1  ), //i
-    .cascade_data_in_col_2     (tensor_core_27_cascade_data_out_col_2  ), //i
-    .cascade_data_in_col_3     (tensor_core_27_cascade_data_out_col_3  ), //i
-    .cascade_data_out_col_1    (tensor_core_28_cascade_data_out_col_1  ), //o
-    .cascade_data_out_col_2    (tensor_core_28_cascade_data_out_col_2  ), //o
-    .cascade_data_out_col_3    (tensor_core_28_cascade_data_out_col_3  )  //o
+  tensor_core_bf12 tensor_core_bf12_28 (
+    .clk                       (clk                                         ), //i
+    .data_in_1                 (tensor_core_bf12_28_data_in_1               ), //i
+    .data_in_2                 (tensor_core_bf12_28_data_in_2               ), //i
+    .data_in_3                 (tensor_core_bf12_28_data_in_3               ), //i
+    .data_in_4                 (tensor_core_bf12_28_data_in_4               ), //i
+    .data_in_5                 (tensor_core_bf12_28_data_in_5               ), //i
+    .data_in_6                 (tensor_core_bf12_28_data_in_6               ), //i
+    .data_in_7                 (tensor_core_bf12_28_data_in_7               ), //i
+    .data_in_8                 (tensor_core_bf12_28_data_in_8               ), //i
+    .data_in_9                 (tensor_core_bf12_28_data_in_9               ), //i
+    .data_in_10                (tensor_core_bf12_28_data_in_10              ), //i
+    .data_in_11                (tensor_core_bf12_28_data_in_11              ), //i
+    .data_in_12                (tensor_core_bf12_28_data_in_12              ), //i
+    .data_in_13                (tensor_core_bf12_28_data_in_13              ), //i
+    .data_in_14                (tensor_core_bf12_28_data_in_14              ), //i
+    .data_in_15                (tensor_core_bf12_28_data_in_15              ), //i
+    .data_in_16                (tensor_core_bf12_28_data_in_16              ), //i
+    .data_in_17                (tensor_core_bf12_28_data_in_17              ), //i
+    .data_in_18                (tensor_core_bf12_28_data_in_18              ), //i
+    .data_in_19                (tensor_core_bf12_28_data_in_19              ), //i
+    .data_in_20                (tensor_core_bf12_28_data_in_20              ), //i
+    .side_in_1                 (4'b0000                                     ), //i
+    .side_in_2                 (4'b0000                                     ), //i
+    .side_in_3                 (4'b0000                                     ), //i
+    .side_in_4                 (4'b0000                                     ), //i
+    .shared_exponent_data      (io_expIn_28                                 ), //i
+    .feed_sel                  (2'b01                                       ), //i
+    .load_bb_one               (tensor_core_bf12_28_load_bb_one             ), //i
+    .load_bb_two               (tensor_core_bf12_28_load_bb_two             ), //i
+    .load_buf_sel              (loadBufSel                                  ), //i
+    .bf24_col_1                (tensor_core_bf12_28_bf24_col_1              ), //o
+    .bf24_col_2                (tensor_core_bf12_28_bf24_col_2              ), //o
+    .bf24_col_3                (tensor_core_bf12_28_bf24_col_3              ), //o
+    .acc_en                    (1'b0                                        ), //i
+    .zero_en                   (1'b0                                        ), //i
+    .clr0                      (1'b0                                        ), //i
+    .clr1                      (1'b0                                        ), //i
+    .cascade_weight_in         (tensor_core_bf12_27_cascade_weight_out      ), //i
+    .cascade_weight_out        (tensor_core_bf12_28_cascade_weight_out      ), //o
+    .cascade_data_in_col_1     (tensor_core_bf12_27_cascade_data_out_col_1  ), //i
+    .cascade_data_in_col_2     (tensor_core_bf12_27_cascade_data_out_col_2  ), //i
+    .cascade_data_in_col_3     (tensor_core_bf12_27_cascade_data_out_col_3  ), //i
+    .cascade_data_out_col_1    (tensor_core_bf12_28_cascade_data_out_col_1  ), //o
+    .cascade_data_out_col_2    (tensor_core_bf12_28_cascade_data_out_col_2  ), //o
+    .cascade_data_out_col_3    (tensor_core_bf12_28_cascade_data_out_col_3  )  //o
   );
-  tensor_core tensor_core_29 (
-    .clk                       (clk                                    ), //i
-    .data_in_1                 (tensor_core_29_data_in_1               ), //i
-    .data_in_2                 (tensor_core_29_data_in_2               ), //i
-    .data_in_3                 (tensor_core_29_data_in_3               ), //i
-    .data_in_4                 (tensor_core_29_data_in_4               ), //i
-    .data_in_5                 (tensor_core_29_data_in_5               ), //i
-    .data_in_6                 (tensor_core_29_data_in_6               ), //i
-    .data_in_7                 (tensor_core_29_data_in_7               ), //i
-    .data_in_8                 (tensor_core_29_data_in_8               ), //i
-    .data_in_9                 (tensor_core_29_data_in_9               ), //i
-    .data_in_10                (tensor_core_29_data_in_10              ), //i
-    .side_in_1                 (8'h0                                   ), //i
-    .side_in_2                 (8'h0                                   ), //i
-    .shared_exponent_data      (io_expIn_29                            ), //i
-    .feed_sel                  (2'b01                                  ), //i
-    .load_bb_one               (tensor_core_29_load_bb_one             ), //i
-    .load_bb_two               (tensor_core_29_load_bb_two             ), //i
-    .load_buf_sel              (loadBufSel                             ), //i
-    .bf24_col_1                (tensor_core_29_bf24_col_1              ), //o
-    .bf24_col_2                (tensor_core_29_bf24_col_2              ), //o
-    .bf24_col_3                (tensor_core_29_bf24_col_3              ), //o
-    .acc_en                    (1'b0                                   ), //i
-    .zero_en                   (1'b0                                   ), //i
-    .cascade_weight_in         (tensor_core_28_cascade_weight_out      ), //i
-    .cascade_weight_out        (tensor_core_29_cascade_weight_out      ), //o
-    .cascade_data_in_col_1     (tensor_core_28_cascade_data_out_col_1  ), //i
-    .cascade_data_in_col_2     (tensor_core_28_cascade_data_out_col_2  ), //i
-    .cascade_data_in_col_3     (tensor_core_28_cascade_data_out_col_3  ), //i
-    .cascade_data_out_col_1    (tensor_core_29_cascade_data_out_col_1  ), //o
-    .cascade_data_out_col_2    (tensor_core_29_cascade_data_out_col_2  ), //o
-    .cascade_data_out_col_3    (tensor_core_29_cascade_data_out_col_3  )  //o
+  tensor_core_bf12 tensor_core_bf12_29 (
+    .clk                       (clk                                         ), //i
+    .data_in_1                 (tensor_core_bf12_29_data_in_1               ), //i
+    .data_in_2                 (tensor_core_bf12_29_data_in_2               ), //i
+    .data_in_3                 (tensor_core_bf12_29_data_in_3               ), //i
+    .data_in_4                 (tensor_core_bf12_29_data_in_4               ), //i
+    .data_in_5                 (tensor_core_bf12_29_data_in_5               ), //i
+    .data_in_6                 (tensor_core_bf12_29_data_in_6               ), //i
+    .data_in_7                 (tensor_core_bf12_29_data_in_7               ), //i
+    .data_in_8                 (tensor_core_bf12_29_data_in_8               ), //i
+    .data_in_9                 (tensor_core_bf12_29_data_in_9               ), //i
+    .data_in_10                (tensor_core_bf12_29_data_in_10              ), //i
+    .data_in_11                (tensor_core_bf12_29_data_in_11              ), //i
+    .data_in_12                (tensor_core_bf12_29_data_in_12              ), //i
+    .data_in_13                (tensor_core_bf12_29_data_in_13              ), //i
+    .data_in_14                (tensor_core_bf12_29_data_in_14              ), //i
+    .data_in_15                (tensor_core_bf12_29_data_in_15              ), //i
+    .data_in_16                (tensor_core_bf12_29_data_in_16              ), //i
+    .data_in_17                (tensor_core_bf12_29_data_in_17              ), //i
+    .data_in_18                (tensor_core_bf12_29_data_in_18              ), //i
+    .data_in_19                (tensor_core_bf12_29_data_in_19              ), //i
+    .data_in_20                (tensor_core_bf12_29_data_in_20              ), //i
+    .side_in_1                 (4'b0000                                     ), //i
+    .side_in_2                 (4'b0000                                     ), //i
+    .side_in_3                 (4'b0000                                     ), //i
+    .side_in_4                 (4'b0000                                     ), //i
+    .shared_exponent_data      (io_expIn_29                                 ), //i
+    .feed_sel                  (2'b01                                       ), //i
+    .load_bb_one               (tensor_core_bf12_29_load_bb_one             ), //i
+    .load_bb_two               (tensor_core_bf12_29_load_bb_two             ), //i
+    .load_buf_sel              (loadBufSel                                  ), //i
+    .bf24_col_1                (tensor_core_bf12_29_bf24_col_1              ), //o
+    .bf24_col_2                (tensor_core_bf12_29_bf24_col_2              ), //o
+    .bf24_col_3                (tensor_core_bf12_29_bf24_col_3              ), //o
+    .acc_en                    (1'b0                                        ), //i
+    .zero_en                   (1'b0                                        ), //i
+    .clr0                      (1'b0                                        ), //i
+    .clr1                      (1'b0                                        ), //i
+    .cascade_weight_in         (tensor_core_bf12_28_cascade_weight_out      ), //i
+    .cascade_weight_out        (tensor_core_bf12_29_cascade_weight_out      ), //o
+    .cascade_data_in_col_1     (tensor_core_bf12_28_cascade_data_out_col_1  ), //i
+    .cascade_data_in_col_2     (tensor_core_bf12_28_cascade_data_out_col_2  ), //i
+    .cascade_data_in_col_3     (tensor_core_bf12_28_cascade_data_out_col_3  ), //i
+    .cascade_data_out_col_1    (tensor_core_bf12_29_cascade_data_out_col_1  ), //o
+    .cascade_data_out_col_2    (tensor_core_bf12_29_cascade_data_out_col_2  ), //o
+    .cascade_data_out_col_3    (tensor_core_bf12_29_cascade_data_out_col_3  )  //o
   );
-  tensor_core tensor_core_30 (
-    .clk                       (clk                                    ), //i
-    .data_in_1                 (tensor_core_30_data_in_1               ), //i
-    .data_in_2                 (tensor_core_30_data_in_2               ), //i
-    .data_in_3                 (tensor_core_30_data_in_3               ), //i
-    .data_in_4                 (tensor_core_30_data_in_4               ), //i
-    .data_in_5                 (tensor_core_30_data_in_5               ), //i
-    .data_in_6                 (tensor_core_30_data_in_6               ), //i
-    .data_in_7                 (tensor_core_30_data_in_7               ), //i
-    .data_in_8                 (tensor_core_30_data_in_8               ), //i
-    .data_in_9                 (tensor_core_30_data_in_9               ), //i
-    .data_in_10                (tensor_core_30_data_in_10              ), //i
-    .side_in_1                 (8'h0                                   ), //i
-    .side_in_2                 (8'h0                                   ), //i
-    .shared_exponent_data      (io_expIn_30                            ), //i
-    .feed_sel                  (2'b01                                  ), //i
-    .load_bb_one               (tensor_core_30_load_bb_one             ), //i
-    .load_bb_two               (tensor_core_30_load_bb_two             ), //i
-    .load_buf_sel              (loadBufSel                             ), //i
-    .bf24_col_1                (tensor_core_30_bf24_col_1              ), //o
-    .bf24_col_2                (tensor_core_30_bf24_col_2              ), //o
-    .bf24_col_3                (tensor_core_30_bf24_col_3              ), //o
-    .acc_en                    (1'b0                                   ), //i
-    .zero_en                   (1'b0                                   ), //i
-    .cascade_weight_in         (tensor_core_29_cascade_weight_out      ), //i
-    .cascade_weight_out        (tensor_core_30_cascade_weight_out      ), //o
-    .cascade_data_in_col_1     (tensor_core_29_cascade_data_out_col_1  ), //i
-    .cascade_data_in_col_2     (tensor_core_29_cascade_data_out_col_2  ), //i
-    .cascade_data_in_col_3     (tensor_core_29_cascade_data_out_col_3  ), //i
-    .cascade_data_out_col_1    (tensor_core_30_cascade_data_out_col_1  ), //o
-    .cascade_data_out_col_2    (tensor_core_30_cascade_data_out_col_2  ), //o
-    .cascade_data_out_col_3    (tensor_core_30_cascade_data_out_col_3  )  //o
+  tensor_core_bf12 tensor_core_bf12_30 (
+    .clk                       (clk                                         ), //i
+    .data_in_1                 (tensor_core_bf12_30_data_in_1               ), //i
+    .data_in_2                 (tensor_core_bf12_30_data_in_2               ), //i
+    .data_in_3                 (tensor_core_bf12_30_data_in_3               ), //i
+    .data_in_4                 (tensor_core_bf12_30_data_in_4               ), //i
+    .data_in_5                 (tensor_core_bf12_30_data_in_5               ), //i
+    .data_in_6                 (tensor_core_bf12_30_data_in_6               ), //i
+    .data_in_7                 (tensor_core_bf12_30_data_in_7               ), //i
+    .data_in_8                 (tensor_core_bf12_30_data_in_8               ), //i
+    .data_in_9                 (tensor_core_bf12_30_data_in_9               ), //i
+    .data_in_10                (tensor_core_bf12_30_data_in_10              ), //i
+    .data_in_11                (tensor_core_bf12_30_data_in_11              ), //i
+    .data_in_12                (tensor_core_bf12_30_data_in_12              ), //i
+    .data_in_13                (tensor_core_bf12_30_data_in_13              ), //i
+    .data_in_14                (tensor_core_bf12_30_data_in_14              ), //i
+    .data_in_15                (tensor_core_bf12_30_data_in_15              ), //i
+    .data_in_16                (tensor_core_bf12_30_data_in_16              ), //i
+    .data_in_17                (tensor_core_bf12_30_data_in_17              ), //i
+    .data_in_18                (tensor_core_bf12_30_data_in_18              ), //i
+    .data_in_19                (tensor_core_bf12_30_data_in_19              ), //i
+    .data_in_20                (tensor_core_bf12_30_data_in_20              ), //i
+    .side_in_1                 (4'b0000                                     ), //i
+    .side_in_2                 (4'b0000                                     ), //i
+    .side_in_3                 (4'b0000                                     ), //i
+    .side_in_4                 (4'b0000                                     ), //i
+    .shared_exponent_data      (io_expIn_30                                 ), //i
+    .feed_sel                  (2'b01                                       ), //i
+    .load_bb_one               (tensor_core_bf12_30_load_bb_one             ), //i
+    .load_bb_two               (tensor_core_bf12_30_load_bb_two             ), //i
+    .load_buf_sel              (loadBufSel                                  ), //i
+    .bf24_col_1                (tensor_core_bf12_30_bf24_col_1              ), //o
+    .bf24_col_2                (tensor_core_bf12_30_bf24_col_2              ), //o
+    .bf24_col_3                (tensor_core_bf12_30_bf24_col_3              ), //o
+    .acc_en                    (1'b0                                        ), //i
+    .zero_en                   (1'b0                                        ), //i
+    .clr0                      (1'b0                                        ), //i
+    .clr1                      (1'b0                                        ), //i
+    .cascade_weight_in         (tensor_core_bf12_29_cascade_weight_out      ), //i
+    .cascade_weight_out        (tensor_core_bf12_30_cascade_weight_out      ), //o
+    .cascade_data_in_col_1     (tensor_core_bf12_29_cascade_data_out_col_1  ), //i
+    .cascade_data_in_col_2     (tensor_core_bf12_29_cascade_data_out_col_2  ), //i
+    .cascade_data_in_col_3     (tensor_core_bf12_29_cascade_data_out_col_3  ), //i
+    .cascade_data_out_col_1    (tensor_core_bf12_30_cascade_data_out_col_1  ), //o
+    .cascade_data_out_col_2    (tensor_core_bf12_30_cascade_data_out_col_2  ), //o
+    .cascade_data_out_col_3    (tensor_core_bf12_30_cascade_data_out_col_3  )  //o
   );
-  tensor_core tensor_core_31 (
-    .clk                       (clk                                    ), //i
-    .data_in_1                 (tensor_core_31_data_in_1               ), //i
-    .data_in_2                 (tensor_core_31_data_in_2               ), //i
-    .data_in_3                 (tensor_core_31_data_in_3               ), //i
-    .data_in_4                 (tensor_core_31_data_in_4               ), //i
-    .data_in_5                 (tensor_core_31_data_in_5               ), //i
-    .data_in_6                 (tensor_core_31_data_in_6               ), //i
-    .data_in_7                 (tensor_core_31_data_in_7               ), //i
-    .data_in_8                 (tensor_core_31_data_in_8               ), //i
-    .data_in_9                 (tensor_core_31_data_in_9               ), //i
-    .data_in_10                (tensor_core_31_data_in_10              ), //i
-    .side_in_1                 (8'h0                                   ), //i
-    .side_in_2                 (8'h0                                   ), //i
-    .shared_exponent_data      (io_expIn_31                            ), //i
-    .feed_sel                  (2'b01                                  ), //i
-    .load_bb_one               (tensor_core_31_load_bb_one             ), //i
-    .load_bb_two               (tensor_core_31_load_bb_two             ), //i
-    .load_buf_sel              (loadBufSel                             ), //i
-    .bf24_col_1                (tensor_core_31_bf24_col_1              ), //o
-    .bf24_col_2                (tensor_core_31_bf24_col_2              ), //o
-    .bf24_col_3                (tensor_core_31_bf24_col_3              ), //o
-    .acc_en                    (1'b0                                   ), //i
-    .zero_en                   (1'b0                                   ), //i
-    .cascade_weight_in         (tensor_core_30_cascade_weight_out      ), //i
-    .cascade_weight_out        (tensor_core_31_cascade_weight_out      ), //o
-    .cascade_data_in_col_1     (tensor_core_30_cascade_data_out_col_1  ), //i
-    .cascade_data_in_col_2     (tensor_core_30_cascade_data_out_col_2  ), //i
-    .cascade_data_in_col_3     (tensor_core_30_cascade_data_out_col_3  ), //i
-    .cascade_data_out_col_1    (tensor_core_31_cascade_data_out_col_1  ), //o
-    .cascade_data_out_col_2    (tensor_core_31_cascade_data_out_col_2  ), //o
-    .cascade_data_out_col_3    (tensor_core_31_cascade_data_out_col_3  )  //o
+  tensor_core_bf12 tensor_core_bf12_31 (
+    .clk                       (clk                                         ), //i
+    .data_in_1                 (tensor_core_bf12_31_data_in_1               ), //i
+    .data_in_2                 (tensor_core_bf12_31_data_in_2               ), //i
+    .data_in_3                 (tensor_core_bf12_31_data_in_3               ), //i
+    .data_in_4                 (tensor_core_bf12_31_data_in_4               ), //i
+    .data_in_5                 (tensor_core_bf12_31_data_in_5               ), //i
+    .data_in_6                 (tensor_core_bf12_31_data_in_6               ), //i
+    .data_in_7                 (tensor_core_bf12_31_data_in_7               ), //i
+    .data_in_8                 (tensor_core_bf12_31_data_in_8               ), //i
+    .data_in_9                 (tensor_core_bf12_31_data_in_9               ), //i
+    .data_in_10                (tensor_core_bf12_31_data_in_10              ), //i
+    .data_in_11                (tensor_core_bf12_31_data_in_11              ), //i
+    .data_in_12                (tensor_core_bf12_31_data_in_12              ), //i
+    .data_in_13                (tensor_core_bf12_31_data_in_13              ), //i
+    .data_in_14                (tensor_core_bf12_31_data_in_14              ), //i
+    .data_in_15                (tensor_core_bf12_31_data_in_15              ), //i
+    .data_in_16                (tensor_core_bf12_31_data_in_16              ), //i
+    .data_in_17                (tensor_core_bf12_31_data_in_17              ), //i
+    .data_in_18                (tensor_core_bf12_31_data_in_18              ), //i
+    .data_in_19                (tensor_core_bf12_31_data_in_19              ), //i
+    .data_in_20                (tensor_core_bf12_31_data_in_20              ), //i
+    .side_in_1                 (4'b0000                                     ), //i
+    .side_in_2                 (4'b0000                                     ), //i
+    .side_in_3                 (4'b0000                                     ), //i
+    .side_in_4                 (4'b0000                                     ), //i
+    .shared_exponent_data      (io_expIn_31                                 ), //i
+    .feed_sel                  (2'b01                                       ), //i
+    .load_bb_one               (tensor_core_bf12_31_load_bb_one             ), //i
+    .load_bb_two               (tensor_core_bf12_31_load_bb_two             ), //i
+    .load_buf_sel              (loadBufSel                                  ), //i
+    .bf24_col_1                (tensor_core_bf12_31_bf24_col_1              ), //o
+    .bf24_col_2                (tensor_core_bf12_31_bf24_col_2              ), //o
+    .bf24_col_3                (tensor_core_bf12_31_bf24_col_3              ), //o
+    .acc_en                    (1'b0                                        ), //i
+    .zero_en                   (1'b0                                        ), //i
+    .clr0                      (1'b0                                        ), //i
+    .clr1                      (1'b0                                        ), //i
+    .cascade_weight_in         (tensor_core_bf12_30_cascade_weight_out      ), //i
+    .cascade_weight_out        (tensor_core_bf12_31_cascade_weight_out      ), //o
+    .cascade_data_in_col_1     (tensor_core_bf12_30_cascade_data_out_col_1  ), //i
+    .cascade_data_in_col_2     (tensor_core_bf12_30_cascade_data_out_col_2  ), //i
+    .cascade_data_in_col_3     (tensor_core_bf12_30_cascade_data_out_col_3  ), //i
+    .cascade_data_out_col_1    (tensor_core_bf12_31_cascade_data_out_col_1  ), //o
+    .cascade_data_out_col_2    (tensor_core_bf12_31_cascade_data_out_col_2  ), //o
+    .cascade_data_out_col_3    (tensor_core_bf12_31_cascade_data_out_col_3  )  //o
   );
-  tensor_core tensor_core_32 (
-    .clk                       (clk                                    ), //i
-    .data_in_1                 (tensor_core_32_data_in_1               ), //i
-    .data_in_2                 (tensor_core_32_data_in_2               ), //i
-    .data_in_3                 (tensor_core_32_data_in_3               ), //i
-    .data_in_4                 (tensor_core_32_data_in_4               ), //i
-    .data_in_5                 (tensor_core_32_data_in_5               ), //i
-    .data_in_6                 (tensor_core_32_data_in_6               ), //i
-    .data_in_7                 (tensor_core_32_data_in_7               ), //i
-    .data_in_8                 (tensor_core_32_data_in_8               ), //i
-    .data_in_9                 (tensor_core_32_data_in_9               ), //i
-    .data_in_10                (tensor_core_32_data_in_10              ), //i
-    .side_in_1                 (8'h0                                   ), //i
-    .side_in_2                 (8'h0                                   ), //i
-    .shared_exponent_data      (io_expIn_32                            ), //i
-    .feed_sel                  (2'b01                                  ), //i
-    .load_bb_one               (tensor_core_32_load_bb_one             ), //i
-    .load_bb_two               (tensor_core_32_load_bb_two             ), //i
-    .load_buf_sel              (loadBufSel                             ), //i
-    .bf24_col_1                (tensor_core_32_bf24_col_1              ), //o
-    .bf24_col_2                (tensor_core_32_bf24_col_2              ), //o
-    .bf24_col_3                (tensor_core_32_bf24_col_3              ), //o
-    .acc_en                    (1'b0                                   ), //i
-    .zero_en                   (1'b0                                   ), //i
-    .cascade_weight_in         (tensor_core_31_cascade_weight_out      ), //i
-    .cascade_weight_out        (tensor_core_32_cascade_weight_out      ), //o
-    .cascade_data_in_col_1     (tensor_core_31_cascade_data_out_col_1  ), //i
-    .cascade_data_in_col_2     (tensor_core_31_cascade_data_out_col_2  ), //i
-    .cascade_data_in_col_3     (tensor_core_31_cascade_data_out_col_3  ), //i
-    .cascade_data_out_col_1    (tensor_core_32_cascade_data_out_col_1  ), //o
-    .cascade_data_out_col_2    (tensor_core_32_cascade_data_out_col_2  ), //o
-    .cascade_data_out_col_3    (tensor_core_32_cascade_data_out_col_3  )  //o
+  tensor_core_bf12 tensor_core_bf12_32 (
+    .clk                       (clk                                         ), //i
+    .data_in_1                 (tensor_core_bf12_32_data_in_1               ), //i
+    .data_in_2                 (tensor_core_bf12_32_data_in_2               ), //i
+    .data_in_3                 (tensor_core_bf12_32_data_in_3               ), //i
+    .data_in_4                 (tensor_core_bf12_32_data_in_4               ), //i
+    .data_in_5                 (tensor_core_bf12_32_data_in_5               ), //i
+    .data_in_6                 (tensor_core_bf12_32_data_in_6               ), //i
+    .data_in_7                 (tensor_core_bf12_32_data_in_7               ), //i
+    .data_in_8                 (tensor_core_bf12_32_data_in_8               ), //i
+    .data_in_9                 (tensor_core_bf12_32_data_in_9               ), //i
+    .data_in_10                (tensor_core_bf12_32_data_in_10              ), //i
+    .data_in_11                (tensor_core_bf12_32_data_in_11              ), //i
+    .data_in_12                (tensor_core_bf12_32_data_in_12              ), //i
+    .data_in_13                (tensor_core_bf12_32_data_in_13              ), //i
+    .data_in_14                (tensor_core_bf12_32_data_in_14              ), //i
+    .data_in_15                (tensor_core_bf12_32_data_in_15              ), //i
+    .data_in_16                (tensor_core_bf12_32_data_in_16              ), //i
+    .data_in_17                (tensor_core_bf12_32_data_in_17              ), //i
+    .data_in_18                (tensor_core_bf12_32_data_in_18              ), //i
+    .data_in_19                (tensor_core_bf12_32_data_in_19              ), //i
+    .data_in_20                (tensor_core_bf12_32_data_in_20              ), //i
+    .side_in_1                 (4'b0000                                     ), //i
+    .side_in_2                 (4'b0000                                     ), //i
+    .side_in_3                 (4'b0000                                     ), //i
+    .side_in_4                 (4'b0000                                     ), //i
+    .shared_exponent_data      (io_expIn_32                                 ), //i
+    .feed_sel                  (2'b01                                       ), //i
+    .load_bb_one               (tensor_core_bf12_32_load_bb_one             ), //i
+    .load_bb_two               (tensor_core_bf12_32_load_bb_two             ), //i
+    .load_buf_sel              (loadBufSel                                  ), //i
+    .bf24_col_1                (tensor_core_bf12_32_bf24_col_1              ), //o
+    .bf24_col_2                (tensor_core_bf12_32_bf24_col_2              ), //o
+    .bf24_col_3                (tensor_core_bf12_32_bf24_col_3              ), //o
+    .acc_en                    (1'b0                                        ), //i
+    .zero_en                   (1'b0                                        ), //i
+    .clr0                      (1'b0                                        ), //i
+    .clr1                      (1'b0                                        ), //i
+    .cascade_weight_in         (tensor_core_bf12_31_cascade_weight_out      ), //i
+    .cascade_weight_out        (tensor_core_bf12_32_cascade_weight_out      ), //o
+    .cascade_data_in_col_1     (tensor_core_bf12_31_cascade_data_out_col_1  ), //i
+    .cascade_data_in_col_2     (tensor_core_bf12_31_cascade_data_out_col_2  ), //i
+    .cascade_data_in_col_3     (tensor_core_bf12_31_cascade_data_out_col_3  ), //i
+    .cascade_data_out_col_1    (tensor_core_bf12_32_cascade_data_out_col_1  ), //o
+    .cascade_data_out_col_2    (tensor_core_bf12_32_cascade_data_out_col_2  ), //o
+    .cascade_data_out_col_3    (tensor_core_bf12_32_cascade_data_out_col_3  )  //o
   );
-  tensor_core tensor_core_33 (
-    .clk                       (clk                                    ), //i
-    .data_in_1                 (tensor_core_33_data_in_1               ), //i
-    .data_in_2                 (tensor_core_33_data_in_2               ), //i
-    .data_in_3                 (tensor_core_33_data_in_3               ), //i
-    .data_in_4                 (tensor_core_33_data_in_4               ), //i
-    .data_in_5                 (tensor_core_33_data_in_5               ), //i
-    .data_in_6                 (tensor_core_33_data_in_6               ), //i
-    .data_in_7                 (tensor_core_33_data_in_7               ), //i
-    .data_in_8                 (tensor_core_33_data_in_8               ), //i
-    .data_in_9                 (tensor_core_33_data_in_9               ), //i
-    .data_in_10                (tensor_core_33_data_in_10              ), //i
-    .side_in_1                 (8'h0                                   ), //i
-    .side_in_2                 (8'h0                                   ), //i
-    .shared_exponent_data      (io_expIn_33                            ), //i
-    .feed_sel                  (2'b01                                  ), //i
-    .load_bb_one               (tensor_core_33_load_bb_one             ), //i
-    .load_bb_two               (tensor_core_33_load_bb_two             ), //i
-    .load_buf_sel              (loadBufSel                             ), //i
-    .bf24_col_1                (tensor_core_33_bf24_col_1              ), //o
-    .bf24_col_2                (tensor_core_33_bf24_col_2              ), //o
-    .bf24_col_3                (tensor_core_33_bf24_col_3              ), //o
-    .acc_en                    (1'b0                                   ), //i
-    .zero_en                   (1'b0                                   ), //i
-    .cascade_weight_in         (tensor_core_32_cascade_weight_out      ), //i
-    .cascade_weight_out        (tensor_core_33_cascade_weight_out      ), //o
-    .cascade_data_in_col_1     (tensor_core_32_cascade_data_out_col_1  ), //i
-    .cascade_data_in_col_2     (tensor_core_32_cascade_data_out_col_2  ), //i
-    .cascade_data_in_col_3     (tensor_core_32_cascade_data_out_col_3  ), //i
-    .cascade_data_out_col_1    (tensor_core_33_cascade_data_out_col_1  ), //o
-    .cascade_data_out_col_2    (tensor_core_33_cascade_data_out_col_2  ), //o
-    .cascade_data_out_col_3    (tensor_core_33_cascade_data_out_col_3  )  //o
+  tensor_core_bf12 tensor_core_bf12_33 (
+    .clk                       (clk                                         ), //i
+    .data_in_1                 (tensor_core_bf12_33_data_in_1               ), //i
+    .data_in_2                 (tensor_core_bf12_33_data_in_2               ), //i
+    .data_in_3                 (tensor_core_bf12_33_data_in_3               ), //i
+    .data_in_4                 (tensor_core_bf12_33_data_in_4               ), //i
+    .data_in_5                 (tensor_core_bf12_33_data_in_5               ), //i
+    .data_in_6                 (tensor_core_bf12_33_data_in_6               ), //i
+    .data_in_7                 (tensor_core_bf12_33_data_in_7               ), //i
+    .data_in_8                 (tensor_core_bf12_33_data_in_8               ), //i
+    .data_in_9                 (tensor_core_bf12_33_data_in_9               ), //i
+    .data_in_10                (tensor_core_bf12_33_data_in_10              ), //i
+    .data_in_11                (tensor_core_bf12_33_data_in_11              ), //i
+    .data_in_12                (tensor_core_bf12_33_data_in_12              ), //i
+    .data_in_13                (tensor_core_bf12_33_data_in_13              ), //i
+    .data_in_14                (tensor_core_bf12_33_data_in_14              ), //i
+    .data_in_15                (tensor_core_bf12_33_data_in_15              ), //i
+    .data_in_16                (tensor_core_bf12_33_data_in_16              ), //i
+    .data_in_17                (tensor_core_bf12_33_data_in_17              ), //i
+    .data_in_18                (tensor_core_bf12_33_data_in_18              ), //i
+    .data_in_19                (tensor_core_bf12_33_data_in_19              ), //i
+    .data_in_20                (tensor_core_bf12_33_data_in_20              ), //i
+    .side_in_1                 (4'b0000                                     ), //i
+    .side_in_2                 (4'b0000                                     ), //i
+    .side_in_3                 (4'b0000                                     ), //i
+    .side_in_4                 (4'b0000                                     ), //i
+    .shared_exponent_data      (io_expIn_33                                 ), //i
+    .feed_sel                  (2'b01                                       ), //i
+    .load_bb_one               (tensor_core_bf12_33_load_bb_one             ), //i
+    .load_bb_two               (tensor_core_bf12_33_load_bb_two             ), //i
+    .load_buf_sel              (loadBufSel                                  ), //i
+    .bf24_col_1                (tensor_core_bf12_33_bf24_col_1              ), //o
+    .bf24_col_2                (tensor_core_bf12_33_bf24_col_2              ), //o
+    .bf24_col_3                (tensor_core_bf12_33_bf24_col_3              ), //o
+    .acc_en                    (1'b0                                        ), //i
+    .zero_en                   (1'b0                                        ), //i
+    .clr0                      (1'b0                                        ), //i
+    .clr1                      (1'b0                                        ), //i
+    .cascade_weight_in         (tensor_core_bf12_32_cascade_weight_out      ), //i
+    .cascade_weight_out        (tensor_core_bf12_33_cascade_weight_out      ), //o
+    .cascade_data_in_col_1     (tensor_core_bf12_32_cascade_data_out_col_1  ), //i
+    .cascade_data_in_col_2     (tensor_core_bf12_32_cascade_data_out_col_2  ), //i
+    .cascade_data_in_col_3     (tensor_core_bf12_32_cascade_data_out_col_3  ), //i
+    .cascade_data_out_col_1    (tensor_core_bf12_33_cascade_data_out_col_1  ), //o
+    .cascade_data_out_col_2    (tensor_core_bf12_33_cascade_data_out_col_2  ), //o
+    .cascade_data_out_col_3    (tensor_core_bf12_33_cascade_data_out_col_3  )  //o
   );
   StreamFifo AccuDelayInst (
     .io_push_valid        (oBufferLoadValid                ), //i
@@ -229904,424 +230744,774 @@ module TensorCoreChain (
 
   assign outValidCounter_overflowVal = (io_inputIters - 8'h01);
   assign io_outValid = outValidCounter_willOverflow;
-  assign tcEntry_data_in_1 = io_loadCascadeIn[7 : 0];
-  assign tcEntry_data_in_2 = io_loadCascadeIn[15 : 8];
-  assign tcEntry_data_in_3 = io_loadCascadeIn[23 : 16];
-  assign tcEntry_data_in_4 = io_loadCascadeIn[31 : 24];
-  assign tcEntry_data_in_5 = io_loadCascadeIn[39 : 32];
-  assign tcEntry_data_in_6 = io_loadCascadeIn[47 : 40];
-  assign tcEntry_data_in_7 = io_loadCascadeIn[55 : 48];
-  assign tcEntry_data_in_8 = io_loadCascadeIn[63 : 56];
-  assign tcEntry_data_in_9 = io_loadCascadeIn[71 : 64];
-  assign tcEntry_data_in_10 = io_loadCascadeIn[79 : 72];
-  assign tcStartPoint_data_in_1 = io_dataIn_0[7 : 0];
-  assign tcStartPoint_data_in_2 = io_dataIn_0[15 : 8];
-  assign tcStartPoint_data_in_3 = io_dataIn_0[23 : 16];
-  assign tcStartPoint_data_in_4 = io_dataIn_0[31 : 24];
-  assign tcStartPoint_data_in_5 = io_dataIn_0[39 : 32];
-  assign tcStartPoint_data_in_6 = io_dataIn_0[47 : 40];
-  assign tcStartPoint_data_in_7 = io_dataIn_0[55 : 48];
-  assign tcStartPoint_data_in_8 = io_dataIn_0[63 : 56];
-  assign tcStartPoint_data_in_9 = io_dataIn_0[71 : 64];
-  assign tcStartPoint_data_in_10 = io_dataIn_0[79 : 72];
+  assign tcEntry_data_in_1 = io_loadCascadeIn[3 : 0];
+  assign tcEntry_data_in_2 = io_loadCascadeIn[7 : 4];
+  assign tcEntry_data_in_3 = io_loadCascadeIn[11 : 8];
+  assign tcEntry_data_in_4 = io_loadCascadeIn[15 : 12];
+  assign tcEntry_data_in_5 = io_loadCascadeIn[19 : 16];
+  assign tcEntry_data_in_6 = io_loadCascadeIn[23 : 20];
+  assign tcEntry_data_in_7 = io_loadCascadeIn[27 : 24];
+  assign tcEntry_data_in_8 = io_loadCascadeIn[31 : 28];
+  assign tcEntry_data_in_9 = io_loadCascadeIn[35 : 32];
+  assign tcEntry_data_in_10 = io_loadCascadeIn[39 : 36];
+  assign tcEntry_data_in_11 = io_loadCascadeIn[43 : 40];
+  assign tcEntry_data_in_12 = io_loadCascadeIn[47 : 44];
+  assign tcEntry_data_in_13 = io_loadCascadeIn[51 : 48];
+  assign tcEntry_data_in_14 = io_loadCascadeIn[55 : 52];
+  assign tcEntry_data_in_15 = io_loadCascadeIn[59 : 56];
+  assign tcEntry_data_in_16 = io_loadCascadeIn[63 : 60];
+  assign tcEntry_data_in_17 = io_loadCascadeIn[67 : 64];
+  assign tcEntry_data_in_18 = io_loadCascadeIn[71 : 68];
+  assign tcEntry_data_in_19 = io_loadCascadeIn[75 : 72];
+  assign tcEntry_data_in_20 = io_loadCascadeIn[79 : 76];
+  assign tcStartPoint_data_in_1 = io_dataIn_0[3 : 0];
+  assign tcStartPoint_data_in_2 = io_dataIn_0[7 : 4];
+  assign tcStartPoint_data_in_3 = io_dataIn_0[11 : 8];
+  assign tcStartPoint_data_in_4 = io_dataIn_0[15 : 12];
+  assign tcStartPoint_data_in_5 = io_dataIn_0[19 : 16];
+  assign tcStartPoint_data_in_6 = io_dataIn_0[23 : 20];
+  assign tcStartPoint_data_in_7 = io_dataIn_0[27 : 24];
+  assign tcStartPoint_data_in_8 = io_dataIn_0[31 : 28];
+  assign tcStartPoint_data_in_9 = io_dataIn_0[35 : 32];
+  assign tcStartPoint_data_in_10 = io_dataIn_0[39 : 36];
+  assign tcStartPoint_data_in_11 = io_dataIn_0[43 : 40];
+  assign tcStartPoint_data_in_12 = io_dataIn_0[47 : 44];
+  assign tcStartPoint_data_in_13 = io_dataIn_0[51 : 48];
+  assign tcStartPoint_data_in_14 = io_dataIn_0[55 : 52];
+  assign tcStartPoint_data_in_15 = io_dataIn_0[59 : 56];
+  assign tcStartPoint_data_in_16 = io_dataIn_0[63 : 60];
+  assign tcStartPoint_data_in_17 = io_dataIn_0[67 : 64];
+  assign tcStartPoint_data_in_18 = io_dataIn_0[71 : 68];
+  assign tcStartPoint_data_in_19 = io_dataIn_0[75 : 72];
+  assign tcStartPoint_data_in_20 = io_dataIn_0[79 : 76];
   assign tcStartPoint_load_bb_one = loadBufCtrl[0];
   assign tcStartPoint_load_bb_two = loadBufCtrl[1];
-  assign tensor_core_1_data_in_1 = io_dataIn_1[7 : 0];
-  assign tensor_core_1_data_in_2 = io_dataIn_1[15 : 8];
-  assign tensor_core_1_data_in_3 = io_dataIn_1[23 : 16];
-  assign tensor_core_1_data_in_4 = io_dataIn_1[31 : 24];
-  assign tensor_core_1_data_in_5 = io_dataIn_1[39 : 32];
-  assign tensor_core_1_data_in_6 = io_dataIn_1[47 : 40];
-  assign tensor_core_1_data_in_7 = io_dataIn_1[55 : 48];
-  assign tensor_core_1_data_in_8 = io_dataIn_1[63 : 56];
-  assign tensor_core_1_data_in_9 = io_dataIn_1[71 : 64];
-  assign tensor_core_1_data_in_10 = io_dataIn_1[79 : 72];
-  assign tensor_core_1_load_bb_one = loadBufCtrl[0];
-  assign tensor_core_1_load_bb_two = loadBufCtrl[1];
-  assign tensor_core_2_data_in_1 = io_dataIn_2[7 : 0];
-  assign tensor_core_2_data_in_2 = io_dataIn_2[15 : 8];
-  assign tensor_core_2_data_in_3 = io_dataIn_2[23 : 16];
-  assign tensor_core_2_data_in_4 = io_dataIn_2[31 : 24];
-  assign tensor_core_2_data_in_5 = io_dataIn_2[39 : 32];
-  assign tensor_core_2_data_in_6 = io_dataIn_2[47 : 40];
-  assign tensor_core_2_data_in_7 = io_dataIn_2[55 : 48];
-  assign tensor_core_2_data_in_8 = io_dataIn_2[63 : 56];
-  assign tensor_core_2_data_in_9 = io_dataIn_2[71 : 64];
-  assign tensor_core_2_data_in_10 = io_dataIn_2[79 : 72];
-  assign tensor_core_2_load_bb_one = loadBufCtrl[0];
-  assign tensor_core_2_load_bb_two = loadBufCtrl[1];
-  assign tensor_core_3_data_in_1 = io_dataIn_3[7 : 0];
-  assign tensor_core_3_data_in_2 = io_dataIn_3[15 : 8];
-  assign tensor_core_3_data_in_3 = io_dataIn_3[23 : 16];
-  assign tensor_core_3_data_in_4 = io_dataIn_3[31 : 24];
-  assign tensor_core_3_data_in_5 = io_dataIn_3[39 : 32];
-  assign tensor_core_3_data_in_6 = io_dataIn_3[47 : 40];
-  assign tensor_core_3_data_in_7 = io_dataIn_3[55 : 48];
-  assign tensor_core_3_data_in_8 = io_dataIn_3[63 : 56];
-  assign tensor_core_3_data_in_9 = io_dataIn_3[71 : 64];
-  assign tensor_core_3_data_in_10 = io_dataIn_3[79 : 72];
-  assign tensor_core_3_load_bb_one = loadBufCtrl[0];
-  assign tensor_core_3_load_bb_two = loadBufCtrl[1];
-  assign tensor_core_4_data_in_1 = io_dataIn_4[7 : 0];
-  assign tensor_core_4_data_in_2 = io_dataIn_4[15 : 8];
-  assign tensor_core_4_data_in_3 = io_dataIn_4[23 : 16];
-  assign tensor_core_4_data_in_4 = io_dataIn_4[31 : 24];
-  assign tensor_core_4_data_in_5 = io_dataIn_4[39 : 32];
-  assign tensor_core_4_data_in_6 = io_dataIn_4[47 : 40];
-  assign tensor_core_4_data_in_7 = io_dataIn_4[55 : 48];
-  assign tensor_core_4_data_in_8 = io_dataIn_4[63 : 56];
-  assign tensor_core_4_data_in_9 = io_dataIn_4[71 : 64];
-  assign tensor_core_4_data_in_10 = io_dataIn_4[79 : 72];
-  assign tensor_core_4_load_bb_one = loadBufCtrl[0];
-  assign tensor_core_4_load_bb_two = loadBufCtrl[1];
-  assign tensor_core_5_data_in_1 = io_dataIn_5[7 : 0];
-  assign tensor_core_5_data_in_2 = io_dataIn_5[15 : 8];
-  assign tensor_core_5_data_in_3 = io_dataIn_5[23 : 16];
-  assign tensor_core_5_data_in_4 = io_dataIn_5[31 : 24];
-  assign tensor_core_5_data_in_5 = io_dataIn_5[39 : 32];
-  assign tensor_core_5_data_in_6 = io_dataIn_5[47 : 40];
-  assign tensor_core_5_data_in_7 = io_dataIn_5[55 : 48];
-  assign tensor_core_5_data_in_8 = io_dataIn_5[63 : 56];
-  assign tensor_core_5_data_in_9 = io_dataIn_5[71 : 64];
-  assign tensor_core_5_data_in_10 = io_dataIn_5[79 : 72];
-  assign tensor_core_5_load_bb_one = loadBufCtrl[0];
-  assign tensor_core_5_load_bb_two = loadBufCtrl[1];
-  assign tensor_core_6_data_in_1 = io_dataIn_6[7 : 0];
-  assign tensor_core_6_data_in_2 = io_dataIn_6[15 : 8];
-  assign tensor_core_6_data_in_3 = io_dataIn_6[23 : 16];
-  assign tensor_core_6_data_in_4 = io_dataIn_6[31 : 24];
-  assign tensor_core_6_data_in_5 = io_dataIn_6[39 : 32];
-  assign tensor_core_6_data_in_6 = io_dataIn_6[47 : 40];
-  assign tensor_core_6_data_in_7 = io_dataIn_6[55 : 48];
-  assign tensor_core_6_data_in_8 = io_dataIn_6[63 : 56];
-  assign tensor_core_6_data_in_9 = io_dataIn_6[71 : 64];
-  assign tensor_core_6_data_in_10 = io_dataIn_6[79 : 72];
-  assign tensor_core_6_load_bb_one = loadBufCtrl[0];
-  assign tensor_core_6_load_bb_two = loadBufCtrl[1];
-  assign tensor_core_7_data_in_1 = io_dataIn_7[7 : 0];
-  assign tensor_core_7_data_in_2 = io_dataIn_7[15 : 8];
-  assign tensor_core_7_data_in_3 = io_dataIn_7[23 : 16];
-  assign tensor_core_7_data_in_4 = io_dataIn_7[31 : 24];
-  assign tensor_core_7_data_in_5 = io_dataIn_7[39 : 32];
-  assign tensor_core_7_data_in_6 = io_dataIn_7[47 : 40];
-  assign tensor_core_7_data_in_7 = io_dataIn_7[55 : 48];
-  assign tensor_core_7_data_in_8 = io_dataIn_7[63 : 56];
-  assign tensor_core_7_data_in_9 = io_dataIn_7[71 : 64];
-  assign tensor_core_7_data_in_10 = io_dataIn_7[79 : 72];
-  assign tensor_core_7_load_bb_one = loadBufCtrl[0];
-  assign tensor_core_7_load_bb_two = loadBufCtrl[1];
-  assign tensor_core_8_data_in_1 = io_dataIn_8[7 : 0];
-  assign tensor_core_8_data_in_2 = io_dataIn_8[15 : 8];
-  assign tensor_core_8_data_in_3 = io_dataIn_8[23 : 16];
-  assign tensor_core_8_data_in_4 = io_dataIn_8[31 : 24];
-  assign tensor_core_8_data_in_5 = io_dataIn_8[39 : 32];
-  assign tensor_core_8_data_in_6 = io_dataIn_8[47 : 40];
-  assign tensor_core_8_data_in_7 = io_dataIn_8[55 : 48];
-  assign tensor_core_8_data_in_8 = io_dataIn_8[63 : 56];
-  assign tensor_core_8_data_in_9 = io_dataIn_8[71 : 64];
-  assign tensor_core_8_data_in_10 = io_dataIn_8[79 : 72];
-  assign tensor_core_8_load_bb_one = loadBufCtrl[0];
-  assign tensor_core_8_load_bb_two = loadBufCtrl[1];
-  assign tensor_core_9_data_in_1 = io_dataIn_9[7 : 0];
-  assign tensor_core_9_data_in_2 = io_dataIn_9[15 : 8];
-  assign tensor_core_9_data_in_3 = io_dataIn_9[23 : 16];
-  assign tensor_core_9_data_in_4 = io_dataIn_9[31 : 24];
-  assign tensor_core_9_data_in_5 = io_dataIn_9[39 : 32];
-  assign tensor_core_9_data_in_6 = io_dataIn_9[47 : 40];
-  assign tensor_core_9_data_in_7 = io_dataIn_9[55 : 48];
-  assign tensor_core_9_data_in_8 = io_dataIn_9[63 : 56];
-  assign tensor_core_9_data_in_9 = io_dataIn_9[71 : 64];
-  assign tensor_core_9_data_in_10 = io_dataIn_9[79 : 72];
-  assign tensor_core_9_load_bb_one = loadBufCtrl[0];
-  assign tensor_core_9_load_bb_two = loadBufCtrl[1];
-  assign tensor_core_10_data_in_1 = io_dataIn_10[7 : 0];
-  assign tensor_core_10_data_in_2 = io_dataIn_10[15 : 8];
-  assign tensor_core_10_data_in_3 = io_dataIn_10[23 : 16];
-  assign tensor_core_10_data_in_4 = io_dataIn_10[31 : 24];
-  assign tensor_core_10_data_in_5 = io_dataIn_10[39 : 32];
-  assign tensor_core_10_data_in_6 = io_dataIn_10[47 : 40];
-  assign tensor_core_10_data_in_7 = io_dataIn_10[55 : 48];
-  assign tensor_core_10_data_in_8 = io_dataIn_10[63 : 56];
-  assign tensor_core_10_data_in_9 = io_dataIn_10[71 : 64];
-  assign tensor_core_10_data_in_10 = io_dataIn_10[79 : 72];
-  assign tensor_core_10_load_bb_one = loadBufCtrl[0];
-  assign tensor_core_10_load_bb_two = loadBufCtrl[1];
-  assign tensor_core_11_data_in_1 = io_dataIn_11[7 : 0];
-  assign tensor_core_11_data_in_2 = io_dataIn_11[15 : 8];
-  assign tensor_core_11_data_in_3 = io_dataIn_11[23 : 16];
-  assign tensor_core_11_data_in_4 = io_dataIn_11[31 : 24];
-  assign tensor_core_11_data_in_5 = io_dataIn_11[39 : 32];
-  assign tensor_core_11_data_in_6 = io_dataIn_11[47 : 40];
-  assign tensor_core_11_data_in_7 = io_dataIn_11[55 : 48];
-  assign tensor_core_11_data_in_8 = io_dataIn_11[63 : 56];
-  assign tensor_core_11_data_in_9 = io_dataIn_11[71 : 64];
-  assign tensor_core_11_data_in_10 = io_dataIn_11[79 : 72];
-  assign tensor_core_11_load_bb_one = loadBufCtrl[0];
-  assign tensor_core_11_load_bb_two = loadBufCtrl[1];
-  assign tensor_core_12_data_in_1 = io_dataIn_12[7 : 0];
-  assign tensor_core_12_data_in_2 = io_dataIn_12[15 : 8];
-  assign tensor_core_12_data_in_3 = io_dataIn_12[23 : 16];
-  assign tensor_core_12_data_in_4 = io_dataIn_12[31 : 24];
-  assign tensor_core_12_data_in_5 = io_dataIn_12[39 : 32];
-  assign tensor_core_12_data_in_6 = io_dataIn_12[47 : 40];
-  assign tensor_core_12_data_in_7 = io_dataIn_12[55 : 48];
-  assign tensor_core_12_data_in_8 = io_dataIn_12[63 : 56];
-  assign tensor_core_12_data_in_9 = io_dataIn_12[71 : 64];
-  assign tensor_core_12_data_in_10 = io_dataIn_12[79 : 72];
-  assign tensor_core_12_load_bb_one = loadBufCtrl[0];
-  assign tensor_core_12_load_bb_two = loadBufCtrl[1];
-  assign tensor_core_13_data_in_1 = io_dataIn_13[7 : 0];
-  assign tensor_core_13_data_in_2 = io_dataIn_13[15 : 8];
-  assign tensor_core_13_data_in_3 = io_dataIn_13[23 : 16];
-  assign tensor_core_13_data_in_4 = io_dataIn_13[31 : 24];
-  assign tensor_core_13_data_in_5 = io_dataIn_13[39 : 32];
-  assign tensor_core_13_data_in_6 = io_dataIn_13[47 : 40];
-  assign tensor_core_13_data_in_7 = io_dataIn_13[55 : 48];
-  assign tensor_core_13_data_in_8 = io_dataIn_13[63 : 56];
-  assign tensor_core_13_data_in_9 = io_dataIn_13[71 : 64];
-  assign tensor_core_13_data_in_10 = io_dataIn_13[79 : 72];
-  assign tensor_core_13_load_bb_one = loadBufCtrl[0];
-  assign tensor_core_13_load_bb_two = loadBufCtrl[1];
-  assign tensor_core_14_data_in_1 = io_dataIn_14[7 : 0];
-  assign tensor_core_14_data_in_2 = io_dataIn_14[15 : 8];
-  assign tensor_core_14_data_in_3 = io_dataIn_14[23 : 16];
-  assign tensor_core_14_data_in_4 = io_dataIn_14[31 : 24];
-  assign tensor_core_14_data_in_5 = io_dataIn_14[39 : 32];
-  assign tensor_core_14_data_in_6 = io_dataIn_14[47 : 40];
-  assign tensor_core_14_data_in_7 = io_dataIn_14[55 : 48];
-  assign tensor_core_14_data_in_8 = io_dataIn_14[63 : 56];
-  assign tensor_core_14_data_in_9 = io_dataIn_14[71 : 64];
-  assign tensor_core_14_data_in_10 = io_dataIn_14[79 : 72];
-  assign tensor_core_14_load_bb_one = loadBufCtrl[0];
-  assign tensor_core_14_load_bb_two = loadBufCtrl[1];
-  assign tensor_core_15_data_in_1 = io_dataIn_15[7 : 0];
-  assign tensor_core_15_data_in_2 = io_dataIn_15[15 : 8];
-  assign tensor_core_15_data_in_3 = io_dataIn_15[23 : 16];
-  assign tensor_core_15_data_in_4 = io_dataIn_15[31 : 24];
-  assign tensor_core_15_data_in_5 = io_dataIn_15[39 : 32];
-  assign tensor_core_15_data_in_6 = io_dataIn_15[47 : 40];
-  assign tensor_core_15_data_in_7 = io_dataIn_15[55 : 48];
-  assign tensor_core_15_data_in_8 = io_dataIn_15[63 : 56];
-  assign tensor_core_15_data_in_9 = io_dataIn_15[71 : 64];
-  assign tensor_core_15_data_in_10 = io_dataIn_15[79 : 72];
-  assign tensor_core_15_load_bb_one = loadBufCtrl[0];
-  assign tensor_core_15_load_bb_two = loadBufCtrl[1];
-  assign tensor_core_16_data_in_1 = io_dataIn_16[7 : 0];
-  assign tensor_core_16_data_in_2 = io_dataIn_16[15 : 8];
-  assign tensor_core_16_data_in_3 = io_dataIn_16[23 : 16];
-  assign tensor_core_16_data_in_4 = io_dataIn_16[31 : 24];
-  assign tensor_core_16_data_in_5 = io_dataIn_16[39 : 32];
-  assign tensor_core_16_data_in_6 = io_dataIn_16[47 : 40];
-  assign tensor_core_16_data_in_7 = io_dataIn_16[55 : 48];
-  assign tensor_core_16_data_in_8 = io_dataIn_16[63 : 56];
-  assign tensor_core_16_data_in_9 = io_dataIn_16[71 : 64];
-  assign tensor_core_16_data_in_10 = io_dataIn_16[79 : 72];
-  assign tensor_core_16_load_bb_one = loadBufCtrl[0];
-  assign tensor_core_16_load_bb_two = loadBufCtrl[1];
-  assign tensor_core_17_data_in_1 = io_dataIn_17[7 : 0];
-  assign tensor_core_17_data_in_2 = io_dataIn_17[15 : 8];
-  assign tensor_core_17_data_in_3 = io_dataIn_17[23 : 16];
-  assign tensor_core_17_data_in_4 = io_dataIn_17[31 : 24];
-  assign tensor_core_17_data_in_5 = io_dataIn_17[39 : 32];
-  assign tensor_core_17_data_in_6 = io_dataIn_17[47 : 40];
-  assign tensor_core_17_data_in_7 = io_dataIn_17[55 : 48];
-  assign tensor_core_17_data_in_8 = io_dataIn_17[63 : 56];
-  assign tensor_core_17_data_in_9 = io_dataIn_17[71 : 64];
-  assign tensor_core_17_data_in_10 = io_dataIn_17[79 : 72];
-  assign tensor_core_17_load_bb_one = loadBufCtrl[0];
-  assign tensor_core_17_load_bb_two = loadBufCtrl[1];
-  assign tensor_core_18_data_in_1 = io_dataIn_18[7 : 0];
-  assign tensor_core_18_data_in_2 = io_dataIn_18[15 : 8];
-  assign tensor_core_18_data_in_3 = io_dataIn_18[23 : 16];
-  assign tensor_core_18_data_in_4 = io_dataIn_18[31 : 24];
-  assign tensor_core_18_data_in_5 = io_dataIn_18[39 : 32];
-  assign tensor_core_18_data_in_6 = io_dataIn_18[47 : 40];
-  assign tensor_core_18_data_in_7 = io_dataIn_18[55 : 48];
-  assign tensor_core_18_data_in_8 = io_dataIn_18[63 : 56];
-  assign tensor_core_18_data_in_9 = io_dataIn_18[71 : 64];
-  assign tensor_core_18_data_in_10 = io_dataIn_18[79 : 72];
-  assign tensor_core_18_load_bb_one = loadBufCtrl[0];
-  assign tensor_core_18_load_bb_two = loadBufCtrl[1];
-  assign tensor_core_19_data_in_1 = io_dataIn_19[7 : 0];
-  assign tensor_core_19_data_in_2 = io_dataIn_19[15 : 8];
-  assign tensor_core_19_data_in_3 = io_dataIn_19[23 : 16];
-  assign tensor_core_19_data_in_4 = io_dataIn_19[31 : 24];
-  assign tensor_core_19_data_in_5 = io_dataIn_19[39 : 32];
-  assign tensor_core_19_data_in_6 = io_dataIn_19[47 : 40];
-  assign tensor_core_19_data_in_7 = io_dataIn_19[55 : 48];
-  assign tensor_core_19_data_in_8 = io_dataIn_19[63 : 56];
-  assign tensor_core_19_data_in_9 = io_dataIn_19[71 : 64];
-  assign tensor_core_19_data_in_10 = io_dataIn_19[79 : 72];
-  assign tensor_core_19_load_bb_one = loadBufCtrl[0];
-  assign tensor_core_19_load_bb_two = loadBufCtrl[1];
-  assign tensor_core_20_data_in_1 = io_dataIn_20[7 : 0];
-  assign tensor_core_20_data_in_2 = io_dataIn_20[15 : 8];
-  assign tensor_core_20_data_in_3 = io_dataIn_20[23 : 16];
-  assign tensor_core_20_data_in_4 = io_dataIn_20[31 : 24];
-  assign tensor_core_20_data_in_5 = io_dataIn_20[39 : 32];
-  assign tensor_core_20_data_in_6 = io_dataIn_20[47 : 40];
-  assign tensor_core_20_data_in_7 = io_dataIn_20[55 : 48];
-  assign tensor_core_20_data_in_8 = io_dataIn_20[63 : 56];
-  assign tensor_core_20_data_in_9 = io_dataIn_20[71 : 64];
-  assign tensor_core_20_data_in_10 = io_dataIn_20[79 : 72];
-  assign tensor_core_20_load_bb_one = loadBufCtrl[0];
-  assign tensor_core_20_load_bb_two = loadBufCtrl[1];
-  assign tensor_core_21_data_in_1 = io_dataIn_21[7 : 0];
-  assign tensor_core_21_data_in_2 = io_dataIn_21[15 : 8];
-  assign tensor_core_21_data_in_3 = io_dataIn_21[23 : 16];
-  assign tensor_core_21_data_in_4 = io_dataIn_21[31 : 24];
-  assign tensor_core_21_data_in_5 = io_dataIn_21[39 : 32];
-  assign tensor_core_21_data_in_6 = io_dataIn_21[47 : 40];
-  assign tensor_core_21_data_in_7 = io_dataIn_21[55 : 48];
-  assign tensor_core_21_data_in_8 = io_dataIn_21[63 : 56];
-  assign tensor_core_21_data_in_9 = io_dataIn_21[71 : 64];
-  assign tensor_core_21_data_in_10 = io_dataIn_21[79 : 72];
-  assign tensor_core_21_load_bb_one = loadBufCtrl[0];
-  assign tensor_core_21_load_bb_two = loadBufCtrl[1];
-  assign tensor_core_22_data_in_1 = io_dataIn_22[7 : 0];
-  assign tensor_core_22_data_in_2 = io_dataIn_22[15 : 8];
-  assign tensor_core_22_data_in_3 = io_dataIn_22[23 : 16];
-  assign tensor_core_22_data_in_4 = io_dataIn_22[31 : 24];
-  assign tensor_core_22_data_in_5 = io_dataIn_22[39 : 32];
-  assign tensor_core_22_data_in_6 = io_dataIn_22[47 : 40];
-  assign tensor_core_22_data_in_7 = io_dataIn_22[55 : 48];
-  assign tensor_core_22_data_in_8 = io_dataIn_22[63 : 56];
-  assign tensor_core_22_data_in_9 = io_dataIn_22[71 : 64];
-  assign tensor_core_22_data_in_10 = io_dataIn_22[79 : 72];
-  assign tensor_core_22_load_bb_one = loadBufCtrl[0];
-  assign tensor_core_22_load_bb_two = loadBufCtrl[1];
-  assign tensor_core_23_data_in_1 = io_dataIn_23[7 : 0];
-  assign tensor_core_23_data_in_2 = io_dataIn_23[15 : 8];
-  assign tensor_core_23_data_in_3 = io_dataIn_23[23 : 16];
-  assign tensor_core_23_data_in_4 = io_dataIn_23[31 : 24];
-  assign tensor_core_23_data_in_5 = io_dataIn_23[39 : 32];
-  assign tensor_core_23_data_in_6 = io_dataIn_23[47 : 40];
-  assign tensor_core_23_data_in_7 = io_dataIn_23[55 : 48];
-  assign tensor_core_23_data_in_8 = io_dataIn_23[63 : 56];
-  assign tensor_core_23_data_in_9 = io_dataIn_23[71 : 64];
-  assign tensor_core_23_data_in_10 = io_dataIn_23[79 : 72];
-  assign tensor_core_23_load_bb_one = loadBufCtrl[0];
-  assign tensor_core_23_load_bb_two = loadBufCtrl[1];
-  assign tensor_core_24_data_in_1 = io_dataIn_24[7 : 0];
-  assign tensor_core_24_data_in_2 = io_dataIn_24[15 : 8];
-  assign tensor_core_24_data_in_3 = io_dataIn_24[23 : 16];
-  assign tensor_core_24_data_in_4 = io_dataIn_24[31 : 24];
-  assign tensor_core_24_data_in_5 = io_dataIn_24[39 : 32];
-  assign tensor_core_24_data_in_6 = io_dataIn_24[47 : 40];
-  assign tensor_core_24_data_in_7 = io_dataIn_24[55 : 48];
-  assign tensor_core_24_data_in_8 = io_dataIn_24[63 : 56];
-  assign tensor_core_24_data_in_9 = io_dataIn_24[71 : 64];
-  assign tensor_core_24_data_in_10 = io_dataIn_24[79 : 72];
-  assign tensor_core_24_load_bb_one = loadBufCtrl[0];
-  assign tensor_core_24_load_bb_two = loadBufCtrl[1];
-  assign tensor_core_25_data_in_1 = io_dataIn_25[7 : 0];
-  assign tensor_core_25_data_in_2 = io_dataIn_25[15 : 8];
-  assign tensor_core_25_data_in_3 = io_dataIn_25[23 : 16];
-  assign tensor_core_25_data_in_4 = io_dataIn_25[31 : 24];
-  assign tensor_core_25_data_in_5 = io_dataIn_25[39 : 32];
-  assign tensor_core_25_data_in_6 = io_dataIn_25[47 : 40];
-  assign tensor_core_25_data_in_7 = io_dataIn_25[55 : 48];
-  assign tensor_core_25_data_in_8 = io_dataIn_25[63 : 56];
-  assign tensor_core_25_data_in_9 = io_dataIn_25[71 : 64];
-  assign tensor_core_25_data_in_10 = io_dataIn_25[79 : 72];
-  assign tensor_core_25_load_bb_one = loadBufCtrl[0];
-  assign tensor_core_25_load_bb_two = loadBufCtrl[1];
-  assign tensor_core_26_data_in_1 = io_dataIn_26[7 : 0];
-  assign tensor_core_26_data_in_2 = io_dataIn_26[15 : 8];
-  assign tensor_core_26_data_in_3 = io_dataIn_26[23 : 16];
-  assign tensor_core_26_data_in_4 = io_dataIn_26[31 : 24];
-  assign tensor_core_26_data_in_5 = io_dataIn_26[39 : 32];
-  assign tensor_core_26_data_in_6 = io_dataIn_26[47 : 40];
-  assign tensor_core_26_data_in_7 = io_dataIn_26[55 : 48];
-  assign tensor_core_26_data_in_8 = io_dataIn_26[63 : 56];
-  assign tensor_core_26_data_in_9 = io_dataIn_26[71 : 64];
-  assign tensor_core_26_data_in_10 = io_dataIn_26[79 : 72];
-  assign tensor_core_26_load_bb_one = loadBufCtrl[0];
-  assign tensor_core_26_load_bb_two = loadBufCtrl[1];
-  assign tensor_core_27_data_in_1 = io_dataIn_27[7 : 0];
-  assign tensor_core_27_data_in_2 = io_dataIn_27[15 : 8];
-  assign tensor_core_27_data_in_3 = io_dataIn_27[23 : 16];
-  assign tensor_core_27_data_in_4 = io_dataIn_27[31 : 24];
-  assign tensor_core_27_data_in_5 = io_dataIn_27[39 : 32];
-  assign tensor_core_27_data_in_6 = io_dataIn_27[47 : 40];
-  assign tensor_core_27_data_in_7 = io_dataIn_27[55 : 48];
-  assign tensor_core_27_data_in_8 = io_dataIn_27[63 : 56];
-  assign tensor_core_27_data_in_9 = io_dataIn_27[71 : 64];
-  assign tensor_core_27_data_in_10 = io_dataIn_27[79 : 72];
-  assign tensor_core_27_load_bb_one = loadBufCtrl[0];
-  assign tensor_core_27_load_bb_two = loadBufCtrl[1];
-  assign tensor_core_28_data_in_1 = io_dataIn_28[7 : 0];
-  assign tensor_core_28_data_in_2 = io_dataIn_28[15 : 8];
-  assign tensor_core_28_data_in_3 = io_dataIn_28[23 : 16];
-  assign tensor_core_28_data_in_4 = io_dataIn_28[31 : 24];
-  assign tensor_core_28_data_in_5 = io_dataIn_28[39 : 32];
-  assign tensor_core_28_data_in_6 = io_dataIn_28[47 : 40];
-  assign tensor_core_28_data_in_7 = io_dataIn_28[55 : 48];
-  assign tensor_core_28_data_in_8 = io_dataIn_28[63 : 56];
-  assign tensor_core_28_data_in_9 = io_dataIn_28[71 : 64];
-  assign tensor_core_28_data_in_10 = io_dataIn_28[79 : 72];
-  assign tensor_core_28_load_bb_one = loadBufCtrl[0];
-  assign tensor_core_28_load_bb_two = loadBufCtrl[1];
-  assign tensor_core_29_data_in_1 = io_dataIn_29[7 : 0];
-  assign tensor_core_29_data_in_2 = io_dataIn_29[15 : 8];
-  assign tensor_core_29_data_in_3 = io_dataIn_29[23 : 16];
-  assign tensor_core_29_data_in_4 = io_dataIn_29[31 : 24];
-  assign tensor_core_29_data_in_5 = io_dataIn_29[39 : 32];
-  assign tensor_core_29_data_in_6 = io_dataIn_29[47 : 40];
-  assign tensor_core_29_data_in_7 = io_dataIn_29[55 : 48];
-  assign tensor_core_29_data_in_8 = io_dataIn_29[63 : 56];
-  assign tensor_core_29_data_in_9 = io_dataIn_29[71 : 64];
-  assign tensor_core_29_data_in_10 = io_dataIn_29[79 : 72];
-  assign tensor_core_29_load_bb_one = loadBufCtrl[0];
-  assign tensor_core_29_load_bb_two = loadBufCtrl[1];
-  assign tensor_core_30_data_in_1 = io_dataIn_30[7 : 0];
-  assign tensor_core_30_data_in_2 = io_dataIn_30[15 : 8];
-  assign tensor_core_30_data_in_3 = io_dataIn_30[23 : 16];
-  assign tensor_core_30_data_in_4 = io_dataIn_30[31 : 24];
-  assign tensor_core_30_data_in_5 = io_dataIn_30[39 : 32];
-  assign tensor_core_30_data_in_6 = io_dataIn_30[47 : 40];
-  assign tensor_core_30_data_in_7 = io_dataIn_30[55 : 48];
-  assign tensor_core_30_data_in_8 = io_dataIn_30[63 : 56];
-  assign tensor_core_30_data_in_9 = io_dataIn_30[71 : 64];
-  assign tensor_core_30_data_in_10 = io_dataIn_30[79 : 72];
-  assign tensor_core_30_load_bb_one = loadBufCtrl[0];
-  assign tensor_core_30_load_bb_two = loadBufCtrl[1];
-  assign tensor_core_31_data_in_1 = io_dataIn_31[7 : 0];
-  assign tensor_core_31_data_in_2 = io_dataIn_31[15 : 8];
-  assign tensor_core_31_data_in_3 = io_dataIn_31[23 : 16];
-  assign tensor_core_31_data_in_4 = io_dataIn_31[31 : 24];
-  assign tensor_core_31_data_in_5 = io_dataIn_31[39 : 32];
-  assign tensor_core_31_data_in_6 = io_dataIn_31[47 : 40];
-  assign tensor_core_31_data_in_7 = io_dataIn_31[55 : 48];
-  assign tensor_core_31_data_in_8 = io_dataIn_31[63 : 56];
-  assign tensor_core_31_data_in_9 = io_dataIn_31[71 : 64];
-  assign tensor_core_31_data_in_10 = io_dataIn_31[79 : 72];
-  assign tensor_core_31_load_bb_one = loadBufCtrl[0];
-  assign tensor_core_31_load_bb_two = loadBufCtrl[1];
-  assign tensor_core_32_data_in_1 = io_dataIn_32[7 : 0];
-  assign tensor_core_32_data_in_2 = io_dataIn_32[15 : 8];
-  assign tensor_core_32_data_in_3 = io_dataIn_32[23 : 16];
-  assign tensor_core_32_data_in_4 = io_dataIn_32[31 : 24];
-  assign tensor_core_32_data_in_5 = io_dataIn_32[39 : 32];
-  assign tensor_core_32_data_in_6 = io_dataIn_32[47 : 40];
-  assign tensor_core_32_data_in_7 = io_dataIn_32[55 : 48];
-  assign tensor_core_32_data_in_8 = io_dataIn_32[63 : 56];
-  assign tensor_core_32_data_in_9 = io_dataIn_32[71 : 64];
-  assign tensor_core_32_data_in_10 = io_dataIn_32[79 : 72];
-  assign tensor_core_32_load_bb_one = loadBufCtrl[0];
-  assign tensor_core_32_load_bb_two = loadBufCtrl[1];
-  assign tensor_core_33_data_in_1 = io_dataIn_33[7 : 0];
-  assign tensor_core_33_data_in_2 = io_dataIn_33[15 : 8];
-  assign tensor_core_33_data_in_3 = io_dataIn_33[23 : 16];
-  assign tensor_core_33_data_in_4 = io_dataIn_33[31 : 24];
-  assign tensor_core_33_data_in_5 = io_dataIn_33[39 : 32];
-  assign tensor_core_33_data_in_6 = io_dataIn_33[47 : 40];
-  assign tensor_core_33_data_in_7 = io_dataIn_33[55 : 48];
-  assign tensor_core_33_data_in_8 = io_dataIn_33[63 : 56];
-  assign tensor_core_33_data_in_9 = io_dataIn_33[71 : 64];
-  assign tensor_core_33_data_in_10 = io_dataIn_33[79 : 72];
-  assign tensor_core_33_load_bb_one = loadBufCtrl[0];
-  assign tensor_core_33_load_bb_two = loadBufCtrl[1];
+  assign tensor_core_bf12_1_data_in_1 = io_dataIn_1[3 : 0];
+  assign tensor_core_bf12_1_data_in_2 = io_dataIn_1[7 : 4];
+  assign tensor_core_bf12_1_data_in_3 = io_dataIn_1[11 : 8];
+  assign tensor_core_bf12_1_data_in_4 = io_dataIn_1[15 : 12];
+  assign tensor_core_bf12_1_data_in_5 = io_dataIn_1[19 : 16];
+  assign tensor_core_bf12_1_data_in_6 = io_dataIn_1[23 : 20];
+  assign tensor_core_bf12_1_data_in_7 = io_dataIn_1[27 : 24];
+  assign tensor_core_bf12_1_data_in_8 = io_dataIn_1[31 : 28];
+  assign tensor_core_bf12_1_data_in_9 = io_dataIn_1[35 : 32];
+  assign tensor_core_bf12_1_data_in_10 = io_dataIn_1[39 : 36];
+  assign tensor_core_bf12_1_data_in_11 = io_dataIn_1[43 : 40];
+  assign tensor_core_bf12_1_data_in_12 = io_dataIn_1[47 : 44];
+  assign tensor_core_bf12_1_data_in_13 = io_dataIn_1[51 : 48];
+  assign tensor_core_bf12_1_data_in_14 = io_dataIn_1[55 : 52];
+  assign tensor_core_bf12_1_data_in_15 = io_dataIn_1[59 : 56];
+  assign tensor_core_bf12_1_data_in_16 = io_dataIn_1[63 : 60];
+  assign tensor_core_bf12_1_data_in_17 = io_dataIn_1[67 : 64];
+  assign tensor_core_bf12_1_data_in_18 = io_dataIn_1[71 : 68];
+  assign tensor_core_bf12_1_data_in_19 = io_dataIn_1[75 : 72];
+  assign tensor_core_bf12_1_data_in_20 = io_dataIn_1[79 : 76];
+  assign tensor_core_bf12_1_load_bb_one = loadBufCtrl[0];
+  assign tensor_core_bf12_1_load_bb_two = loadBufCtrl[1];
+  assign tensor_core_bf12_2_data_in_1 = io_dataIn_2[3 : 0];
+  assign tensor_core_bf12_2_data_in_2 = io_dataIn_2[7 : 4];
+  assign tensor_core_bf12_2_data_in_3 = io_dataIn_2[11 : 8];
+  assign tensor_core_bf12_2_data_in_4 = io_dataIn_2[15 : 12];
+  assign tensor_core_bf12_2_data_in_5 = io_dataIn_2[19 : 16];
+  assign tensor_core_bf12_2_data_in_6 = io_dataIn_2[23 : 20];
+  assign tensor_core_bf12_2_data_in_7 = io_dataIn_2[27 : 24];
+  assign tensor_core_bf12_2_data_in_8 = io_dataIn_2[31 : 28];
+  assign tensor_core_bf12_2_data_in_9 = io_dataIn_2[35 : 32];
+  assign tensor_core_bf12_2_data_in_10 = io_dataIn_2[39 : 36];
+  assign tensor_core_bf12_2_data_in_11 = io_dataIn_2[43 : 40];
+  assign tensor_core_bf12_2_data_in_12 = io_dataIn_2[47 : 44];
+  assign tensor_core_bf12_2_data_in_13 = io_dataIn_2[51 : 48];
+  assign tensor_core_bf12_2_data_in_14 = io_dataIn_2[55 : 52];
+  assign tensor_core_bf12_2_data_in_15 = io_dataIn_2[59 : 56];
+  assign tensor_core_bf12_2_data_in_16 = io_dataIn_2[63 : 60];
+  assign tensor_core_bf12_2_data_in_17 = io_dataIn_2[67 : 64];
+  assign tensor_core_bf12_2_data_in_18 = io_dataIn_2[71 : 68];
+  assign tensor_core_bf12_2_data_in_19 = io_dataIn_2[75 : 72];
+  assign tensor_core_bf12_2_data_in_20 = io_dataIn_2[79 : 76];
+  assign tensor_core_bf12_2_load_bb_one = loadBufCtrl[0];
+  assign tensor_core_bf12_2_load_bb_two = loadBufCtrl[1];
+  assign tensor_core_bf12_3_data_in_1 = io_dataIn_3[3 : 0];
+  assign tensor_core_bf12_3_data_in_2 = io_dataIn_3[7 : 4];
+  assign tensor_core_bf12_3_data_in_3 = io_dataIn_3[11 : 8];
+  assign tensor_core_bf12_3_data_in_4 = io_dataIn_3[15 : 12];
+  assign tensor_core_bf12_3_data_in_5 = io_dataIn_3[19 : 16];
+  assign tensor_core_bf12_3_data_in_6 = io_dataIn_3[23 : 20];
+  assign tensor_core_bf12_3_data_in_7 = io_dataIn_3[27 : 24];
+  assign tensor_core_bf12_3_data_in_8 = io_dataIn_3[31 : 28];
+  assign tensor_core_bf12_3_data_in_9 = io_dataIn_3[35 : 32];
+  assign tensor_core_bf12_3_data_in_10 = io_dataIn_3[39 : 36];
+  assign tensor_core_bf12_3_data_in_11 = io_dataIn_3[43 : 40];
+  assign tensor_core_bf12_3_data_in_12 = io_dataIn_3[47 : 44];
+  assign tensor_core_bf12_3_data_in_13 = io_dataIn_3[51 : 48];
+  assign tensor_core_bf12_3_data_in_14 = io_dataIn_3[55 : 52];
+  assign tensor_core_bf12_3_data_in_15 = io_dataIn_3[59 : 56];
+  assign tensor_core_bf12_3_data_in_16 = io_dataIn_3[63 : 60];
+  assign tensor_core_bf12_3_data_in_17 = io_dataIn_3[67 : 64];
+  assign tensor_core_bf12_3_data_in_18 = io_dataIn_3[71 : 68];
+  assign tensor_core_bf12_3_data_in_19 = io_dataIn_3[75 : 72];
+  assign tensor_core_bf12_3_data_in_20 = io_dataIn_3[79 : 76];
+  assign tensor_core_bf12_3_load_bb_one = loadBufCtrl[0];
+  assign tensor_core_bf12_3_load_bb_two = loadBufCtrl[1];
+  assign tensor_core_bf12_4_data_in_1 = io_dataIn_4[3 : 0];
+  assign tensor_core_bf12_4_data_in_2 = io_dataIn_4[7 : 4];
+  assign tensor_core_bf12_4_data_in_3 = io_dataIn_4[11 : 8];
+  assign tensor_core_bf12_4_data_in_4 = io_dataIn_4[15 : 12];
+  assign tensor_core_bf12_4_data_in_5 = io_dataIn_4[19 : 16];
+  assign tensor_core_bf12_4_data_in_6 = io_dataIn_4[23 : 20];
+  assign tensor_core_bf12_4_data_in_7 = io_dataIn_4[27 : 24];
+  assign tensor_core_bf12_4_data_in_8 = io_dataIn_4[31 : 28];
+  assign tensor_core_bf12_4_data_in_9 = io_dataIn_4[35 : 32];
+  assign tensor_core_bf12_4_data_in_10 = io_dataIn_4[39 : 36];
+  assign tensor_core_bf12_4_data_in_11 = io_dataIn_4[43 : 40];
+  assign tensor_core_bf12_4_data_in_12 = io_dataIn_4[47 : 44];
+  assign tensor_core_bf12_4_data_in_13 = io_dataIn_4[51 : 48];
+  assign tensor_core_bf12_4_data_in_14 = io_dataIn_4[55 : 52];
+  assign tensor_core_bf12_4_data_in_15 = io_dataIn_4[59 : 56];
+  assign tensor_core_bf12_4_data_in_16 = io_dataIn_4[63 : 60];
+  assign tensor_core_bf12_4_data_in_17 = io_dataIn_4[67 : 64];
+  assign tensor_core_bf12_4_data_in_18 = io_dataIn_4[71 : 68];
+  assign tensor_core_bf12_4_data_in_19 = io_dataIn_4[75 : 72];
+  assign tensor_core_bf12_4_data_in_20 = io_dataIn_4[79 : 76];
+  assign tensor_core_bf12_4_load_bb_one = loadBufCtrl[0];
+  assign tensor_core_bf12_4_load_bb_two = loadBufCtrl[1];
+  assign tensor_core_bf12_5_data_in_1 = io_dataIn_5[3 : 0];
+  assign tensor_core_bf12_5_data_in_2 = io_dataIn_5[7 : 4];
+  assign tensor_core_bf12_5_data_in_3 = io_dataIn_5[11 : 8];
+  assign tensor_core_bf12_5_data_in_4 = io_dataIn_5[15 : 12];
+  assign tensor_core_bf12_5_data_in_5 = io_dataIn_5[19 : 16];
+  assign tensor_core_bf12_5_data_in_6 = io_dataIn_5[23 : 20];
+  assign tensor_core_bf12_5_data_in_7 = io_dataIn_5[27 : 24];
+  assign tensor_core_bf12_5_data_in_8 = io_dataIn_5[31 : 28];
+  assign tensor_core_bf12_5_data_in_9 = io_dataIn_5[35 : 32];
+  assign tensor_core_bf12_5_data_in_10 = io_dataIn_5[39 : 36];
+  assign tensor_core_bf12_5_data_in_11 = io_dataIn_5[43 : 40];
+  assign tensor_core_bf12_5_data_in_12 = io_dataIn_5[47 : 44];
+  assign tensor_core_bf12_5_data_in_13 = io_dataIn_5[51 : 48];
+  assign tensor_core_bf12_5_data_in_14 = io_dataIn_5[55 : 52];
+  assign tensor_core_bf12_5_data_in_15 = io_dataIn_5[59 : 56];
+  assign tensor_core_bf12_5_data_in_16 = io_dataIn_5[63 : 60];
+  assign tensor_core_bf12_5_data_in_17 = io_dataIn_5[67 : 64];
+  assign tensor_core_bf12_5_data_in_18 = io_dataIn_5[71 : 68];
+  assign tensor_core_bf12_5_data_in_19 = io_dataIn_5[75 : 72];
+  assign tensor_core_bf12_5_data_in_20 = io_dataIn_5[79 : 76];
+  assign tensor_core_bf12_5_load_bb_one = loadBufCtrl[0];
+  assign tensor_core_bf12_5_load_bb_two = loadBufCtrl[1];
+  assign tensor_core_bf12_6_data_in_1 = io_dataIn_6[3 : 0];
+  assign tensor_core_bf12_6_data_in_2 = io_dataIn_6[7 : 4];
+  assign tensor_core_bf12_6_data_in_3 = io_dataIn_6[11 : 8];
+  assign tensor_core_bf12_6_data_in_4 = io_dataIn_6[15 : 12];
+  assign tensor_core_bf12_6_data_in_5 = io_dataIn_6[19 : 16];
+  assign tensor_core_bf12_6_data_in_6 = io_dataIn_6[23 : 20];
+  assign tensor_core_bf12_6_data_in_7 = io_dataIn_6[27 : 24];
+  assign tensor_core_bf12_6_data_in_8 = io_dataIn_6[31 : 28];
+  assign tensor_core_bf12_6_data_in_9 = io_dataIn_6[35 : 32];
+  assign tensor_core_bf12_6_data_in_10 = io_dataIn_6[39 : 36];
+  assign tensor_core_bf12_6_data_in_11 = io_dataIn_6[43 : 40];
+  assign tensor_core_bf12_6_data_in_12 = io_dataIn_6[47 : 44];
+  assign tensor_core_bf12_6_data_in_13 = io_dataIn_6[51 : 48];
+  assign tensor_core_bf12_6_data_in_14 = io_dataIn_6[55 : 52];
+  assign tensor_core_bf12_6_data_in_15 = io_dataIn_6[59 : 56];
+  assign tensor_core_bf12_6_data_in_16 = io_dataIn_6[63 : 60];
+  assign tensor_core_bf12_6_data_in_17 = io_dataIn_6[67 : 64];
+  assign tensor_core_bf12_6_data_in_18 = io_dataIn_6[71 : 68];
+  assign tensor_core_bf12_6_data_in_19 = io_dataIn_6[75 : 72];
+  assign tensor_core_bf12_6_data_in_20 = io_dataIn_6[79 : 76];
+  assign tensor_core_bf12_6_load_bb_one = loadBufCtrl[0];
+  assign tensor_core_bf12_6_load_bb_two = loadBufCtrl[1];
+  assign tensor_core_bf12_7_data_in_1 = io_dataIn_7[3 : 0];
+  assign tensor_core_bf12_7_data_in_2 = io_dataIn_7[7 : 4];
+  assign tensor_core_bf12_7_data_in_3 = io_dataIn_7[11 : 8];
+  assign tensor_core_bf12_7_data_in_4 = io_dataIn_7[15 : 12];
+  assign tensor_core_bf12_7_data_in_5 = io_dataIn_7[19 : 16];
+  assign tensor_core_bf12_7_data_in_6 = io_dataIn_7[23 : 20];
+  assign tensor_core_bf12_7_data_in_7 = io_dataIn_7[27 : 24];
+  assign tensor_core_bf12_7_data_in_8 = io_dataIn_7[31 : 28];
+  assign tensor_core_bf12_7_data_in_9 = io_dataIn_7[35 : 32];
+  assign tensor_core_bf12_7_data_in_10 = io_dataIn_7[39 : 36];
+  assign tensor_core_bf12_7_data_in_11 = io_dataIn_7[43 : 40];
+  assign tensor_core_bf12_7_data_in_12 = io_dataIn_7[47 : 44];
+  assign tensor_core_bf12_7_data_in_13 = io_dataIn_7[51 : 48];
+  assign tensor_core_bf12_7_data_in_14 = io_dataIn_7[55 : 52];
+  assign tensor_core_bf12_7_data_in_15 = io_dataIn_7[59 : 56];
+  assign tensor_core_bf12_7_data_in_16 = io_dataIn_7[63 : 60];
+  assign tensor_core_bf12_7_data_in_17 = io_dataIn_7[67 : 64];
+  assign tensor_core_bf12_7_data_in_18 = io_dataIn_7[71 : 68];
+  assign tensor_core_bf12_7_data_in_19 = io_dataIn_7[75 : 72];
+  assign tensor_core_bf12_7_data_in_20 = io_dataIn_7[79 : 76];
+  assign tensor_core_bf12_7_load_bb_one = loadBufCtrl[0];
+  assign tensor_core_bf12_7_load_bb_two = loadBufCtrl[1];
+  assign tensor_core_bf12_8_data_in_1 = io_dataIn_8[3 : 0];
+  assign tensor_core_bf12_8_data_in_2 = io_dataIn_8[7 : 4];
+  assign tensor_core_bf12_8_data_in_3 = io_dataIn_8[11 : 8];
+  assign tensor_core_bf12_8_data_in_4 = io_dataIn_8[15 : 12];
+  assign tensor_core_bf12_8_data_in_5 = io_dataIn_8[19 : 16];
+  assign tensor_core_bf12_8_data_in_6 = io_dataIn_8[23 : 20];
+  assign tensor_core_bf12_8_data_in_7 = io_dataIn_8[27 : 24];
+  assign tensor_core_bf12_8_data_in_8 = io_dataIn_8[31 : 28];
+  assign tensor_core_bf12_8_data_in_9 = io_dataIn_8[35 : 32];
+  assign tensor_core_bf12_8_data_in_10 = io_dataIn_8[39 : 36];
+  assign tensor_core_bf12_8_data_in_11 = io_dataIn_8[43 : 40];
+  assign tensor_core_bf12_8_data_in_12 = io_dataIn_8[47 : 44];
+  assign tensor_core_bf12_8_data_in_13 = io_dataIn_8[51 : 48];
+  assign tensor_core_bf12_8_data_in_14 = io_dataIn_8[55 : 52];
+  assign tensor_core_bf12_8_data_in_15 = io_dataIn_8[59 : 56];
+  assign tensor_core_bf12_8_data_in_16 = io_dataIn_8[63 : 60];
+  assign tensor_core_bf12_8_data_in_17 = io_dataIn_8[67 : 64];
+  assign tensor_core_bf12_8_data_in_18 = io_dataIn_8[71 : 68];
+  assign tensor_core_bf12_8_data_in_19 = io_dataIn_8[75 : 72];
+  assign tensor_core_bf12_8_data_in_20 = io_dataIn_8[79 : 76];
+  assign tensor_core_bf12_8_load_bb_one = loadBufCtrl[0];
+  assign tensor_core_bf12_8_load_bb_two = loadBufCtrl[1];
+  assign tensor_core_bf12_9_data_in_1 = io_dataIn_9[3 : 0];
+  assign tensor_core_bf12_9_data_in_2 = io_dataIn_9[7 : 4];
+  assign tensor_core_bf12_9_data_in_3 = io_dataIn_9[11 : 8];
+  assign tensor_core_bf12_9_data_in_4 = io_dataIn_9[15 : 12];
+  assign tensor_core_bf12_9_data_in_5 = io_dataIn_9[19 : 16];
+  assign tensor_core_bf12_9_data_in_6 = io_dataIn_9[23 : 20];
+  assign tensor_core_bf12_9_data_in_7 = io_dataIn_9[27 : 24];
+  assign tensor_core_bf12_9_data_in_8 = io_dataIn_9[31 : 28];
+  assign tensor_core_bf12_9_data_in_9 = io_dataIn_9[35 : 32];
+  assign tensor_core_bf12_9_data_in_10 = io_dataIn_9[39 : 36];
+  assign tensor_core_bf12_9_data_in_11 = io_dataIn_9[43 : 40];
+  assign tensor_core_bf12_9_data_in_12 = io_dataIn_9[47 : 44];
+  assign tensor_core_bf12_9_data_in_13 = io_dataIn_9[51 : 48];
+  assign tensor_core_bf12_9_data_in_14 = io_dataIn_9[55 : 52];
+  assign tensor_core_bf12_9_data_in_15 = io_dataIn_9[59 : 56];
+  assign tensor_core_bf12_9_data_in_16 = io_dataIn_9[63 : 60];
+  assign tensor_core_bf12_9_data_in_17 = io_dataIn_9[67 : 64];
+  assign tensor_core_bf12_9_data_in_18 = io_dataIn_9[71 : 68];
+  assign tensor_core_bf12_9_data_in_19 = io_dataIn_9[75 : 72];
+  assign tensor_core_bf12_9_data_in_20 = io_dataIn_9[79 : 76];
+  assign tensor_core_bf12_9_load_bb_one = loadBufCtrl[0];
+  assign tensor_core_bf12_9_load_bb_two = loadBufCtrl[1];
+  assign tensor_core_bf12_10_data_in_1 = io_dataIn_10[3 : 0];
+  assign tensor_core_bf12_10_data_in_2 = io_dataIn_10[7 : 4];
+  assign tensor_core_bf12_10_data_in_3 = io_dataIn_10[11 : 8];
+  assign tensor_core_bf12_10_data_in_4 = io_dataIn_10[15 : 12];
+  assign tensor_core_bf12_10_data_in_5 = io_dataIn_10[19 : 16];
+  assign tensor_core_bf12_10_data_in_6 = io_dataIn_10[23 : 20];
+  assign tensor_core_bf12_10_data_in_7 = io_dataIn_10[27 : 24];
+  assign tensor_core_bf12_10_data_in_8 = io_dataIn_10[31 : 28];
+  assign tensor_core_bf12_10_data_in_9 = io_dataIn_10[35 : 32];
+  assign tensor_core_bf12_10_data_in_10 = io_dataIn_10[39 : 36];
+  assign tensor_core_bf12_10_data_in_11 = io_dataIn_10[43 : 40];
+  assign tensor_core_bf12_10_data_in_12 = io_dataIn_10[47 : 44];
+  assign tensor_core_bf12_10_data_in_13 = io_dataIn_10[51 : 48];
+  assign tensor_core_bf12_10_data_in_14 = io_dataIn_10[55 : 52];
+  assign tensor_core_bf12_10_data_in_15 = io_dataIn_10[59 : 56];
+  assign tensor_core_bf12_10_data_in_16 = io_dataIn_10[63 : 60];
+  assign tensor_core_bf12_10_data_in_17 = io_dataIn_10[67 : 64];
+  assign tensor_core_bf12_10_data_in_18 = io_dataIn_10[71 : 68];
+  assign tensor_core_bf12_10_data_in_19 = io_dataIn_10[75 : 72];
+  assign tensor_core_bf12_10_data_in_20 = io_dataIn_10[79 : 76];
+  assign tensor_core_bf12_10_load_bb_one = loadBufCtrl[0];
+  assign tensor_core_bf12_10_load_bb_two = loadBufCtrl[1];
+  assign tensor_core_bf12_11_data_in_1 = io_dataIn_11[3 : 0];
+  assign tensor_core_bf12_11_data_in_2 = io_dataIn_11[7 : 4];
+  assign tensor_core_bf12_11_data_in_3 = io_dataIn_11[11 : 8];
+  assign tensor_core_bf12_11_data_in_4 = io_dataIn_11[15 : 12];
+  assign tensor_core_bf12_11_data_in_5 = io_dataIn_11[19 : 16];
+  assign tensor_core_bf12_11_data_in_6 = io_dataIn_11[23 : 20];
+  assign tensor_core_bf12_11_data_in_7 = io_dataIn_11[27 : 24];
+  assign tensor_core_bf12_11_data_in_8 = io_dataIn_11[31 : 28];
+  assign tensor_core_bf12_11_data_in_9 = io_dataIn_11[35 : 32];
+  assign tensor_core_bf12_11_data_in_10 = io_dataIn_11[39 : 36];
+  assign tensor_core_bf12_11_data_in_11 = io_dataIn_11[43 : 40];
+  assign tensor_core_bf12_11_data_in_12 = io_dataIn_11[47 : 44];
+  assign tensor_core_bf12_11_data_in_13 = io_dataIn_11[51 : 48];
+  assign tensor_core_bf12_11_data_in_14 = io_dataIn_11[55 : 52];
+  assign tensor_core_bf12_11_data_in_15 = io_dataIn_11[59 : 56];
+  assign tensor_core_bf12_11_data_in_16 = io_dataIn_11[63 : 60];
+  assign tensor_core_bf12_11_data_in_17 = io_dataIn_11[67 : 64];
+  assign tensor_core_bf12_11_data_in_18 = io_dataIn_11[71 : 68];
+  assign tensor_core_bf12_11_data_in_19 = io_dataIn_11[75 : 72];
+  assign tensor_core_bf12_11_data_in_20 = io_dataIn_11[79 : 76];
+  assign tensor_core_bf12_11_load_bb_one = loadBufCtrl[0];
+  assign tensor_core_bf12_11_load_bb_two = loadBufCtrl[1];
+  assign tensor_core_bf12_12_data_in_1 = io_dataIn_12[3 : 0];
+  assign tensor_core_bf12_12_data_in_2 = io_dataIn_12[7 : 4];
+  assign tensor_core_bf12_12_data_in_3 = io_dataIn_12[11 : 8];
+  assign tensor_core_bf12_12_data_in_4 = io_dataIn_12[15 : 12];
+  assign tensor_core_bf12_12_data_in_5 = io_dataIn_12[19 : 16];
+  assign tensor_core_bf12_12_data_in_6 = io_dataIn_12[23 : 20];
+  assign tensor_core_bf12_12_data_in_7 = io_dataIn_12[27 : 24];
+  assign tensor_core_bf12_12_data_in_8 = io_dataIn_12[31 : 28];
+  assign tensor_core_bf12_12_data_in_9 = io_dataIn_12[35 : 32];
+  assign tensor_core_bf12_12_data_in_10 = io_dataIn_12[39 : 36];
+  assign tensor_core_bf12_12_data_in_11 = io_dataIn_12[43 : 40];
+  assign tensor_core_bf12_12_data_in_12 = io_dataIn_12[47 : 44];
+  assign tensor_core_bf12_12_data_in_13 = io_dataIn_12[51 : 48];
+  assign tensor_core_bf12_12_data_in_14 = io_dataIn_12[55 : 52];
+  assign tensor_core_bf12_12_data_in_15 = io_dataIn_12[59 : 56];
+  assign tensor_core_bf12_12_data_in_16 = io_dataIn_12[63 : 60];
+  assign tensor_core_bf12_12_data_in_17 = io_dataIn_12[67 : 64];
+  assign tensor_core_bf12_12_data_in_18 = io_dataIn_12[71 : 68];
+  assign tensor_core_bf12_12_data_in_19 = io_dataIn_12[75 : 72];
+  assign tensor_core_bf12_12_data_in_20 = io_dataIn_12[79 : 76];
+  assign tensor_core_bf12_12_load_bb_one = loadBufCtrl[0];
+  assign tensor_core_bf12_12_load_bb_two = loadBufCtrl[1];
+  assign tensor_core_bf12_13_data_in_1 = io_dataIn_13[3 : 0];
+  assign tensor_core_bf12_13_data_in_2 = io_dataIn_13[7 : 4];
+  assign tensor_core_bf12_13_data_in_3 = io_dataIn_13[11 : 8];
+  assign tensor_core_bf12_13_data_in_4 = io_dataIn_13[15 : 12];
+  assign tensor_core_bf12_13_data_in_5 = io_dataIn_13[19 : 16];
+  assign tensor_core_bf12_13_data_in_6 = io_dataIn_13[23 : 20];
+  assign tensor_core_bf12_13_data_in_7 = io_dataIn_13[27 : 24];
+  assign tensor_core_bf12_13_data_in_8 = io_dataIn_13[31 : 28];
+  assign tensor_core_bf12_13_data_in_9 = io_dataIn_13[35 : 32];
+  assign tensor_core_bf12_13_data_in_10 = io_dataIn_13[39 : 36];
+  assign tensor_core_bf12_13_data_in_11 = io_dataIn_13[43 : 40];
+  assign tensor_core_bf12_13_data_in_12 = io_dataIn_13[47 : 44];
+  assign tensor_core_bf12_13_data_in_13 = io_dataIn_13[51 : 48];
+  assign tensor_core_bf12_13_data_in_14 = io_dataIn_13[55 : 52];
+  assign tensor_core_bf12_13_data_in_15 = io_dataIn_13[59 : 56];
+  assign tensor_core_bf12_13_data_in_16 = io_dataIn_13[63 : 60];
+  assign tensor_core_bf12_13_data_in_17 = io_dataIn_13[67 : 64];
+  assign tensor_core_bf12_13_data_in_18 = io_dataIn_13[71 : 68];
+  assign tensor_core_bf12_13_data_in_19 = io_dataIn_13[75 : 72];
+  assign tensor_core_bf12_13_data_in_20 = io_dataIn_13[79 : 76];
+  assign tensor_core_bf12_13_load_bb_one = loadBufCtrl[0];
+  assign tensor_core_bf12_13_load_bb_two = loadBufCtrl[1];
+  assign tensor_core_bf12_14_data_in_1 = io_dataIn_14[3 : 0];
+  assign tensor_core_bf12_14_data_in_2 = io_dataIn_14[7 : 4];
+  assign tensor_core_bf12_14_data_in_3 = io_dataIn_14[11 : 8];
+  assign tensor_core_bf12_14_data_in_4 = io_dataIn_14[15 : 12];
+  assign tensor_core_bf12_14_data_in_5 = io_dataIn_14[19 : 16];
+  assign tensor_core_bf12_14_data_in_6 = io_dataIn_14[23 : 20];
+  assign tensor_core_bf12_14_data_in_7 = io_dataIn_14[27 : 24];
+  assign tensor_core_bf12_14_data_in_8 = io_dataIn_14[31 : 28];
+  assign tensor_core_bf12_14_data_in_9 = io_dataIn_14[35 : 32];
+  assign tensor_core_bf12_14_data_in_10 = io_dataIn_14[39 : 36];
+  assign tensor_core_bf12_14_data_in_11 = io_dataIn_14[43 : 40];
+  assign tensor_core_bf12_14_data_in_12 = io_dataIn_14[47 : 44];
+  assign tensor_core_bf12_14_data_in_13 = io_dataIn_14[51 : 48];
+  assign tensor_core_bf12_14_data_in_14 = io_dataIn_14[55 : 52];
+  assign tensor_core_bf12_14_data_in_15 = io_dataIn_14[59 : 56];
+  assign tensor_core_bf12_14_data_in_16 = io_dataIn_14[63 : 60];
+  assign tensor_core_bf12_14_data_in_17 = io_dataIn_14[67 : 64];
+  assign tensor_core_bf12_14_data_in_18 = io_dataIn_14[71 : 68];
+  assign tensor_core_bf12_14_data_in_19 = io_dataIn_14[75 : 72];
+  assign tensor_core_bf12_14_data_in_20 = io_dataIn_14[79 : 76];
+  assign tensor_core_bf12_14_load_bb_one = loadBufCtrl[0];
+  assign tensor_core_bf12_14_load_bb_two = loadBufCtrl[1];
+  assign tensor_core_bf12_15_data_in_1 = io_dataIn_15[3 : 0];
+  assign tensor_core_bf12_15_data_in_2 = io_dataIn_15[7 : 4];
+  assign tensor_core_bf12_15_data_in_3 = io_dataIn_15[11 : 8];
+  assign tensor_core_bf12_15_data_in_4 = io_dataIn_15[15 : 12];
+  assign tensor_core_bf12_15_data_in_5 = io_dataIn_15[19 : 16];
+  assign tensor_core_bf12_15_data_in_6 = io_dataIn_15[23 : 20];
+  assign tensor_core_bf12_15_data_in_7 = io_dataIn_15[27 : 24];
+  assign tensor_core_bf12_15_data_in_8 = io_dataIn_15[31 : 28];
+  assign tensor_core_bf12_15_data_in_9 = io_dataIn_15[35 : 32];
+  assign tensor_core_bf12_15_data_in_10 = io_dataIn_15[39 : 36];
+  assign tensor_core_bf12_15_data_in_11 = io_dataIn_15[43 : 40];
+  assign tensor_core_bf12_15_data_in_12 = io_dataIn_15[47 : 44];
+  assign tensor_core_bf12_15_data_in_13 = io_dataIn_15[51 : 48];
+  assign tensor_core_bf12_15_data_in_14 = io_dataIn_15[55 : 52];
+  assign tensor_core_bf12_15_data_in_15 = io_dataIn_15[59 : 56];
+  assign tensor_core_bf12_15_data_in_16 = io_dataIn_15[63 : 60];
+  assign tensor_core_bf12_15_data_in_17 = io_dataIn_15[67 : 64];
+  assign tensor_core_bf12_15_data_in_18 = io_dataIn_15[71 : 68];
+  assign tensor_core_bf12_15_data_in_19 = io_dataIn_15[75 : 72];
+  assign tensor_core_bf12_15_data_in_20 = io_dataIn_15[79 : 76];
+  assign tensor_core_bf12_15_load_bb_one = loadBufCtrl[0];
+  assign tensor_core_bf12_15_load_bb_two = loadBufCtrl[1];
+  assign tensor_core_bf12_16_data_in_1 = io_dataIn_16[3 : 0];
+  assign tensor_core_bf12_16_data_in_2 = io_dataIn_16[7 : 4];
+  assign tensor_core_bf12_16_data_in_3 = io_dataIn_16[11 : 8];
+  assign tensor_core_bf12_16_data_in_4 = io_dataIn_16[15 : 12];
+  assign tensor_core_bf12_16_data_in_5 = io_dataIn_16[19 : 16];
+  assign tensor_core_bf12_16_data_in_6 = io_dataIn_16[23 : 20];
+  assign tensor_core_bf12_16_data_in_7 = io_dataIn_16[27 : 24];
+  assign tensor_core_bf12_16_data_in_8 = io_dataIn_16[31 : 28];
+  assign tensor_core_bf12_16_data_in_9 = io_dataIn_16[35 : 32];
+  assign tensor_core_bf12_16_data_in_10 = io_dataIn_16[39 : 36];
+  assign tensor_core_bf12_16_data_in_11 = io_dataIn_16[43 : 40];
+  assign tensor_core_bf12_16_data_in_12 = io_dataIn_16[47 : 44];
+  assign tensor_core_bf12_16_data_in_13 = io_dataIn_16[51 : 48];
+  assign tensor_core_bf12_16_data_in_14 = io_dataIn_16[55 : 52];
+  assign tensor_core_bf12_16_data_in_15 = io_dataIn_16[59 : 56];
+  assign tensor_core_bf12_16_data_in_16 = io_dataIn_16[63 : 60];
+  assign tensor_core_bf12_16_data_in_17 = io_dataIn_16[67 : 64];
+  assign tensor_core_bf12_16_data_in_18 = io_dataIn_16[71 : 68];
+  assign tensor_core_bf12_16_data_in_19 = io_dataIn_16[75 : 72];
+  assign tensor_core_bf12_16_data_in_20 = io_dataIn_16[79 : 76];
+  assign tensor_core_bf12_16_load_bb_one = loadBufCtrl[0];
+  assign tensor_core_bf12_16_load_bb_two = loadBufCtrl[1];
+  assign tensor_core_bf12_17_data_in_1 = io_dataIn_17[3 : 0];
+  assign tensor_core_bf12_17_data_in_2 = io_dataIn_17[7 : 4];
+  assign tensor_core_bf12_17_data_in_3 = io_dataIn_17[11 : 8];
+  assign tensor_core_bf12_17_data_in_4 = io_dataIn_17[15 : 12];
+  assign tensor_core_bf12_17_data_in_5 = io_dataIn_17[19 : 16];
+  assign tensor_core_bf12_17_data_in_6 = io_dataIn_17[23 : 20];
+  assign tensor_core_bf12_17_data_in_7 = io_dataIn_17[27 : 24];
+  assign tensor_core_bf12_17_data_in_8 = io_dataIn_17[31 : 28];
+  assign tensor_core_bf12_17_data_in_9 = io_dataIn_17[35 : 32];
+  assign tensor_core_bf12_17_data_in_10 = io_dataIn_17[39 : 36];
+  assign tensor_core_bf12_17_data_in_11 = io_dataIn_17[43 : 40];
+  assign tensor_core_bf12_17_data_in_12 = io_dataIn_17[47 : 44];
+  assign tensor_core_bf12_17_data_in_13 = io_dataIn_17[51 : 48];
+  assign tensor_core_bf12_17_data_in_14 = io_dataIn_17[55 : 52];
+  assign tensor_core_bf12_17_data_in_15 = io_dataIn_17[59 : 56];
+  assign tensor_core_bf12_17_data_in_16 = io_dataIn_17[63 : 60];
+  assign tensor_core_bf12_17_data_in_17 = io_dataIn_17[67 : 64];
+  assign tensor_core_bf12_17_data_in_18 = io_dataIn_17[71 : 68];
+  assign tensor_core_bf12_17_data_in_19 = io_dataIn_17[75 : 72];
+  assign tensor_core_bf12_17_data_in_20 = io_dataIn_17[79 : 76];
+  assign tensor_core_bf12_17_load_bb_one = loadBufCtrl[0];
+  assign tensor_core_bf12_17_load_bb_two = loadBufCtrl[1];
+  assign tensor_core_bf12_18_data_in_1 = io_dataIn_18[3 : 0];
+  assign tensor_core_bf12_18_data_in_2 = io_dataIn_18[7 : 4];
+  assign tensor_core_bf12_18_data_in_3 = io_dataIn_18[11 : 8];
+  assign tensor_core_bf12_18_data_in_4 = io_dataIn_18[15 : 12];
+  assign tensor_core_bf12_18_data_in_5 = io_dataIn_18[19 : 16];
+  assign tensor_core_bf12_18_data_in_6 = io_dataIn_18[23 : 20];
+  assign tensor_core_bf12_18_data_in_7 = io_dataIn_18[27 : 24];
+  assign tensor_core_bf12_18_data_in_8 = io_dataIn_18[31 : 28];
+  assign tensor_core_bf12_18_data_in_9 = io_dataIn_18[35 : 32];
+  assign tensor_core_bf12_18_data_in_10 = io_dataIn_18[39 : 36];
+  assign tensor_core_bf12_18_data_in_11 = io_dataIn_18[43 : 40];
+  assign tensor_core_bf12_18_data_in_12 = io_dataIn_18[47 : 44];
+  assign tensor_core_bf12_18_data_in_13 = io_dataIn_18[51 : 48];
+  assign tensor_core_bf12_18_data_in_14 = io_dataIn_18[55 : 52];
+  assign tensor_core_bf12_18_data_in_15 = io_dataIn_18[59 : 56];
+  assign tensor_core_bf12_18_data_in_16 = io_dataIn_18[63 : 60];
+  assign tensor_core_bf12_18_data_in_17 = io_dataIn_18[67 : 64];
+  assign tensor_core_bf12_18_data_in_18 = io_dataIn_18[71 : 68];
+  assign tensor_core_bf12_18_data_in_19 = io_dataIn_18[75 : 72];
+  assign tensor_core_bf12_18_data_in_20 = io_dataIn_18[79 : 76];
+  assign tensor_core_bf12_18_load_bb_one = loadBufCtrl[0];
+  assign tensor_core_bf12_18_load_bb_two = loadBufCtrl[1];
+  assign tensor_core_bf12_19_data_in_1 = io_dataIn_19[3 : 0];
+  assign tensor_core_bf12_19_data_in_2 = io_dataIn_19[7 : 4];
+  assign tensor_core_bf12_19_data_in_3 = io_dataIn_19[11 : 8];
+  assign tensor_core_bf12_19_data_in_4 = io_dataIn_19[15 : 12];
+  assign tensor_core_bf12_19_data_in_5 = io_dataIn_19[19 : 16];
+  assign tensor_core_bf12_19_data_in_6 = io_dataIn_19[23 : 20];
+  assign tensor_core_bf12_19_data_in_7 = io_dataIn_19[27 : 24];
+  assign tensor_core_bf12_19_data_in_8 = io_dataIn_19[31 : 28];
+  assign tensor_core_bf12_19_data_in_9 = io_dataIn_19[35 : 32];
+  assign tensor_core_bf12_19_data_in_10 = io_dataIn_19[39 : 36];
+  assign tensor_core_bf12_19_data_in_11 = io_dataIn_19[43 : 40];
+  assign tensor_core_bf12_19_data_in_12 = io_dataIn_19[47 : 44];
+  assign tensor_core_bf12_19_data_in_13 = io_dataIn_19[51 : 48];
+  assign tensor_core_bf12_19_data_in_14 = io_dataIn_19[55 : 52];
+  assign tensor_core_bf12_19_data_in_15 = io_dataIn_19[59 : 56];
+  assign tensor_core_bf12_19_data_in_16 = io_dataIn_19[63 : 60];
+  assign tensor_core_bf12_19_data_in_17 = io_dataIn_19[67 : 64];
+  assign tensor_core_bf12_19_data_in_18 = io_dataIn_19[71 : 68];
+  assign tensor_core_bf12_19_data_in_19 = io_dataIn_19[75 : 72];
+  assign tensor_core_bf12_19_data_in_20 = io_dataIn_19[79 : 76];
+  assign tensor_core_bf12_19_load_bb_one = loadBufCtrl[0];
+  assign tensor_core_bf12_19_load_bb_two = loadBufCtrl[1];
+  assign tensor_core_bf12_20_data_in_1 = io_dataIn_20[3 : 0];
+  assign tensor_core_bf12_20_data_in_2 = io_dataIn_20[7 : 4];
+  assign tensor_core_bf12_20_data_in_3 = io_dataIn_20[11 : 8];
+  assign tensor_core_bf12_20_data_in_4 = io_dataIn_20[15 : 12];
+  assign tensor_core_bf12_20_data_in_5 = io_dataIn_20[19 : 16];
+  assign tensor_core_bf12_20_data_in_6 = io_dataIn_20[23 : 20];
+  assign tensor_core_bf12_20_data_in_7 = io_dataIn_20[27 : 24];
+  assign tensor_core_bf12_20_data_in_8 = io_dataIn_20[31 : 28];
+  assign tensor_core_bf12_20_data_in_9 = io_dataIn_20[35 : 32];
+  assign tensor_core_bf12_20_data_in_10 = io_dataIn_20[39 : 36];
+  assign tensor_core_bf12_20_data_in_11 = io_dataIn_20[43 : 40];
+  assign tensor_core_bf12_20_data_in_12 = io_dataIn_20[47 : 44];
+  assign tensor_core_bf12_20_data_in_13 = io_dataIn_20[51 : 48];
+  assign tensor_core_bf12_20_data_in_14 = io_dataIn_20[55 : 52];
+  assign tensor_core_bf12_20_data_in_15 = io_dataIn_20[59 : 56];
+  assign tensor_core_bf12_20_data_in_16 = io_dataIn_20[63 : 60];
+  assign tensor_core_bf12_20_data_in_17 = io_dataIn_20[67 : 64];
+  assign tensor_core_bf12_20_data_in_18 = io_dataIn_20[71 : 68];
+  assign tensor_core_bf12_20_data_in_19 = io_dataIn_20[75 : 72];
+  assign tensor_core_bf12_20_data_in_20 = io_dataIn_20[79 : 76];
+  assign tensor_core_bf12_20_load_bb_one = loadBufCtrl[0];
+  assign tensor_core_bf12_20_load_bb_two = loadBufCtrl[1];
+  assign tensor_core_bf12_21_data_in_1 = io_dataIn_21[3 : 0];
+  assign tensor_core_bf12_21_data_in_2 = io_dataIn_21[7 : 4];
+  assign tensor_core_bf12_21_data_in_3 = io_dataIn_21[11 : 8];
+  assign tensor_core_bf12_21_data_in_4 = io_dataIn_21[15 : 12];
+  assign tensor_core_bf12_21_data_in_5 = io_dataIn_21[19 : 16];
+  assign tensor_core_bf12_21_data_in_6 = io_dataIn_21[23 : 20];
+  assign tensor_core_bf12_21_data_in_7 = io_dataIn_21[27 : 24];
+  assign tensor_core_bf12_21_data_in_8 = io_dataIn_21[31 : 28];
+  assign tensor_core_bf12_21_data_in_9 = io_dataIn_21[35 : 32];
+  assign tensor_core_bf12_21_data_in_10 = io_dataIn_21[39 : 36];
+  assign tensor_core_bf12_21_data_in_11 = io_dataIn_21[43 : 40];
+  assign tensor_core_bf12_21_data_in_12 = io_dataIn_21[47 : 44];
+  assign tensor_core_bf12_21_data_in_13 = io_dataIn_21[51 : 48];
+  assign tensor_core_bf12_21_data_in_14 = io_dataIn_21[55 : 52];
+  assign tensor_core_bf12_21_data_in_15 = io_dataIn_21[59 : 56];
+  assign tensor_core_bf12_21_data_in_16 = io_dataIn_21[63 : 60];
+  assign tensor_core_bf12_21_data_in_17 = io_dataIn_21[67 : 64];
+  assign tensor_core_bf12_21_data_in_18 = io_dataIn_21[71 : 68];
+  assign tensor_core_bf12_21_data_in_19 = io_dataIn_21[75 : 72];
+  assign tensor_core_bf12_21_data_in_20 = io_dataIn_21[79 : 76];
+  assign tensor_core_bf12_21_load_bb_one = loadBufCtrl[0];
+  assign tensor_core_bf12_21_load_bb_two = loadBufCtrl[1];
+  assign tensor_core_bf12_22_data_in_1 = io_dataIn_22[3 : 0];
+  assign tensor_core_bf12_22_data_in_2 = io_dataIn_22[7 : 4];
+  assign tensor_core_bf12_22_data_in_3 = io_dataIn_22[11 : 8];
+  assign tensor_core_bf12_22_data_in_4 = io_dataIn_22[15 : 12];
+  assign tensor_core_bf12_22_data_in_5 = io_dataIn_22[19 : 16];
+  assign tensor_core_bf12_22_data_in_6 = io_dataIn_22[23 : 20];
+  assign tensor_core_bf12_22_data_in_7 = io_dataIn_22[27 : 24];
+  assign tensor_core_bf12_22_data_in_8 = io_dataIn_22[31 : 28];
+  assign tensor_core_bf12_22_data_in_9 = io_dataIn_22[35 : 32];
+  assign tensor_core_bf12_22_data_in_10 = io_dataIn_22[39 : 36];
+  assign tensor_core_bf12_22_data_in_11 = io_dataIn_22[43 : 40];
+  assign tensor_core_bf12_22_data_in_12 = io_dataIn_22[47 : 44];
+  assign tensor_core_bf12_22_data_in_13 = io_dataIn_22[51 : 48];
+  assign tensor_core_bf12_22_data_in_14 = io_dataIn_22[55 : 52];
+  assign tensor_core_bf12_22_data_in_15 = io_dataIn_22[59 : 56];
+  assign tensor_core_bf12_22_data_in_16 = io_dataIn_22[63 : 60];
+  assign tensor_core_bf12_22_data_in_17 = io_dataIn_22[67 : 64];
+  assign tensor_core_bf12_22_data_in_18 = io_dataIn_22[71 : 68];
+  assign tensor_core_bf12_22_data_in_19 = io_dataIn_22[75 : 72];
+  assign tensor_core_bf12_22_data_in_20 = io_dataIn_22[79 : 76];
+  assign tensor_core_bf12_22_load_bb_one = loadBufCtrl[0];
+  assign tensor_core_bf12_22_load_bb_two = loadBufCtrl[1];
+  assign tensor_core_bf12_23_data_in_1 = io_dataIn_23[3 : 0];
+  assign tensor_core_bf12_23_data_in_2 = io_dataIn_23[7 : 4];
+  assign tensor_core_bf12_23_data_in_3 = io_dataIn_23[11 : 8];
+  assign tensor_core_bf12_23_data_in_4 = io_dataIn_23[15 : 12];
+  assign tensor_core_bf12_23_data_in_5 = io_dataIn_23[19 : 16];
+  assign tensor_core_bf12_23_data_in_6 = io_dataIn_23[23 : 20];
+  assign tensor_core_bf12_23_data_in_7 = io_dataIn_23[27 : 24];
+  assign tensor_core_bf12_23_data_in_8 = io_dataIn_23[31 : 28];
+  assign tensor_core_bf12_23_data_in_9 = io_dataIn_23[35 : 32];
+  assign tensor_core_bf12_23_data_in_10 = io_dataIn_23[39 : 36];
+  assign tensor_core_bf12_23_data_in_11 = io_dataIn_23[43 : 40];
+  assign tensor_core_bf12_23_data_in_12 = io_dataIn_23[47 : 44];
+  assign tensor_core_bf12_23_data_in_13 = io_dataIn_23[51 : 48];
+  assign tensor_core_bf12_23_data_in_14 = io_dataIn_23[55 : 52];
+  assign tensor_core_bf12_23_data_in_15 = io_dataIn_23[59 : 56];
+  assign tensor_core_bf12_23_data_in_16 = io_dataIn_23[63 : 60];
+  assign tensor_core_bf12_23_data_in_17 = io_dataIn_23[67 : 64];
+  assign tensor_core_bf12_23_data_in_18 = io_dataIn_23[71 : 68];
+  assign tensor_core_bf12_23_data_in_19 = io_dataIn_23[75 : 72];
+  assign tensor_core_bf12_23_data_in_20 = io_dataIn_23[79 : 76];
+  assign tensor_core_bf12_23_load_bb_one = loadBufCtrl[0];
+  assign tensor_core_bf12_23_load_bb_two = loadBufCtrl[1];
+  assign tensor_core_bf12_24_data_in_1 = io_dataIn_24[3 : 0];
+  assign tensor_core_bf12_24_data_in_2 = io_dataIn_24[7 : 4];
+  assign tensor_core_bf12_24_data_in_3 = io_dataIn_24[11 : 8];
+  assign tensor_core_bf12_24_data_in_4 = io_dataIn_24[15 : 12];
+  assign tensor_core_bf12_24_data_in_5 = io_dataIn_24[19 : 16];
+  assign tensor_core_bf12_24_data_in_6 = io_dataIn_24[23 : 20];
+  assign tensor_core_bf12_24_data_in_7 = io_dataIn_24[27 : 24];
+  assign tensor_core_bf12_24_data_in_8 = io_dataIn_24[31 : 28];
+  assign tensor_core_bf12_24_data_in_9 = io_dataIn_24[35 : 32];
+  assign tensor_core_bf12_24_data_in_10 = io_dataIn_24[39 : 36];
+  assign tensor_core_bf12_24_data_in_11 = io_dataIn_24[43 : 40];
+  assign tensor_core_bf12_24_data_in_12 = io_dataIn_24[47 : 44];
+  assign tensor_core_bf12_24_data_in_13 = io_dataIn_24[51 : 48];
+  assign tensor_core_bf12_24_data_in_14 = io_dataIn_24[55 : 52];
+  assign tensor_core_bf12_24_data_in_15 = io_dataIn_24[59 : 56];
+  assign tensor_core_bf12_24_data_in_16 = io_dataIn_24[63 : 60];
+  assign tensor_core_bf12_24_data_in_17 = io_dataIn_24[67 : 64];
+  assign tensor_core_bf12_24_data_in_18 = io_dataIn_24[71 : 68];
+  assign tensor_core_bf12_24_data_in_19 = io_dataIn_24[75 : 72];
+  assign tensor_core_bf12_24_data_in_20 = io_dataIn_24[79 : 76];
+  assign tensor_core_bf12_24_load_bb_one = loadBufCtrl[0];
+  assign tensor_core_bf12_24_load_bb_two = loadBufCtrl[1];
+  assign tensor_core_bf12_25_data_in_1 = io_dataIn_25[3 : 0];
+  assign tensor_core_bf12_25_data_in_2 = io_dataIn_25[7 : 4];
+  assign tensor_core_bf12_25_data_in_3 = io_dataIn_25[11 : 8];
+  assign tensor_core_bf12_25_data_in_4 = io_dataIn_25[15 : 12];
+  assign tensor_core_bf12_25_data_in_5 = io_dataIn_25[19 : 16];
+  assign tensor_core_bf12_25_data_in_6 = io_dataIn_25[23 : 20];
+  assign tensor_core_bf12_25_data_in_7 = io_dataIn_25[27 : 24];
+  assign tensor_core_bf12_25_data_in_8 = io_dataIn_25[31 : 28];
+  assign tensor_core_bf12_25_data_in_9 = io_dataIn_25[35 : 32];
+  assign tensor_core_bf12_25_data_in_10 = io_dataIn_25[39 : 36];
+  assign tensor_core_bf12_25_data_in_11 = io_dataIn_25[43 : 40];
+  assign tensor_core_bf12_25_data_in_12 = io_dataIn_25[47 : 44];
+  assign tensor_core_bf12_25_data_in_13 = io_dataIn_25[51 : 48];
+  assign tensor_core_bf12_25_data_in_14 = io_dataIn_25[55 : 52];
+  assign tensor_core_bf12_25_data_in_15 = io_dataIn_25[59 : 56];
+  assign tensor_core_bf12_25_data_in_16 = io_dataIn_25[63 : 60];
+  assign tensor_core_bf12_25_data_in_17 = io_dataIn_25[67 : 64];
+  assign tensor_core_bf12_25_data_in_18 = io_dataIn_25[71 : 68];
+  assign tensor_core_bf12_25_data_in_19 = io_dataIn_25[75 : 72];
+  assign tensor_core_bf12_25_data_in_20 = io_dataIn_25[79 : 76];
+  assign tensor_core_bf12_25_load_bb_one = loadBufCtrl[0];
+  assign tensor_core_bf12_25_load_bb_two = loadBufCtrl[1];
+  assign tensor_core_bf12_26_data_in_1 = io_dataIn_26[3 : 0];
+  assign tensor_core_bf12_26_data_in_2 = io_dataIn_26[7 : 4];
+  assign tensor_core_bf12_26_data_in_3 = io_dataIn_26[11 : 8];
+  assign tensor_core_bf12_26_data_in_4 = io_dataIn_26[15 : 12];
+  assign tensor_core_bf12_26_data_in_5 = io_dataIn_26[19 : 16];
+  assign tensor_core_bf12_26_data_in_6 = io_dataIn_26[23 : 20];
+  assign tensor_core_bf12_26_data_in_7 = io_dataIn_26[27 : 24];
+  assign tensor_core_bf12_26_data_in_8 = io_dataIn_26[31 : 28];
+  assign tensor_core_bf12_26_data_in_9 = io_dataIn_26[35 : 32];
+  assign tensor_core_bf12_26_data_in_10 = io_dataIn_26[39 : 36];
+  assign tensor_core_bf12_26_data_in_11 = io_dataIn_26[43 : 40];
+  assign tensor_core_bf12_26_data_in_12 = io_dataIn_26[47 : 44];
+  assign tensor_core_bf12_26_data_in_13 = io_dataIn_26[51 : 48];
+  assign tensor_core_bf12_26_data_in_14 = io_dataIn_26[55 : 52];
+  assign tensor_core_bf12_26_data_in_15 = io_dataIn_26[59 : 56];
+  assign tensor_core_bf12_26_data_in_16 = io_dataIn_26[63 : 60];
+  assign tensor_core_bf12_26_data_in_17 = io_dataIn_26[67 : 64];
+  assign tensor_core_bf12_26_data_in_18 = io_dataIn_26[71 : 68];
+  assign tensor_core_bf12_26_data_in_19 = io_dataIn_26[75 : 72];
+  assign tensor_core_bf12_26_data_in_20 = io_dataIn_26[79 : 76];
+  assign tensor_core_bf12_26_load_bb_one = loadBufCtrl[0];
+  assign tensor_core_bf12_26_load_bb_two = loadBufCtrl[1];
+  assign tensor_core_bf12_27_data_in_1 = io_dataIn_27[3 : 0];
+  assign tensor_core_bf12_27_data_in_2 = io_dataIn_27[7 : 4];
+  assign tensor_core_bf12_27_data_in_3 = io_dataIn_27[11 : 8];
+  assign tensor_core_bf12_27_data_in_4 = io_dataIn_27[15 : 12];
+  assign tensor_core_bf12_27_data_in_5 = io_dataIn_27[19 : 16];
+  assign tensor_core_bf12_27_data_in_6 = io_dataIn_27[23 : 20];
+  assign tensor_core_bf12_27_data_in_7 = io_dataIn_27[27 : 24];
+  assign tensor_core_bf12_27_data_in_8 = io_dataIn_27[31 : 28];
+  assign tensor_core_bf12_27_data_in_9 = io_dataIn_27[35 : 32];
+  assign tensor_core_bf12_27_data_in_10 = io_dataIn_27[39 : 36];
+  assign tensor_core_bf12_27_data_in_11 = io_dataIn_27[43 : 40];
+  assign tensor_core_bf12_27_data_in_12 = io_dataIn_27[47 : 44];
+  assign tensor_core_bf12_27_data_in_13 = io_dataIn_27[51 : 48];
+  assign tensor_core_bf12_27_data_in_14 = io_dataIn_27[55 : 52];
+  assign tensor_core_bf12_27_data_in_15 = io_dataIn_27[59 : 56];
+  assign tensor_core_bf12_27_data_in_16 = io_dataIn_27[63 : 60];
+  assign tensor_core_bf12_27_data_in_17 = io_dataIn_27[67 : 64];
+  assign tensor_core_bf12_27_data_in_18 = io_dataIn_27[71 : 68];
+  assign tensor_core_bf12_27_data_in_19 = io_dataIn_27[75 : 72];
+  assign tensor_core_bf12_27_data_in_20 = io_dataIn_27[79 : 76];
+  assign tensor_core_bf12_27_load_bb_one = loadBufCtrl[0];
+  assign tensor_core_bf12_27_load_bb_two = loadBufCtrl[1];
+  assign tensor_core_bf12_28_data_in_1 = io_dataIn_28[3 : 0];
+  assign tensor_core_bf12_28_data_in_2 = io_dataIn_28[7 : 4];
+  assign tensor_core_bf12_28_data_in_3 = io_dataIn_28[11 : 8];
+  assign tensor_core_bf12_28_data_in_4 = io_dataIn_28[15 : 12];
+  assign tensor_core_bf12_28_data_in_5 = io_dataIn_28[19 : 16];
+  assign tensor_core_bf12_28_data_in_6 = io_dataIn_28[23 : 20];
+  assign tensor_core_bf12_28_data_in_7 = io_dataIn_28[27 : 24];
+  assign tensor_core_bf12_28_data_in_8 = io_dataIn_28[31 : 28];
+  assign tensor_core_bf12_28_data_in_9 = io_dataIn_28[35 : 32];
+  assign tensor_core_bf12_28_data_in_10 = io_dataIn_28[39 : 36];
+  assign tensor_core_bf12_28_data_in_11 = io_dataIn_28[43 : 40];
+  assign tensor_core_bf12_28_data_in_12 = io_dataIn_28[47 : 44];
+  assign tensor_core_bf12_28_data_in_13 = io_dataIn_28[51 : 48];
+  assign tensor_core_bf12_28_data_in_14 = io_dataIn_28[55 : 52];
+  assign tensor_core_bf12_28_data_in_15 = io_dataIn_28[59 : 56];
+  assign tensor_core_bf12_28_data_in_16 = io_dataIn_28[63 : 60];
+  assign tensor_core_bf12_28_data_in_17 = io_dataIn_28[67 : 64];
+  assign tensor_core_bf12_28_data_in_18 = io_dataIn_28[71 : 68];
+  assign tensor_core_bf12_28_data_in_19 = io_dataIn_28[75 : 72];
+  assign tensor_core_bf12_28_data_in_20 = io_dataIn_28[79 : 76];
+  assign tensor_core_bf12_28_load_bb_one = loadBufCtrl[0];
+  assign tensor_core_bf12_28_load_bb_two = loadBufCtrl[1];
+  assign tensor_core_bf12_29_data_in_1 = io_dataIn_29[3 : 0];
+  assign tensor_core_bf12_29_data_in_2 = io_dataIn_29[7 : 4];
+  assign tensor_core_bf12_29_data_in_3 = io_dataIn_29[11 : 8];
+  assign tensor_core_bf12_29_data_in_4 = io_dataIn_29[15 : 12];
+  assign tensor_core_bf12_29_data_in_5 = io_dataIn_29[19 : 16];
+  assign tensor_core_bf12_29_data_in_6 = io_dataIn_29[23 : 20];
+  assign tensor_core_bf12_29_data_in_7 = io_dataIn_29[27 : 24];
+  assign tensor_core_bf12_29_data_in_8 = io_dataIn_29[31 : 28];
+  assign tensor_core_bf12_29_data_in_9 = io_dataIn_29[35 : 32];
+  assign tensor_core_bf12_29_data_in_10 = io_dataIn_29[39 : 36];
+  assign tensor_core_bf12_29_data_in_11 = io_dataIn_29[43 : 40];
+  assign tensor_core_bf12_29_data_in_12 = io_dataIn_29[47 : 44];
+  assign tensor_core_bf12_29_data_in_13 = io_dataIn_29[51 : 48];
+  assign tensor_core_bf12_29_data_in_14 = io_dataIn_29[55 : 52];
+  assign tensor_core_bf12_29_data_in_15 = io_dataIn_29[59 : 56];
+  assign tensor_core_bf12_29_data_in_16 = io_dataIn_29[63 : 60];
+  assign tensor_core_bf12_29_data_in_17 = io_dataIn_29[67 : 64];
+  assign tensor_core_bf12_29_data_in_18 = io_dataIn_29[71 : 68];
+  assign tensor_core_bf12_29_data_in_19 = io_dataIn_29[75 : 72];
+  assign tensor_core_bf12_29_data_in_20 = io_dataIn_29[79 : 76];
+  assign tensor_core_bf12_29_load_bb_one = loadBufCtrl[0];
+  assign tensor_core_bf12_29_load_bb_two = loadBufCtrl[1];
+  assign tensor_core_bf12_30_data_in_1 = io_dataIn_30[3 : 0];
+  assign tensor_core_bf12_30_data_in_2 = io_dataIn_30[7 : 4];
+  assign tensor_core_bf12_30_data_in_3 = io_dataIn_30[11 : 8];
+  assign tensor_core_bf12_30_data_in_4 = io_dataIn_30[15 : 12];
+  assign tensor_core_bf12_30_data_in_5 = io_dataIn_30[19 : 16];
+  assign tensor_core_bf12_30_data_in_6 = io_dataIn_30[23 : 20];
+  assign tensor_core_bf12_30_data_in_7 = io_dataIn_30[27 : 24];
+  assign tensor_core_bf12_30_data_in_8 = io_dataIn_30[31 : 28];
+  assign tensor_core_bf12_30_data_in_9 = io_dataIn_30[35 : 32];
+  assign tensor_core_bf12_30_data_in_10 = io_dataIn_30[39 : 36];
+  assign tensor_core_bf12_30_data_in_11 = io_dataIn_30[43 : 40];
+  assign tensor_core_bf12_30_data_in_12 = io_dataIn_30[47 : 44];
+  assign tensor_core_bf12_30_data_in_13 = io_dataIn_30[51 : 48];
+  assign tensor_core_bf12_30_data_in_14 = io_dataIn_30[55 : 52];
+  assign tensor_core_bf12_30_data_in_15 = io_dataIn_30[59 : 56];
+  assign tensor_core_bf12_30_data_in_16 = io_dataIn_30[63 : 60];
+  assign tensor_core_bf12_30_data_in_17 = io_dataIn_30[67 : 64];
+  assign tensor_core_bf12_30_data_in_18 = io_dataIn_30[71 : 68];
+  assign tensor_core_bf12_30_data_in_19 = io_dataIn_30[75 : 72];
+  assign tensor_core_bf12_30_data_in_20 = io_dataIn_30[79 : 76];
+  assign tensor_core_bf12_30_load_bb_one = loadBufCtrl[0];
+  assign tensor_core_bf12_30_load_bb_two = loadBufCtrl[1];
+  assign tensor_core_bf12_31_data_in_1 = io_dataIn_31[3 : 0];
+  assign tensor_core_bf12_31_data_in_2 = io_dataIn_31[7 : 4];
+  assign tensor_core_bf12_31_data_in_3 = io_dataIn_31[11 : 8];
+  assign tensor_core_bf12_31_data_in_4 = io_dataIn_31[15 : 12];
+  assign tensor_core_bf12_31_data_in_5 = io_dataIn_31[19 : 16];
+  assign tensor_core_bf12_31_data_in_6 = io_dataIn_31[23 : 20];
+  assign tensor_core_bf12_31_data_in_7 = io_dataIn_31[27 : 24];
+  assign tensor_core_bf12_31_data_in_8 = io_dataIn_31[31 : 28];
+  assign tensor_core_bf12_31_data_in_9 = io_dataIn_31[35 : 32];
+  assign tensor_core_bf12_31_data_in_10 = io_dataIn_31[39 : 36];
+  assign tensor_core_bf12_31_data_in_11 = io_dataIn_31[43 : 40];
+  assign tensor_core_bf12_31_data_in_12 = io_dataIn_31[47 : 44];
+  assign tensor_core_bf12_31_data_in_13 = io_dataIn_31[51 : 48];
+  assign tensor_core_bf12_31_data_in_14 = io_dataIn_31[55 : 52];
+  assign tensor_core_bf12_31_data_in_15 = io_dataIn_31[59 : 56];
+  assign tensor_core_bf12_31_data_in_16 = io_dataIn_31[63 : 60];
+  assign tensor_core_bf12_31_data_in_17 = io_dataIn_31[67 : 64];
+  assign tensor_core_bf12_31_data_in_18 = io_dataIn_31[71 : 68];
+  assign tensor_core_bf12_31_data_in_19 = io_dataIn_31[75 : 72];
+  assign tensor_core_bf12_31_data_in_20 = io_dataIn_31[79 : 76];
+  assign tensor_core_bf12_31_load_bb_one = loadBufCtrl[0];
+  assign tensor_core_bf12_31_load_bb_two = loadBufCtrl[1];
+  assign tensor_core_bf12_32_data_in_1 = io_dataIn_32[3 : 0];
+  assign tensor_core_bf12_32_data_in_2 = io_dataIn_32[7 : 4];
+  assign tensor_core_bf12_32_data_in_3 = io_dataIn_32[11 : 8];
+  assign tensor_core_bf12_32_data_in_4 = io_dataIn_32[15 : 12];
+  assign tensor_core_bf12_32_data_in_5 = io_dataIn_32[19 : 16];
+  assign tensor_core_bf12_32_data_in_6 = io_dataIn_32[23 : 20];
+  assign tensor_core_bf12_32_data_in_7 = io_dataIn_32[27 : 24];
+  assign tensor_core_bf12_32_data_in_8 = io_dataIn_32[31 : 28];
+  assign tensor_core_bf12_32_data_in_9 = io_dataIn_32[35 : 32];
+  assign tensor_core_bf12_32_data_in_10 = io_dataIn_32[39 : 36];
+  assign tensor_core_bf12_32_data_in_11 = io_dataIn_32[43 : 40];
+  assign tensor_core_bf12_32_data_in_12 = io_dataIn_32[47 : 44];
+  assign tensor_core_bf12_32_data_in_13 = io_dataIn_32[51 : 48];
+  assign tensor_core_bf12_32_data_in_14 = io_dataIn_32[55 : 52];
+  assign tensor_core_bf12_32_data_in_15 = io_dataIn_32[59 : 56];
+  assign tensor_core_bf12_32_data_in_16 = io_dataIn_32[63 : 60];
+  assign tensor_core_bf12_32_data_in_17 = io_dataIn_32[67 : 64];
+  assign tensor_core_bf12_32_data_in_18 = io_dataIn_32[71 : 68];
+  assign tensor_core_bf12_32_data_in_19 = io_dataIn_32[75 : 72];
+  assign tensor_core_bf12_32_data_in_20 = io_dataIn_32[79 : 76];
+  assign tensor_core_bf12_32_load_bb_one = loadBufCtrl[0];
+  assign tensor_core_bf12_32_load_bb_two = loadBufCtrl[1];
+  assign tensor_core_bf12_33_data_in_1 = io_dataIn_33[3 : 0];
+  assign tensor_core_bf12_33_data_in_2 = io_dataIn_33[7 : 4];
+  assign tensor_core_bf12_33_data_in_3 = io_dataIn_33[11 : 8];
+  assign tensor_core_bf12_33_data_in_4 = io_dataIn_33[15 : 12];
+  assign tensor_core_bf12_33_data_in_5 = io_dataIn_33[19 : 16];
+  assign tensor_core_bf12_33_data_in_6 = io_dataIn_33[23 : 20];
+  assign tensor_core_bf12_33_data_in_7 = io_dataIn_33[27 : 24];
+  assign tensor_core_bf12_33_data_in_8 = io_dataIn_33[31 : 28];
+  assign tensor_core_bf12_33_data_in_9 = io_dataIn_33[35 : 32];
+  assign tensor_core_bf12_33_data_in_10 = io_dataIn_33[39 : 36];
+  assign tensor_core_bf12_33_data_in_11 = io_dataIn_33[43 : 40];
+  assign tensor_core_bf12_33_data_in_12 = io_dataIn_33[47 : 44];
+  assign tensor_core_bf12_33_data_in_13 = io_dataIn_33[51 : 48];
+  assign tensor_core_bf12_33_data_in_14 = io_dataIn_33[55 : 52];
+  assign tensor_core_bf12_33_data_in_15 = io_dataIn_33[59 : 56];
+  assign tensor_core_bf12_33_data_in_16 = io_dataIn_33[63 : 60];
+  assign tensor_core_bf12_33_data_in_17 = io_dataIn_33[67 : 64];
+  assign tensor_core_bf12_33_data_in_18 = io_dataIn_33[71 : 68];
+  assign tensor_core_bf12_33_data_in_19 = io_dataIn_33[75 : 72];
+  assign tensor_core_bf12_33_data_in_20 = io_dataIn_33[79 : 76];
+  assign tensor_core_bf12_33_load_bb_one = loadBufCtrl[0];
+  assign tensor_core_bf12_33_load_bb_two = loadBufCtrl[1];
   always @(*) begin
     resValidCounter_willIncrement = 1'b0;
     if(io_outValid) begin

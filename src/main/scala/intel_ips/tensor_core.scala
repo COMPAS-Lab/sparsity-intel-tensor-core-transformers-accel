@@ -303,3 +303,72 @@ class TensorCoreBehavioral(tc_type: TensorCoreType) extends Component{
   io.bf24_col_2 <> combinedOuts(1)
   io.bf24_col_3 <> combinedOuts(2)
 }
+
+class TensorCoreBaseInterfaceBf12 extends Bundle {
+  val clk = in Bool()
+  // data input port
+  val data_in_1, data_in_2, data_in_3, data_in_4, data_in_5,
+  data_in_6, data_in_7, data_in_8, data_in_9, data_in_10,
+  data_in_11, data_in_12, data_in_13, data_in_14, data_in_15,
+  data_in_16, data_in_17, data_in_18, data_in_19, data_in_20 = in UInt(4 bits)
+  // side in ports
+  val side_in_1, side_in_2, side_in_3, side_in_4 = in UInt(4 bits)
+  // exponent port
+  val shared_exponent_data = in UInt(8 bits)
+  // control ports
+  // feed selection: 0: select data in to buffers;
+  // 2: select load cascade in to buffers
+  val feed_sel = in UInt(2 bits)
+  // select one bank of the buffers to load
+  val load_bb_one, load_bb_two = in Bool()
+  // select one bank of the buffers as the input of DOT
+  val load_buf_sel = in Bool()
+  // cascade load chain ports
+  // output port
+  val bf24_col_1, bf24_col_2, bf24_col_3 = out UInt(24 bits)
+}
+
+class tensor_core_bf12 extends BlackBox {
+  class TensorCoreIntf extends TensorCoreBaseInterfaceBf12 {
+	  val acc_en, zero_en = in Bool()
+    val clr0, clr1 = in Bool()
+    val cascade_weight_in = in UInt(88 bits)
+    val cascade_weight_out = out UInt(88 bits)
+    val cascade_data_in_col_1, cascade_data_in_col_2, cascade_data_in_col_3 =
+      in UInt(32 bits)
+    val cascade_data_out_col_1, cascade_data_out_col_2, cascade_data_out_col_3 =
+      out UInt(32 bits)
+  }
+  val io = new TensorCoreIntf
+
+  // disable the prefix
+  noIoPrefix()
+  mapClockDomain(clock = io.clk)
+}
+
+class tensor_core_entry_bf12 extends BlackBox {
+  class TensorCoreEntryIntf extends TensorCoreBaseInterfaceBf12 {
+    val clr0, clr1 = in Bool()
+    val cascade_weight_out = out UInt(88 bits)
+    val cascade_data_out_col_1, cascade_data_out_col_2, cascade_data_out_col_3 =
+      out UInt(32 bits)
+  }
+  val io = new TensorCoreEntryIntf
+
+  noIoPrefix()
+  mapClockDomain(clock = io.clk)
+}
+
+class tensor_core_start_bf12 extends BlackBox {
+  class TensorCoreStartIntf extends TensorCoreBaseInterfaceBf12 {
+    val clr0, clr1 = in Bool()
+	  val cascade_weight_in = in UInt(88 bits)
+    val cascade_weight_out = out UInt(88 bits)
+    val cascade_data_out_col_1, cascade_data_out_col_2, cascade_data_out_col_3 =
+      out UInt(32 bits)
+  }
+  val io = new TensorCoreStartIntf
+
+  noIoPrefix()
+  mapClockDomain(clock = io.clk)
+}
