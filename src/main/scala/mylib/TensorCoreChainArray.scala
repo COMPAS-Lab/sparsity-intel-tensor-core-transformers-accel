@@ -42,8 +42,7 @@ class TensorCoreChainArray(array_col: Int, array_row: Int, chain_len: Int,
     val calEn = in Bool()
     // config ports
     val configPorts =  in (TensorCoreChainArrayConfigPorts())
-    val res_top = master Stream (UInt(output_width * 3 bits))
-    val res_bot = master Stream (UInt(output_width * 3 bits))
+    val res = Vec(master Stream (UInt(output_width * 3 bits)), array_row)
     val res_id = in UInt(16 bits)
   }
 
@@ -242,64 +241,24 @@ class TensorCoreChainArray(array_col: Int, array_row: Int, chain_len: Int,
 
   //output buffer path
   val outputBufferSelOut = Vec(Stream(UInt(output_width * 3 bits)), array_row * array_col)
-  val outputBufferSelOutDelayedTop = Vec(Stream(UInt(output_width * 3 bits)), array_row*array_col/2)
-  val outputBufferSelOutDelayedBot = Vec(Stream(UInt(output_width * 3 bits)), array_row*array_col - (array_row*array_col/2))
+  val outputBufferSelOutDelayed =
+    Vec(Vec(Stream(UInt(output_width * 3 bits)), array_col), array_row)
 
   for (r <- 0 until array_row; c <- 0 until array_col) {
     val tcChainId = r * array_col + c
     outputBufferSelOut(tcChainId).payload := tensorArray(r)(c).io.res.payload.asBits.asUInt
     outputBufferSelOut(tcChainId).valid := tensorArray(r)(c).io.res.valid
     tensorArray(r)(c).io.res.ready := outputBufferSelOut(tcChainId).ready
-    if (tcChainId < array_row * array_col / 2) {
-      outputBufferSelOutDelayedTop(tcChainId) << outputBufferSelOut(tcChainId)
-    } else {
-      outputBufferSelOutDelayedBot(
-        tcChainId - array_row * array_col / 2) << outputBufferSelOut(tcChainId)
-    }
+    outputBufferSelOutDelayed(r)(c) << outputBufferSelOut(tcChainId)
   }
 
-  // TODO: temporary factorizing the number of output ports
-  def calculatePrimeFactors(n: Int): List[Int] = {
-    def loop(p: Int, rem: Int, res: List[Int]): List[Int] =
-      if (rem % p == 0) {
-        loop(p, rem / p, res :+ p)
-      } else if (p > rem) {
-        res
-      } else {
-        loop(p + 1, rem, res)
-      }
-
-    loop(2, n, Nil)
+  // TODO: verify function of shift regs
+  val outShiftRegs = new Array[OutputShiftReg](array_row)
+  for (regIdx <- 0 until array_row) {
+    outShiftRegs(regIdx) = new OutputShiftReg(output_width * 3, array_col)
+    outShiftRegs(regIdx).io.resIn <> outputBufferSelOutDelayed(regIdx)
+    io.res(regIdx) <> outShiftRegs(regIdx).io.popOut
   }
-
-  def createMuxHierarchy(inputs: Vec[Stream[UInt]], factor: List[Int], currUsedBits: Int): Vec[Stream[UInt]] = {
-    val outStageStreams = Vec(Stream(UInt(output_width*3 bits)), inputs.length / factor(0))
-    val usedIdBits = log2Up(factor(0)) + currUsedBits
-    println("currently on " + factor(0))
-    println("used bits " + usedIdBits)
-
-    for (i <- 0 until outStageStreams.length) {
-      val currInputs = Vec(Stream(UInt(output_width*3 bits)), factor(0))
-      for (j <- 0 until factor(0)) {
-        currInputs(j) <-/< inputs(i*factor(0) + j)
-      }
-      currInputs.foreach(_.ready := False)
-      outStageStreams(i) << currInputs(io.res_id(currUsedBits+log2Up(factor(0))-1 downto currUsedBits))
-    }
-
-    if(factor.length > 1) {
-      return createMuxHierarchy(outStageStreams, factor.slice(1, factor.length), usedIdBits)
-    } else {
-      return outStageStreams
-    }
-  }
-
-  val topMuxStages = calculatePrimeFactors(array_col * array_row / 2)
-  val botMuxStages = calculatePrimeFactors(array_col * array_row - array_col * array_row / 2)
-
-  println("top factors: " + topMuxStages + " bot factors: " + botMuxStages)
-  io.res_top << createMuxHierarchy(outputBufferSelOutDelayedTop, topMuxStages, 0)(0)
-  io.res_bot << createMuxHierarchy(outputBufferSelOutDelayedBot, botMuxStages, 0)(0)
 }
 
 object TensorCoreArrayGen {

@@ -40,7 +40,7 @@ class tensor_core_array_wrapper(array_col: Int, array_row: Int, chain_len: Int,
     val load_start = in UInt(32 bits)
     val hbm_0_ready, hbm_1_ready, hbm_2_ready, hbm_3_ready, hbm_4_ready, hbm_5_ready = in Bool()
     val tcarray_in = Vec(slave(MultiPortStream(256, 32, false, true)), 4)
-    val tcarray_out = Vec(master(MultiPortStream(128, 32, true, false)), 2)
+    val tcarray_out = Vec(master(MultiPortStream(256, 32, true, false)), 5)
   }
 
   noIoPrefix()
@@ -67,7 +67,6 @@ class tensor_core_array_wrapper(array_col: Int, array_row: Int, chain_len: Int,
 
   val selectTcarrayIn, startTCarrayIn = Reg(Bool()) init False
   val selectTcarrayOut, startTCarrayOut = Reg(Bool()) init False
-  val outPopTop, outPopBot = Reg(Bool()) init False
 
   val dataIn = Vec(Flow(UInt(320 bits)), 2)
   val combinedDataIn0 = RegNext(io.tcarray_in(1).data(63 downto 0) @@ io.tcarray_in(0).data) init 0
@@ -89,8 +88,6 @@ class tensor_core_array_wrapper(array_col: Int, array_row: Int, chain_len: Int,
   val dataInRowIdx: UInt = io.in_buffer_id - (array_col - 1)
   data2TcarrayRowTop(dataInRowIdx.resize(log2Up(data2TcarrayRowTop.length))) := dataIn(0)
   data2TcarrayRowBot(dataInRowIdx.resize(log2Up(data2TcarrayRowBot.length))) := dataIn(1)
-
-  val dataOutStreamTop, dataOutStreamBot = Stream(UInt(72 bits))
 
   val tcArray = new TensorCoreChainArray(array_col = array_col, array_row = array_row,
                                       chain_len = chain_len, out_buf_delay = chain_len*3-3,
@@ -114,8 +111,6 @@ class tensor_core_array_wrapper(array_col: Int, array_row: Int, chain_len: Int,
   tcArray.io.configPorts.matAColSubGrpLen := U(mat_a_col/(chain_len * 20), 16 bits)
   tcArray.io.calEn := io.start(0).rise()
   tcArray.io.res_id := io.in_buffer_id
-  tcArray.io.res_top >> dataOutStreamTop
-  tcArray.io.res_bot >> dataOutStreamBot
 
   val rdFsm = new StateMachine {
     val rdWordCounter = Counter(mat_a_col / (chain_len * 3))
@@ -166,42 +161,38 @@ class tensor_core_array_wrapper(array_col: Int, array_row: Int, chain_len: Int,
   }
 
   //out logic
-  val wrInitCountTop = Counter(2 bits)
-  val outValidTop = tcArray.io.res_top.valid
-  dataOutStreamTop.ready := outPopTop
+  //split output rows into groups of 3
+  val OUT_GRP_SIZE = 3
+  for (g <- 0 until tcArray.io.res.size/OUT_GRP_SIZE) {
+    val wrInitCount = Counter(2 bits)
+    val outValid =
+      List.tabulate(OUT_GRP_SIZE)(i => tcArray.io.res(g*3+i).valid).reduce((a, b) => a && b)
+    val outPop = Reg(Bool()) init False
+    val dataOutStream = Stream(UInt(72*OUT_GRP_SIZE bits))
 
-  when(outValidTop.rise() && ~wrInitCountTop.willOverflowIfInc) {
-    wrInitCountTop.increment()
-  }.elsewhen(~outValidTop && wrInitCountTop.willOverflowIfInc) {
-    wrInitCountTop.clear()
+    when(outValid.rise() && ~wrInitCount.willOverflowIfInc) {
+      wrInitCount.increment()
+    }.elsewhen(outValid && wrInitCount.willOverflowIfInc) {
+      wrInitCount.clear()
+    }
+    outPop := wrInitCount.willOverflowIfInc && io.tcarray_out(g).almost_full
+    dataOutStream.valid := outValid
+    dataOutStream.payload :=
+      List.tabulate(OUT_GRP_SIZE)(i => tcArray.io.res(g*3+i).payload).reduce((a, b) => a @@ b)
+    dataOutStream.ready := outPop
+    for (i <- 0 until OUT_GRP_SIZE) (tcArray.io.res(g*3+i).ready := dataOutStream.ready)
+
+    io.tcarray_out(g).start := ~wrInitCount.willOverflowIfInc
+    io.tcarray_out(g).select := outPop && outValid
+    io.tcarray_out(g).addr := io.wr_addr
+    io.tcarray_out(g).data := dataOutStream.payload.resize(io.tcarray_out(g).data.getWidth bits)
   }
-  outPopTop := wrInitCountTop.willOverflowIfInc && io.tcarray_out(0).almost_full
-
-  val wrInitCountBot = Counter(2 bits)
-  val outValidBot = tcArray.io.res_bot.valid
-  dataOutStreamBot.ready := outPopBot
-
-  when(outValidBot.rise() && ~wrInitCountBot.willOverflowIfInc) {
-    wrInitCountBot.increment()
-  }.elsewhen(~outValidBot && wrInitCountBot.willOverflowIfInc) {
-    wrInitCountBot.clear()
-  }
-  outPopBot := wrInitCountBot.willOverflowIfInc && io.tcarray_out(1).almost_full
 
   for (elem <- io.tcarray_in) {
     elem.start := startTCarrayIn
     elem.select := selectTcarrayIn
     elem.addr := io.rd_addr
   }
-
-  io.tcarray_out(0).start := ~wrInitCountTop.willOverflowIfInc
-  io.tcarray_out(0).select := outPopTop && outValidTop
-  io.tcarray_out(0).addr := io.wr_addr
-  io.tcarray_out(0).data := dataOutStreamTop.payload.resize(128 bits)
-  io.tcarray_out(1).start := ~wrInitCountBot.willOverflowIfInc
-  io.tcarray_out(1).select := outPopBot && outValidBot
-  io.tcarray_out(1).addr := io.wr_addr
-  io.tcarray_out(1).data := dataOutStreamBot.payload.resize(128 bits)
 
   //  generate mem usage report
   val col_mem_size = tcArray.colMem.length * 3
