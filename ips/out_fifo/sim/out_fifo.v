@@ -13,7 +13,7 @@ module out_fifo (
 		output wire        empty  //            .empty
 	);
 
-	out_fifo_fifo_1910_tx5cw3y fifo_0 (
+	out_fifo_fifo_1910_pounbea fifo_0 (
 		.data  (data),  //   input,  width = 72,  fifo_input.datain
 		.wrreq (wrreq), //   input,   width = 1,            .wrreq
 		.rdreq (rdreq), //   input,   width = 1,            .rdreq

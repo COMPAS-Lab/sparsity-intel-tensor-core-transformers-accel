@@ -298,7 +298,7 @@
         <ipxact:parameter parameterId="GUI_RAM_BLOCK_TYPE" type="string">
           <ipxact:name>GUI_RAM_BLOCK_TYPE</ipxact:name>
           <ipxact:displayName>What should the memory block type be?</ipxact:displayName>
-          <ipxact:value>Auto</ipxact:value>
+          <ipxact:value>M20K</ipxact:value>
         </ipxact:parameter>
         <ipxact:parameter parameterId="GUI_Optimize" type="int">
           <ipxact:name>GUI_Optimize</ipxact:name>

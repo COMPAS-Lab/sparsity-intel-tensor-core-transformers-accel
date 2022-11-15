@@ -94,7 +94,7 @@
           </parameter>
           <parameter>
             <name>GUI_RAM_BLOCK_TYPE</name>
-            <value>Auto</value>
+            <value>M20K</value>
           </parameter>
           <parameter>
             <name>GUI_RdUsedw_width</name>
@@ -193,7 +193,7 @@
         <className>fifo</className>
         <version>19.1.0</version>
         <name>fifo_0</name>
-        <uniqueName>out_fifo_fifo_1910_tx5cw3y</uniqueName>
+        <uniqueName>out_fifo_fifo_1910_pounbea</uniqueName>
         <nonce>0</nonce>
         <incidentConnections></incidentConnections>
         <path>out_fifo.fifo_0</path>

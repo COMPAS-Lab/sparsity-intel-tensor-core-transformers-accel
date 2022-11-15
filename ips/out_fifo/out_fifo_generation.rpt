@@ -8,7 +8,7 @@ Info: out_fifo: "Transforming system: out_fifo"
 Info: out_fifo: "Naming system components in system: out_fifo"
 Info: out_fifo: "Processing generation queue"
 Info: out_fifo: "Generating: out_fifo"
-Info: out_fifo: "Generating: out_fifo_fifo_1910_tx5cw3y"
+Info: out_fifo: "Generating: out_fifo_fifo_1910_pounbea"
 Info: out_fifo: Done "out_fifo" with 2 modules, 2 files
 Info: Generating the following file(s) for MODELSIM simulator in C:/Users/tianchu.ji/Documents/MvmTensorCore/ips/out_fifo/sim/ directory:
 Info: 	common/modelsim_files.tcl
@@ -37,10 +37,7 @@ Info: out_fifo: "Transforming system: out_fifo"
 Info: out_fifo: "Naming system components in system: out_fifo"
 Info: out_fifo: "Processing generation queue"
 Info: out_fifo: "Generating: out_fifo"
-Info: out_fifo: "Generating: out_fifo_fifo_1910_tx5cw3y"
+Info: out_fifo: "Generating: out_fifo_fifo_1910_pounbea"
 Info: out_fifo: Done "out_fifo" with 2 modules, 2 files
 Info: qsys-generate succeeded.
 Info: Finished: Create HDL design files for synthesis
-Info: Starting: IP-XACT
-Info: qsys-generate C:\Users\tianchu.ji\Documents\MvmTensorCore\ips\out_fifo.ip --synthesis=VERILOG --ipxact --output-directory=C:\Users\tianchu.ji\Documents\MvmTensorCore\ips\out_fifo --family="Stratix 10" --part=1SN21BHU2F53E2VG
-Info: Finished: IP-XACT

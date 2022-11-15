@@ -15,7 +15,7 @@
 // synopsys translate_off
 `timescale 1 ps / 1 ps
 // synopsys translate_on
-module  out_fifo_fifo_1910_tx5cw3y  (
+module  out_fifo_fifo_1910_pounbea  (
     clock,
     data,
     rdreq,
@@ -57,6 +57,7 @@ module  out_fifo_fifo_1910_tx5cw3y  (
         scfifo_component.add_ram_output_register  = "ON",
         scfifo_component.enable_ecc  = "FALSE",
         scfifo_component.intended_device_family  = "Stratix 10",
+        scfifo_component.lpm_hint  = "RAM_BLOCK_TYPE=M20K",
         scfifo_component.lpm_numwords  = 128,
         scfifo_component.lpm_showahead  = "OFF",
         scfifo_component.lpm_type  = "scfifo",

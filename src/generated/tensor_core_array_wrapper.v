@@ -1,6 +1,6 @@
 // Generator : SpinalHDL v1.6.0    git head : 73c8d8e2b86b45646e9d0b2e729291f2b65e6be3
 // Component : tensor_core_array_wrapper
-// Git hash  : 56f109fcd057915b860d161c6d88a21dc582ba75
+// Git hash  : 569590912ed3bea308626a7aebac7ded08bd7e5b
 
 
 `define rdFsm_enumDefinition_binary_sequential_type [1:0]
@@ -30,6 +30,9 @@ module tensor_core_array_wrapper (
   input               hbm_3_ready,
   input               hbm_4_ready,
   input               hbm_5_ready,
+  input               hbm_6_ready,
+  input               hbm_7_ready,
+  input               hbm_8_ready,
   output              start_tcarray_in_0,
   output              select_tcarray_in_0,
   input      [255:0]  data_tcarray_in_0,

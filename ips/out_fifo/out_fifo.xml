@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <deploy
- date="2022.05.05.16:14:07"
+ date="2022.11.10.08:46:57"
  outputDirectory="C:/Users/tianchu.ji/Documents/MvmTensorCore/ips/out_fifo/">
  <perimeter>
   <parameter
@@ -75,16 +75,16 @@
   </childSourceFiles>
   <messages>
    <message level="Info" culprit="out_fifo">"Generating: out_fifo"</message>
-   <message level="Info" culprit="out_fifo">"Generating: out_fifo_fifo_1910_tx5cw3y"</message>
+   <message level="Info" culprit="out_fifo">"Generating: out_fifo_fifo_1910_pounbea"</message>
   </messages>
  </entity>
- <entity kind="fifo" version="19.1.0" name="out_fifo_fifo_1910_tx5cw3y">
+ <entity kind="fifo" version="19.1.0" name="out_fifo_fifo_1910_pounbea">
   <parameter name="GUI_Full" value="true" />
   <parameter name="GUI_RdUsedw_width" value="8" />
   <parameter name="GUI_AlmostFullThr" value="1" />
   <parameter name="GUI_AlmostEmpty" value="false" />
   <parameter name="DEVICE_FAMILY" value="Stratix 10" />
-  <parameter name="GUI_RAM_BLOCK_TYPE" value="Auto" />
+  <parameter name="GUI_RAM_BLOCK_TYPE" value="M20K" />
   <parameter name="GUI_Empty" value="true" />
   <parameter name="GUI_wsEmpty" value="false" />
   <parameter name="GUI_msb_usedw" value="false" />
@@ -124,12 +124,12 @@
   <parameter name="GUI_Width" value="72" />
   <generatedFiles>
    <file
-       path="C:\Users\tianchu.ji\Documents\MvmTensorCore\ips\out_fifo\fifo_1910\synth\out_fifo_fifo_1910_tx5cw3y.v"
+       path="C:\Users\tianchu.ji\Documents\MvmTensorCore\ips\out_fifo\fifo_1910\synth\out_fifo_fifo_1910_pounbea.v"
        attributes="" />
   </generatedFiles>
   <childGeneratedFiles>
    <file
-       path="C:\Users\tianchu.ji\Documents\MvmTensorCore\ips\out_fifo\fifo_1910\synth\out_fifo_fifo_1910_tx5cw3y.v"
+       path="C:\Users\tianchu.ji\Documents\MvmTensorCore\ips\out_fifo\fifo_1910\synth\out_fifo_fifo_1910_pounbea.v"
        attributes="" />
   </childGeneratedFiles>
   <sourceFiles>
@@ -138,7 +138,7 @@
   <childSourceFiles/>
   <instantiator instantiator="out_fifo" as="fifo_0" />
   <messages>
-   <message level="Info" culprit="out_fifo">"Generating: out_fifo_fifo_1910_tx5cw3y"</message>
+   <message level="Info" culprit="out_fifo">"Generating: out_fifo_fifo_1910_pounbea"</message>
   </messages>
  </entity>
 </deploy>

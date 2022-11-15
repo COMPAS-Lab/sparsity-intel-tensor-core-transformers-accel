@@ -38,7 +38,7 @@ class tensor_core_array_wrapper(array_col: Int, array_row: Int, chain_len: Int,
     val in_buffer_id = in UInt(16 bits)
     val rd_addr, wr_addr = in UInt(32 bits)
     val load_start = in UInt(32 bits)
-    val hbm_0_ready, hbm_1_ready, hbm_2_ready, hbm_3_ready, hbm_4_ready, hbm_5_ready = in Bool()
+    val hbm_0_ready, hbm_1_ready, hbm_2_ready, hbm_3_ready, hbm_4_ready, hbm_5_ready, hbm_6_ready, hbm_7_ready, hbm_8_ready = in Bool()
     val tcarray_in = Vec(slave(MultiPortStream(256, 32, false, true)), 4)
     val tcarray_out = Vec(master(MultiPortStream(256, 32, true, false)), 5)
   }
