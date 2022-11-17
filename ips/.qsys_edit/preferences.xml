@@ -7,5 +7,6 @@
    simulation="VERILOG"
    block_symbol_file="0"
    documentation="0"
-   clear_previous="1" />
+   clear_previous="1"
+   greybox="0" />
 </preferences>

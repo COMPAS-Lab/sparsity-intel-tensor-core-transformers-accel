@@ -12,7 +12,7 @@ class OutputShiftReg (input_bits: Int, num_inputs: Int) extends Component {
 
   val shiftRegs = Vec(RegInit(U(0, input_bits bits)), num_inputs)
   val isShifting = RegInit(False)
-  val loadedRegs = RegInit(U(0, input_bits bits))
+  val loadedRegs = RegInit(U(0, num_inputs bits))
 
   when(isShifting) {
     io.popOut.valid := True

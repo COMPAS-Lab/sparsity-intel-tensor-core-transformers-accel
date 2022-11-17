@@ -1,6 +1,6 @@
 // Generator : SpinalHDL v1.6.0    git head : 73c8d8e2b86b45646e9d0b2e729291f2b65e6be3
 // Component : tensor_core_array_wrapper
-// Git hash  : 569590912ed3bea308626a7aebac7ded08bd7e5b
+// Git hash  : bb20f282e450f08506d2a3b246745ad8042ad955
 
 
 `define rdFsm_enumDefinition_binary_sequential_type [1:0]
@@ -227089,7 +227089,7 @@ module OutputShiftReg (
   reg        [71:0]   shiftRegs_31;
   reg        [71:0]   shiftRegs_32;
   reg                 isShifting;
-  reg        [71:0]   loadedRegs;
+  reg        [32:0]   loadedRegs;
   wire                io_popOut_fire;
   wire                io_popOut_fire_1;
   wire                io_popOut_fire_2;
@@ -227599,7 +227599,7 @@ module OutputShiftReg (
   end
 
   assign io_popOut_fire_32 = (io_popOut_valid && io_popOut_ready);
-  assign when_OutputShiftReg_l42 = (loadedRegs == 72'hffffffffffffffffff);
+  assign when_OutputShiftReg_l42 = (loadedRegs == 33'h1ffffffff);
   assign io_popOut_payload = shiftRegs_32;
   always @(posedge clk) begin
     if(!clrn) begin
@@ -227637,11 +227637,11 @@ module OutputShiftReg (
       shiftRegs_31 <= 72'h0;
       shiftRegs_32 <= 72'h0;
       isShifting <= 1'b0;
-      loadedRegs <= 72'h0;
+      loadedRegs <= 33'h0;
       outCounter_value <= 6'h0;
     end else begin
       if(isShifting) begin
-        loadedRegs <= 72'h0;
+        loadedRegs <= 33'h0;
         if(io_popOut_fire) begin
           shiftRegs_1 <= shiftRegs_0;
         end
