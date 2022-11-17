@@ -38,7 +38,8 @@ class tensor_core_array_wrapper(array_col: Int, array_row: Int, chain_len: Int,
     val in_buffer_id = in UInt(16 bits)
     val rd_addr, wr_addr = in UInt(32 bits)
     val load_start = in UInt(32 bits)
-    val hbm_0_ready, hbm_1_ready, hbm_2_ready, hbm_3_ready, hbm_4_ready, hbm_5_ready, hbm_6_ready, hbm_7_ready, hbm_8_ready = in Bool()
+    val hbm_0_ready, hbm_1_ready, hbm_2_ready, hbm_3_ready, hbm_4_ready,
+          hbm_5_ready, hbm_6_ready, hbm_7_ready, hbm_8_ready = in Bool()
     val tcarray_in = Vec(slave(MultiPortStream(256, 32, false, true)), 4)
     val tcarray_out = Vec(master(MultiPortStream(256, 32, true, false)), 5)
   }
@@ -68,7 +69,7 @@ class tensor_core_array_wrapper(array_col: Int, array_row: Int, chain_len: Int,
   val selectTcarrayIn, startTCarrayIn = Reg(Bool()) init False
   val selectTcarrayOut, startTCarrayOut = Reg(Bool()) init False
 
-  val dataIn = Vec(Flow(UInt(320 bits)), 2)
+  val dataIn = Vec(Stream(UInt(320 bits)), 2)
   val combinedDataIn0 = RegNext(io.tcarray_in(1).data(63 downto 0) @@ io.tcarray_in(0).data) init 0
   val combinedDataIn1 = RegNext(io.tcarray_in(3).data(63 downto 0) @@ io.tcarray_in(2).data) init 0
   dataIn(0).payload := combinedDataIn0
@@ -76,18 +77,15 @@ class tensor_core_array_wrapper(array_col: Int, array_row: Int, chain_len: Int,
   dataIn(1).valid := RegNext(selectTcarrayIn)
   dataIn(1).payload := combinedDataIn1
 
-  val data2TcarrayCol = Vec(Flow(UInt(320 bits)), array_col)
-  val data2TcarrayRowTop = Vec(Flow(UInt(320 bits)), chain_len * array_row / 2)
-  val data2TcarrayRowBot = Vec(Flow(UInt(320 bits)), chain_len * array_row / 2)
-  data2TcarrayRowTop := data2TcarrayRowTop.getZero
-  data2TcarrayRowBot := data2TcarrayRowBot.getZero
-  data2TcarrayCol := data2TcarrayCol.getZero
+  val data2TcarrayCol = Vec(Stream(UInt(320 bits)), array_col)
+  val data2TcarrayRow = Vec(Stream(UInt(320 bits)), chain_len * array_row)
 
-  val dataInColIdx: UInt = (io.in_buffer_id & U(array_col-1)).resize(log2Up(array_col))
-  data2TcarrayCol(dataInColIdx.resize(log2Up(data2TcarrayCol.length))) := dataIn(0)
-  val dataInRowIdx: UInt = io.in_buffer_id - (array_col - 1)
-  data2TcarrayRowTop(dataInRowIdx.resize(log2Up(data2TcarrayRowTop.length))) := dataIn(0)
-  data2TcarrayRowBot(dataInRowIdx.resize(log2Up(data2TcarrayRowBot.length))) := dataIn(1)
+  val dataInColShiftRegs = new InputShiftReg(320, array_col)
+  dataInColShiftRegs.io.pushIn <> dataIn(0)
+  for (i <- 0 until array_col) (data2TcarrayCol(i) <> dataInColShiftRegs.io.dataOut(i))
+  val dataInRowShiftRegs = new InputShiftReg(320, array_row * chain_len)
+  dataInRowShiftRegs.io.pushIn <> dataIn(1)
+  for (i <- 0 until array_row*chain_len) (data2TcarrayRow(i) <> dataInRowShiftRegs.io.dataOut(i))
 
   val tcArray = new TensorCoreChainArray(array_col = array_col, array_row = array_row,
                                       chain_len = chain_len, out_buf_delay = chain_len*3-3,
@@ -95,13 +93,9 @@ class tensor_core_array_wrapper(array_col: Int, array_row: Int, chain_len: Int,
                                       output_fifo_depth = 128, output_width = 24, 
                                       inout_pipe_delay = 4)
 
-  tcArray.io.matALoad := data2TcarrayCol
+  tcArray.io.matALoad <> data2TcarrayCol
   for (rowIdx <- 0 until array_row; chainIdx <- 0 until chain_len) {
-    if ((rowIdx * chain_len + chainIdx) < (array_row * chain_len / 2)) {
-      tcArray.io.matBLoad(rowIdx)(chainIdx) := data2TcarrayRowTop(rowIdx * chain_len + chainIdx)
-    } else {
-      tcArray.io.matBLoad(rowIdx)(chainIdx) := data2TcarrayRowBot(rowIdx * chain_len + chainIdx - array_row * chain_len / 2)
-    }
+      tcArray.io.matBLoad(rowIdx)(chainIdx) <> data2TcarrayRow(rowIdx * chain_len + chainIdx)
   }
   tcArray.io.configPorts.tccColBufferCnterRange := U(
       (mat_a_row / array_col) * (mat_a_col / 20), 16 bits)

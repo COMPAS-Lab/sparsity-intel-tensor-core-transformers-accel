@@ -37,8 +37,8 @@ class TensorCoreChainArray(array_col: Int, array_row: Int, chain_len: Int,
                            output_fifo_depth: Int, output_width: Int,
                            inout_pipe_delay: Int = 5) extends Component {
   val io = new Bundle {
-    val matALoad = Vec(slave Flow (UInt(32 * 10 bits)), array_col)
-    val matBLoad = Vec(Vec(slave Flow (UInt(32 * 10 bits)), chain_len), array_row)
+    val matALoad = Vec(slave Stream (UInt(32 * 10 bits)), array_col)
+    val matBLoad = Vec(Vec(slave Stream (UInt(32 * 10 bits)), chain_len), array_row)
     val calEn = in Bool()
     // config ports
     val configPorts =  in (TensorCoreChainArrayConfigPorts())
@@ -73,7 +73,8 @@ class TensorCoreChainArray(array_col: Int, array_row: Int, chain_len: Int,
 
   //buffer write and read
   for (c <- 0 until array_col) {
-    colConverters(c).io.dataIn <> io.matALoad(c)
+    colConverters(c).io.dataIn <> io.matALoad(c).asFlow
+    io.matALoad(c).ready := True
     val colBufferWrCounter = DynaCounter(16, configDelay.tccColBufferCnterRange)
     colMem(c).io.wraddress := colBufferWrCounter.resize(colMem(c).io.wraddress.getWidth)
     colMem(c).io.data := colConverters(c).io.dataOut.payload
@@ -98,7 +99,8 @@ class TensorCoreChainArray(array_col: Int, array_row: Int, chain_len: Int,
 
       rowMem(r * chain_len + tcId).setName("rowMem_" + r + "_" + tcId)
       rowConverters(r)(tcId) = new FixedBfpConverter
-      rowConverters(r)(tcId).io.dataIn <> io.matBLoad(r)(tcId)
+      rowConverters(r)(tcId).io.dataIn <> io.matBLoad(r)(tcId).asFlow
+      io.matBLoad(r)(tcId).ready := True
       rowMem(r * chain_len + tcId).io.wraddress :=
         rowBufferWrCounter.resize(rowMem(r * chain_len + tcId).io.wraddress.getWidth)
       rowMem(r * chain_len + tcId).io.data := rowConverters(r)(tcId).io.dataOut.payload
