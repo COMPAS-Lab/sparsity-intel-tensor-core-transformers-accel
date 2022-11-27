@@ -199,7 +199,7 @@ class tensor_core_array_wrapper(array_col: Int, array_row: Int, chain_len: Int,
 object tensor_core_array_wrapper_gen {
   def main(args: Array[String]): Unit = {
     val gen = new DefaultConfig
-    val array_col = 33
+    val array_col = 20
     val array_row = 15
     val chain_len = 6
     gen.defaultSpinalConfig.generate(new tensor_core_array_wrapper(

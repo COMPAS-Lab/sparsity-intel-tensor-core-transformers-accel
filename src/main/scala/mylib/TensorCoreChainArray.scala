@@ -50,8 +50,12 @@ class TensorCoreChainArray(array_col: Int, array_row: Int, chain_len: Int,
   val calEnDelay = Delay(io.calEn, 2, init=False)
   val configDelay = Delay(io.configPorts, 2, init=TensorCoreChainArrayConfigPorts().getZero)
 
-  val rowBufferRdCounter = DynaCounter(16, configDelay.tccRowBufferCnterRange + (chain_len-1) * 2)
-  val colBufferRdCounter = DynaCounter(16, configDelay.tccColBufferCnterRange)
+  val rowBufferRdCounter = Array.fill(array_row){
+    DynaCounter(16, configDelay.tccRowBufferCnterRange + (chain_len-1) * 2)
+  }
+  val colBufferRdCounter = Array.fill(array_col){
+    DynaCounter(16, configDelay.tccColBufferCnterRange)
+  }
 
   val tensorLoadValid, tensorDataValid = Reg(Bool()) init False
   val matAColSubGrpLenReg = Reg(UInt(io.configPorts.matAColSubGrpLen.getWidth bits)) init 0
@@ -79,7 +83,7 @@ class TensorCoreChainArray(array_col: Int, array_row: Int, chain_len: Int,
     colMem(c).io.wraddress := colBufferWrCounter.resize(colMem(c).io.wraddress.getWidth)
     colMem(c).io.data := colConverters(c).io.dataOut.payload
     //TODO: fix col buffer rd addr delay timing misalignment
-    colMem(c).io.rdaddress := Delay(colBufferRdCounter.resize(colMem(c).io.rdaddress.getWidth), 2)
+    colMem(c).io.rdaddress := Delay(colBufferRdCounter(c).resize(colMem(c).io.rdaddress.getWidth), 2)
     colMem(c).setName("colMem_" + c)
 
     when(colConverters(c).io.dataOut.fire) {
@@ -106,7 +110,7 @@ class TensorCoreChainArray(array_col: Int, array_row: Int, chain_len: Int,
       rowMem(r * chain_len + tcId).io.data := rowConverters(r)(tcId).io.dataOut.payload
       //TODO: utilize row buffer to delay the inputs according to its destination tensor core
       //   in each tensor core chain
-      rowMemAddr(r)(tcId) = rowBufferRdCounter - U(2*tcId, rowBufferRdCounter.getWidth bits)
+      rowMemAddr(r)(tcId) = rowBufferRdCounter(r) - U(2*tcId, rowBufferRdCounter(r).getWidth bits)
       //TODO: fix row mem rd addr delay timing misalignment
       rowMem(r * chain_len + tcId).io.rdaddress :=
         Delay(rowMemAddr(r)(tcId).resize(rowMem(r * chain_len + tcId).io.rdaddress.getWidth), 2)
@@ -164,8 +168,8 @@ class TensorCoreChainArray(array_col: Int, array_row: Int, chain_len: Int,
     val sIdle: State = new State with EntryPoint {
       onEntry {
         matAColSubGrpLenReg := 0
-        colBufferRdCounter.clear()
-        rowBufferRdCounter.clear()
+        colBufferRdCounter.foreach(_.clear())
+        rowBufferRdCounter.foreach(_.clear())
         computeIterCounter.clear()
         resValidCounter.clear()
         tensorLoadValid := False
@@ -183,12 +187,12 @@ class TensorCoreChainArray(array_col: Int, array_row: Int, chain_len: Int,
 
     val sPreLoad: State = new State {
       onEntry {
-        colBufferRdCounter.increment()
+        colBufferRdCounter.foreach(_.increment())
         tensorLoadValid := True
         loadIterCounter.clear()
       }
       whenIsActive {
-        colBufferRdCounter.increment()
+        colBufferRdCounter.foreach(_.increment())
         when(loadRdy) {
           loadIterCounter.increment()
           goto(sCompute)
@@ -199,26 +203,26 @@ class TensorCoreChainArray(array_col: Int, array_row: Int, chain_len: Int,
     val sCompute: State = new State {
       onEntry {
         tensorDataValid := True
-        rowBufferRdCounter.increment()
+        rowBufferRdCounter.foreach(_.increment())
       }
       whenIsActive {
         when(dataInFinish === False) {
-          rowBufferRdCounter.increment()
+          rowBufferRdCounter.foreach(_.increment())
         } otherwise {
-          rowBufferRdCounter.clear()
+          rowBufferRdCounter.foreach(_.clear())
           tensorDataValid := False
         }
-        when(rowBufferRdCounter.willOverflow) {
+        when(rowBufferRdCounter(0).willOverflow) {
           dataInFinish := True
         }
 
         when(loadFinish === False) {
-          colBufferRdCounter.increment()
+          colBufferRdCounter.foreach(_.increment())
         } otherwise {
-          colBufferRdCounter.clear()
+          colBufferRdCounter.foreach(_.clear())
           tensorLoadValid := False
         }
-        when(colBufferRdCounter.willOverflow) {
+        when(colBufferRdCounter(0).willOverflow) {
           loadFinish := True
         }
 
