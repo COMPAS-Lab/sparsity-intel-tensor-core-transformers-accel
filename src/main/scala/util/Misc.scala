@@ -73,18 +73,52 @@ class StreamDelay[T <: Data](dataType: HardType[T]) extends Component {
     val outputStream = master Stream(dataType)
   }
 
-  io.outputStream <-/< io.inputStream
+  val outReg, bufferReg = Reg(dataType)
+  val outValidReg = Reg(Bool()) init False
+  val inReadyReg = Reg(Bool()) init True
+  val isBufferLoaded = Reg(Bool()) init False
+  inReadyReg := io.outputStream.ready
+
+  when(~outValidReg) {
+    outValidReg := io.inputStream.fire
+    when(io.inputStream.fire) {
+      outReg := io.inputStream.payload
+    }
+  } otherwise {
+    when (io.outputStream.fire & ~isBufferLoaded) {
+      outValidReg := io.inputStream.fire
+      outReg := io.inputStream.payload
+    } elsewhen (io.outputStream.fire & isBufferLoaded) {
+      outValidReg := True
+      outReg := bufferReg
+      when(io.inputStream.fire) {
+        bufferReg := io.inputStream.payload
+        isBufferLoaded := True
+      } otherwise {
+        isBufferLoaded := False
+      }
+    } otherwise {
+      when(io.inputStream.fire & ~isBufferLoaded) {
+        isBufferLoaded := True
+        bufferReg := io.inputStream.payload
+      }
+    }
+  }
+
+  io.outputStream.payload := outReg
+  io.inputStream.ready := inReadyReg
+  io.outputStream.valid := outValidReg
 }
 
 object StreamDelay {
   def apply[T <: Data](src: Stream[T], delayCycles: Int): Stream[T] = {
-    val streamPipe = Array.fill(delayCycles-1)(new StreamDelay(src.payloadType))
+    val streamPipe = Array.fill(delayCycles)(new StreamDelay(src.payloadType))
 
-    src >> streamPipe(0).io.inputStream
-    for (i <- 1 until delayCycles-1) {
-      streamPipe(i-1).io.outputStream >> streamPipe(i).io.inputStream
+    streamPipe(0).io.inputStream << src
+    for (i <- 1 until delayCycles) {
+      streamPipe(i - 1).io.outputStream >> streamPipe(i).io.inputStream
     }
 
-    streamPipe(delayCycles-2).io.outputStream
+    streamPipe(delayCycles-1).io.outputStream
   }
 }
