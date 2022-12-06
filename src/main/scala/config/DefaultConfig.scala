@@ -14,6 +14,7 @@ class DefaultConfig {
   var defaultSpinalConfig = SpinalConfig(
     mode = Verilog,
     targetDirectory = "./src/generated",
+    oneFilePerComponent = true,
     defaultConfigForClockDomains = defaultClockConfig
   )
 

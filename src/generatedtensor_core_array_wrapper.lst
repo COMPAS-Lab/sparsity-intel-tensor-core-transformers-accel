@@ -1,0 +1,9 @@
+./src/generated/enumdefine.v
+./src/generated/StreamFifo.v
+./src/generated/TensorCoreChainBf12.v
+./src/generated/FixedBfpConverter.v
+./src/generated/OutputShiftReg.v
+./src/generated/InputShiftReg.v
+./src/generated/InputShiftReg_1.v
+./src/generated/TensorCoreChainArray.v
+./src/generated/tensor_core_array_wrapper.v

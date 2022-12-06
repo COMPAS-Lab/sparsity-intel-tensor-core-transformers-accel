@@ -1,7 +1,6 @@
 // Generator : SpinalHDL v1.6.0    git head : 73c8d8e2b86b45646e9d0b2e729291f2b65e6be3
 // Component : FixedBfpConverter
-// Git hash  : 80996c892034c401e0fecb28659ab31014f74916
-
+// Git hash  : bc7f4dec79ebddc91db05d9976770d5512bae44e
 
 
 module FixedBfpConverter (
@@ -10,59 +9,58 @@ module FixedBfpConverter (
   output              io_dataOut_valid,
   output     [87:0]   io_dataOut_payload,
   input               clk,
-  input               resetn
+  input               clrn
 );
   wire       [7:0]    _zz__zz_resMants_0;
-  wire       [9:0]    _zz_resMants_0_1;
   wire       [9:0]    _zz_resMants_0_2;
-  wire       [8:0]    _zz_resMants_0_3;
-  wire       [9:0]    _zz_resMants_0_4;
+  wire       [9:0]    _zz_resMants_0_3;
+  wire       [8:0]    _zz_resMants_0_4;
+  wire       [9:0]    _zz_resMants_0_5;
   wire       [7:0]    _zz__zz_resMants_1;
-  wire       [9:0]    _zz_resMants_1_1;
   wire       [9:0]    _zz_resMants_1_2;
-  wire       [8:0]    _zz_resMants_1_3;
-  wire       [9:0]    _zz_resMants_1_4;
+  wire       [9:0]    _zz_resMants_1_3;
+  wire       [8:0]    _zz_resMants_1_4;
+  wire       [9:0]    _zz_resMants_1_5;
   wire       [7:0]    _zz__zz_resMants_2;
-  wire       [9:0]    _zz_resMants_2_1;
   wire       [9:0]    _zz_resMants_2_2;
-  wire       [8:0]    _zz_resMants_2_3;
-  wire       [9:0]    _zz_resMants_2_4;
+  wire       [9:0]    _zz_resMants_2_3;
+  wire       [8:0]    _zz_resMants_2_4;
+  wire       [9:0]    _zz_resMants_2_5;
   wire       [7:0]    _zz__zz_resMants_3;
-  wire       [9:0]    _zz_resMants_3_1;
   wire       [9:0]    _zz_resMants_3_2;
-  wire       [8:0]    _zz_resMants_3_3;
-  wire       [9:0]    _zz_resMants_3_4;
+  wire       [9:0]    _zz_resMants_3_3;
+  wire       [8:0]    _zz_resMants_3_4;
+  wire       [9:0]    _zz_resMants_3_5;
   wire       [7:0]    _zz__zz_resMants_4;
-  wire       [9:0]    _zz_resMants_4_1;
   wire       [9:0]    _zz_resMants_4_2;
-  wire       [8:0]    _zz_resMants_4_3;
-  wire       [9:0]    _zz_resMants_4_4;
+  wire       [9:0]    _zz_resMants_4_3;
+  wire       [8:0]    _zz_resMants_4_4;
+  wire       [9:0]    _zz_resMants_4_5;
   wire       [7:0]    _zz__zz_resMants_5;
-  wire       [9:0]    _zz_resMants_5_1;
   wire       [9:0]    _zz_resMants_5_2;
-  wire       [8:0]    _zz_resMants_5_3;
-  wire       [9:0]    _zz_resMants_5_4;
+  wire       [9:0]    _zz_resMants_5_3;
+  wire       [8:0]    _zz_resMants_5_4;
+  wire       [9:0]    _zz_resMants_5_5;
   wire       [7:0]    _zz__zz_resMants_6;
-  wire       [9:0]    _zz_resMants_6_1;
   wire       [9:0]    _zz_resMants_6_2;
-  wire       [8:0]    _zz_resMants_6_3;
-  wire       [9:0]    _zz_resMants_6_4;
+  wire       [9:0]    _zz_resMants_6_3;
+  wire       [8:0]    _zz_resMants_6_4;
+  wire       [9:0]    _zz_resMants_6_5;
   wire       [7:0]    _zz__zz_resMants_7;
-  wire       [9:0]    _zz_resMants_7_1;
   wire       [9:0]    _zz_resMants_7_2;
-  wire       [8:0]    _zz_resMants_7_3;
-  wire       [9:0]    _zz_resMants_7_4;
+  wire       [9:0]    _zz_resMants_7_3;
+  wire       [8:0]    _zz_resMants_7_4;
+  wire       [9:0]    _zz_resMants_7_5;
   wire       [7:0]    _zz__zz_resMants_8;
-  wire       [9:0]    _zz_resMants_8_1;
   wire       [9:0]    _zz_resMants_8_2;
-  wire       [8:0]    _zz_resMants_8_3;
-  wire       [9:0]    _zz_resMants_8_4;
+  wire       [9:0]    _zz_resMants_8_3;
+  wire       [8:0]    _zz_resMants_8_4;
+  wire       [9:0]    _zz_resMants_8_5;
   wire       [7:0]    _zz__zz_resMants_9;
-  wire       [9:0]    _zz_resMants_9_1;
   wire       [9:0]    _zz_resMants_9_2;
-  wire       [8:0]    _zz_resMants_9_3;
-  wire       [9:0]    _zz_resMants_9_4;
-  wire       [7:0]    _zz_resExp;
+  wire       [9:0]    _zz_resMants_9_3;
+  wire       [8:0]    _zz_resMants_9_4;
+  wire       [9:0]    _zz_resMants_9_5;
   wire       [7:0]    _zz_io_dataOut_payload;
   wire       [7:0]    _zz_io_dataOut_payload_1;
   wire                dataIn_0_signBit;
@@ -240,6 +238,66 @@ module FixedBfpConverter (
   reg                 delayedData_9_signBit;
   reg        [22:0]   delayedData_9_mantissa;
   reg        [7:0]    delayedData_9_exp;
+  reg                 delayedData_delay_1_0_signBit;
+  reg        [22:0]   delayedData_delay_1_0_mantissa;
+  reg        [7:0]    delayedData_delay_1_0_exp;
+  reg                 delayedData_delay_1_1_signBit;
+  reg        [22:0]   delayedData_delay_1_1_mantissa;
+  reg        [7:0]    delayedData_delay_1_1_exp;
+  reg                 delayedData_delay_1_2_signBit;
+  reg        [22:0]   delayedData_delay_1_2_mantissa;
+  reg        [7:0]    delayedData_delay_1_2_exp;
+  reg                 delayedData_delay_1_3_signBit;
+  reg        [22:0]   delayedData_delay_1_3_mantissa;
+  reg        [7:0]    delayedData_delay_1_3_exp;
+  reg                 delayedData_delay_1_4_signBit;
+  reg        [22:0]   delayedData_delay_1_4_mantissa;
+  reg        [7:0]    delayedData_delay_1_4_exp;
+  reg                 delayedData_delay_1_5_signBit;
+  reg        [22:0]   delayedData_delay_1_5_mantissa;
+  reg        [7:0]    delayedData_delay_1_5_exp;
+  reg                 delayedData_delay_1_6_signBit;
+  reg        [22:0]   delayedData_delay_1_6_mantissa;
+  reg        [7:0]    delayedData_delay_1_6_exp;
+  reg                 delayedData_delay_1_7_signBit;
+  reg        [22:0]   delayedData_delay_1_7_mantissa;
+  reg        [7:0]    delayedData_delay_1_7_exp;
+  reg                 delayedData_delay_1_8_signBit;
+  reg        [22:0]   delayedData_delay_1_8_mantissa;
+  reg        [7:0]    delayedData_delay_1_8_exp;
+  reg                 delayedData_delay_1_9_signBit;
+  reg        [22:0]   delayedData_delay_1_9_mantissa;
+  reg        [7:0]    delayedData_delay_1_9_exp;
+  reg                 delayedDataForResMants_0_signBit;
+  reg        [22:0]   delayedDataForResMants_0_mantissa;
+  reg        [7:0]    delayedDataForResMants_0_exp;
+  reg                 delayedDataForResMants_1_signBit;
+  reg        [22:0]   delayedDataForResMants_1_mantissa;
+  reg        [7:0]    delayedDataForResMants_1_exp;
+  reg                 delayedDataForResMants_2_signBit;
+  reg        [22:0]   delayedDataForResMants_2_mantissa;
+  reg        [7:0]    delayedDataForResMants_2_exp;
+  reg                 delayedDataForResMants_3_signBit;
+  reg        [22:0]   delayedDataForResMants_3_mantissa;
+  reg        [7:0]    delayedDataForResMants_3_exp;
+  reg                 delayedDataForResMants_4_signBit;
+  reg        [22:0]   delayedDataForResMants_4_mantissa;
+  reg        [7:0]    delayedDataForResMants_4_exp;
+  reg                 delayedDataForResMants_5_signBit;
+  reg        [22:0]   delayedDataForResMants_5_mantissa;
+  reg        [7:0]    delayedDataForResMants_5_exp;
+  reg                 delayedDataForResMants_6_signBit;
+  reg        [22:0]   delayedDataForResMants_6_mantissa;
+  reg        [7:0]    delayedDataForResMants_6_exp;
+  reg                 delayedDataForResMants_7_signBit;
+  reg        [22:0]   delayedDataForResMants_7_mantissa;
+  reg        [7:0]    delayedDataForResMants_7_exp;
+  reg                 delayedDataForResMants_8_signBit;
+  reg        [22:0]   delayedDataForResMants_8_mantissa;
+  reg        [7:0]    delayedDataForResMants_8_exp;
+  reg                 delayedDataForResMants_9_signBit;
+  reg        [22:0]   delayedDataForResMants_9_mantissa;
+  reg        [7:0]    delayedDataForResMants_9_exp;
   reg        [7:0]    resMants_0;
   reg        [7:0]    resMants_1;
   reg        [7:0]    resMants_2;
@@ -251,73 +309,86 @@ module FixedBfpConverter (
   reg        [7:0]    resMants_8;
   reg        [7:0]    resMants_9;
   reg        [7:0]    resExp;
-  wire       [8:0]    _zz_resMants_0;
-  wire       [8:0]    _zz_resMants_1;
-  wire       [8:0]    _zz_resMants_2;
-  wire       [8:0]    _zz_resMants_3;
-  wire       [8:0]    _zz_resMants_4;
-  wire       [8:0]    _zz_resMants_5;
-  wire       [8:0]    _zz_resMants_6;
-  wire       [8:0]    _zz_resMants_7;
-  wire       [8:0]    _zz_resMants_8;
-  wire       [8:0]    _zz_resMants_9;
+  reg        [8:0]    _zz_resMants_0;
+  reg        [8:0]    _zz_resMants_0_1;
+  reg        [8:0]    _zz_resMants_1;
+  reg        [8:0]    _zz_resMants_1_1;
+  reg        [8:0]    _zz_resMants_2;
+  reg        [8:0]    _zz_resMants_2_1;
+  reg        [8:0]    _zz_resMants_3;
+  reg        [8:0]    _zz_resMants_3_1;
+  reg        [8:0]    _zz_resMants_4;
+  reg        [8:0]    _zz_resMants_4_1;
+  reg        [8:0]    _zz_resMants_5;
+  reg        [8:0]    _zz_resMants_5_1;
+  reg        [8:0]    _zz_resMants_6;
+  reg        [8:0]    _zz_resMants_6_1;
+  reg        [8:0]    _zz_resMants_7;
+  reg        [8:0]    _zz_resMants_7_1;
+  reg        [8:0]    _zz_resMants_8;
+  reg        [8:0]    _zz_resMants_8_1;
+  reg        [8:0]    _zz_resMants_9;
+  reg        [8:0]    _zz_resMants_9_1;
+  reg        [7:0]    _zz_resExp;
+  reg        [7:0]    _zz_resExp_1;
   reg                 io_dataIn_valid_delay_1;
   reg                 io_dataIn_valid_delay_2;
   reg                 io_dataIn_valid_delay_3;
   reg                 io_dataIn_valid_delay_4;
   reg                 io_dataIn_valid_delay_5;
+  reg                 io_dataIn_valid_delay_6;
+  reg                 io_dataIn_valid_delay_7;
 
   assign _zz__zz_resMants_0 = (largestExp - delayedData_0_exp);
-  assign _zz_resMants_0_1 = ({1'b1,(~ _zz_resMants_0)} + _zz_resMants_0_2);
-  assign _zz_resMants_0_3 = 9'h001;
-  assign _zz_resMants_0_2 = {1'd0, _zz_resMants_0_3};
-  assign _zz_resMants_0_4 = {1'b0,_zz_resMants_0};
+  assign _zz_resMants_0_2 = ({1'b1,(~ _zz_resMants_0_1)} + _zz_resMants_0_3);
+  assign _zz_resMants_0_4 = 9'h001;
+  assign _zz_resMants_0_3 = {1'd0, _zz_resMants_0_4};
+  assign _zz_resMants_0_5 = {1'b0,_zz_resMants_0_1};
   assign _zz__zz_resMants_1 = (largestExp - delayedData_1_exp);
-  assign _zz_resMants_1_1 = ({1'b1,(~ _zz_resMants_1)} + _zz_resMants_1_2);
-  assign _zz_resMants_1_3 = 9'h001;
-  assign _zz_resMants_1_2 = {1'd0, _zz_resMants_1_3};
-  assign _zz_resMants_1_4 = {1'b0,_zz_resMants_1};
+  assign _zz_resMants_1_2 = ({1'b1,(~ _zz_resMants_1_1)} + _zz_resMants_1_3);
+  assign _zz_resMants_1_4 = 9'h001;
+  assign _zz_resMants_1_3 = {1'd0, _zz_resMants_1_4};
+  assign _zz_resMants_1_5 = {1'b0,_zz_resMants_1_1};
   assign _zz__zz_resMants_2 = (largestExp - delayedData_2_exp);
-  assign _zz_resMants_2_1 = ({1'b1,(~ _zz_resMants_2)} + _zz_resMants_2_2);
-  assign _zz_resMants_2_3 = 9'h001;
-  assign _zz_resMants_2_2 = {1'd0, _zz_resMants_2_3};
-  assign _zz_resMants_2_4 = {1'b0,_zz_resMants_2};
+  assign _zz_resMants_2_2 = ({1'b1,(~ _zz_resMants_2_1)} + _zz_resMants_2_3);
+  assign _zz_resMants_2_4 = 9'h001;
+  assign _zz_resMants_2_3 = {1'd0, _zz_resMants_2_4};
+  assign _zz_resMants_2_5 = {1'b0,_zz_resMants_2_1};
   assign _zz__zz_resMants_3 = (largestExp - delayedData_3_exp);
-  assign _zz_resMants_3_1 = ({1'b1,(~ _zz_resMants_3)} + _zz_resMants_3_2);
-  assign _zz_resMants_3_3 = 9'h001;
-  assign _zz_resMants_3_2 = {1'd0, _zz_resMants_3_3};
-  assign _zz_resMants_3_4 = {1'b0,_zz_resMants_3};
+  assign _zz_resMants_3_2 = ({1'b1,(~ _zz_resMants_3_1)} + _zz_resMants_3_3);
+  assign _zz_resMants_3_4 = 9'h001;
+  assign _zz_resMants_3_3 = {1'd0, _zz_resMants_3_4};
+  assign _zz_resMants_3_5 = {1'b0,_zz_resMants_3_1};
   assign _zz__zz_resMants_4 = (largestExp - delayedData_4_exp);
-  assign _zz_resMants_4_1 = ({1'b1,(~ _zz_resMants_4)} + _zz_resMants_4_2);
-  assign _zz_resMants_4_3 = 9'h001;
-  assign _zz_resMants_4_2 = {1'd0, _zz_resMants_4_3};
-  assign _zz_resMants_4_4 = {1'b0,_zz_resMants_4};
+  assign _zz_resMants_4_2 = ({1'b1,(~ _zz_resMants_4_1)} + _zz_resMants_4_3);
+  assign _zz_resMants_4_4 = 9'h001;
+  assign _zz_resMants_4_3 = {1'd0, _zz_resMants_4_4};
+  assign _zz_resMants_4_5 = {1'b0,_zz_resMants_4_1};
   assign _zz__zz_resMants_5 = (largestExp - delayedData_5_exp);
-  assign _zz_resMants_5_1 = ({1'b1,(~ _zz_resMants_5)} + _zz_resMants_5_2);
-  assign _zz_resMants_5_3 = 9'h001;
-  assign _zz_resMants_5_2 = {1'd0, _zz_resMants_5_3};
-  assign _zz_resMants_5_4 = {1'b0,_zz_resMants_5};
+  assign _zz_resMants_5_2 = ({1'b1,(~ _zz_resMants_5_1)} + _zz_resMants_5_3);
+  assign _zz_resMants_5_4 = 9'h001;
+  assign _zz_resMants_5_3 = {1'd0, _zz_resMants_5_4};
+  assign _zz_resMants_5_5 = {1'b0,_zz_resMants_5_1};
   assign _zz__zz_resMants_6 = (largestExp - delayedData_6_exp);
-  assign _zz_resMants_6_1 = ({1'b1,(~ _zz_resMants_6)} + _zz_resMants_6_2);
-  assign _zz_resMants_6_3 = 9'h001;
-  assign _zz_resMants_6_2 = {1'd0, _zz_resMants_6_3};
-  assign _zz_resMants_6_4 = {1'b0,_zz_resMants_6};
+  assign _zz_resMants_6_2 = ({1'b1,(~ _zz_resMants_6_1)} + _zz_resMants_6_3);
+  assign _zz_resMants_6_4 = 9'h001;
+  assign _zz_resMants_6_3 = {1'd0, _zz_resMants_6_4};
+  assign _zz_resMants_6_5 = {1'b0,_zz_resMants_6_1};
   assign _zz__zz_resMants_7 = (largestExp - delayedData_7_exp);
-  assign _zz_resMants_7_1 = ({1'b1,(~ _zz_resMants_7)} + _zz_resMants_7_2);
-  assign _zz_resMants_7_3 = 9'h001;
-  assign _zz_resMants_7_2 = {1'd0, _zz_resMants_7_3};
-  assign _zz_resMants_7_4 = {1'b0,_zz_resMants_7};
+  assign _zz_resMants_7_2 = ({1'b1,(~ _zz_resMants_7_1)} + _zz_resMants_7_3);
+  assign _zz_resMants_7_4 = 9'h001;
+  assign _zz_resMants_7_3 = {1'd0, _zz_resMants_7_4};
+  assign _zz_resMants_7_5 = {1'b0,_zz_resMants_7_1};
   assign _zz__zz_resMants_8 = (largestExp - delayedData_8_exp);
-  assign _zz_resMants_8_1 = ({1'b1,(~ _zz_resMants_8)} + _zz_resMants_8_2);
-  assign _zz_resMants_8_3 = 9'h001;
-  assign _zz_resMants_8_2 = {1'd0, _zz_resMants_8_3};
-  assign _zz_resMants_8_4 = {1'b0,_zz_resMants_8};
+  assign _zz_resMants_8_2 = ({1'b1,(~ _zz_resMants_8_1)} + _zz_resMants_8_3);
+  assign _zz_resMants_8_4 = 9'h001;
+  assign _zz_resMants_8_3 = {1'd0, _zz_resMants_8_4};
+  assign _zz_resMants_8_5 = {1'b0,_zz_resMants_8_1};
   assign _zz__zz_resMants_9 = (largestExp - delayedData_9_exp);
-  assign _zz_resMants_9_1 = ({1'b1,(~ _zz_resMants_9)} + _zz_resMants_9_2);
-  assign _zz_resMants_9_3 = 9'h001;
-  assign _zz_resMants_9_2 = {1'd0, _zz_resMants_9_3};
-  assign _zz_resMants_9_4 = {1'b0,_zz_resMants_9};
-  assign _zz_resExp = (largestExp + 8'h7f);
+  assign _zz_resMants_9_2 = ({1'b1,(~ _zz_resMants_9_1)} + _zz_resMants_9_3);
+  assign _zz_resMants_9_4 = 9'h001;
+  assign _zz_resMants_9_3 = {1'd0, _zz_resMants_9_4};
+  assign _zz_resMants_9_5 = {1'b0,_zz_resMants_9_1};
   assign _zz_io_dataOut_payload = resMants_1;
   assign _zz_io_dataOut_payload_1 = resMants_0;
   assign dataVec_0 = io_dataIn_payload[31 : 0];
@@ -364,18 +435,8 @@ module FixedBfpConverter (
   assign voidData_signBit = 1'b0;
   assign voidData_mantissa = 23'h0;
   assign voidData_exp = 8'h0;
-  assign _zz_resMants_0 = ({1'b1,delayedData_0_mantissa[22 : 15]} >>> _zz__zz_resMants_0);
-  assign _zz_resMants_1 = ({1'b1,delayedData_1_mantissa[22 : 15]} >>> _zz__zz_resMants_1);
-  assign _zz_resMants_2 = ({1'b1,delayedData_2_mantissa[22 : 15]} >>> _zz__zz_resMants_2);
-  assign _zz_resMants_3 = ({1'b1,delayedData_3_mantissa[22 : 15]} >>> _zz__zz_resMants_3);
-  assign _zz_resMants_4 = ({1'b1,delayedData_4_mantissa[22 : 15]} >>> _zz__zz_resMants_4);
-  assign _zz_resMants_5 = ({1'b1,delayedData_5_mantissa[22 : 15]} >>> _zz__zz_resMants_5);
-  assign _zz_resMants_6 = ({1'b1,delayedData_6_mantissa[22 : 15]} >>> _zz__zz_resMants_6);
-  assign _zz_resMants_7 = ({1'b1,delayedData_7_mantissa[22 : 15]} >>> _zz__zz_resMants_7);
-  assign _zz_resMants_8 = ({1'b1,delayedData_8_mantissa[22 : 15]} >>> _zz__zz_resMants_8);
-  assign _zz_resMants_9 = ({1'b1,delayedData_9_mantissa[22 : 15]} >>> _zz__zz_resMants_9);
   assign io_dataOut_payload = {{resMants_9,{resMants_8,{resMants_7,{resMants_6,{resMants_5,{resMants_4,{resMants_3,{resMants_2,{_zz_io_dataOut_payload,_zz_io_dataOut_payload_1}}}}}}}}},resExp};
-  assign io_dataOut_valid = io_dataIn_valid_delay_5;
+  assign io_dataOut_valid = io_dataIn_valid_delay_7;
   always @(posedge clk) begin
     _zz_exceptionalCompRes <= ((dataIn_9_exp <= dataIn_8_exp) ? dataIn_8_exp : dataIn_9_exp);
     _zz_exceptionalCompRes_1 <= _zz_exceptionalCompRes;
@@ -383,10 +444,12 @@ module FixedBfpConverter (
     io_dataIn_valid_delay_2 <= io_dataIn_valid_delay_1;
     io_dataIn_valid_delay_3 <= io_dataIn_valid_delay_2;
     io_dataIn_valid_delay_4 <= io_dataIn_valid_delay_3;
+    io_dataIn_valid_delay_5 <= io_dataIn_valid_delay_4;
+    io_dataIn_valid_delay_6 <= io_dataIn_valid_delay_5;
   end
 
-  always @(posedge clk or negedge resetn) begin
-    if(!resetn) begin
+  always @(posedge clk) begin
+    if(!clrn) begin
       _zz_exceptionalCompRes_2 <= 8'h0;
       intermediateCompRes_0 <= 8'h0;
       intermediateCompRes_1 <= 8'h0;
@@ -516,6 +579,66 @@ module FixedBfpConverter (
       delayedData_9_signBit <= voidData_signBit;
       delayedData_9_mantissa <= voidData_mantissa;
       delayedData_9_exp <= voidData_exp;
+      delayedData_delay_1_0_signBit <= voidData_signBit;
+      delayedData_delay_1_0_mantissa <= voidData_mantissa;
+      delayedData_delay_1_0_exp <= voidData_exp;
+      delayedData_delay_1_1_signBit <= voidData_signBit;
+      delayedData_delay_1_1_mantissa <= voidData_mantissa;
+      delayedData_delay_1_1_exp <= voidData_exp;
+      delayedData_delay_1_2_signBit <= voidData_signBit;
+      delayedData_delay_1_2_mantissa <= voidData_mantissa;
+      delayedData_delay_1_2_exp <= voidData_exp;
+      delayedData_delay_1_3_signBit <= voidData_signBit;
+      delayedData_delay_1_3_mantissa <= voidData_mantissa;
+      delayedData_delay_1_3_exp <= voidData_exp;
+      delayedData_delay_1_4_signBit <= voidData_signBit;
+      delayedData_delay_1_4_mantissa <= voidData_mantissa;
+      delayedData_delay_1_4_exp <= voidData_exp;
+      delayedData_delay_1_5_signBit <= voidData_signBit;
+      delayedData_delay_1_5_mantissa <= voidData_mantissa;
+      delayedData_delay_1_5_exp <= voidData_exp;
+      delayedData_delay_1_6_signBit <= voidData_signBit;
+      delayedData_delay_1_6_mantissa <= voidData_mantissa;
+      delayedData_delay_1_6_exp <= voidData_exp;
+      delayedData_delay_1_7_signBit <= voidData_signBit;
+      delayedData_delay_1_7_mantissa <= voidData_mantissa;
+      delayedData_delay_1_7_exp <= voidData_exp;
+      delayedData_delay_1_8_signBit <= voidData_signBit;
+      delayedData_delay_1_8_mantissa <= voidData_mantissa;
+      delayedData_delay_1_8_exp <= voidData_exp;
+      delayedData_delay_1_9_signBit <= voidData_signBit;
+      delayedData_delay_1_9_mantissa <= voidData_mantissa;
+      delayedData_delay_1_9_exp <= voidData_exp;
+      delayedDataForResMants_0_signBit <= voidData_signBit;
+      delayedDataForResMants_0_mantissa <= voidData_mantissa;
+      delayedDataForResMants_0_exp <= voidData_exp;
+      delayedDataForResMants_1_signBit <= voidData_signBit;
+      delayedDataForResMants_1_mantissa <= voidData_mantissa;
+      delayedDataForResMants_1_exp <= voidData_exp;
+      delayedDataForResMants_2_signBit <= voidData_signBit;
+      delayedDataForResMants_2_mantissa <= voidData_mantissa;
+      delayedDataForResMants_2_exp <= voidData_exp;
+      delayedDataForResMants_3_signBit <= voidData_signBit;
+      delayedDataForResMants_3_mantissa <= voidData_mantissa;
+      delayedDataForResMants_3_exp <= voidData_exp;
+      delayedDataForResMants_4_signBit <= voidData_signBit;
+      delayedDataForResMants_4_mantissa <= voidData_mantissa;
+      delayedDataForResMants_4_exp <= voidData_exp;
+      delayedDataForResMants_5_signBit <= voidData_signBit;
+      delayedDataForResMants_5_mantissa <= voidData_mantissa;
+      delayedDataForResMants_5_exp <= voidData_exp;
+      delayedDataForResMants_6_signBit <= voidData_signBit;
+      delayedDataForResMants_6_mantissa <= voidData_mantissa;
+      delayedDataForResMants_6_exp <= voidData_exp;
+      delayedDataForResMants_7_signBit <= voidData_signBit;
+      delayedDataForResMants_7_mantissa <= voidData_mantissa;
+      delayedDataForResMants_7_exp <= voidData_exp;
+      delayedDataForResMants_8_signBit <= voidData_signBit;
+      delayedDataForResMants_8_mantissa <= voidData_mantissa;
+      delayedDataForResMants_8_exp <= voidData_exp;
+      delayedDataForResMants_9_signBit <= voidData_signBit;
+      delayedDataForResMants_9_mantissa <= voidData_mantissa;
+      delayedDataForResMants_9_exp <= voidData_exp;
       resMants_0 <= 8'h0;
       resMants_1 <= 8'h0;
       resMants_2 <= 8'h0;
@@ -527,7 +650,29 @@ module FixedBfpConverter (
       resMants_8 <= 8'h0;
       resMants_9 <= 8'h0;
       resExp <= 8'h0;
-      io_dataIn_valid_delay_5 <= 1'b0;
+      _zz_resMants_0 <= 9'h0;
+      _zz_resMants_0_1 <= 9'h0;
+      _zz_resMants_1 <= 9'h0;
+      _zz_resMants_1_1 <= 9'h0;
+      _zz_resMants_2 <= 9'h0;
+      _zz_resMants_2_1 <= 9'h0;
+      _zz_resMants_3 <= 9'h0;
+      _zz_resMants_3_1 <= 9'h0;
+      _zz_resMants_4 <= 9'h0;
+      _zz_resMants_4_1 <= 9'h0;
+      _zz_resMants_5 <= 9'h0;
+      _zz_resMants_5_1 <= 9'h0;
+      _zz_resMants_6 <= 9'h0;
+      _zz_resMants_6_1 <= 9'h0;
+      _zz_resMants_7 <= 9'h0;
+      _zz_resMants_7_1 <= 9'h0;
+      _zz_resMants_8 <= 9'h0;
+      _zz_resMants_8_1 <= 9'h0;
+      _zz_resMants_9 <= 9'h0;
+      _zz_resMants_9_1 <= 9'h0;
+      _zz_resExp <= 8'h0;
+      _zz_resExp_1 <= 8'h0;
+      io_dataIn_valid_delay_7 <= 1'b0;
     end else begin
       _zz_exceptionalCompRes_2 <= _zz_exceptionalCompRes_1;
       intermediateCompRes_0 <= ((dataIn_1_exp <= dataIn_0_exp) ? dataIn_0_exp : dataIn_1_exp);
@@ -658,58 +803,140 @@ module FixedBfpConverter (
       delayedData_9_signBit <= dataIn_delay_3_9_signBit;
       delayedData_9_mantissa <= dataIn_delay_3_9_mantissa;
       delayedData_9_exp <= dataIn_delay_3_9_exp;
-      if(delayedData_0_signBit) begin
-        resMants_0 <= _zz_resMants_0_1[9 : 2];
+      delayedData_delay_1_0_signBit <= delayedData_0_signBit;
+      delayedData_delay_1_0_mantissa <= delayedData_0_mantissa;
+      delayedData_delay_1_0_exp <= delayedData_0_exp;
+      delayedData_delay_1_1_signBit <= delayedData_1_signBit;
+      delayedData_delay_1_1_mantissa <= delayedData_1_mantissa;
+      delayedData_delay_1_1_exp <= delayedData_1_exp;
+      delayedData_delay_1_2_signBit <= delayedData_2_signBit;
+      delayedData_delay_1_2_mantissa <= delayedData_2_mantissa;
+      delayedData_delay_1_2_exp <= delayedData_2_exp;
+      delayedData_delay_1_3_signBit <= delayedData_3_signBit;
+      delayedData_delay_1_3_mantissa <= delayedData_3_mantissa;
+      delayedData_delay_1_3_exp <= delayedData_3_exp;
+      delayedData_delay_1_4_signBit <= delayedData_4_signBit;
+      delayedData_delay_1_4_mantissa <= delayedData_4_mantissa;
+      delayedData_delay_1_4_exp <= delayedData_4_exp;
+      delayedData_delay_1_5_signBit <= delayedData_5_signBit;
+      delayedData_delay_1_5_mantissa <= delayedData_5_mantissa;
+      delayedData_delay_1_5_exp <= delayedData_5_exp;
+      delayedData_delay_1_6_signBit <= delayedData_6_signBit;
+      delayedData_delay_1_6_mantissa <= delayedData_6_mantissa;
+      delayedData_delay_1_6_exp <= delayedData_6_exp;
+      delayedData_delay_1_7_signBit <= delayedData_7_signBit;
+      delayedData_delay_1_7_mantissa <= delayedData_7_mantissa;
+      delayedData_delay_1_7_exp <= delayedData_7_exp;
+      delayedData_delay_1_8_signBit <= delayedData_8_signBit;
+      delayedData_delay_1_8_mantissa <= delayedData_8_mantissa;
+      delayedData_delay_1_8_exp <= delayedData_8_exp;
+      delayedData_delay_1_9_signBit <= delayedData_9_signBit;
+      delayedData_delay_1_9_mantissa <= delayedData_9_mantissa;
+      delayedData_delay_1_9_exp <= delayedData_9_exp;
+      delayedDataForResMants_0_signBit <= delayedData_delay_1_0_signBit;
+      delayedDataForResMants_0_mantissa <= delayedData_delay_1_0_mantissa;
+      delayedDataForResMants_0_exp <= delayedData_delay_1_0_exp;
+      delayedDataForResMants_1_signBit <= delayedData_delay_1_1_signBit;
+      delayedDataForResMants_1_mantissa <= delayedData_delay_1_1_mantissa;
+      delayedDataForResMants_1_exp <= delayedData_delay_1_1_exp;
+      delayedDataForResMants_2_signBit <= delayedData_delay_1_2_signBit;
+      delayedDataForResMants_2_mantissa <= delayedData_delay_1_2_mantissa;
+      delayedDataForResMants_2_exp <= delayedData_delay_1_2_exp;
+      delayedDataForResMants_3_signBit <= delayedData_delay_1_3_signBit;
+      delayedDataForResMants_3_mantissa <= delayedData_delay_1_3_mantissa;
+      delayedDataForResMants_3_exp <= delayedData_delay_1_3_exp;
+      delayedDataForResMants_4_signBit <= delayedData_delay_1_4_signBit;
+      delayedDataForResMants_4_mantissa <= delayedData_delay_1_4_mantissa;
+      delayedDataForResMants_4_exp <= delayedData_delay_1_4_exp;
+      delayedDataForResMants_5_signBit <= delayedData_delay_1_5_signBit;
+      delayedDataForResMants_5_mantissa <= delayedData_delay_1_5_mantissa;
+      delayedDataForResMants_5_exp <= delayedData_delay_1_5_exp;
+      delayedDataForResMants_6_signBit <= delayedData_delay_1_6_signBit;
+      delayedDataForResMants_6_mantissa <= delayedData_delay_1_6_mantissa;
+      delayedDataForResMants_6_exp <= delayedData_delay_1_6_exp;
+      delayedDataForResMants_7_signBit <= delayedData_delay_1_7_signBit;
+      delayedDataForResMants_7_mantissa <= delayedData_delay_1_7_mantissa;
+      delayedDataForResMants_7_exp <= delayedData_delay_1_7_exp;
+      delayedDataForResMants_8_signBit <= delayedData_delay_1_8_signBit;
+      delayedDataForResMants_8_mantissa <= delayedData_delay_1_8_mantissa;
+      delayedDataForResMants_8_exp <= delayedData_delay_1_8_exp;
+      delayedDataForResMants_9_signBit <= delayedData_delay_1_9_signBit;
+      delayedDataForResMants_9_mantissa <= delayedData_delay_1_9_mantissa;
+      delayedDataForResMants_9_exp <= delayedData_delay_1_9_exp;
+      _zz_resMants_0 <= (((((delayedData_0_signBit == voidData_signBit) && (delayedData_0_mantissa == voidData_mantissa)) && (delayedData_0_exp == voidData_exp)) ? 9'h0 : {1'b1,delayedData_0_mantissa[22 : 15]}) >>> _zz__zz_resMants_0);
+      _zz_resMants_0_1 <= _zz_resMants_0;
+      if(delayedDataForResMants_0_signBit) begin
+        resMants_0 <= _zz_resMants_0_2[9 : 2];
       end else begin
-        resMants_0 <= _zz_resMants_0_4[9 : 2];
+        resMants_0 <= _zz_resMants_0_5[9 : 2];
       end
-      if(delayedData_1_signBit) begin
-        resMants_1 <= _zz_resMants_1_1[9 : 2];
+      _zz_resMants_1 <= (((((delayedData_1_signBit == voidData_signBit) && (delayedData_1_mantissa == voidData_mantissa)) && (delayedData_1_exp == voidData_exp)) ? 9'h0 : {1'b1,delayedData_1_mantissa[22 : 15]}) >>> _zz__zz_resMants_1);
+      _zz_resMants_1_1 <= _zz_resMants_1;
+      if(delayedDataForResMants_1_signBit) begin
+        resMants_1 <= _zz_resMants_1_2[9 : 2];
       end else begin
-        resMants_1 <= _zz_resMants_1_4[9 : 2];
+        resMants_1 <= _zz_resMants_1_5[9 : 2];
       end
-      if(delayedData_2_signBit) begin
-        resMants_2 <= _zz_resMants_2_1[9 : 2];
+      _zz_resMants_2 <= (((((delayedData_2_signBit == voidData_signBit) && (delayedData_2_mantissa == voidData_mantissa)) && (delayedData_2_exp == voidData_exp)) ? 9'h0 : {1'b1,delayedData_2_mantissa[22 : 15]}) >>> _zz__zz_resMants_2);
+      _zz_resMants_2_1 <= _zz_resMants_2;
+      if(delayedDataForResMants_2_signBit) begin
+        resMants_2 <= _zz_resMants_2_2[9 : 2];
       end else begin
-        resMants_2 <= _zz_resMants_2_4[9 : 2];
+        resMants_2 <= _zz_resMants_2_5[9 : 2];
       end
-      if(delayedData_3_signBit) begin
-        resMants_3 <= _zz_resMants_3_1[9 : 2];
+      _zz_resMants_3 <= (((((delayedData_3_signBit == voidData_signBit) && (delayedData_3_mantissa == voidData_mantissa)) && (delayedData_3_exp == voidData_exp)) ? 9'h0 : {1'b1,delayedData_3_mantissa[22 : 15]}) >>> _zz__zz_resMants_3);
+      _zz_resMants_3_1 <= _zz_resMants_3;
+      if(delayedDataForResMants_3_signBit) begin
+        resMants_3 <= _zz_resMants_3_2[9 : 2];
       end else begin
-        resMants_3 <= _zz_resMants_3_4[9 : 2];
+        resMants_3 <= _zz_resMants_3_5[9 : 2];
       end
-      if(delayedData_4_signBit) begin
-        resMants_4 <= _zz_resMants_4_1[9 : 2];
+      _zz_resMants_4 <= (((((delayedData_4_signBit == voidData_signBit) && (delayedData_4_mantissa == voidData_mantissa)) && (delayedData_4_exp == voidData_exp)) ? 9'h0 : {1'b1,delayedData_4_mantissa[22 : 15]}) >>> _zz__zz_resMants_4);
+      _zz_resMants_4_1 <= _zz_resMants_4;
+      if(delayedDataForResMants_4_signBit) begin
+        resMants_4 <= _zz_resMants_4_2[9 : 2];
       end else begin
-        resMants_4 <= _zz_resMants_4_4[9 : 2];
+        resMants_4 <= _zz_resMants_4_5[9 : 2];
       end
-      if(delayedData_5_signBit) begin
-        resMants_5 <= _zz_resMants_5_1[9 : 2];
+      _zz_resMants_5 <= (((((delayedData_5_signBit == voidData_signBit) && (delayedData_5_mantissa == voidData_mantissa)) && (delayedData_5_exp == voidData_exp)) ? 9'h0 : {1'b1,delayedData_5_mantissa[22 : 15]}) >>> _zz__zz_resMants_5);
+      _zz_resMants_5_1 <= _zz_resMants_5;
+      if(delayedDataForResMants_5_signBit) begin
+        resMants_5 <= _zz_resMants_5_2[9 : 2];
       end else begin
-        resMants_5 <= _zz_resMants_5_4[9 : 2];
+        resMants_5 <= _zz_resMants_5_5[9 : 2];
       end
-      if(delayedData_6_signBit) begin
-        resMants_6 <= _zz_resMants_6_1[9 : 2];
+      _zz_resMants_6 <= (((((delayedData_6_signBit == voidData_signBit) && (delayedData_6_mantissa == voidData_mantissa)) && (delayedData_6_exp == voidData_exp)) ? 9'h0 : {1'b1,delayedData_6_mantissa[22 : 15]}) >>> _zz__zz_resMants_6);
+      _zz_resMants_6_1 <= _zz_resMants_6;
+      if(delayedDataForResMants_6_signBit) begin
+        resMants_6 <= _zz_resMants_6_2[9 : 2];
       end else begin
-        resMants_6 <= _zz_resMants_6_4[9 : 2];
+        resMants_6 <= _zz_resMants_6_5[9 : 2];
       end
-      if(delayedData_7_signBit) begin
-        resMants_7 <= _zz_resMants_7_1[9 : 2];
+      _zz_resMants_7 <= (((((delayedData_7_signBit == voidData_signBit) && (delayedData_7_mantissa == voidData_mantissa)) && (delayedData_7_exp == voidData_exp)) ? 9'h0 : {1'b1,delayedData_7_mantissa[22 : 15]}) >>> _zz__zz_resMants_7);
+      _zz_resMants_7_1 <= _zz_resMants_7;
+      if(delayedDataForResMants_7_signBit) begin
+        resMants_7 <= _zz_resMants_7_2[9 : 2];
       end else begin
-        resMants_7 <= _zz_resMants_7_4[9 : 2];
+        resMants_7 <= _zz_resMants_7_5[9 : 2];
       end
-      if(delayedData_8_signBit) begin
-        resMants_8 <= _zz_resMants_8_1[9 : 2];
+      _zz_resMants_8 <= (((((delayedData_8_signBit == voidData_signBit) && (delayedData_8_mantissa == voidData_mantissa)) && (delayedData_8_exp == voidData_exp)) ? 9'h0 : {1'b1,delayedData_8_mantissa[22 : 15]}) >>> _zz__zz_resMants_8);
+      _zz_resMants_8_1 <= _zz_resMants_8;
+      if(delayedDataForResMants_8_signBit) begin
+        resMants_8 <= _zz_resMants_8_2[9 : 2];
       end else begin
-        resMants_8 <= _zz_resMants_8_4[9 : 2];
+        resMants_8 <= _zz_resMants_8_5[9 : 2];
       end
-      if(delayedData_9_signBit) begin
-        resMants_9 <= _zz_resMants_9_1[9 : 2];
+      _zz_resMants_9 <= (((((delayedData_9_signBit == voidData_signBit) && (delayedData_9_mantissa == voidData_mantissa)) && (delayedData_9_exp == voidData_exp)) ? 9'h0 : {1'b1,delayedData_9_mantissa[22 : 15]}) >>> _zz__zz_resMants_9);
+      _zz_resMants_9_1 <= _zz_resMants_9;
+      if(delayedDataForResMants_9_signBit) begin
+        resMants_9 <= _zz_resMants_9_2[9 : 2];
       end else begin
-        resMants_9 <= _zz_resMants_9_4[9 : 2];
+        resMants_9 <= _zz_resMants_9_5[9 : 2];
       end
-      resExp <= (_zz_resExp - 8'h06);
-      io_dataIn_valid_delay_5 <= io_dataIn_valid_delay_4;
+      _zz_resExp <= (largestExp - 8'h06);
+      _zz_resExp_1 <= _zz_resExp;
+      resExp <= _zz_resExp_1;
+      io_dataIn_valid_delay_7 <= io_dataIn_valid_delay_6;
     end
   end
 

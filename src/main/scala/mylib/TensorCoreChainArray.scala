@@ -57,7 +57,8 @@ class TensorCoreChainArray(array_col: Int, array_row: Int, chain_len: Int,
     DynaCounter(16, configDelay.tccColBufferCnterRange)
   }
 
-  val tensorLoadValid, tensorDataValid = Reg(Bool()) init False
+  val tensorLoadValid = Reg(Bits(array_col bits)) init 0
+  val tensorDataValid = Reg(Bits(array_row bits)) init 0
   val matAColSubGrpLenReg = Reg(UInt(io.configPorts.matAColSubGrpLen.getWidth bits)) init 0
 
   val tensorArray = Array.ofDim[TensorCoreChainBf12](array_row, array_col)
@@ -143,8 +144,8 @@ class TensorCoreChainArray(array_col: Int, array_row: Int, chain_len: Int,
 
     tensorArray(r)(c).io.loadCascadeIn := Delay(colMem(c).io.q(87 downto 8), inout_pipe_delay, init=U"80'd0")
     tensorArray(r)(c).io.expCascadeIn := Delay(colMem(c).io.q(7 downto 0), inout_pipe_delay, init=U"8'd0")
-    tensorArray(r)(c).io.loadValid := Delay(tensorLoadValid, 1+2+inout_pipe_delay, init=False)
-    tensorArray(r)(c).io.dataValid := Delay(tensorDataValid, 1+2+inout_pipe_delay, init=False)
+    tensorArray(r)(c).io.loadValid := Delay(tensorLoadValid(c), 1+2+inout_pipe_delay, init=False)
+    tensorArray(r)(c).io.dataValid := Delay(tensorDataValid(r), 1+2+inout_pipe_delay, init=False)
     // tensor core input iters: number of iterations to take matB sub columns
     //   it is the number of B columns for a tensor core chain row.
     //   it equals to the chain_loading_latency when the Dot Product
@@ -154,92 +155,148 @@ class TensorCoreChainArray(array_col: Int, array_row: Int, chain_len: Int,
   }
 
   // compute control path
-  val ctrlStateMachine = new StateMachine {
-    val loadRdy, dataInIterReady, resOutValid = Bool()
-    loadRdy := tensorArray(0)(0).io.loadReady
-    dataInIterReady := tensorArray(0)(0).io.dataIterReady
-    resOutValid := tensorArray(0)(0).io.outValid
-    val loadFinish, dataInFinish = Reg(Bool()) init False
+  //row buffer ctrl
+  for (r <- 0 until array_row) {
+    val rowCtrlFsm = new StateMachine {
+      val loadRdy, dataInIterReady, resOutValid = Bool()
+      loadRdy := tensorArray(r)(0).io.loadReady
+      dataInIterReady := tensorArray(r)(0).io.dataIterReady
+      resOutValid := tensorArray(r)(0).io.outValid
+      val dataInFinish = Reg(Bool()) init False
 
-    val loadIterCounter, computeIterCounter =
-      DynaCounter(matAColSubGrpLenReg.getWidth, matAColSubGrpLenReg)
-    val resValidCounter = DynaCounter(matAColSubGrpLenReg.getWidth, matAColSubGrpLenReg)
+      val computeIterCounter =
+        DynaCounter(matAColSubGrpLenReg.getWidth, matAColSubGrpLenReg)
+      val resValidCounter = DynaCounter(matAColSubGrpLenReg.getWidth, matAColSubGrpLenReg)
 
-    val sIdle: State = new State with EntryPoint {
-      onEntry {
-        matAColSubGrpLenReg := 0
-        colBufferRdCounter.foreach(_.clear())
-        rowBufferRdCounter.foreach(_.clear())
-        computeIterCounter.clear()
-        resValidCounter.clear()
-        tensorLoadValid := False
-        tensorDataValid := False
-        loadFinish := False
-        dataInFinish := False
-      }
-      whenIsActive {
-        when(calEnDelay) {
-          matAColSubGrpLenReg := configDelay.matAColSubGrpLen
-          goto(sPreLoad)
+      val sIdle: State = new State with EntryPoint {
+        onEntry {
+          matAColSubGrpLenReg := 0
+          rowBufferRdCounter(r).clear()
+          computeIterCounter.clear()
+          resValidCounter.clear()
+          tensorDataValid(r) := False
+          dataInFinish := False
+        }
+        whenIsActive {
+          when(calEnDelay) {
+            matAColSubGrpLenReg := configDelay.matAColSubGrpLen
+            goto(sPreLoad)
+          }
         }
       }
-    }
 
-    val sPreLoad: State = new State {
-      onEntry {
-        colBufferRdCounter.foreach(_.increment())
-        tensorLoadValid := True
-        loadIterCounter.clear()
-      }
-      whenIsActive {
-        colBufferRdCounter.foreach(_.increment())
-        when(loadRdy) {
-          loadIterCounter.increment()
-          goto(sCompute)
+      val sPreLoad: State = new State {
+        whenIsActive {
+          when(loadRdy) {
+            goto(sCompute)
+          }
         }
       }
-    }
 
-    val sCompute: State = new State {
-      onEntry {
-        tensorDataValid := True
-        rowBufferRdCounter.foreach(_.increment())
+      val sCompute: State = new State {
+        onEntry {
+          tensorDataValid(r) := True
+          rowBufferRdCounter(r).increment()
+        }
+        whenIsActive {
+          when(dataInFinish === False) {
+            rowBufferRdCounter(r).increment()
+          } otherwise {
+            rowBufferRdCounter(r).clear()
+            tensorDataValid(r) := False
+          }
+          when(rowBufferRdCounter(r).willOverflow) {
+            dataInFinish := True
+          }
+          when(dataInIterReady)(computeIterCounter.increment())
+          when(computeIterCounter.willOverflow) {
+            goto(sWriteRes)
+          }
+        }
       }
-      whenIsActive {
-        when(dataInFinish === False) {
-          rowBufferRdCounter.foreach(_.increment())
-        } otherwise {
-          rowBufferRdCounter.foreach(_.clear())
-          tensorDataValid := False
-        }
-        when(rowBufferRdCounter(0).willOverflow) {
-          dataInFinish := True
-        }
 
-        when(loadFinish === False) {
-          colBufferRdCounter.foreach(_.increment())
-        } otherwise {
-          colBufferRdCounter.foreach(_.clear())
-          tensorLoadValid := False
-        }
-        when(colBufferRdCounter(0).willOverflow) {
-          loadFinish := True
-        }
-
-        when(resOutValid)(resValidCounter.increment())
-        when(loadRdy)(loadIterCounter.increment())
-        when(dataInIterReady)(computeIterCounter.increment())
-        when(computeIterCounter.willOverflow) {
-          goto(sWriteRes)
+      val sWriteRes: State = new State {
+        whenIsActive {
+          when(resOutValid)(resValidCounter.increment())
+          when(resValidCounter.willOverflow) {
+            goto(sIdle)
+          }
         }
       }
     }
+  }
+  //col buffer ctrl
+  for (c <- 0 until array_col) {
+    val colCtrlFsm = new StateMachine {
+      val loadRdy, dataInIterReady, resOutValid = Bool()
+      loadRdy := tensorArray(0)(c).io.loadReady
+      dataInIterReady := tensorArray(0)(c).io.dataIterReady
+      resOutValid := tensorArray(0)(c).io.outValid
+      val loadFinish = Reg(Bool()) init False
 
-    val sWriteRes: State = new State {
-      whenIsActive {
-        when(resOutValid)(resValidCounter.increment())
-        when(resValidCounter.willOverflow) {
-          goto(sIdle)
+      val loadIterCounter, computeIterCounter =
+        DynaCounter(matAColSubGrpLenReg.getWidth, matAColSubGrpLenReg)
+      val resValidCounter = DynaCounter(matAColSubGrpLenReg.getWidth, matAColSubGrpLenReg)
+
+      val sIdle: State = new State with EntryPoint {
+        onEntry {
+          matAColSubGrpLenReg := 0
+          colBufferRdCounter(c).clear()
+          computeIterCounter.clear()
+          resValidCounter.clear()
+          tensorLoadValid(c) := False
+          loadFinish := False
+        }
+        whenIsActive {
+          when(calEnDelay) {
+            matAColSubGrpLenReg := configDelay.matAColSubGrpLen
+            goto(sPreLoad)
+          }
+        }
+      }
+
+      val sPreLoad: State = new State {
+        onEntry {
+          colBufferRdCounter(c).increment()
+          tensorLoadValid(c) := True
+          loadIterCounter.clear()
+        }
+        whenIsActive {
+          colBufferRdCounter(c).increment()
+          when(loadRdy) {
+            loadIterCounter.increment()
+            goto(sCompute)
+          }
+        }
+      }
+
+      val sCompute: State = new State {
+        whenIsActive {
+          when(loadFinish === False) {
+            colBufferRdCounter(c).increment()
+          } otherwise {
+            colBufferRdCounter(c).clear()
+            tensorLoadValid(c) := False
+          }
+          when(colBufferRdCounter(c).willOverflow) {
+            loadFinish := True
+          }
+
+          when(resOutValid)(resValidCounter.increment())
+          when(loadRdy)(loadIterCounter.increment())
+          when(dataInIterReady)(computeIterCounter.increment())
+          when(computeIterCounter.willOverflow) {
+            goto(sWriteRes)
+          }
+        }
+      }
+
+      val sWriteRes: State = new State {
+        whenIsActive {
+          when(resOutValid)(resValidCounter.increment())
+          when(resValidCounter.willOverflow) {
+            goto(sIdle)
+          }
         }
       }
     }
