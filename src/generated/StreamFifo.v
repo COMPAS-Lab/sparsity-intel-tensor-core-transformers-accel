@@ -1,6 +1,6 @@
 // Generator : SpinalHDL v1.6.0    git head : 73c8d8e2b86b45646e9d0b2e729291f2b65e6be3
 // Component : StreamFifo
-// Git hash  : bc7f4dec79ebddc91db05d9976770d5512bae44e
+// Git hash  : 6e1c97b5167704d0de09f8aa81c7dcf974169440
 
 
 module StreamFifo (

@@ -59,7 +59,6 @@ class TensorCoreChainArray(array_col: Int, array_row: Int, chain_len: Int,
 
   val tensorLoadValid = Reg(Bits(array_col bits)) init 0
   val tensorDataValid = Reg(Bits(array_row bits)) init 0
-  val matAColSubGrpLenReg = Reg(UInt(io.configPorts.matAColSubGrpLen.getWidth bits)) init 0
 
   val tensorArray = Array.ofDim[TensorCoreChainBf12](array_row, array_col)
   for (r <- 0 until array_row; c <- 0 until array_col) {
@@ -165,12 +164,12 @@ class TensorCoreChainArray(array_col: Int, array_row: Int, chain_len: Int,
       val dataInFinish = Reg(Bool()) init False
 
       val computeIterCounter =
-        DynaCounter(matAColSubGrpLenReg.getWidth, matAColSubGrpLenReg)
-      val resValidCounter = DynaCounter(matAColSubGrpLenReg.getWidth, matAColSubGrpLenReg)
+        DynaCounter(configDelay.matAColSubGrpLen.getWidth, configDelay.matAColSubGrpLen)
+      val resValidCounter =
+        DynaCounter(configDelay.matAColSubGrpLen.getWidth, configDelay.matAColSubGrpLen)
 
       val sIdle: State = new State with EntryPoint {
         onEntry {
-          matAColSubGrpLenReg := 0
           rowBufferRdCounter(r).clear()
           computeIterCounter.clear()
           resValidCounter.clear()
@@ -179,7 +178,6 @@ class TensorCoreChainArray(array_col: Int, array_row: Int, chain_len: Int,
         }
         whenIsActive {
           when(calEnDelay) {
-            matAColSubGrpLenReg := configDelay.matAColSubGrpLen
             goto(sPreLoad)
           }
         }
@@ -234,13 +232,14 @@ class TensorCoreChainArray(array_col: Int, array_row: Int, chain_len: Int,
       resOutValid := tensorArray(0)(c).io.outValid
       val loadFinish = Reg(Bool()) init False
 
-      val loadIterCounter, computeIterCounter =
-        DynaCounter(matAColSubGrpLenReg.getWidth, matAColSubGrpLenReg)
-      val resValidCounter = DynaCounter(matAColSubGrpLenReg.getWidth, matAColSubGrpLenReg)
+      val loadIterCounter, computeIterCounter = {
+        DynaCounter(configDelay.matAColSubGrpLen.getWidth, configDelay.matAColSubGrpLen)
+      }
+      val resValidCounter =
+        DynaCounter(configDelay.matAColSubGrpLen.getWidth, configDelay.matAColSubGrpLen)
 
       val sIdle: State = new State with EntryPoint {
         onEntry {
-          matAColSubGrpLenReg := 0
           colBufferRdCounter(c).clear()
           computeIterCounter.clear()
           resValidCounter.clear()
@@ -249,7 +248,6 @@ class TensorCoreChainArray(array_col: Int, array_row: Int, chain_len: Int,
         }
         whenIsActive {
           when(calEnDelay) {
-            matAColSubGrpLenReg := configDelay.matAColSubGrpLen
             goto(sPreLoad)
           }
         }
