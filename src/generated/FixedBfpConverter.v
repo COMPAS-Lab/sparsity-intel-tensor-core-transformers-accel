@@ -1,8 +1,8 @@
-// Generator : SpinalHDL v1.6.0    git head : 73c8d8e2b86b45646e9d0b2e729291f2b65e6be3
+// Generator : SpinalHDL v1.7.3a    git head : 04162b8322332003bd011fabf5de3e7522c45630
 // Component : FixedBfpConverter
-// Git hash  : 6e1c97b5167704d0de09f8aa81c7dcf974169440
+// Git hash  : 06218f42f9566428349a61cc7c252221f19e7cdb
 
-
+`timescale 1ns/1ps 
 module FixedBfpConverter (
   input               io_dataIn_valid,
   input      [319:0]  io_dataIn_payload,
@@ -11,6 +11,7 @@ module FixedBfpConverter (
   input               clk,
   input               clrn
 );
+
   wire       [7:0]    _zz__zz_resMants_0;
   wire       [9:0]    _zz_resMants_0_2;
   wire       [9:0]    _zz_resMants_0_3;

@@ -110,10 +110,11 @@ class TensorCoreChainArray(array_col: Int, array_row: Int, chain_len: Int,
       rowMem(r * chain_len + tcId).io.data := rowConverters(r)(tcId).io.dataOut.payload
       //TODO: utilize row buffer to delay the inputs according to its destination tensor core
       //   in each tensor core chain
-      rowMemAddr(r)(tcId) = rowBufferRdCounter(r) - U(2*tcId, rowBufferRdCounter(r).getWidth bits)
+      //TODO: check timing of delayed row address compute
+      rowMemAddr(r)(tcId) = Delay(rowBufferRdCounter(r) - U(2*tcId, rowBufferRdCounter(r).getWidth bits), 2)
       //TODO: fix row mem rd addr delay timing misalignment
       rowMem(r * chain_len + tcId).io.rdaddress :=
-        Delay(rowMemAddr(r)(tcId).resize(rowMem(r * chain_len + tcId).io.rdaddress.getWidth), 2)
+        rowMemAddr(r)(tcId).resize(rowMem(r * chain_len + tcId).io.rdaddress.getWidth)
 
       when(rowConverters(r)(tcId).io.dataOut.fire) {
         rowBufferWrCounter.increment()
@@ -131,14 +132,11 @@ class TensorCoreChainArray(array_col: Int, array_row: Int, chain_len: Int,
     for (cl <- 0 until chain_len) (rowMemOut(cl) := rowMem(r * chain_len + cl).io.q)
 
     for (tcId <- 0 until chain_len) {
-      when(rowMemAddr(r)(tcId) < io.configPorts.tccRowBufferCnterRange &&
-            rowMemAddr(r)(tcId) >= 2*tcId) {
-        tensorArray(r)(c).io.dataIn(tcId) := Delay(rowMemOut(tcId)(87 downto 8), inout_pipe_delay, init=U"80'd0")
-        tensorArray(r)(c).io.expIn(tcId) := Delay(rowMemOut(tcId)(7 downto 0), inout_pipe_delay, init=U"8'd0")
-      }.otherwise {
-        tensorArray(r)(c).io.dataIn(tcId) := 0
-        tensorArray(r)(c).io.expIn(tcId) := 0
-      }
+      // TODO: check timing of the delayed row address
+      tensorArray(r)(c).io.dataIn(tcId).valid :=
+        (rowMemAddr(r)(tcId) < io.configPorts.tccRowBufferCnterRange && rowMemAddr(r)(tcId) >= 2*tcId)
+      tensorArray(r)(c).io.dataIn(tcId).payload := Delay(rowMemOut(tcId)(87 downto 8), inout_pipe_delay, init = U"80'd0")
+      tensorArray(r)(c).io.expIn(tcId) := Delay(rowMemOut(tcId)(7 downto 0), inout_pipe_delay, init = U"8'd0")
     }
 
     tensorArray(r)(c).io.loadCascadeIn := Delay(colMem(c).io.q(87 downto 8), inout_pipe_delay, init=U"80'd0")

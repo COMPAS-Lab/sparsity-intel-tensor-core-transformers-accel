@@ -15,7 +15,8 @@ class DefaultConfig {
     mode = Verilog,
     targetDirectory = "./src/generated",
     oneFilePerComponent = true,
-    defaultConfigForClockDomains = defaultClockConfig
+    defaultConfigForClockDomains = defaultClockConfig,
+    removePruned = false
   )
 
   var defaultSimConfig = SimConfig.withConfig(SpinalConfig(

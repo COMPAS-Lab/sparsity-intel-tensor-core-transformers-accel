@@ -10,7 +10,7 @@ import util._
 class TensorCoreChainBf12(chain_len: Int, out_buf_delay: Int,
                       out_fifo_depth: Int, output_width: Int) extends Component {
   val io = new Bundle {
-    val dataIn = in Vec(UInt(80 bits), chain_len)
+    val dataIn = Vec(master Flow(UInt(80 bits)), chain_len)
     val loadCascadeIn = in UInt(80 bits)
     val expIn = in Vec(UInt(8 bits), chain_len)
     val expCascadeIn = in UInt(8 bits)
@@ -108,7 +108,7 @@ class TensorCoreChainBf12(chain_len: Int, out_buf_delay: Int,
   tcEntry.io.clr0 <> False
   tcEntry.io.clr1 <> False
 
-  connect_data_in(tcStartPoint.io, io.dataIn(0))
+  connect_data_in(tcStartPoint.io, io.dataIn(0).payload)
   tcStartPoint.io.shared_exponent_data <> io.expIn(0)
   tcStartPoint.io.cascade_weight_in <> tcEntry.io.cascade_weight_out
   tcStartPoint.io.load_buf_sel <> loadBufSel
@@ -119,7 +119,7 @@ class TensorCoreChainBf12(chain_len: Int, out_buf_delay: Int,
   tcStartPoint.io.side_in_3 <> U"4'd0"
   tcStartPoint.io.side_in_4 <> U"4'd0"
   tcStartPoint.io.feed_sel <> U"2'd1"
-  tcStartPoint.io.clr0 <> False
+  tcStartPoint.io.clr0 <> io.dataIn(0).valid
   tcStartPoint.io.clr1 <> False
 
   for (i <- 0 until chain_len-1) {
@@ -127,7 +127,7 @@ class TensorCoreChainBf12(chain_len: Int, out_buf_delay: Int,
 
 //    val delayedDataIn = Delay(io.dataIn(i+1), 2*(i+1), init=U(0, io.dataIn(i+1).getWidth bits))
 //    connect_data_in(tcCoreChainElems(i).io, delayedDataIn)
-    connect_data_in(tcCoreChainElems(i).io, io.dataIn(i+1))
+    connect_data_in(tcCoreChainElems(i).io, io.dataIn(i+1).payload)
 //    val delayedExpIn = Delay(io.expIn(i+1), 2*(i+1), init=U(0, io.expIn(i+1).getWidth bits))
 //    tcCoreChainElems(i).io.shared_exponent_data <> delayedExpIn
     tcCoreChainElems(i).io.shared_exponent_data <> io.expIn(i+1)
@@ -153,7 +153,7 @@ class TensorCoreChainBf12(chain_len: Int, out_buf_delay: Int,
     tcCoreChainElems(i).io.side_in_2 <> U"4'd0"
     tcCoreChainElems(i).io.side_in_3 <> U"4'd0"
     tcCoreChainElems(i).io.side_in_4 <> U"4'd0"
-    tcCoreChainElems(i).io.clr0 <> False
+    tcCoreChainElems(i).io.clr0 <> io.dataIn(i+1).valid
     tcCoreChainElems(i).io.clr1 <> False
   }
 
