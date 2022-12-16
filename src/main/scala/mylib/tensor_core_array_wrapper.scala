@@ -155,12 +155,12 @@ class tensor_core_array_wrapper(array_col: Int, array_row: Int, chain_len: Int,
   }
 
   //out logic
-  //split output rows into groups of 3
-  val OUT_GRP_SIZE = 3
+  //split output rows into groups of out_grp_size
+  val OUT_GRP_SIZE = 4
   for (g <- 0 until tcArray.io.res.size/OUT_GRP_SIZE) {
     val wrInitCount = Counter(2 bits)
     val outValid =
-      List.tabulate(OUT_GRP_SIZE)(i => tcArray.io.res(g*3+i).valid).reduce((a, b) => a && b)
+      List.tabulate(OUT_GRP_SIZE)(i => tcArray.io.res(g*OUT_GRP_SIZE+i).valid).reduce((a, b) => a && b)
     val outPop = Reg(Bool()) init False
     val dataOutStream = Stream(UInt(72*OUT_GRP_SIZE bits))
 
@@ -172,15 +172,20 @@ class tensor_core_array_wrapper(array_col: Int, array_row: Int, chain_len: Int,
     outPop := wrInitCount.willOverflowIfInc && io.tcarray_out(g).almost_full
     dataOutStream.valid := outValid
     dataOutStream.payload :=
-      List.tabulate(OUT_GRP_SIZE)(i => tcArray.io.res(g*3+i).payload).reduce((a, b) => a @@ b)
+      List.tabulate(OUT_GRP_SIZE)(i => tcArray.io.res(g*OUT_GRP_SIZE+i).payload).reduce((a, b) => a @@ b)
     dataOutStream.ready := outPop
-    for (i <- 0 until OUT_GRP_SIZE) (tcArray.io.res(g*3+i).ready := dataOutStream.ready)
+    for (i <- 0 until OUT_GRP_SIZE) (tcArray.io.res(g*OUT_GRP_SIZE+i).ready := dataOutStream.ready)
 
     io.tcarray_out(g).start := ~wrInitCount.willOverflowIfInc
     io.tcarray_out(g).select := outPop && outValid
     io.tcarray_out(g).addr := io.wr_addr
     io.tcarray_out(g).data := dataOutStream.payload.resize(io.tcarray_out(g).data.getWidth bits)
   }
+
+  io.tcarray_out(4).start := False
+  io.tcarray_out(4).select := False
+  io.tcarray_out(4).addr := U"32'd0"
+  io.tcarray_out(4).data := U"256'd0"
 
   for (elem <- io.tcarray_in) {
     elem.start := startTCarrayIn
@@ -199,16 +204,16 @@ class tensor_core_array_wrapper(array_col: Int, array_row: Int, chain_len: Int,
 object tensor_core_array_wrapper_gen {
   def main(args: Array[String]): Unit = {
     val gen = new DefaultConfig
-    val array_col = 20
-    val array_row = 15
-    val chain_len = 6
-    gen.defaultSpinalConfig.generate(new tensor_core_array_wrapper(
+    val array_col = 10
+    val array_row = 16
+    val chain_len = 13
+    gen.defaultSpinalConfig.withoutEnumString().generate(new tensor_core_array_wrapper(
       array_col = array_col,
       array_row = array_row,
       chain_len = chain_len,
       mat_a_row = array_col*2*2,
-      mat_a_col = chain_len*array_row*20,
-      mat_b_col = chain_len*array_row*2*8*3 
+      mat_a_col = chain_len*array_row*20*2,
+      mat_b_col = chain_len*array_row*2*8*3*2 
     ))
   }
 }
