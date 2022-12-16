@@ -1,8 +1,8 @@
-// Generator : SpinalHDL v1.6.0    git head : 73c8d8e2b86b45646e9d0b2e729291f2b65e6be3
+// Generator : SpinalHDL v1.7.3a    git head : 04162b8322332003bd011fabf5de3e7522c45630
 // Component : StreamFifo
-// Git hash  : 6e1c97b5167704d0de09f8aa81c7dcf974169440
+// Git hash  : 06218f42f9566428349a61cc7c252221f19e7cdb
 
-
+`timescale 1ns/1ps 
 module StreamFifo (
   input               io_push_valid,
   output              io_push_ready,
@@ -20,6 +20,7 @@ module StreamFifo (
   input               clk,
   input               clrn
 );
+
   reg        [71:0]   _zz_logic_ram_port0;
   wire       [6:0]    _zz_logic_pushPtr_valueNext;
   wire       [0:0]    _zz_logic_pushPtr_valueNext_1;
@@ -50,7 +51,7 @@ module StreamFifo (
   wire                logic_full;
   reg                 _zz_io_pop_valid;
   wire       [71:0]   _zz_io_pop_payload_0;
-  wire                when_Stream_l933;
+  wire                when_Stream_l1075;
   wire       [6:0]    logic_ptrDif;
   reg [71:0] logic_ram [0:127];
 
@@ -137,7 +138,7 @@ module StreamFifo (
   assign io_pop_payload_0 = _zz_io_pop_payload_0[23 : 0];
   assign io_pop_payload_1 = _zz_io_pop_payload_0[47 : 24];
   assign io_pop_payload_2 = _zz_io_pop_payload_0[71 : 48];
-  assign when_Stream_l933 = (logic_pushing != logic_popping);
+  assign when_Stream_l1075 = (logic_pushing != logic_popping);
   assign logic_ptrDif = (logic_pushPtr_value - logic_popPtr_value);
   assign io_occupancy = {(logic_risingOccupancy && logic_ptrMatch),logic_ptrDif};
   assign io_availability = {((! logic_risingOccupancy) && logic_ptrMatch),_zz_io_availability};
@@ -151,7 +152,7 @@ module StreamFifo (
       logic_pushPtr_value <= logic_pushPtr_valueNext;
       logic_popPtr_value <= logic_popPtr_valueNext;
       _zz_io_pop_valid <= (logic_popPtr_valueNext == logic_pushPtr_value);
-      if(when_Stream_l933) begin
+      if(when_Stream_l1075) begin
         logic_risingOccupancy <= logic_pushing;
       end
       if(io_flush) begin

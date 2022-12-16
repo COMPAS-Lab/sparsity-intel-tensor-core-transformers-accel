@@ -1,8 +1,8 @@
-// Generator : SpinalHDL v1.6.0    git head : 73c8d8e2b86b45646e9d0b2e729291f2b65e6be3
+// Generator : SpinalHDL v1.7.3a    git head : 04162b8322332003bd011fabf5de3e7522c45630
 // Component : OutputShiftReg
-// Git hash  : 6e1c97b5167704d0de09f8aa81c7dcf974169440
+// Git hash  : 06218f42f9566428349a61cc7c252221f19e7cdb
 
-
+`timescale 1ns/1ps 
 module OutputShiftReg (
   input               io_resIn_0_valid,
   output reg          io_resIn_0_ready,
@@ -70,6 +70,7 @@ module OutputShiftReg (
   input               clk,
   input               clrn
 );
+
   wire       [4:0]    _zz_outCounter_valueNext;
   wire       [0:0]    _zz_outCounter_valueNext_1;
   reg        [71:0]   shiftRegs_0;
@@ -421,7 +422,7 @@ module OutputShiftReg (
   end
 
   assign io_popOut_fire_19 = (io_popOut_valid && io_popOut_ready);
-  assign when_OutputShiftReg_l42 = (loadedRegs == 20'hfffff);
+  assign when_OutputShiftReg_l42 = (&loadedRegs);
   assign io_popOut_payload = shiftRegs_19;
   always @(posedge clk) begin
     if(!clrn) begin
