@@ -3,6 +3,7 @@
 ./src/generated/TensorCoreChainBf12.v
 ./src/generated/FixedBfpConverter.v
 ./src/generated/OutputShiftReg.v
+./src/generated/StreamDelay.v
 ./src/generated/InputShiftReg.v
 ./src/generated/InputShiftReg_1.v
 ./src/generated/TensorCoreChainArray.v

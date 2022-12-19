@@ -10,13 +10,13 @@ import util._
 class TensorCoreChainBf12(chain_len: Int, out_buf_delay: Int,
                       out_fifo_depth: Int, output_width: Int) extends Component {
   val io = new Bundle {
-    val dataIn = Vec(master Flow(UInt(80 bits)), chain_len)
+    val dataIn = Vec(slave Flow(UInt(80 bits)), chain_len)
     val loadCascadeIn = in UInt(80 bits)
     val expIn = in Vec(UInt(8 bits), chain_len)
     val expCascadeIn = in UInt(8 bits)
     //data valid and data in should be 1 clock earlier than
     //the first loading because of data load reg and load_buf_sel reg
-    val dataValid = in Bool()
+    val dataValid = in Bool()2
     val dataIterReady = out Bool()
     val loadValid = in Bool()
     val loadReady = out Bool()
