@@ -1,6 +1,7 @@
 package intel_ips
 
 import spinal.core._
+import spinal.lib._
 
 class out_fifo(output_width: Int) extends BlackBox {
   val io = new Bundle {
@@ -15,4 +16,22 @@ class out_fifo(output_width: Int) extends BlackBox {
   noIoPrefix()
   // specify the tensor core main clock
   mapClockDomain(clock = io.clock)
+}
+
+class StreamOutFifo(output_width: Int) extends BlackBox {
+  val io = new Bundle {
+    val push = slave Stream(UInt(output_width*3 bits))
+    val pop = master Stream(UInt(output_width*3 bits))
+  }
+
+  val core = new out_fifo(output_width)
+
+  core.setName("FifoCore")
+  core.io.data := io.push.payload
+  core.io.wrreq := io.push.valid
+  io.push.ready := ~core.io.full
+
+  io.pop.payload := core.io.q
+  io.pop.valid := !core.io.empty
+  core.io.rdreq := io.pop.ready
 }
