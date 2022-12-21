@@ -93,7 +93,7 @@ class TensorCoreChainBf12(chain_len: Int, out_buf_delay: Int,
   val outValidCounter = DynaCounter(io.inputIters.getWidth, io.inputIters)
 
   when(oBufferLoadValid) (outValidCounter.increment())
-  io.outValid := outValidCounter.willOverflow
+  io.outValid := Delay(outValidCounter.willOverflow, 1, init = False)
 
   connect_data_in(tcEntry.io, io.loadCascadeIn)
   tcEntry.io.shared_exponent_data := io.expCascadeIn
@@ -163,19 +163,18 @@ class TensorCoreChainBf12(chain_len: Int, out_buf_delay: Int,
   fbDelayFifo.io.push.payload := tcAccu.io.bf24_col_1 @@ tcAccu.io.bf24_col_2 @@ tcAccu.io.bf24_col_3
 
   val resValidCounter = DynaCounter(io.matAColSubGrpLen.getWidth, io.matAColSubGrpLen)
-  when(io.outValid) (resValidCounter.increment())
+  when(outValidCounter.willOverflow) (resValidCounter.increment())
 
   val fbOutRegPipe = 2
   val fbDelayFifoPayload = Vec(UInt(output_width bits), 3)
   fbDelayFifoPayload := fbDelayFifo.io.pop.payload.subdivideIn(output_width bits)
+  io.res.payload := fbDelayFifoPayload
   when(resValidCounter.willOverflowIfInc) {
-    io.res.payload := fbDelayFifoPayload
     io.res.valid := fbDelayFifo.io.pop.valid
     fbDelayFifo.io.pop.ready := io.res.ready
   } .otherwise {
     //TODO: check validity of ready delay
     fbDelayFifo.io.pop.ready := Delay(oBufferLoadValid, out_buf_delay - 2 - fbOutRegPipe, init = False)
-    io.res.payload.foreach(_ := U(0))
     io.res.valid := False
   }
 
