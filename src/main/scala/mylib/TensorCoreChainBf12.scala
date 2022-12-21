@@ -10,7 +10,7 @@ import util._
 class TensorCoreChainBf12(chain_len: Int, out_buf_delay: Int,
                       out_fifo_depth: Int, output_width: Int) extends Component {
   val io = new Bundle {
-    val dataIn = Vec(master Flow(UInt(80 bits)), chain_len)
+    val dataIn = Vec(slave Flow(UInt(80 bits)), chain_len)
     val loadCascadeIn = in UInt(80 bits)
     val expIn = in Vec(UInt(8 bits), chain_len)
     val expCascadeIn = in UInt(8 bits)
@@ -157,17 +157,21 @@ class TensorCoreChainBf12(chain_len: Int, out_buf_delay: Int,
     tcCoreChainElems(i).io.clr1 <> False
   }
 
-  val fbDelayFifo = StreamFifo(Vec(UInt(24 bits), 3), out_fifo_depth)
+  val fbDelayFifo = new StreamOutFifo(output_width)
   fbDelayFifo.setName("AccuDelayInst")
   fbDelayFifo.io.push.valid := oBufferLoadValid
-  fbDelayFifo.io.push.payload := Vec(tcAccu.io.bf24_col_1, tcAccu.io.bf24_col_2, tcAccu.io.bf24_col_3)
+  fbDelayFifo.io.push.payload := tcAccu.io.bf24_col_1 @@ tcAccu.io.bf24_col_2 @@ tcAccu.io.bf24_col_3
 
   val resValidCounter = DynaCounter(io.matAColSubGrpLen.getWidth, io.matAColSubGrpLen)
   when(io.outValid) (resValidCounter.increment())
 
-  val fbOutRegPipe = 2  
+  val fbOutRegPipe = 2
+  val fbDelayFifoPayload = Vec(UInt(output_width bits), 3)
+  fbDelayFifoPayload := fbDelayFifo.io.pop.payload.subdivideIn(output_width bits)
   when(resValidCounter.willOverflowIfInc) {
-    io.res <> fbDelayFifo.io.pop
+    io.res.payload := fbDelayFifoPayload
+    io.res.valid := fbDelayFifo.io.pop.valid
+    fbDelayFifo.io.pop.ready := io.res.ready
   } .otherwise {
     //TODO: check validity of ready delay
     fbDelayFifo.io.pop.ready := Delay(oBufferLoadValid, out_buf_delay - 2 - fbOutRegPipe, init = False)
@@ -176,9 +180,9 @@ class TensorCoreChainBf12(chain_len: Int, out_buf_delay: Int,
   }
 
   //TODO: double check the assignment sequence here
-  tcAccu.io.bf24_a1 := Delay(fbDelayFifo.io.pop.payload(0), fbOutRegPipe, init = U"24'd0")
-  tcAccu.io.bf24_a2 := Delay(fbDelayFifo.io.pop.payload(1), fbOutRegPipe, init = U"24'd0")
-  tcAccu.io.bf24_a3 := Delay(fbDelayFifo.io.pop.payload(2), fbOutRegPipe, init = U"24'd0")
+  tcAccu.io.bf24_a1 := Delay(fbDelayFifoPayload(0), fbOutRegPipe, init = U"24'd0")
+  tcAccu.io.bf24_a2 := Delay(fbDelayFifoPayload(1), fbOutRegPipe, init = U"24'd0")
+  tcAccu.io.bf24_a3 := Delay(fbDelayFifoPayload(2), fbOutRegPipe, init = U"24'd0")
   tcAccu.io.cascade_data_in_col_1 <> tcCoreChainElems(chain_len-2).io.cascade_data_out_col_1
   tcAccu.io.cascade_data_in_col_2 <> tcCoreChainElems(chain_len-2).io.cascade_data_out_col_2
   tcAccu.io.cascade_data_in_col_3 <> tcCoreChainElems(chain_len-2).io.cascade_data_out_col_3

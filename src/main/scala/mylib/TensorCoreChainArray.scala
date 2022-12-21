@@ -315,7 +315,10 @@ class TensorCoreChainArray(array_col: Int, array_row: Int, chain_len: Int,
   val outShiftRegs = new Array[OutputShiftReg](array_row)
   for (regIdx <- 0 until array_row) {
     outShiftRegs(regIdx) = new OutputShiftReg(output_width * 3, array_col)
-    outShiftRegs(regIdx).io.resIn <> outputBufferSelOutDelayed(regIdx)
+    for (col <- 0 until array_col) {
+      outShiftRegs(regIdx).io.resIn(col) <<
+        StreamDelay(outputBufferSelOutDelayed(regIdx)(col), 2)
+    }
     io.res(regIdx) <> outShiftRegs(regIdx).io.popOut
   }
 }

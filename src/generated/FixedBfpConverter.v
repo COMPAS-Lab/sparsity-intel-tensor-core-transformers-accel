@@ -1,6 +1,6 @@
 // Generator : SpinalHDL v1.7.3a    git head : 04162b8322332003bd011fabf5de3e7522c45630
 // Component : FixedBfpConverter
-// Git hash  : 06218f42f9566428349a61cc7c252221f19e7cdb
+// Git hash  : 49d0755e1ebad225e157f484ef3544456c6ad7b5
 
 `timescale 1ns/1ps 
 module FixedBfpConverter (
