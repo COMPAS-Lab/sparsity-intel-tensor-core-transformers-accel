@@ -164,12 +164,13 @@ class TensorCoreChainBf12(chain_len: Int, out_buf_delay: Int,
 
   val resValidCounter = DynaCounter(io.matAColSubGrpLen.getWidth, io.matAColSubGrpLen)
   when(outValidCounter.willOverflow) (resValidCounter.increment())
-
+  val resValid = RegNext(resValidCounter.willOverflowIfInc, init = False)
+  
   val fbOutRegPipe = 2
   val fbDelayFifoPayload = Vec(UInt(output_width bits), 3)
   fbDelayFifoPayload := fbDelayFifo.io.pop.payload.subdivideIn(output_width bits)
   io.res.payload := fbDelayFifoPayload
-  when(resValidCounter.willOverflowIfInc) {
+  when(resValid) {
     io.res.valid := fbDelayFifo.io.pop.valid
     fbDelayFifo.io.pop.ready := io.res.ready
   } .otherwise {
@@ -187,7 +188,7 @@ class TensorCoreChainBf12(chain_len: Int, out_buf_delay: Int,
   tcAccu.io.cascade_data_in_col_3 <> tcCoreChainElems(chain_len-2).io.cascade_data_out_col_3
   tcAccu.io.zero_en := False
   tcAccu.io.acc_en := False 
-  tcAccu.io.clr0 <> resValidCounter.willOverflowIfInc
+  tcAccu.io.clr0 <> resValid
 }
 
 object TensorCoreChainBf12Gen {
