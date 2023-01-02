@@ -1,5 +1,5 @@
 ./src/generated/enumdefine.v
-./src/generated/StreamFifo.v
+./src/generated/StreamOutFifo.v
 ./src/generated/TensorCoreChainBf12.v
 ./src/generated/FixedBfpConverter.v
 ./src/generated/OutputShiftReg.v
