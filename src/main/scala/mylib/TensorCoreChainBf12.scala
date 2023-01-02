@@ -83,7 +83,7 @@ class TensorCoreChainBf12(chain_len: Int, out_buf_delay: Int,
   when(inputCounter.willOverflow) {
     loadBufSel := !loadBufSel
   }
-  io.dataIterReady := inputCounter.willOverflow
+  io.dataIterReady := Delay(inputCounter.willOverflow, 1, init=False)
 
   //output buffer ctrl logic.
   // delayed output valid: 4c of dot lat,3c of accu lat and 2*(chain_len-1)
@@ -163,7 +163,7 @@ class TensorCoreChainBf12(chain_len: Int, out_buf_delay: Int,
   fbDelayFifo.io.push.payload := tcAccu.io.bf24_col_1 @@ tcAccu.io.bf24_col_2 @@ tcAccu.io.bf24_col_3
 
   val resValidCounter = DynaCounter(io.matAColSubGrpLen.getWidth, io.matAColSubGrpLen)
-  when(outValidCounter.willOverflow) (resValidCounter.increment())
+  when(io.outValid) (resValidCounter.increment())
   val resValid = RegNext(resValidCounter.willOverflowIfInc, init = False)
   
   val fbOutRegPipe = 2

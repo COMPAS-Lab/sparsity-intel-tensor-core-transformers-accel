@@ -91,7 +91,7 @@ class tensor_core_array_wrapper(array_col: Int, array_row: Int, chain_len: Int,
                                       chain_len = chain_len, out_buf_delay = chain_len*3-3,
                                       col_buf_max_depth = 128, row_buf_max_depth = 128,
                                       output_fifo_depth = 128, output_width = 24, 
-                                      inout_pipe_delay = 4)
+                                      inout_pipe_delay = 5)
 
   tcArray.io.matALoad <> data2TcarrayCol
   for (rowIdx <- 0 until array_row; chainIdx <- 0 until chain_len) {
@@ -156,7 +156,8 @@ class tensor_core_array_wrapper(array_col: Int, array_row: Int, chain_len: Int,
 
   //out logic
   //split output rows into groups of out_grp_size
-  val OUT_GRP_SIZE = 4
+  val OUT_GRP_SIZE = 3
+
   for (g <- 0 until tcArray.io.res.size/OUT_GRP_SIZE) {
     val wrInitCount = Counter(2 bits)
     val outValid =
@@ -182,11 +183,6 @@ class tensor_core_array_wrapper(array_col: Int, array_row: Int, chain_len: Int,
     io.tcarray_out(g).data := dataOutStream.payload.resize(io.tcarray_out(g).data.getWidth bits)
   }
 
-  io.tcarray_out(4).start := False
-  io.tcarray_out(4).select := False
-  io.tcarray_out(4).addr := U"32'd0"
-  io.tcarray_out(4).data := U"256'd0"
-
   for (elem <- io.tcarray_in) {
     elem.start := startTCarrayIn
     elem.select := selectTcarrayIn
@@ -204,9 +200,9 @@ class tensor_core_array_wrapper(array_col: Int, array_row: Int, chain_len: Int,
 object tensor_core_array_wrapper_gen {
   def main(args: Array[String]): Unit = {
     val gen = new DefaultConfig
-    val array_col = 10
-    val array_row = 16
-    val chain_len = 13
+    val array_col = 20
+    val array_row = 15
+    val chain_len = 6
     gen.defaultSpinalConfig.withoutEnumString().generate(new tensor_core_array_wrapper(
       array_col = array_col,
       array_row = array_row,

@@ -18,7 +18,7 @@ class out_fifo(output_width: Int) extends BlackBox {
   mapClockDomain(clock = io.clock)
 }
 
-class StreamOutFifo(output_width: Int) extends BlackBox {
+class StreamOutFifo(output_width: Int) extends Component {
   val io = new Bundle {
     val push = slave Stream(UInt(output_width*3 bits))
     val pop = master Stream(UInt(output_width*3 bits))

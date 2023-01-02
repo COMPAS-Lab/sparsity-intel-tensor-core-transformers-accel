@@ -47,8 +47,8 @@ class TensorCoreChainArray(array_col: Int, array_row: Int, chain_len: Int,
   }
 
   //adding pipes to the ctrl signals
-  val calEnDelay = Delay(io.calEn, 2, init=False)
-  val configDelay = Delay(io.configPorts, 2, init=TensorCoreChainArrayConfigPorts().getZero)
+  val calEnDelay = Delay(io.calEn, 4, init=False)
+  val configDelay = Delay(io.configPorts, 4, init=TensorCoreChainArrayConfigPorts().getZero)
 
   val rowBufferRdCounter = Array.fill(array_row){
     DynaCounter(16, configDelay.tccRowBufferCnterRange + (chain_len-1) * 2)
@@ -100,7 +100,8 @@ class TensorCoreChainArray(array_col: Int, array_row: Int, chain_len: Int,
     for (tcId <- 0 until chain_len) {
       val rowBufferWrCounter =
           DynaCounter(io.configPorts.tccColBufferCnterRange.getWidth, configDelay.tccRowBufferCnterRange)
-
+      rowBufferWrCounter.setName("rowMemWrCounter_" + r + "_" + tcId)
+      
       rowMem(r * chain_len + tcId).setName("rowMem_" + r + "_" + tcId)
       rowConverters(r)(tcId) = new FixedBfpConverter
       rowConverters(r)(tcId).io.dataIn <> io.matBLoad(r)(tcId).asFlow
@@ -160,11 +161,16 @@ class TensorCoreChainArray(array_col: Int, array_row: Int, chain_len: Int,
       dataInIterReady := tensorArray(r)(0).io.dataIterReady
       resOutValid := tensorArray(r)(0).io.outValid
       val dataInFinish = Reg(Bool()) init False
-
       val computeIterCounter =
-        DynaCounter(configDelay.matAColSubGrpLen.getWidth, configDelay.matAColSubGrpLen)
+        DynaCounter(configDelay.matAColSubGrpLen.getWidth, configDelay.matAColSubGrpLen-1)
       val resValidCounter =
-        DynaCounter(configDelay.matAColSubGrpLen.getWidth, configDelay.matAColSubGrpLen)
+        DynaCounter(configDelay.matAColSubGrpLen.getWidth, configDelay.matAColSubGrpLen-1)
+
+      loadRdy.setName("row_loadRdy_" + r)
+      dataInIterReady.setName("row_dataInIterReady_" + r)
+      resOutValid.setName("row_resOutValid_" + r)
+      computeIterCounter.setName("row_computeIterCounter_" + r)
+      resValidCounter.setName("row_resValidCounter_" + r)
 
       val sIdle: State = new State with EntryPoint {
         onEntry {
@@ -205,7 +211,7 @@ class TensorCoreChainArray(array_col: Int, array_row: Int, chain_len: Int,
             dataInFinish := True
           }
           when(dataInIterReady)(computeIterCounter.increment())
-          when(computeIterCounter.willOverflow) {
+          when(Delay(computeIterCounter.willOverflow, 1, init=False)) {
             goto(sWriteRes)
           }
         }
@@ -214,7 +220,7 @@ class TensorCoreChainArray(array_col: Int, array_row: Int, chain_len: Int,
       val sWriteRes: State = new State {
         whenIsActive {
           when(resOutValid)(resValidCounter.increment())
-          when(resValidCounter.willOverflow) {
+          when(Delay(resValidCounter.willOverflow, 1, init=False)) {
             goto(sIdle)
           }
         }
@@ -231,10 +237,17 @@ class TensorCoreChainArray(array_col: Int, array_row: Int, chain_len: Int,
       val loadFinish = Reg(Bool()) init False
 
       val loadIterCounter, computeIterCounter = {
-        DynaCounter(configDelay.matAColSubGrpLen.getWidth, configDelay.matAColSubGrpLen)
+        DynaCounter(configDelay.matAColSubGrpLen.getWidth, configDelay.matAColSubGrpLen-1)
       }
       val resValidCounter =
-        DynaCounter(configDelay.matAColSubGrpLen.getWidth, configDelay.matAColSubGrpLen)
+        DynaCounter(configDelay.matAColSubGrpLen.getWidth, configDelay.matAColSubGrpLen-1)
+
+      loadRdy.setName("col_loadRdy_" + c)
+      dataInIterReady.setName("col_dataInIterReady_" + c)
+      resOutValid.setName("col_resOutValid_" + c)
+      computeIterCounter.setName("col_computeIterCounter_" + c)
+      loadIterCounter.setName("col_loadIterCounter_" + c)
+      resValidCounter.setName("col_resValidCounter_" + c)
 
       val sIdle: State = new State with EntryPoint {
         onEntry {
@@ -281,7 +294,7 @@ class TensorCoreChainArray(array_col: Int, array_row: Int, chain_len: Int,
           when(resOutValid)(resValidCounter.increment())
           when(loadRdy)(loadIterCounter.increment())
           when(dataInIterReady)(computeIterCounter.increment())
-          when(computeIterCounter.willOverflow) {
+          when(Delay(computeIterCounter.willOverflow, 1, init=False)) {
             goto(sWriteRes)
           }
         }
@@ -290,7 +303,7 @@ class TensorCoreChainArray(array_col: Int, array_row: Int, chain_len: Int,
       val sWriteRes: State = new State {
         whenIsActive {
           when(resOutValid)(resValidCounter.increment())
-          when(resValidCounter.willOverflow) {
+          when(Delay(resValidCounter.willOverflow, 1, init=False)) {
             goto(sIdle)
           }
         }
@@ -315,11 +328,11 @@ class TensorCoreChainArray(array_col: Int, array_row: Int, chain_len: Int,
   val outShiftRegs = new Array[OutputShiftReg](array_row)
   for (regIdx <- 0 until array_row) {
     outShiftRegs(regIdx) = new OutputShiftReg(output_width * 3, array_col)
+    
     for (col <- 0 until array_col) {
-      outShiftRegs(regIdx).io.resIn(col) <<
-        StreamDelay(outputBufferSelOutDelayed(regIdx)(col), 2)
+      outShiftRegs(regIdx).io.resIn(col) << outputBufferSelOutDelayed(regIdx)(col)
     }
-    io.res(regIdx) <> outShiftRegs(regIdx).io.popOut
+    io.res(regIdx) << StreamDelay(outShiftRegs(regIdx).io.popOut, 5)
   }
 }
 
