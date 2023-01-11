@@ -2,6 +2,7 @@ package util
 
 import spinal.core._
 import spinal.lib._
+import scala.math.pow
 
 object LeadingZeros {
 
@@ -64,6 +65,38 @@ object DynaCounter {
     val dynaCounter = new DynaCounter(width)
     dynaCounter.overflowVal := overflowVal-1
     dynaCounter
+  }
+}
+
+class DelayTree(num_bit: Int, stage: Int) extends Component {
+  val io = new Bundle {
+    val dataIn = in UInt(num_bit bits)
+    val dataOut = out Vec(UInt(num_bit bits), pow(2, stage).toInt)
+  }
+
+  private var finishedOuts: Int = 0
+  private def tree_recurse(e: UInt, curr_stage: Int): Unit = {
+    if (curr_stage < stage-1) {
+      val a, b = Reg(UInt(num_bit bits))
+      tree_recurse(a, curr_stage+1)
+      tree_recurse(b, curr_stage+1)
+      a := e
+      b := e
+    } else {
+      io.dataOut(finishedOuts) := e
+      io.dataOut(finishedOuts+1) := e
+      finishedOuts += 2
+    }
+  }
+
+  tree_recurse(io.dataIn, 0)
+}
+
+object DelayTree {
+  def apply(src: UInt, stage: Int): Vec[UInt] = {
+    val tree = new DelayTree(src.getWidth, stage)
+    tree.io.dataIn := src
+    tree.io.dataOut
   }
 }
 

@@ -15,7 +15,7 @@
 // synopsys translate_off
 `timescale 1 ps / 1 ps
 // synopsys translate_on
-module  out_fifo_fifo_1910_pounbea  (
+module  out_fifo_fifo_1910_5btp2ny  (
     clock,
     data,
     rdreq,
@@ -58,11 +58,11 @@ module  out_fifo_fifo_1910_pounbea  (
         scfifo_component.enable_ecc  = "FALSE",
         scfifo_component.intended_device_family  = "Stratix 10",
         scfifo_component.lpm_hint  = "RAM_BLOCK_TYPE=M20K",
-        scfifo_component.lpm_numwords  = 128,
+        scfifo_component.lpm_numwords  = 32,
         scfifo_component.lpm_showahead  = "OFF",
         scfifo_component.lpm_type  = "scfifo",
         scfifo_component.lpm_width  = 72,
-        scfifo_component.lpm_widthu  = 7,
+        scfifo_component.lpm_widthu  = 5,
         scfifo_component.overflow_checking  = "ON",
         scfifo_component.underflow_checking  = "ON",
         scfifo_component.use_eab  = "ON";

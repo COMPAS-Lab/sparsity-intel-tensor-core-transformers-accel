@@ -128,28 +128,32 @@ class TensorCoreChainArray(array_col: Int, array_row: Int, chain_len: Int,
   }
 
   // data connection from row/col buffer to the tensor core chains
-  for (r <- 0 until array_row; c <- 0 until array_col) {
-    val rowMemOut: Vec[UInt] = Vec(UInt(8*11 bits), chain_len)
-    for (cl <- 0 until chain_len) (rowMemOut(cl) := rowMem(r * chain_len + cl).io.q)
+  for (c <- 0 until array_col) {
+    val delayedLoadCascadeIn = DelayTree(colMem(c).io.q(87 downto 8), log2Up(array_row))
+    val delayedExpCascadeIn = DelayTree(colMem(c).io.q(7 downto 0), log2Up(array_row))
+    for (r <- 0 until array_row) {
+      val rowMemOut: Vec[UInt] = Vec(UInt(8 * 11 bits), chain_len)
+      for (cl <- 0 until chain_len) (rowMemOut(cl) := rowMem(r * chain_len + cl).io.q)
 
-    for (tcId <- 0 until chain_len) {
-      // TODO: check timing of the delayed row address
-      tensorArray(r)(c).io.dataIn(tcId).valid :=
-        (rowMemAddr(r)(tcId) < io.configPorts.tccRowBufferCnterRange && rowMemAddr(r)(tcId) >= 2*tcId)
-      tensorArray(r)(c).io.dataIn(tcId).payload := Delay(rowMemOut(tcId)(87 downto 8), inout_pipe_delay, init = U"80'd0")
-      tensorArray(r)(c).io.expIn(tcId) := Delay(rowMemOut(tcId)(7 downto 0), inout_pipe_delay, init = U"8'd0")
+      for (tcId <- 0 until chain_len) {
+        // TODO: check timing of the delayed row address
+        tensorArray(r)(c).io.dataIn(tcId).valid :=
+          (rowMemAddr(r)(tcId) < io.configPorts.tccRowBufferCnterRange && rowMemAddr(r)(tcId) >= 2 * tcId)
+        tensorArray(r)(c).io.dataIn(tcId).payload := Delay(rowMemOut(tcId)(87 downto 8), inout_pipe_delay, init = U"80'd0")
+        tensorArray(r)(c).io.expIn(tcId) := Delay(rowMemOut(tcId)(7 downto 0), inout_pipe_delay, init = U"8'd0")
+      }
+
+      tensorArray(r)(c).io.loadCascadeIn := delayedLoadCascadeIn(r)
+      tensorArray(r)(c).io.expCascadeIn := delayedExpCascadeIn(r)
+      tensorArray(r)(c).io.loadValid := Delay(tensorLoadValid(c), 1 + 2 + inout_pipe_delay, init = False)
+      tensorArray(r)(c).io.dataValid := Delay(tensorDataValid(r), 1 + 2 + inout_pipe_delay, init = False)
+      // tensor core input iters: number of iterations to take matB sub columns
+      //   it is the number of B columns for a tensor core chain row.
+      //   it equals to the chain_loading_latency when the Dot Product
+      //   hides the matA loading latency just fine.
+      tensorArray(r)(c).io.inputIters := configDelay.matBColsPerTccRow
+      tensorArray(r)(c).io.matAColSubGrpLen := configDelay.matAColSubGrpLen
     }
-
-    tensorArray(r)(c).io.loadCascadeIn := Delay(colMem(c).io.q(87 downto 8), inout_pipe_delay, init=U"80'd0")
-    tensorArray(r)(c).io.expCascadeIn := Delay(colMem(c).io.q(7 downto 0), inout_pipe_delay, init=U"8'd0")
-    tensorArray(r)(c).io.loadValid := Delay(tensorLoadValid(c), 1+2+inout_pipe_delay, init=False)
-    tensorArray(r)(c).io.dataValid := Delay(tensorDataValid(r), 1+2+inout_pipe_delay, init=False)
-    // tensor core input iters: number of iterations to take matB sub columns
-    //   it is the number of B columns for a tensor core chain row.
-    //   it equals to the chain_loading_latency when the Dot Product
-    //   hides the matA loading latency just fine.
-    tensorArray(r)(c).io.inputIters := configDelay.matBColsPerTccRow
-    tensorArray(r)(c).io.matAColSubGrpLen := configDelay.matAColSubGrpLen
   }
 
   // compute control path
@@ -173,14 +177,12 @@ class TensorCoreChainArray(array_col: Int, array_row: Int, chain_len: Int,
       resValidCounter.setName("row_resValidCounter_" + r)
 
       val sIdle: State = new State with EntryPoint {
-        onEntry {
+        whenIsActive {
           rowBufferRdCounter(r).clear()
           computeIterCounter.clear()
           resValidCounter.clear()
           tensorDataValid(r) := False
           dataInFinish := False
-        }
-        whenIsActive {
           when(calEnDelay) {
             goto(sPreLoad)
           }
@@ -250,14 +252,12 @@ class TensorCoreChainArray(array_col: Int, array_row: Int, chain_len: Int,
       resValidCounter.setName("col_resValidCounter_" + c)
 
       val sIdle: State = new State with EntryPoint {
-        onEntry {
+        whenIsActive {
           colBufferRdCounter(c).clear()
           computeIterCounter.clear()
           resValidCounter.clear()
           tensorLoadValid(c) := False
           loadFinish := False
-        }
-        whenIsActive {
           when(calEnDelay) {
             goto(sPreLoad)
           }
@@ -330,9 +330,9 @@ class TensorCoreChainArray(array_col: Int, array_row: Int, chain_len: Int,
     outShiftRegs(regIdx) = new OutputShiftReg(output_width * 3, array_col)
     
     for (col <- 0 until array_col) {
-      outShiftRegs(regIdx).io.resIn(col) << outputBufferSelOutDelayed(regIdx)(col)
+      outShiftRegs(regIdx).io.resIn(col) << StreamDelay(outputBufferSelOutDelayed(regIdx)(col), 3)
     }
-    io.res(regIdx) << StreamDelay(outShiftRegs(regIdx).io.popOut, 5)
+    io.res(regIdx) << StreamDelay(outShiftRegs(regIdx).io.popOut, 3)
   }
 }
 

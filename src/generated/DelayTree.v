@@ -1,0 +1,77 @@
+// Generator : SpinalHDL v1.7.3a    git head : 04162b8322332003bd011fabf5de3e7522c45630
+// Component : DelayTree
+// Git hash  : cb207be92a3693b2f4fe24f4792cfe4129d4d797
+
+`timescale 1ns/1ps 
+module DelayTree (
+  input      [79:0]   io_dataIn,
+  output     [79:0]   io_dataOut_0,
+  output     [79:0]   io_dataOut_1,
+  output     [79:0]   io_dataOut_2,
+  output     [79:0]   io_dataOut_3,
+  output     [79:0]   io_dataOut_4,
+  output     [79:0]   io_dataOut_5,
+  output     [79:0]   io_dataOut_6,
+  output     [79:0]   io_dataOut_7,
+  output     [79:0]   io_dataOut_8,
+  output     [79:0]   io_dataOut_9,
+  output     [79:0]   io_dataOut_10,
+  output     [79:0]   io_dataOut_11,
+  output     [79:0]   io_dataOut_12,
+  output     [79:0]   io_dataOut_13,
+  output     [79:0]   io_dataOut_14,
+  output     [79:0]   io_dataOut_15,
+  input               clk,
+  input               clrn
+);
+
+  reg        [79:0]   _zz_io_dataOut_0;
+  reg        [79:0]   _zz_io_dataOut_8;
+  reg        [79:0]   _zz_io_dataOut_0_1;
+  reg        [79:0]   _zz_io_dataOut_4;
+  reg        [79:0]   _zz_io_dataOut_0_2;
+  reg        [79:0]   _zz_io_dataOut_2;
+  reg        [79:0]   _zz_io_dataOut_4_1;
+  reg        [79:0]   _zz_io_dataOut_6;
+  reg        [79:0]   _zz_io_dataOut_8_1;
+  reg        [79:0]   _zz_io_dataOut_12;
+  reg        [79:0]   _zz_io_dataOut_8_2;
+  reg        [79:0]   _zz_io_dataOut_10;
+  reg        [79:0]   _zz_io_dataOut_12_1;
+  reg        [79:0]   _zz_io_dataOut_14;
+
+  assign io_dataOut_0 = _zz_io_dataOut_0_2;
+  assign io_dataOut_1 = _zz_io_dataOut_0_2;
+  assign io_dataOut_2 = _zz_io_dataOut_2;
+  assign io_dataOut_3 = _zz_io_dataOut_2;
+  assign io_dataOut_4 = _zz_io_dataOut_4_1;
+  assign io_dataOut_5 = _zz_io_dataOut_4_1;
+  assign io_dataOut_6 = _zz_io_dataOut_6;
+  assign io_dataOut_7 = _zz_io_dataOut_6;
+  assign io_dataOut_8 = _zz_io_dataOut_8_2;
+  assign io_dataOut_9 = _zz_io_dataOut_8_2;
+  assign io_dataOut_10 = _zz_io_dataOut_10;
+  assign io_dataOut_11 = _zz_io_dataOut_10;
+  assign io_dataOut_12 = _zz_io_dataOut_12_1;
+  assign io_dataOut_13 = _zz_io_dataOut_12_1;
+  assign io_dataOut_14 = _zz_io_dataOut_14;
+  assign io_dataOut_15 = _zz_io_dataOut_14;
+  always @(posedge clk) begin
+    _zz_io_dataOut_0_2 <= _zz_io_dataOut_0_1;
+    _zz_io_dataOut_2 <= _zz_io_dataOut_0_1;
+    _zz_io_dataOut_4_1 <= _zz_io_dataOut_4;
+    _zz_io_dataOut_6 <= _zz_io_dataOut_4;
+    _zz_io_dataOut_0_1 <= _zz_io_dataOut_0;
+    _zz_io_dataOut_4 <= _zz_io_dataOut_0;
+    _zz_io_dataOut_8_2 <= _zz_io_dataOut_8_1;
+    _zz_io_dataOut_10 <= _zz_io_dataOut_8_1;
+    _zz_io_dataOut_12_1 <= _zz_io_dataOut_12;
+    _zz_io_dataOut_14 <= _zz_io_dataOut_12;
+    _zz_io_dataOut_8_1 <= _zz_io_dataOut_8;
+    _zz_io_dataOut_12 <= _zz_io_dataOut_8;
+    _zz_io_dataOut_0 <= io_dataIn;
+    _zz_io_dataOut_8 <= io_dataIn;
+  end
+
+
+endmodule

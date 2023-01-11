@@ -2,6 +2,8 @@
 ./src/generated/StreamOutFifo.v
 ./src/generated/TensorCoreChainBf12.v
 ./src/generated/FixedBfpConverter.v
+./src/generated/DelayTree.v
+./src/generated/DelayTree_1.v
 ./src/generated/OutputShiftReg.v
 ./src/generated/StreamDelay.v
 ./src/generated/InputShiftReg.v

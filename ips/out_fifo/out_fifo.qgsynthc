@@ -50,7 +50,7 @@
           </parameter>
           <parameter>
             <name>GUI_Depth</name>
-            <value>128</value>
+            <value>32</value>
           </parameter>
           <parameter>
             <name>GUI_ENABLE_ECC</name>
@@ -114,7 +114,7 @@
           </parameter>
           <parameter>
             <name>GUI_Usedw_width</name>
-            <value>7</value>
+            <value>5</value>
           </parameter>
           <parameter>
             <name>GUI_Width</name>
@@ -193,7 +193,7 @@
         <className>fifo</className>
         <version>19.1.0</version>
         <name>fifo_0</name>
-        <uniqueName>out_fifo_fifo_1910_pounbea</uniqueName>
+        <uniqueName>out_fifo_fifo_1910_5btp2ny</uniqueName>
         <nonce>0</nonce>
         <incidentConnections></incidentConnections>
         <path>out_fifo.fifo_0</path>

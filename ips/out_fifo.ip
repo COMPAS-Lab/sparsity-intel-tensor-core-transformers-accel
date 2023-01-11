@@ -318,7 +318,7 @@
         <ipxact:parameter parameterId="GUI_Depth" type="int">
           <ipxact:name>GUI_Depth</ipxact:name>
           <ipxact:displayName>How deep should the FIFO be?</ipxact:displayName>
-          <ipxact:value>128</ipxact:value>
+          <ipxact:value>32</ipxact:value>
         </ipxact:parameter>
         <ipxact:parameter parameterId="GUI_output_width" type="int">
           <ipxact:name>GUI_output_width</ipxact:name>
@@ -463,7 +463,7 @@
         <ipxact:parameter parameterId="GUI_Usedw_width" type="int">
           <ipxact:name>GUI_Usedw_width</ipxact:name>
           <ipxact:displayName>GUI_Usedw_width</ipxact:displayName>
-          <ipxact:value>7</ipxact:value>
+          <ipxact:value>5</ipxact:value>
         </ipxact:parameter>
         <ipxact:parameter parameterId="GUI_RdUsedw_width" type="int">
           <ipxact:name>GUI_RdUsedw_width</ipxact:name>
