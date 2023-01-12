@@ -312,27 +312,34 @@ class TensorCoreChainArray(array_col: Int, array_row: Int, chain_len: Int,
   }
 
   //output buffer path
-  val outputBufferSelOut = Vec(Stream(UInt(output_width * 3 bits)), array_row * array_col)
-  val outputBufferSelOutDelayed =
+  val outputBufferSelOut =
     Vec(Vec(Stream(UInt(output_width * 3 bits)), array_col), array_row)
 
   for (r <- 0 until array_row; c <- 0 until array_col) {
     val tcChainId = r * array_col + c
-    outputBufferSelOut(tcChainId).payload := tensorArray(r)(c).io.res.payload.asBits.asUInt
-    outputBufferSelOut(tcChainId).valid := tensorArray(r)(c).io.res.valid
-    tensorArray(r)(c).io.res.ready := outputBufferSelOut(tcChainId).ready
-    outputBufferSelOutDelayed(r)(c) << outputBufferSelOut(tcChainId)
+    outputBufferSelOut(r)(c).payload := tensorArray(r)(c).io.res.payload.asBits.asUInt
+    outputBufferSelOut(r)(c).valid := tensorArray(r)(c).io.res.valid
+    tensorArray(r)(c).io.res.ready := outputBufferSelOut(r)(c).ready
   }
 
   // TODO: verify function of shift regs
   val outShiftRegs = new Array[OutputShiftReg](array_row)
+  val outResDelayUnblocked = Vec(Flow (UInt(output_width * 3 bits)), array_row)
+  val outBuffer = new Array[StreamFifo[UInt]](array_row)
   for (regIdx <- 0 until array_row) {
     outShiftRegs(regIdx) = new OutputShiftReg(output_width * 3, array_col)
     
     for (col <- 0 until array_col) {
-      outShiftRegs(regIdx).io.resIn(col) << StreamDelay(outputBufferSelOutDelayed(regIdx)(col), 3)
+      outShiftRegs(regIdx).io.resIn(col) << StreamDelay(outputBufferSelOut(regIdx)(col), 3)
     }
-    io.res(regIdx) << StreamDelay(outShiftRegs(regIdx).io.popOut, 3)
+
+    outResDelayUnblocked(regIdx) << outShiftRegs(regIdx).io.popOut.toFlow
+    outBuffer(regIdx) = StreamFifo(UInt(outResDelayUnblocked(regIdx).payload.getWidth bits), 64)
+    outBuffer(regIdx).io.push.payload := Delay(outResDelayUnblocked(regIdx).payload, 4,
+      init=outResDelayUnblocked(regIdx).payload.getZero)
+    outBuffer(regIdx).io.push.valid := Delay(outResDelayUnblocked(regIdx).valid, 4, init=False)
+
+    io.res(regIdx) << outBuffer(regIdx).io.pop
   }
 }
 
