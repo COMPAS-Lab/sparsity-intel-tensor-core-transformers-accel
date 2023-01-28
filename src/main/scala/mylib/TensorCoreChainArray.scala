@@ -313,32 +313,42 @@ class TensorCoreChainArray(array_col: Int, array_row: Int, chain_len: Int,
 
   //output buffer path
   val outputBufferSelOut =
-    Vec(Vec(Stream(UInt(output_width * 3 bits)), array_col), array_row)
+    Vec(Vec(Flow(UInt(output_width * 3 bits)), array_col), array_row)
 
   for (r <- 0 until array_row; c <- 0 until array_col) {
     val tcChainId = r * array_col + c
     outputBufferSelOut(r)(c).payload := tensorArray(r)(c).io.res.payload.asBits.asUInt
     outputBufferSelOut(r)(c).valid := tensorArray(r)(c).io.res.valid
-    tensorArray(r)(c).io.res.ready := outputBufferSelOut(r)(c).ready
+    tensorArray(r)(c).io.res.ready := True
   }
 
   // TODO: verify function of shift regs
-  val outShiftRegs = new Array[OutputShiftReg](array_row)
-  val outResDelayUnblocked = Vec(Flow (UInt(output_width * 3 bits)), array_row)
-  val outBuffer = new Array[StreamFifo[UInt]](array_row)
+  // val outShiftRegs = new Array[OutputShiftReg](array_row)
+  // val outResDelayUnblocked = Vec(Flow (UInt(output_width * 3 bits)), array_row)
+  // val outBuffer = new Array[StreamFifo[UInt]](array_row)
+  val outBuffer = new Array[StreamOutAsymFifo](array_row)
   for (regIdx <- 0 until array_row) {
-    outShiftRegs(regIdx) = new OutputShiftReg(output_width * 3, array_col)
+    // outShiftRegs(regIdx) = new OutputShiftReg(output_width * 3, array_col)
     
-    for (col <- 0 until array_col) {
-      outShiftRegs(regIdx).io.resIn(col) << StreamDelay(outputBufferSelOut(regIdx)(col), 3)
-    }
+    // for (col <- 0 until array_col) {
+      //temperarly break the back pressure from output shift register to
+      // check timing
+      // outShiftRegs(regIdx).io.resIn(col) << Delay(outputBufferSelOut(regIdx)(col), 4)
+      // outShiftRegs(regIdx).io.resIn(col).valid := Delay(outputBufferSelOut(regIdx)(col).valid, 4)
+      // outShiftRegs(regIdx).io.resIn(col).payload := Delay(outputBufferSelOut(regIdx)(col).payload, 4)
+    // }
 
-    outResDelayUnblocked(regIdx) << outShiftRegs(regIdx).io.popOut.toFlow
-    outBuffer(regIdx) = StreamFifo(UInt(outResDelayUnblocked(regIdx).payload.getWidth bits), 64)
-    outBuffer(regIdx).io.push.payload := Delay(outResDelayUnblocked(regIdx).payload, 4,
-      init=outResDelayUnblocked(regIdx).payload.getZero)
-    outBuffer(regIdx).io.push.valid := Delay(outResDelayUnblocked(regIdx).valid, 4, init=False)
+    // outResDelayUnblocked(regIdx) << outShiftRegs(regIdx).io.popOut
+    // outBuffer(regIdx) = StreamFifo(UInt(outResDelayUnblocked(regIdx).payload.getWidth bits), 64)
+    // outBuffer(regIdx).io.push.payload := Delay(outResDelayUnblocked(regIdx).payload, 4,
+    //   init=outResDelayUnblocked(regIdx).payload.getZero)
+    // outBuffer(regIdx).io.push.valid := Delay(outResDelayUnblocked(regIdx).valid, 4, init=False)
 
+    outBuffer(regIdx) = new StreamOutAsymFifo(output_width * 3 * array_col, output_width * 3)
+    outBuffer(regIdx).io.push.valid := Delay(outputBufferSelOut(regIdx)(0).valid, inout_pipe_delay)
+    outBuffer(regIdx).io.push.payload := 
+      Delay(List.tabulate(array_col)(i => outputBufferSelOut(regIdx)(i).payload).reduce((a, b) => a @@ b), inout_pipe_delay)
+    
     io.res(regIdx) << outBuffer(regIdx).io.pop
   }
 }

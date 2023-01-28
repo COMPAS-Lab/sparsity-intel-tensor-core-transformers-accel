@@ -91,7 +91,7 @@ class tensor_core_array_wrapper(array_col: Int, array_row: Int, chain_len: Int,
                                       chain_len = chain_len, out_buf_delay = chain_len*3-3,
                                       col_buf_max_depth = 128, row_buf_max_depth = 128,
                                       output_fifo_depth = 128, output_width = 24, 
-                                      inout_pipe_delay = 3)
+                                      inout_pipe_delay = 4)
 
   tcArray.io.matALoad <> data2TcarrayCol
   for (rowIdx <- 0 until array_row; chainIdx <- 0 until chain_len) {
@@ -200,9 +200,9 @@ class tensor_core_array_wrapper(array_col: Int, array_row: Int, chain_len: Int,
 object tensor_core_array_wrapper_gen {
   def main(args: Array[String]): Unit = {
     val gen = new DefaultConfig
-    val array_col = 20
+    val array_col = 16
     val array_row = 15
-    val chain_len = 4
+    val chain_len = 6
     gen.defaultSpinalConfig.withoutEnumString().generate(new tensor_core_array_wrapper(
       array_col = array_col,
       array_row = array_row,

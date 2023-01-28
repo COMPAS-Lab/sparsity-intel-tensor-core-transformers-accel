@@ -1,12 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <preferences>
  <debug showDebugMenu="0" />
- <window width="1333" height="932" x="0" y="0" />
+ <window width="1100" height="800" x="0" y="0" />
  <generation
    path=""
-   simulation="VERILOG"
    block_symbol_file="0"
    documentation="0"
-   clear_previous="1"
-   greybox="0" />
+   simulation="VERILOG"
+   clear_previous="1" />
 </preferences>

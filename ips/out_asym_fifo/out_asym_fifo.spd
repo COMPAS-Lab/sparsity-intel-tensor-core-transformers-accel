@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<simPackage>
+ <file
+   path="fifo_1910/sim/out_asym_fifo_fifo_1910_5vttcmy.v"
+   type="VERILOG"
+   library="fifo_1910" />
+ <file
+   path="fifo_1910/sim/out_asym_fifo_fifo_1910_5vttcmy.sdc"
+   type="SDC_ENTITY"
+   library="fifo_1910" />
+ <file
+   path="sim/out_asym_fifo.v"
+   type="VERILOG"
+   library="out_asym_fifo"
+   hasInlineConfiguration="true" />
+ <topLevel name="out_asym_fifo.out_asym_fifo" />
+ <deviceFamily name="stratix10" />
+</simPackage>

@@ -1,6 +1,6 @@
 // Generator : SpinalHDL v1.7.3a    git head : 04162b8322332003bd011fabf5de3e7522c45630
 // Component : TensorCoreChainBf12
-// Git hash  : cb207be92a3693b2f4fe24f4792cfe4129d4d797
+// Git hash  : 257eb1a112838047dc69fc54ad4c70da7b455b11
 
 `timescale 1ns/1ps 
 module TensorCoreChainBf12 (
@@ -12,11 +12,17 @@ module TensorCoreChainBf12 (
   input      [79:0]   io_dataIn_2_payload,
   input               io_dataIn_3_valid,
   input      [79:0]   io_dataIn_3_payload,
+  input               io_dataIn_4_valid,
+  input      [79:0]   io_dataIn_4_payload,
+  input               io_dataIn_5_valid,
+  input      [79:0]   io_dataIn_5_payload,
   input      [79:0]   io_loadCascadeIn,
   input      [7:0]    io_expIn_0,
   input      [7:0]    io_expIn_1,
   input      [7:0]    io_expIn_2,
   input      [7:0]    io_expIn_3,
+  input      [7:0]    io_expIn_4,
+  input      [7:0]    io_expIn_5,
   input      [7:0]    io_expCascadeIn,
   input               io_dataValid,
   output              io_dataIterReady,
@@ -142,6 +148,50 @@ module TensorCoreChainBf12 (
   wire       [3:0]    tensor_core_bf12_3_data_in_20;
   wire                tensor_core_bf12_3_load_bb_one;
   wire                tensor_core_bf12_3_load_bb_two;
+  wire       [3:0]    tensor_core_bf12_4_data_in_1;
+  wire       [3:0]    tensor_core_bf12_4_data_in_2;
+  wire       [3:0]    tensor_core_bf12_4_data_in_3;
+  wire       [3:0]    tensor_core_bf12_4_data_in_4;
+  wire       [3:0]    tensor_core_bf12_4_data_in_5;
+  wire       [3:0]    tensor_core_bf12_4_data_in_6;
+  wire       [3:0]    tensor_core_bf12_4_data_in_7;
+  wire       [3:0]    tensor_core_bf12_4_data_in_8;
+  wire       [3:0]    tensor_core_bf12_4_data_in_9;
+  wire       [3:0]    tensor_core_bf12_4_data_in_10;
+  wire       [3:0]    tensor_core_bf12_4_data_in_11;
+  wire       [3:0]    tensor_core_bf12_4_data_in_12;
+  wire       [3:0]    tensor_core_bf12_4_data_in_13;
+  wire       [3:0]    tensor_core_bf12_4_data_in_14;
+  wire       [3:0]    tensor_core_bf12_4_data_in_15;
+  wire       [3:0]    tensor_core_bf12_4_data_in_16;
+  wire       [3:0]    tensor_core_bf12_4_data_in_17;
+  wire       [3:0]    tensor_core_bf12_4_data_in_18;
+  wire       [3:0]    tensor_core_bf12_4_data_in_19;
+  wire       [3:0]    tensor_core_bf12_4_data_in_20;
+  wire                tensor_core_bf12_4_load_bb_one;
+  wire                tensor_core_bf12_4_load_bb_two;
+  wire       [3:0]    tensor_core_bf12_5_data_in_1;
+  wire       [3:0]    tensor_core_bf12_5_data_in_2;
+  wire       [3:0]    tensor_core_bf12_5_data_in_3;
+  wire       [3:0]    tensor_core_bf12_5_data_in_4;
+  wire       [3:0]    tensor_core_bf12_5_data_in_5;
+  wire       [3:0]    tensor_core_bf12_5_data_in_6;
+  wire       [3:0]    tensor_core_bf12_5_data_in_7;
+  wire       [3:0]    tensor_core_bf12_5_data_in_8;
+  wire       [3:0]    tensor_core_bf12_5_data_in_9;
+  wire       [3:0]    tensor_core_bf12_5_data_in_10;
+  wire       [3:0]    tensor_core_bf12_5_data_in_11;
+  wire       [3:0]    tensor_core_bf12_5_data_in_12;
+  wire       [3:0]    tensor_core_bf12_5_data_in_13;
+  wire       [3:0]    tensor_core_bf12_5_data_in_14;
+  wire       [3:0]    tensor_core_bf12_5_data_in_15;
+  wire       [3:0]    tensor_core_bf12_5_data_in_16;
+  wire       [3:0]    tensor_core_bf12_5_data_in_17;
+  wire       [3:0]    tensor_core_bf12_5_data_in_18;
+  wire       [3:0]    tensor_core_bf12_5_data_in_19;
+  wire       [3:0]    tensor_core_bf12_5_data_in_20;
+  wire                tensor_core_bf12_5_load_bb_one;
+  wire                tensor_core_bf12_5_load_bb_two;
   wire       [71:0]   AccuDelayInst_io_push_payload;
   reg                 AccuDelayInst_io_pop_ready;
   wire       [23:0]   tcEntry_bf24_col_1;
@@ -185,12 +235,26 @@ module TensorCoreChainBf12 (
   wire       [31:0]   tensor_core_bf12_3_cascade_data_out_col_1;
   wire       [31:0]   tensor_core_bf12_3_cascade_data_out_col_2;
   wire       [31:0]   tensor_core_bf12_3_cascade_data_out_col_3;
+  wire       [23:0]   tensor_core_bf12_4_bf24_col_1;
+  wire       [23:0]   tensor_core_bf12_4_bf24_col_2;
+  wire       [23:0]   tensor_core_bf12_4_bf24_col_3;
+  wire       [87:0]   tensor_core_bf12_4_cascade_weight_out;
+  wire       [31:0]   tensor_core_bf12_4_cascade_data_out_col_1;
+  wire       [31:0]   tensor_core_bf12_4_cascade_data_out_col_2;
+  wire       [31:0]   tensor_core_bf12_4_cascade_data_out_col_3;
+  wire       [23:0]   tensor_core_bf12_5_bf24_col_1;
+  wire       [23:0]   tensor_core_bf12_5_bf24_col_2;
+  wire       [23:0]   tensor_core_bf12_5_bf24_col_3;
+  wire       [87:0]   tensor_core_bf12_5_cascade_weight_out;
+  wire       [31:0]   tensor_core_bf12_5_cascade_data_out_col_1;
+  wire       [31:0]   tensor_core_bf12_5_cascade_data_out_col_2;
+  wire       [31:0]   tensor_core_bf12_5_cascade_data_out_col_3;
   wire                AccuDelayInst_io_push_ready;
   wire                AccuDelayInst_io_pop_valid;
   wire       [71:0]   AccuDelayInst_io_pop_payload;
-  wire       [3:0]    _zz_loadCounter_valueNext;
+  wire       [4:0]    _zz_loadCounter_valueNext;
   wire       [0:0]    _zz_loadCounter_valueNext_1;
-  wire       [3:0]    _zz_loadSelCounter_valueNext;
+  wire       [4:0]    _zz_loadSelCounter_valueNext;
   wire       [0:0]    _zz_loadSelCounter_valueNext_1;
   wire       [15:0]   _zz_inputCounter_valueNext;
   wire       [0:0]    _zz_inputCounter_valueNext_1;
@@ -205,14 +269,14 @@ module TensorCoreChainBf12 (
   reg                 loadValidD2t;
   reg                 loadCounter_willIncrement;
   wire                loadCounter_willClear;
-  reg        [3:0]    loadCounter_valueNext;
-  reg        [3:0]    loadCounter_value;
+  reg        [4:0]    loadCounter_valueNext;
+  reg        [4:0]    loadCounter_value;
   wire                loadCounter_willOverflowIfInc;
   wire                loadCounter_willOverflow;
   reg                 loadSelCounter_willIncrement;
   wire                loadSelCounter_willClear;
-  reg        [3:0]    loadSelCounter_valueNext;
-  reg        [3:0]    loadSelCounter_value;
+  reg        [4:0]    loadSelCounter_valueNext;
+  reg        [4:0]    loadSelCounter_value;
   wire                loadSelCounter_willOverflowIfInc;
   wire                loadSelCounter_willOverflow;
   reg        [1:0]    loadBufCtrlReg;
@@ -237,6 +301,10 @@ module TensorCoreChainBf12 (
   reg                 io_dataValid_delay_9;
   reg                 io_dataValid_delay_10;
   reg                 io_dataValid_delay_11;
+  reg                 io_dataValid_delay_12;
+  reg                 io_dataValid_delay_13;
+  reg                 io_dataValid_delay_14;
+  reg                 io_dataValid_delay_15;
   reg                 oBufferLoadValid;
   wire       [15:0]   outValidCounter_overflowVal;
   reg                 outValidCounter_willIncrement;
@@ -262,6 +330,12 @@ module TensorCoreChainBf12 (
   reg                 oBufferLoadValid_delay_3;
   reg                 oBufferLoadValid_delay_4;
   reg                 oBufferLoadValid_delay_5;
+  reg                 oBufferLoadValid_delay_6;
+  reg                 oBufferLoadValid_delay_7;
+  reg                 oBufferLoadValid_delay_8;
+  reg                 oBufferLoadValid_delay_9;
+  reg                 oBufferLoadValid_delay_10;
+  reg                 oBufferLoadValid_delay_11;
   reg        [23:0]   fbDelayFifoPayload_0_delay_1;
   reg        [23:0]   fbDelayFifoPayload_0_delay_2;
   reg        [23:0]   fbDelayFifoPayload_1_delay_1;
@@ -270,9 +344,9 @@ module TensorCoreChainBf12 (
   reg        [23:0]   fbDelayFifoPayload_2_delay_2;
 
   assign _zz_loadCounter_valueNext_1 = loadCounter_willIncrement;
-  assign _zz_loadCounter_valueNext = {3'd0, _zz_loadCounter_valueNext_1};
+  assign _zz_loadCounter_valueNext = {4'd0, _zz_loadCounter_valueNext_1};
   assign _zz_loadSelCounter_valueNext_1 = loadSelCounter_willIncrement;
-  assign _zz_loadSelCounter_valueNext = {3'd0, _zz_loadSelCounter_valueNext_1};
+  assign _zz_loadSelCounter_valueNext = {4'd0, _zz_loadSelCounter_valueNext_1};
   assign _zz_inputCounter_valueNext_1 = inputCounter_willIncrement;
   assign _zz_inputCounter_valueNext = {15'd0, _zz_inputCounter_valueNext_1};
   assign _zz_outValidCounter_valueNext_1 = outValidCounter_willIncrement;
@@ -370,9 +444,9 @@ module TensorCoreChainBf12 (
     .bf24_a1                (fbDelayFifoPayload_0_delay_2[23:0]             ), //i
     .bf24_a2                (fbDelayFifoPayload_1_delay_2[23:0]             ), //i
     .bf24_a3                (fbDelayFifoPayload_2_delay_2[23:0]             ), //i
-    .cascade_data_in_col_1  (tensor_core_bf12_3_cascade_data_out_col_1[31:0]), //i
-    .cascade_data_in_col_2  (tensor_core_bf12_3_cascade_data_out_col_2[31:0]), //i
-    .cascade_data_in_col_3  (tensor_core_bf12_3_cascade_data_out_col_3[31:0]), //i
+    .cascade_data_in_col_1  (tensor_core_bf12_5_cascade_data_out_col_1[31:0]), //i
+    .cascade_data_in_col_2  (tensor_core_bf12_5_cascade_data_out_col_2[31:0]), //i
+    .cascade_data_in_col_3  (tensor_core_bf12_5_cascade_data_out_col_3[31:0]), //i
     .bf24_col_1             (tcAccu_bf24_col_1[23:0]                        ), //o
     .bf24_col_2             (tcAccu_bf24_col_2[23:0]                        ), //o
     .bf24_col_3             (tcAccu_bf24_col_3[23:0]                        ), //o
@@ -521,6 +595,100 @@ module TensorCoreChainBf12 (
     .cascade_data_out_col_2 (tensor_core_bf12_3_cascade_data_out_col_2[31:0]), //o
     .cascade_data_out_col_3 (tensor_core_bf12_3_cascade_data_out_col_3[31:0])  //o
   );
+  tensor_core_bf12 tensor_core_bf12_4 (
+    .clk                    (clk                                            ), //i
+    .data_in_1              (tensor_core_bf12_4_data_in_1[3:0]              ), //i
+    .data_in_2              (tensor_core_bf12_4_data_in_2[3:0]              ), //i
+    .data_in_3              (tensor_core_bf12_4_data_in_3[3:0]              ), //i
+    .data_in_4              (tensor_core_bf12_4_data_in_4[3:0]              ), //i
+    .data_in_5              (tensor_core_bf12_4_data_in_5[3:0]              ), //i
+    .data_in_6              (tensor_core_bf12_4_data_in_6[3:0]              ), //i
+    .data_in_7              (tensor_core_bf12_4_data_in_7[3:0]              ), //i
+    .data_in_8              (tensor_core_bf12_4_data_in_8[3:0]              ), //i
+    .data_in_9              (tensor_core_bf12_4_data_in_9[3:0]              ), //i
+    .data_in_10             (tensor_core_bf12_4_data_in_10[3:0]             ), //i
+    .data_in_11             (tensor_core_bf12_4_data_in_11[3:0]             ), //i
+    .data_in_12             (tensor_core_bf12_4_data_in_12[3:0]             ), //i
+    .data_in_13             (tensor_core_bf12_4_data_in_13[3:0]             ), //i
+    .data_in_14             (tensor_core_bf12_4_data_in_14[3:0]             ), //i
+    .data_in_15             (tensor_core_bf12_4_data_in_15[3:0]             ), //i
+    .data_in_16             (tensor_core_bf12_4_data_in_16[3:0]             ), //i
+    .data_in_17             (tensor_core_bf12_4_data_in_17[3:0]             ), //i
+    .data_in_18             (tensor_core_bf12_4_data_in_18[3:0]             ), //i
+    .data_in_19             (tensor_core_bf12_4_data_in_19[3:0]             ), //i
+    .data_in_20             (tensor_core_bf12_4_data_in_20[3:0]             ), //i
+    .side_in_1              (4'b0000                                        ), //i
+    .side_in_2              (4'b0000                                        ), //i
+    .side_in_3              (4'b0000                                        ), //i
+    .side_in_4              (4'b0000                                        ), //i
+    .shared_exponent_data   (io_expIn_4[7:0]                                ), //i
+    .feed_sel               (2'b01                                          ), //i
+    .load_bb_one            (tensor_core_bf12_4_load_bb_one                 ), //i
+    .load_bb_two            (tensor_core_bf12_4_load_bb_two                 ), //i
+    .load_buf_sel           (loadBufSel                                     ), //i
+    .bf24_col_1             (tensor_core_bf12_4_bf24_col_1[23:0]            ), //o
+    .bf24_col_2             (tensor_core_bf12_4_bf24_col_2[23:0]            ), //o
+    .bf24_col_3             (tensor_core_bf12_4_bf24_col_3[23:0]            ), //o
+    .acc_en                 (1'b0                                           ), //i
+    .zero_en                (1'b0                                           ), //i
+    .clr0                   (io_dataIn_4_valid                              ), //i
+    .clr1                   (1'b0                                           ), //i
+    .cascade_weight_in      (tensor_core_bf12_3_cascade_weight_out[87:0]    ), //i
+    .cascade_weight_out     (tensor_core_bf12_4_cascade_weight_out[87:0]    ), //o
+    .cascade_data_in_col_1  (tensor_core_bf12_3_cascade_data_out_col_1[31:0]), //i
+    .cascade_data_in_col_2  (tensor_core_bf12_3_cascade_data_out_col_2[31:0]), //i
+    .cascade_data_in_col_3  (tensor_core_bf12_3_cascade_data_out_col_3[31:0]), //i
+    .cascade_data_out_col_1 (tensor_core_bf12_4_cascade_data_out_col_1[31:0]), //o
+    .cascade_data_out_col_2 (tensor_core_bf12_4_cascade_data_out_col_2[31:0]), //o
+    .cascade_data_out_col_3 (tensor_core_bf12_4_cascade_data_out_col_3[31:0])  //o
+  );
+  tensor_core_bf12 tensor_core_bf12_5 (
+    .clk                    (clk                                            ), //i
+    .data_in_1              (tensor_core_bf12_5_data_in_1[3:0]              ), //i
+    .data_in_2              (tensor_core_bf12_5_data_in_2[3:0]              ), //i
+    .data_in_3              (tensor_core_bf12_5_data_in_3[3:0]              ), //i
+    .data_in_4              (tensor_core_bf12_5_data_in_4[3:0]              ), //i
+    .data_in_5              (tensor_core_bf12_5_data_in_5[3:0]              ), //i
+    .data_in_6              (tensor_core_bf12_5_data_in_6[3:0]              ), //i
+    .data_in_7              (tensor_core_bf12_5_data_in_7[3:0]              ), //i
+    .data_in_8              (tensor_core_bf12_5_data_in_8[3:0]              ), //i
+    .data_in_9              (tensor_core_bf12_5_data_in_9[3:0]              ), //i
+    .data_in_10             (tensor_core_bf12_5_data_in_10[3:0]             ), //i
+    .data_in_11             (tensor_core_bf12_5_data_in_11[3:0]             ), //i
+    .data_in_12             (tensor_core_bf12_5_data_in_12[3:0]             ), //i
+    .data_in_13             (tensor_core_bf12_5_data_in_13[3:0]             ), //i
+    .data_in_14             (tensor_core_bf12_5_data_in_14[3:0]             ), //i
+    .data_in_15             (tensor_core_bf12_5_data_in_15[3:0]             ), //i
+    .data_in_16             (tensor_core_bf12_5_data_in_16[3:0]             ), //i
+    .data_in_17             (tensor_core_bf12_5_data_in_17[3:0]             ), //i
+    .data_in_18             (tensor_core_bf12_5_data_in_18[3:0]             ), //i
+    .data_in_19             (tensor_core_bf12_5_data_in_19[3:0]             ), //i
+    .data_in_20             (tensor_core_bf12_5_data_in_20[3:0]             ), //i
+    .side_in_1              (4'b0000                                        ), //i
+    .side_in_2              (4'b0000                                        ), //i
+    .side_in_3              (4'b0000                                        ), //i
+    .side_in_4              (4'b0000                                        ), //i
+    .shared_exponent_data   (io_expIn_5[7:0]                                ), //i
+    .feed_sel               (2'b01                                          ), //i
+    .load_bb_one            (tensor_core_bf12_5_load_bb_one                 ), //i
+    .load_bb_two            (tensor_core_bf12_5_load_bb_two                 ), //i
+    .load_buf_sel           (loadBufSel                                     ), //i
+    .bf24_col_1             (tensor_core_bf12_5_bf24_col_1[23:0]            ), //o
+    .bf24_col_2             (tensor_core_bf12_5_bf24_col_2[23:0]            ), //o
+    .bf24_col_3             (tensor_core_bf12_5_bf24_col_3[23:0]            ), //o
+    .acc_en                 (1'b0                                           ), //i
+    .zero_en                (1'b0                                           ), //i
+    .clr0                   (io_dataIn_5_valid                              ), //i
+    .clr1                   (1'b0                                           ), //i
+    .cascade_weight_in      (tensor_core_bf12_4_cascade_weight_out[87:0]    ), //i
+    .cascade_weight_out     (tensor_core_bf12_5_cascade_weight_out[87:0]    ), //o
+    .cascade_data_in_col_1  (tensor_core_bf12_4_cascade_data_out_col_1[31:0]), //i
+    .cascade_data_in_col_2  (tensor_core_bf12_4_cascade_data_out_col_2[31:0]), //i
+    .cascade_data_in_col_3  (tensor_core_bf12_4_cascade_data_out_col_3[31:0]), //i
+    .cascade_data_out_col_1 (tensor_core_bf12_5_cascade_data_out_col_1[31:0]), //o
+    .cascade_data_out_col_2 (tensor_core_bf12_5_cascade_data_out_col_2[31:0]), //o
+    .cascade_data_out_col_3 (tensor_core_bf12_5_cascade_data_out_col_3[31:0])  //o
+  );
   StreamOutFifo AccuDelayInst (
     .io_push_valid   (oBufferLoadValid                   ), //i
     .io_push_ready   (AccuDelayInst_io_push_ready        ), //o
@@ -538,16 +706,16 @@ module TensorCoreChainBf12 (
   end
 
   assign loadCounter_willClear = 1'b0;
-  assign loadCounter_willOverflowIfInc = (loadCounter_value == 4'b1011);
+  assign loadCounter_willOverflowIfInc = (loadCounter_value == 5'h11);
   assign loadCounter_willOverflow = (loadCounter_willOverflowIfInc && loadCounter_willIncrement);
   always @(*) begin
     if(loadCounter_willOverflow) begin
-      loadCounter_valueNext = 4'b0000;
+      loadCounter_valueNext = 5'h0;
     end else begin
       loadCounter_valueNext = (loadCounter_value + _zz_loadCounter_valueNext);
     end
     if(loadCounter_willClear) begin
-      loadCounter_valueNext = 4'b0000;
+      loadCounter_valueNext = 5'h0;
     end
   end
 
@@ -559,16 +727,16 @@ module TensorCoreChainBf12 (
   end
 
   assign loadSelCounter_willClear = 1'b0;
-  assign loadSelCounter_willOverflowIfInc = (loadSelCounter_value == 4'b1011);
+  assign loadSelCounter_willOverflowIfInc = (loadSelCounter_value == 5'h11);
   assign loadSelCounter_willOverflow = (loadSelCounter_willOverflowIfInc && loadSelCounter_willIncrement);
   always @(*) begin
     if(loadSelCounter_willOverflow) begin
-      loadSelCounter_valueNext = 4'b0000;
+      loadSelCounter_valueNext = 5'h0;
     end else begin
       loadSelCounter_valueNext = (loadSelCounter_value + _zz_loadSelCounter_valueNext);
     end
     if(loadSelCounter_willClear) begin
-      loadSelCounter_valueNext = 4'b0000;
+      loadSelCounter_valueNext = 5'h0;
     end
   end
 
@@ -728,6 +896,50 @@ module TensorCoreChainBf12 (
   assign tensor_core_bf12_3_data_in_20 = io_dataIn_3_payload[79 : 76];
   assign tensor_core_bf12_3_load_bb_one = loadBufCtrl[0];
   assign tensor_core_bf12_3_load_bb_two = loadBufCtrl[1];
+  assign tensor_core_bf12_4_data_in_1 = io_dataIn_4_payload[3 : 0];
+  assign tensor_core_bf12_4_data_in_2 = io_dataIn_4_payload[7 : 4];
+  assign tensor_core_bf12_4_data_in_3 = io_dataIn_4_payload[11 : 8];
+  assign tensor_core_bf12_4_data_in_4 = io_dataIn_4_payload[15 : 12];
+  assign tensor_core_bf12_4_data_in_5 = io_dataIn_4_payload[19 : 16];
+  assign tensor_core_bf12_4_data_in_6 = io_dataIn_4_payload[23 : 20];
+  assign tensor_core_bf12_4_data_in_7 = io_dataIn_4_payload[27 : 24];
+  assign tensor_core_bf12_4_data_in_8 = io_dataIn_4_payload[31 : 28];
+  assign tensor_core_bf12_4_data_in_9 = io_dataIn_4_payload[35 : 32];
+  assign tensor_core_bf12_4_data_in_10 = io_dataIn_4_payload[39 : 36];
+  assign tensor_core_bf12_4_data_in_11 = io_dataIn_4_payload[43 : 40];
+  assign tensor_core_bf12_4_data_in_12 = io_dataIn_4_payload[47 : 44];
+  assign tensor_core_bf12_4_data_in_13 = io_dataIn_4_payload[51 : 48];
+  assign tensor_core_bf12_4_data_in_14 = io_dataIn_4_payload[55 : 52];
+  assign tensor_core_bf12_4_data_in_15 = io_dataIn_4_payload[59 : 56];
+  assign tensor_core_bf12_4_data_in_16 = io_dataIn_4_payload[63 : 60];
+  assign tensor_core_bf12_4_data_in_17 = io_dataIn_4_payload[67 : 64];
+  assign tensor_core_bf12_4_data_in_18 = io_dataIn_4_payload[71 : 68];
+  assign tensor_core_bf12_4_data_in_19 = io_dataIn_4_payload[75 : 72];
+  assign tensor_core_bf12_4_data_in_20 = io_dataIn_4_payload[79 : 76];
+  assign tensor_core_bf12_4_load_bb_one = loadBufCtrl[0];
+  assign tensor_core_bf12_4_load_bb_two = loadBufCtrl[1];
+  assign tensor_core_bf12_5_data_in_1 = io_dataIn_5_payload[3 : 0];
+  assign tensor_core_bf12_5_data_in_2 = io_dataIn_5_payload[7 : 4];
+  assign tensor_core_bf12_5_data_in_3 = io_dataIn_5_payload[11 : 8];
+  assign tensor_core_bf12_5_data_in_4 = io_dataIn_5_payload[15 : 12];
+  assign tensor_core_bf12_5_data_in_5 = io_dataIn_5_payload[19 : 16];
+  assign tensor_core_bf12_5_data_in_6 = io_dataIn_5_payload[23 : 20];
+  assign tensor_core_bf12_5_data_in_7 = io_dataIn_5_payload[27 : 24];
+  assign tensor_core_bf12_5_data_in_8 = io_dataIn_5_payload[31 : 28];
+  assign tensor_core_bf12_5_data_in_9 = io_dataIn_5_payload[35 : 32];
+  assign tensor_core_bf12_5_data_in_10 = io_dataIn_5_payload[39 : 36];
+  assign tensor_core_bf12_5_data_in_11 = io_dataIn_5_payload[43 : 40];
+  assign tensor_core_bf12_5_data_in_12 = io_dataIn_5_payload[47 : 44];
+  assign tensor_core_bf12_5_data_in_13 = io_dataIn_5_payload[51 : 48];
+  assign tensor_core_bf12_5_data_in_14 = io_dataIn_5_payload[55 : 52];
+  assign tensor_core_bf12_5_data_in_15 = io_dataIn_5_payload[59 : 56];
+  assign tensor_core_bf12_5_data_in_16 = io_dataIn_5_payload[63 : 60];
+  assign tensor_core_bf12_5_data_in_17 = io_dataIn_5_payload[67 : 64];
+  assign tensor_core_bf12_5_data_in_18 = io_dataIn_5_payload[71 : 68];
+  assign tensor_core_bf12_5_data_in_19 = io_dataIn_5_payload[75 : 72];
+  assign tensor_core_bf12_5_data_in_20 = io_dataIn_5_payload[79 : 76];
+  assign tensor_core_bf12_5_load_bb_one = loadBufCtrl[0];
+  assign tensor_core_bf12_5_load_bb_two = loadBufCtrl[1];
   assign AccuDelayInst_io_push_payload = {{tcAccu_bf24_col_1,tcAccu_bf24_col_2},tcAccu_bf24_col_3};
   always @(*) begin
     resValidCounter_willIncrement = 1'b0;
@@ -769,7 +981,7 @@ module TensorCoreChainBf12 (
     if(resValid) begin
       AccuDelayInst_io_pop_ready = io_res_ready;
     end else begin
-      AccuDelayInst_io_pop_ready = oBufferLoadValid_delay_5;
+      AccuDelayInst_io_pop_ready = oBufferLoadValid_delay_11;
     end
   end
 
@@ -780,8 +992,8 @@ module TensorCoreChainBf12 (
       loadValidD3t <= 1'b0;
       io_loadValid_delay_1_1 <= 1'b0;
       loadValidD2t <= 1'b0;
-      loadCounter_value <= 4'b0000;
-      loadSelCounter_value <= 4'b0000;
+      loadCounter_value <= 5'h0;
+      loadSelCounter_value <= 5'h0;
       loadBufCtrlReg <= 2'b01;
       inputCounter_value <= 16'h0;
       loadBufSel <= 1'b0;
@@ -797,6 +1009,10 @@ module TensorCoreChainBf12 (
       io_dataValid_delay_9 <= 1'b0;
       io_dataValid_delay_10 <= 1'b0;
       io_dataValid_delay_11 <= 1'b0;
+      io_dataValid_delay_12 <= 1'b0;
+      io_dataValid_delay_13 <= 1'b0;
+      io_dataValid_delay_14 <= 1'b0;
+      io_dataValid_delay_15 <= 1'b0;
       oBufferLoadValid <= 1'b0;
       outValidCounter_value <= 16'h0;
       outValidCounter_willOverflow_delay_1 <= 1'b0;
@@ -835,7 +1051,11 @@ module TensorCoreChainBf12 (
       io_dataValid_delay_9 <= io_dataValid_delay_8;
       io_dataValid_delay_10 <= io_dataValid_delay_9;
       io_dataValid_delay_11 <= io_dataValid_delay_10;
-      oBufferLoadValid <= io_dataValid_delay_11;
+      io_dataValid_delay_12 <= io_dataValid_delay_11;
+      io_dataValid_delay_13 <= io_dataValid_delay_12;
+      io_dataValid_delay_14 <= io_dataValid_delay_13;
+      io_dataValid_delay_15 <= io_dataValid_delay_14;
+      oBufferLoadValid <= io_dataValid_delay_15;
       outValidCounter_value <= outValidCounter_valueNext;
       outValidCounter_willOverflow_delay_1 <= outValidCounter_willOverflow;
       resValidCounter_value <= resValidCounter_valueNext;
@@ -856,12 +1076,24 @@ module TensorCoreChainBf12 (
       oBufferLoadValid_delay_3 <= 1'b0;
       oBufferLoadValid_delay_4 <= 1'b0;
       oBufferLoadValid_delay_5 <= 1'b0;
+      oBufferLoadValid_delay_6 <= 1'b0;
+      oBufferLoadValid_delay_7 <= 1'b0;
+      oBufferLoadValid_delay_8 <= 1'b0;
+      oBufferLoadValid_delay_9 <= 1'b0;
+      oBufferLoadValid_delay_10 <= 1'b0;
+      oBufferLoadValid_delay_11 <= 1'b0;
     end else begin
       oBufferLoadValid_delay_1 <= oBufferLoadValid;
       oBufferLoadValid_delay_2 <= oBufferLoadValid_delay_1;
       oBufferLoadValid_delay_3 <= oBufferLoadValid_delay_2;
       oBufferLoadValid_delay_4 <= oBufferLoadValid_delay_3;
       oBufferLoadValid_delay_5 <= oBufferLoadValid_delay_4;
+      oBufferLoadValid_delay_6 <= oBufferLoadValid_delay_5;
+      oBufferLoadValid_delay_7 <= oBufferLoadValid_delay_6;
+      oBufferLoadValid_delay_8 <= oBufferLoadValid_delay_7;
+      oBufferLoadValid_delay_9 <= oBufferLoadValid_delay_8;
+      oBufferLoadValid_delay_10 <= oBufferLoadValid_delay_9;
+      oBufferLoadValid_delay_11 <= oBufferLoadValid_delay_10;
     end
   end
 

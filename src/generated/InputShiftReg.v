@@ -1,6 +1,6 @@
 // Generator : SpinalHDL v1.7.3a    git head : 04162b8322332003bd011fabf5de3e7522c45630
 // Component : InputShiftReg
-// Git hash  : cb207be92a3693b2f4fe24f4792cfe4129d4d797
+// Git hash  : 257eb1a112838047dc69fc54ad4c70da7b455b11
 
 `timescale 1ns/1ps 
 module InputShiftReg (
@@ -55,23 +55,11 @@ module InputShiftReg (
   output reg          io_dataOut_15_valid,
   input               io_dataOut_15_ready,
   output     [319:0]  io_dataOut_15_payload,
-  output reg          io_dataOut_16_valid,
-  input               io_dataOut_16_ready,
-  output     [319:0]  io_dataOut_16_payload,
-  output reg          io_dataOut_17_valid,
-  input               io_dataOut_17_ready,
-  output     [319:0]  io_dataOut_17_payload,
-  output reg          io_dataOut_18_valid,
-  input               io_dataOut_18_ready,
-  output     [319:0]  io_dataOut_18_payload,
-  output reg          io_dataOut_19_valid,
-  input               io_dataOut_19_ready,
-  output     [319:0]  io_dataOut_19_payload,
   input               clk,
   input               clrn
 );
 
-  wire       [4:0]    _zz_loadedNumRegs_valueNext;
+  wire       [3:0]    _zz_loadedNumRegs_valueNext;
   wire       [0:0]    _zz_loadedNumRegs_valueNext_1;
   reg        [319:0]  shiftRegs_0;
   reg        [319:0]  shiftRegs_1;
@@ -89,15 +77,11 @@ module InputShiftReg (
   reg        [319:0]  shiftRegs_13;
   reg        [319:0]  shiftRegs_14;
   reg        [319:0]  shiftRegs_15;
-  reg        [319:0]  shiftRegs_16;
-  reg        [319:0]  shiftRegs_17;
-  reg        [319:0]  shiftRegs_18;
-  reg        [319:0]  shiftRegs_19;
   reg                 isLoading;
   reg                 loadedNumRegs_willIncrement;
   reg                 loadedNumRegs_willClear;
-  reg        [4:0]    loadedNumRegs_valueNext;
-  reg        [4:0]    loadedNumRegs_value;
+  reg        [3:0]    loadedNumRegs_valueNext;
+  reg        [3:0]    loadedNumRegs_value;
   wire                loadedNumRegs_willOverflowIfInc;
   wire                loadedNumRegs_willOverflow;
   wire                io_pushIn_fire;
@@ -105,7 +89,7 @@ module InputShiftReg (
   wire                io_dataOut_0_fire;
 
   assign _zz_loadedNumRegs_valueNext_1 = loadedNumRegs_willIncrement;
-  assign _zz_loadedNumRegs_valueNext = {4'd0, _zz_loadedNumRegs_valueNext_1};
+  assign _zz_loadedNumRegs_valueNext = {3'd0, _zz_loadedNumRegs_valueNext_1};
   always @(*) begin
     loadedNumRegs_willIncrement = 1'b0;
     if(isLoading) begin
@@ -122,16 +106,12 @@ module InputShiftReg (
     end
   end
 
-  assign loadedNumRegs_willOverflowIfInc = (loadedNumRegs_value == 5'h13);
+  assign loadedNumRegs_willOverflowIfInc = (loadedNumRegs_value == 4'b1111);
   assign loadedNumRegs_willOverflow = (loadedNumRegs_willOverflowIfInc && loadedNumRegs_willIncrement);
   always @(*) begin
-    if(loadedNumRegs_willOverflow) begin
-      loadedNumRegs_valueNext = 5'h0;
-    end else begin
-      loadedNumRegs_valueNext = (loadedNumRegs_value + _zz_loadedNumRegs_valueNext);
-    end
+    loadedNumRegs_valueNext = (loadedNumRegs_value + _zz_loadedNumRegs_valueNext);
     if(loadedNumRegs_willClear) begin
-      loadedNumRegs_valueNext = 5'h0;
+      loadedNumRegs_valueNext = 4'b0000;
     end
   end
 
@@ -152,10 +132,6 @@ module InputShiftReg (
   assign io_dataOut_13_payload = shiftRegs_13;
   assign io_dataOut_14_payload = shiftRegs_14;
   assign io_dataOut_15_payload = shiftRegs_15;
-  assign io_dataOut_16_payload = shiftRegs_16;
-  assign io_dataOut_17_payload = shiftRegs_17;
-  assign io_dataOut_18_payload = shiftRegs_18;
-  assign io_dataOut_19_payload = shiftRegs_19;
   always @(*) begin
     io_dataOut_0_valid = 1'b0;
     if(!isLoading) begin
@@ -268,34 +244,6 @@ module InputShiftReg (
     end
   end
 
-  always @(*) begin
-    io_dataOut_16_valid = 1'b0;
-    if(!isLoading) begin
-      io_dataOut_16_valid = 1'b1;
-    end
-  end
-
-  always @(*) begin
-    io_dataOut_17_valid = 1'b0;
-    if(!isLoading) begin
-      io_dataOut_17_valid = 1'b1;
-    end
-  end
-
-  always @(*) begin
-    io_dataOut_18_valid = 1'b0;
-    if(!isLoading) begin
-      io_dataOut_18_valid = 1'b1;
-    end
-  end
-
-  always @(*) begin
-    io_dataOut_19_valid = 1'b0;
-    if(!isLoading) begin
-      io_dataOut_19_valid = 1'b1;
-    end
-  end
-
   assign io_pushIn_fire_1 = (io_pushIn_valid && io_pushIn_ready);
   assign io_dataOut_0_fire = (io_dataOut_0_valid && io_dataOut_0_ready);
   assign io_pushIn_ready = isLoading;
@@ -317,12 +265,8 @@ module InputShiftReg (
       shiftRegs_13 <= 320'h0;
       shiftRegs_14 <= 320'h0;
       shiftRegs_15 <= 320'h0;
-      shiftRegs_16 <= 320'h0;
-      shiftRegs_17 <= 320'h0;
-      shiftRegs_18 <= 320'h0;
-      shiftRegs_19 <= 320'h0;
       isLoading <= 1'b0;
-      loadedNumRegs_value <= 5'h0;
+      loadedNumRegs_value <= 4'b0000;
     end else begin
       loadedNumRegs_value <= loadedNumRegs_valueNext;
       if(isLoading) begin
@@ -343,10 +287,6 @@ module InputShiftReg (
           shiftRegs_13 <= shiftRegs_12;
           shiftRegs_14 <= shiftRegs_13;
           shiftRegs_15 <= shiftRegs_14;
-          shiftRegs_16 <= shiftRegs_15;
-          shiftRegs_17 <= shiftRegs_16;
-          shiftRegs_18 <= shiftRegs_17;
-          shiftRegs_19 <= shiftRegs_18;
         end
       end
       if(isLoading) begin

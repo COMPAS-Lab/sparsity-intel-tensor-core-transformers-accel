@@ -1,11 +1,11 @@
 ./src/generated/enumdefine.v
 ./src/generated/StreamOutFifo.v
+./src/main/sverilog/out_asym_fifo.sv
 ./src/generated/TensorCoreChainBf12.v
 ./src/generated/FixedBfpConverter.v
 ./src/generated/DelayTree.v
 ./src/generated/DelayTree_1.v
-./src/generated/OutputShiftReg.v
-./src/generated/StreamDelay.v
+./src/generated/StreamOutAsymFifo.v
 ./src/generated/InputShiftReg.v
 ./src/generated/InputShiftReg_1.v
 ./src/generated/TensorCoreChainArray.v

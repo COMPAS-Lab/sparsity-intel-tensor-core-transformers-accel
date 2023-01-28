@@ -6,8 +6,8 @@ import spinal.lib.fsm._
 
 class OutputShiftReg (input_bits: Int, num_inputs: Int) extends Component {
   val io = new Bundle {
-    val resIn = Vec(slave Stream(UInt(input_bits bits)), num_inputs)
-    val popOut = master Stream(UInt(input_bits bits))
+    val resIn = Vec(slave Flow(UInt(input_bits bits)), num_inputs)
+    val popOut = master Flow(UInt(input_bits bits))
   }
 
   val shiftRegs = Vec(RegInit(U(0, input_bits bits)), num_inputs)
@@ -17,14 +17,12 @@ class OutputShiftReg (input_bits: Int, num_inputs: Int) extends Component {
   when(isShifting) {
     io.popOut.valid := True
     loadedRegs.clearAll()
-    io.resIn.foreach(_.ready := False)
     for (i <- 1 until num_inputs) {
       when(io.popOut.fire) (shiftRegs(i) := shiftRegs(i-1))
     }
   } otherwise {
     io.popOut.valid := False
     for (i <- 0 until num_inputs) {
-      io.resIn(i).ready := ~loadedRegs(i)
       when(io.resIn(i).fire && ~loadedRegs(i)) {
         shiftRegs(i) := io.resIn(i).payload
         loadedRegs(i) := True
