@@ -1,6 +1,6 @@
 // Generator : SpinalHDL v1.7.3a    git head : 04162b8322332003bd011fabf5de3e7522c45630
 // Component : tensor_core_array_wrapper
-// Git hash  : 257eb1a112838047dc69fc54ad4c70da7b455b11
+// Git hash  : 8dd3b16f8433a31143e533c705fd002baa7cec1c
 
 `timescale 1ns/1ps 
 module tensor_core_array_wrapper (
@@ -809,8 +809,8 @@ module tensor_core_array_wrapper (
   reg                 _zz_select_tcarray_out_0_1;
   wire                _zz_io_res_0_ready;
   reg                 _zz_select_tcarray_out_0_regNext;
-  wire                when_tensor_core_array_wrapper_l168;
-  wire                when_tensor_core_array_wrapper_l170;
+  wire                when_tensor_core_array_wrapper_l167;
+  wire                when_tensor_core_array_wrapper_l169;
   reg                 _zz_start_tcarray_out_1;
   reg                 _zz_2;
   reg        [1:0]    _zz_start_tcarray_out_1_1;
@@ -820,8 +820,8 @@ module tensor_core_array_wrapper (
   reg                 _zz_select_tcarray_out_1_1;
   wire                _zz_io_res_3_ready;
   reg                 _zz_select_tcarray_out_1_regNext;
-  wire                when_tensor_core_array_wrapper_l168_1;
-  wire                when_tensor_core_array_wrapper_l170_1;
+  wire                when_tensor_core_array_wrapper_l167_1;
+  wire                when_tensor_core_array_wrapper_l169_1;
   reg                 _zz_start_tcarray_out_2;
   reg                 _zz_3;
   reg        [1:0]    _zz_start_tcarray_out_2_1;
@@ -831,8 +831,8 @@ module tensor_core_array_wrapper (
   reg                 _zz_select_tcarray_out_2_1;
   wire                _zz_io_res_6_ready;
   reg                 _zz_select_tcarray_out_2_regNext;
-  wire                when_tensor_core_array_wrapper_l168_2;
-  wire                when_tensor_core_array_wrapper_l170_2;
+  wire                when_tensor_core_array_wrapper_l167_2;
+  wire                when_tensor_core_array_wrapper_l169_2;
   reg                 _zz_start_tcarray_out_3;
   reg                 _zz_4;
   reg        [1:0]    _zz_start_tcarray_out_3_1;
@@ -842,8 +842,8 @@ module tensor_core_array_wrapper (
   reg                 _zz_select_tcarray_out_3_1;
   wire                _zz_io_res_9_ready;
   reg                 _zz_select_tcarray_out_3_regNext;
-  wire                when_tensor_core_array_wrapper_l168_3;
-  wire                when_tensor_core_array_wrapper_l170_3;
+  wire                when_tensor_core_array_wrapper_l167_3;
+  wire                when_tensor_core_array_wrapper_l169_3;
   reg                 _zz_start_tcarray_out_4;
   reg                 _zz_5;
   reg        [1:0]    _zz_start_tcarray_out_4_1;
@@ -853,16 +853,16 @@ module tensor_core_array_wrapper (
   reg                 _zz_select_tcarray_out_4_1;
   wire                _zz_io_res_12_ready;
   reg                 _zz_select_tcarray_out_4_regNext;
-  wire                when_tensor_core_array_wrapper_l168_4;
-  wire                when_tensor_core_array_wrapper_l170_4;
+  wire                when_tensor_core_array_wrapper_l167_4;
+  wire                when_tensor_core_array_wrapper_l169_4;
   reg        [1:0]    rdFsm_stateReg;
   reg        [1:0]    rdFsm_stateNext;
-  wire                _zz_when_tensor_core_array_wrapper_l126;
-  reg                 _zz_when_tensor_core_array_wrapper_l126_regNext;
-  wire                when_tensor_core_array_wrapper_l126;
-  wire                when_tensor_core_array_wrapper_l134;
+  wire                _zz_when_tensor_core_array_wrapper_l125;
+  reg                 _zz_when_tensor_core_array_wrapper_l125_regNext;
+  wire                when_tensor_core_array_wrapper_l125;
+  wire                when_tensor_core_array_wrapper_l133;
+  wire                when_tensor_core_array_wrapper_l140;
   wire                when_tensor_core_array_wrapper_l141;
-  wire                when_tensor_core_array_wrapper_l142;
   wire                when_StateMachine_l234;
   wire                when_StateMachine_l250;
 
@@ -1586,7 +1586,6 @@ module tensor_core_array_wrapper (
     .io_res_14_valid                       (tcArray_io_res_14_valid          ), //o
     .io_res_14_ready                       (_zz_io_res_12_ready              ), //i
     .io_res_14_payload                     (tcArray_io_res_14_payload[71:0]  ), //o
-    .io_res_id                             (in_buffer_id[15:0]               ), //i
     .clk                                   (clk                              ), //i
     .clrn                                  (clrn                             )  //i
   );
@@ -1976,7 +1975,7 @@ module tensor_core_array_wrapper (
       rdFsm_enumDef_sIdle : begin
       end
       rdFsm_enumDef_sWait : begin
-        if(when_tensor_core_array_wrapper_l134) begin
+        if(when_tensor_core_array_wrapper_l133) begin
           rdFsm_startAssertCounter_willIncrement = 1'b1;
         end
       end
@@ -2005,15 +2004,15 @@ module tensor_core_array_wrapper (
 
   always @(*) begin
     _zz_start_tcarray_out_0 = 1'b0;
-    if(when_tensor_core_array_wrapper_l168) begin
+    if(when_tensor_core_array_wrapper_l167) begin
       _zz_start_tcarray_out_0 = 1'b1;
     end
   end
 
   always @(*) begin
     _zz_1 = 1'b0;
-    if(!when_tensor_core_array_wrapper_l168) begin
-      if(when_tensor_core_array_wrapper_l170) begin
+    if(!when_tensor_core_array_wrapper_l167) begin
+      if(when_tensor_core_array_wrapper_l169) begin
         _zz_1 = 1'b1;
       end
     end
@@ -2028,8 +2027,8 @@ module tensor_core_array_wrapper (
   end
 
   assign _zz_select_tcarray_out_0 = ((tcArray_io_res_0_valid && tcArray_io_res_1_valid) && tcArray_io_res_2_valid);
-  assign when_tensor_core_array_wrapper_l168 = ((_zz_select_tcarray_out_0 && (! _zz_select_tcarray_out_0_regNext)) && (! _zz_start_tcarray_out_0_3));
-  assign when_tensor_core_array_wrapper_l170 = (_zz_select_tcarray_out_0 && _zz_start_tcarray_out_0_3);
+  assign when_tensor_core_array_wrapper_l167 = ((_zz_select_tcarray_out_0 && (! _zz_select_tcarray_out_0_regNext)) && (! _zz_start_tcarray_out_0_3));
+  assign when_tensor_core_array_wrapper_l169 = (_zz_select_tcarray_out_0 && _zz_start_tcarray_out_0_3);
   assign _zz_io_res_0_ready = _zz_select_tcarray_out_0_1;
   assign start_tcarray_out_0 = (! _zz_start_tcarray_out_0_3);
   assign select_tcarray_out_0 = (_zz_select_tcarray_out_0_1 && _zz_select_tcarray_out_0);
@@ -2037,15 +2036,15 @@ module tensor_core_array_wrapper (
   assign data_tcarray_out_0 = {40'd0, _zz_data_tcarray_out_0};
   always @(*) begin
     _zz_start_tcarray_out_1 = 1'b0;
-    if(when_tensor_core_array_wrapper_l168_1) begin
+    if(when_tensor_core_array_wrapper_l167_1) begin
       _zz_start_tcarray_out_1 = 1'b1;
     end
   end
 
   always @(*) begin
     _zz_2 = 1'b0;
-    if(!when_tensor_core_array_wrapper_l168_1) begin
-      if(when_tensor_core_array_wrapper_l170_1) begin
+    if(!when_tensor_core_array_wrapper_l167_1) begin
+      if(when_tensor_core_array_wrapper_l169_1) begin
         _zz_2 = 1'b1;
       end
     end
@@ -2060,8 +2059,8 @@ module tensor_core_array_wrapper (
   end
 
   assign _zz_select_tcarray_out_1 = ((tcArray_io_res_3_valid && tcArray_io_res_4_valid) && tcArray_io_res_5_valid);
-  assign when_tensor_core_array_wrapper_l168_1 = ((_zz_select_tcarray_out_1 && (! _zz_select_tcarray_out_1_regNext)) && (! _zz_start_tcarray_out_1_3));
-  assign when_tensor_core_array_wrapper_l170_1 = (_zz_select_tcarray_out_1 && _zz_start_tcarray_out_1_3);
+  assign when_tensor_core_array_wrapper_l167_1 = ((_zz_select_tcarray_out_1 && (! _zz_select_tcarray_out_1_regNext)) && (! _zz_start_tcarray_out_1_3));
+  assign when_tensor_core_array_wrapper_l169_1 = (_zz_select_tcarray_out_1 && _zz_start_tcarray_out_1_3);
   assign _zz_io_res_3_ready = _zz_select_tcarray_out_1_1;
   assign start_tcarray_out_1 = (! _zz_start_tcarray_out_1_3);
   assign select_tcarray_out_1 = (_zz_select_tcarray_out_1_1 && _zz_select_tcarray_out_1);
@@ -2069,15 +2068,15 @@ module tensor_core_array_wrapper (
   assign data_tcarray_out_1 = {40'd0, _zz_data_tcarray_out_1};
   always @(*) begin
     _zz_start_tcarray_out_2 = 1'b0;
-    if(when_tensor_core_array_wrapper_l168_2) begin
+    if(when_tensor_core_array_wrapper_l167_2) begin
       _zz_start_tcarray_out_2 = 1'b1;
     end
   end
 
   always @(*) begin
     _zz_3 = 1'b0;
-    if(!when_tensor_core_array_wrapper_l168_2) begin
-      if(when_tensor_core_array_wrapper_l170_2) begin
+    if(!when_tensor_core_array_wrapper_l167_2) begin
+      if(when_tensor_core_array_wrapper_l169_2) begin
         _zz_3 = 1'b1;
       end
     end
@@ -2092,8 +2091,8 @@ module tensor_core_array_wrapper (
   end
 
   assign _zz_select_tcarray_out_2 = ((tcArray_io_res_6_valid && tcArray_io_res_7_valid) && tcArray_io_res_8_valid);
-  assign when_tensor_core_array_wrapper_l168_2 = ((_zz_select_tcarray_out_2 && (! _zz_select_tcarray_out_2_regNext)) && (! _zz_start_tcarray_out_2_3));
-  assign when_tensor_core_array_wrapper_l170_2 = (_zz_select_tcarray_out_2 && _zz_start_tcarray_out_2_3);
+  assign when_tensor_core_array_wrapper_l167_2 = ((_zz_select_tcarray_out_2 && (! _zz_select_tcarray_out_2_regNext)) && (! _zz_start_tcarray_out_2_3));
+  assign when_tensor_core_array_wrapper_l169_2 = (_zz_select_tcarray_out_2 && _zz_start_tcarray_out_2_3);
   assign _zz_io_res_6_ready = _zz_select_tcarray_out_2_1;
   assign start_tcarray_out_2 = (! _zz_start_tcarray_out_2_3);
   assign select_tcarray_out_2 = (_zz_select_tcarray_out_2_1 && _zz_select_tcarray_out_2);
@@ -2101,15 +2100,15 @@ module tensor_core_array_wrapper (
   assign data_tcarray_out_2 = {40'd0, _zz_data_tcarray_out_2};
   always @(*) begin
     _zz_start_tcarray_out_3 = 1'b0;
-    if(when_tensor_core_array_wrapper_l168_3) begin
+    if(when_tensor_core_array_wrapper_l167_3) begin
       _zz_start_tcarray_out_3 = 1'b1;
     end
   end
 
   always @(*) begin
     _zz_4 = 1'b0;
-    if(!when_tensor_core_array_wrapper_l168_3) begin
-      if(when_tensor_core_array_wrapper_l170_3) begin
+    if(!when_tensor_core_array_wrapper_l167_3) begin
+      if(when_tensor_core_array_wrapper_l169_3) begin
         _zz_4 = 1'b1;
       end
     end
@@ -2124,8 +2123,8 @@ module tensor_core_array_wrapper (
   end
 
   assign _zz_select_tcarray_out_3 = ((tcArray_io_res_9_valid && tcArray_io_res_10_valid) && tcArray_io_res_11_valid);
-  assign when_tensor_core_array_wrapper_l168_3 = ((_zz_select_tcarray_out_3 && (! _zz_select_tcarray_out_3_regNext)) && (! _zz_start_tcarray_out_3_3));
-  assign when_tensor_core_array_wrapper_l170_3 = (_zz_select_tcarray_out_3 && _zz_start_tcarray_out_3_3);
+  assign when_tensor_core_array_wrapper_l167_3 = ((_zz_select_tcarray_out_3 && (! _zz_select_tcarray_out_3_regNext)) && (! _zz_start_tcarray_out_3_3));
+  assign when_tensor_core_array_wrapper_l169_3 = (_zz_select_tcarray_out_3 && _zz_start_tcarray_out_3_3);
   assign _zz_io_res_9_ready = _zz_select_tcarray_out_3_1;
   assign start_tcarray_out_3 = (! _zz_start_tcarray_out_3_3);
   assign select_tcarray_out_3 = (_zz_select_tcarray_out_3_1 && _zz_select_tcarray_out_3);
@@ -2133,15 +2132,15 @@ module tensor_core_array_wrapper (
   assign data_tcarray_out_3 = {40'd0, _zz_data_tcarray_out_3};
   always @(*) begin
     _zz_start_tcarray_out_4 = 1'b0;
-    if(when_tensor_core_array_wrapper_l168_4) begin
+    if(when_tensor_core_array_wrapper_l167_4) begin
       _zz_start_tcarray_out_4 = 1'b1;
     end
   end
 
   always @(*) begin
     _zz_5 = 1'b0;
-    if(!when_tensor_core_array_wrapper_l168_4) begin
-      if(when_tensor_core_array_wrapper_l170_4) begin
+    if(!when_tensor_core_array_wrapper_l167_4) begin
+      if(when_tensor_core_array_wrapper_l169_4) begin
         _zz_5 = 1'b1;
       end
     end
@@ -2156,8 +2155,8 @@ module tensor_core_array_wrapper (
   end
 
   assign _zz_select_tcarray_out_4 = ((tcArray_io_res_12_valid && tcArray_io_res_13_valid) && tcArray_io_res_14_valid);
-  assign when_tensor_core_array_wrapper_l168_4 = ((_zz_select_tcarray_out_4 && (! _zz_select_tcarray_out_4_regNext)) && (! _zz_start_tcarray_out_4_3));
-  assign when_tensor_core_array_wrapper_l170_4 = (_zz_select_tcarray_out_4 && _zz_start_tcarray_out_4_3);
+  assign when_tensor_core_array_wrapper_l167_4 = ((_zz_select_tcarray_out_4 && (! _zz_select_tcarray_out_4_regNext)) && (! _zz_start_tcarray_out_4_3));
+  assign when_tensor_core_array_wrapper_l169_4 = (_zz_select_tcarray_out_4 && _zz_start_tcarray_out_4_3);
   assign _zz_io_res_12_ready = _zz_select_tcarray_out_4_1;
   assign start_tcarray_out_4 = (! _zz_start_tcarray_out_4_3);
   assign select_tcarray_out_4 = (_zz_select_tcarray_out_4_1 && _zz_select_tcarray_out_4);
@@ -2179,15 +2178,15 @@ module tensor_core_array_wrapper (
     rdFsm_stateNext = rdFsm_stateReg;
     case(rdFsm_stateReg)
       rdFsm_enumDef_sIdle : begin
-        if(when_tensor_core_array_wrapper_l126) begin
+        if(when_tensor_core_array_wrapper_l125) begin
           rdFsm_stateNext = rdFsm_enumDef_sWait;
         end
       end
       rdFsm_enumDef_sWait : begin
-        if(when_tensor_core_array_wrapper_l141) begin
+        if(when_tensor_core_array_wrapper_l140) begin
           rdFsm_stateNext = rdFsm_enumDef_sIdle;
         end else begin
-          if(when_tensor_core_array_wrapper_l142) begin
+          if(when_tensor_core_array_wrapper_l141) begin
             rdFsm_stateNext = rdFsm_enumDef_sSend;
           end
         end
@@ -2208,11 +2207,11 @@ module tensor_core_array_wrapper (
     end
   end
 
-  assign _zz_when_tensor_core_array_wrapper_l126 = load_start[0];
-  assign when_tensor_core_array_wrapper_l126 = ((_zz_when_tensor_core_array_wrapper_l126 && (! _zz_when_tensor_core_array_wrapper_l126_regNext)) && hbm_0_ready);
-  assign when_tensor_core_array_wrapper_l134 = (rdFsm_startAssertCounter_value < 2'b11);
-  assign when_tensor_core_array_wrapper_l141 = (|{port_error_tcarray_in_3,{port_error_tcarray_in_2,{port_error_tcarray_in_1,port_error_tcarray_in_0}}});
-  assign when_tensor_core_array_wrapper_l142 = (rdFsm_startAssertCounter_willOverflow && (! (|{almost_empty_tcarray_in_3,{almost_empty_tcarray_in_2,{almost_empty_tcarray_in_1,almost_empty_tcarray_in_0}}})));
+  assign _zz_when_tensor_core_array_wrapper_l125 = load_start[0];
+  assign when_tensor_core_array_wrapper_l125 = ((_zz_when_tensor_core_array_wrapper_l125 && (! _zz_when_tensor_core_array_wrapper_l125_regNext)) && hbm_0_ready);
+  assign when_tensor_core_array_wrapper_l133 = (rdFsm_startAssertCounter_value < 2'b11);
+  assign when_tensor_core_array_wrapper_l140 = (|{port_error_tcarray_in_3,{port_error_tcarray_in_2,{port_error_tcarray_in_1,port_error_tcarray_in_0}}});
+  assign when_tensor_core_array_wrapper_l141 = (rdFsm_startAssertCounter_willOverflow && (! (|{almost_empty_tcarray_in_3,{almost_empty_tcarray_in_2,{almost_empty_tcarray_in_1,almost_empty_tcarray_in_0}}})));
   assign when_StateMachine_l234 = ((rdFsm_stateReg == rdFsm_enumDef_sSend) && (! (rdFsm_stateNext == rdFsm_enumDef_sSend)));
   assign when_StateMachine_l250 = ((! (rdFsm_stateReg == rdFsm_enumDef_sIdle)) && (rdFsm_stateNext == rdFsm_enumDef_sIdle));
   always @(posedge clk) begin
@@ -2254,7 +2253,7 @@ module tensor_core_array_wrapper (
         rdFsm_enumDef_sIdle : begin
         end
         rdFsm_enumDef_sWait : begin
-          if(when_tensor_core_array_wrapper_l134) begin
+          if(when_tensor_core_array_wrapper_l133) begin
             startTCarrayIn <= 1'b1;
           end else begin
             startTCarrayIn <= 1'b0;
@@ -2287,7 +2286,7 @@ module tensor_core_array_wrapper (
   end
 
   always @(posedge clk) begin
-    _zz_when_tensor_core_array_wrapper_l126_regNext <= _zz_when_tensor_core_array_wrapper_l126;
+    _zz_when_tensor_core_array_wrapper_l125_regNext <= _zz_when_tensor_core_array_wrapper_l125;
   end
 
 

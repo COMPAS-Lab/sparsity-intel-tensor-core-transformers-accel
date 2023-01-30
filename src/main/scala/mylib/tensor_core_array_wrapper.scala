@@ -104,7 +104,6 @@ class tensor_core_array_wrapper(array_col: Int, array_row: Int, chain_len: Int,
   tcArray.io.configPorts.matBColsPerTccRow := U((mat_b_col/array_row), 16 bits)
   tcArray.io.configPorts.matAColSubGrpLen := U(mat_a_col/(chain_len * 20), 16 bits)
   tcArray.io.calEn := io.start(0).rise()
-  tcArray.io.res_id := io.in_buffer_id
 
   val rdFsm = new StateMachine {
     val rdWordCounter = Counter(mat_a_col / (chain_len * 3))
@@ -191,8 +190,8 @@ class tensor_core_array_wrapper(array_col: Int, array_row: Int, chain_len: Int,
 
   //  generate mem usage report
   val col_mem_size = tcArray.colMem.length * 3
-  val row_mem_size = tcArray.rowMem.length * 3
-  val fb_fifo_size = tcArray.tensorArray.length * tcArray.tensorArray(0).length * 2
+  val row_mem_size = tcArray.tensorArray(0).rowMem.length * 3
+  val fb_fifo_size = tcArray.tensorArray.length * tcArray.tensorArray(0).tensorRow.length * 2
   println("total ram blocks: ", (col_mem_size + row_mem_size + fb_fifo_size))
 
 }
