@@ -70,12 +70,14 @@ class tensor_core_array_wrapper(array_col: Int, array_row: Int, chain_len: Int,
   val selectTcarrayOut, startTCarrayOut = Reg(Bool()) init False
 
   val dataIn = Vec(Stream(UInt(320 bits)), 2)
-  val combinedDataIn0 = RegNext(io.tcarray_in(1).data(63 downto 0) @@ io.tcarray_in(0).data) init 0
-  val combinedDataIn1 = RegNext(io.tcarray_in(3).data(63 downto 0) @@ io.tcarray_in(2).data) init 0
-  dataIn(0).payload := combinedDataIn0
+  val combinedDataIn0 = RegNext(io.tcarray_in(1).data @@ io.tcarray_in(0).data)
+  val combinedDataIn1 = RegNext(io.tcarray_in(3).data @@ io.tcarray_in(2).data)
+  combinedDataIn0.addAttribute("preserve_syn_only")
+  combinedDataIn1.addAttribute("preserve_syn_only")
+  dataIn(0).payload := combinedDataIn0(dataIn(0).payload.getWidth-1 downto 0)
   dataIn(0).valid := RegNext(selectTcarrayIn)
   dataIn(1).valid := RegNext(selectTcarrayIn)
-  dataIn(1).payload := combinedDataIn1
+  dataIn(1).payload := combinedDataIn1(dataIn(1).payload.getWidth-1 downto 0)
 
   val data2TcarrayCol = Vec(Stream(UInt(320 bits)), array_col)
   val data2TcarrayRow = Vec(Stream(UInt(320 bits)), chain_len * array_row)
@@ -201,8 +203,8 @@ object tensor_core_array_wrapper_gen {
   def main(args: Array[String]): Unit = {
     val gen = new DefaultConfig
     val array_col = 16
-    val array_row = 15
-    val chain_len = 6
+    val array_row = 14
+    val chain_len = 14
     gen.defaultSpinalConfig.withoutEnumString().generate(new tensor_core_array_wrapper(
       array_col = array_col,
       array_row = array_row,

@@ -58,9 +58,9 @@ class TensorCoreChainBf12(chain_len: Int, out_buf_delay: Int,
 
   // loading requires 3 extra cycles, align the valid signal
   // with the first compute core here
-  val loadValidD3t = Delay(io.loadValid, 3, init=False)
+  val loadValidD3t = Delay(io.loadValid, 3)
   // 2 cycle delay valid signal for loading selection
-  val loadValidD2t = Delay(io.loadValid, 2, init=False)
+  val loadValidD2t = Delay(io.loadValid, 2)
   val loadCounter, loadSelCounter = Counter(chain_len*3)
   val loadBufCtrlReg = Reg(UInt(2 bits)) init U"2'b01"
   val loadBufCtrl = UInt(2 bits)
@@ -83,17 +83,17 @@ class TensorCoreChainBf12(chain_len: Int, out_buf_delay: Int,
   when(inputCounter.willOverflow) {
     loadBufSel := !loadBufSel
   }
-  io.dataIterReady := Delay(inputCounter.willOverflow, 1, init=False)
+  io.dataIterReady := Delay(inputCounter.willOverflow, 1)
 
   //output buffer ctrl logic.
   // delayed output valid: 4c of dot lat,3c of accu lat and 2*(chain_len-1)
   // of input delay on the last stage of the chain
-  val oBufferLoadValid = Delay(io.dataValid, 2*(chain_len-1)+4+3-1, init=False)
+  val oBufferLoadValid = Delay(io.dataValid, 2*(chain_len-1)+4+3-1)
   //counting the output iterations for output valid
   val outValidCounter = DynaCounter(io.inputIters.getWidth, io.inputIters)
 
   when(oBufferLoadValid) (outValidCounter.increment())
-  io.outValid := Delay(outValidCounter.willOverflow, 1, init = False)
+  io.outValid := Delay(outValidCounter.willOverflow, 1)
 
   connect_data_in(tcEntry.io, io.loadCascadeIn)
   tcEntry.io.shared_exponent_data := io.expCascadeIn
@@ -124,12 +124,7 @@ class TensorCoreChainBf12(chain_len: Int, out_buf_delay: Int,
 
   for (i <- 0 until chain_len-1) {
     tcCoreChainElems(i) = new tensor_core_bf12
-
-//    val delayedDataIn = Delay(io.dataIn(i+1), 2*(i+1), init=U(0, io.dataIn(i+1).getWidth bits))
-//    connect_data_in(tcCoreChainElems(i).io, delayedDataIn)
     connect_data_in(tcCoreChainElems(i).io, io.dataIn(i+1).payload)
-//    val delayedExpIn = Delay(io.expIn(i+1), 2*(i+1), init=U(0, io.expIn(i+1).getWidth bits))
-//    tcCoreChainElems(i).io.shared_exponent_data <> delayedExpIn
     tcCoreChainElems(i).io.shared_exponent_data <> io.expIn(i+1)
 
     if (i == 0) {
@@ -162,9 +157,10 @@ class TensorCoreChainBf12(chain_len: Int, out_buf_delay: Int,
   fbDelayFifo.io.push.valid := oBufferLoadValid
   fbDelayFifo.io.push.payload := tcAccu.io.bf24_col_1 @@ tcAccu.io.bf24_col_2 @@ tcAccu.io.bf24_col_3
 
-  val resValidCounter = DynaCounter(io.matAColSubGrpLen.getWidth, io.matAColSubGrpLen)
+  // TODO: check delay timing of res valid counter
+  val resValidCounter = DynaCounter(io.matAColSubGrpLen.getWidth, io.matAColSubGrpLen-2)
   when(io.outValid) (resValidCounter.increment())
-  val resValid = RegNext(resValidCounter.willOverflowIfInc, init = False)
+  val resValid = Delay(resValidCounter.willOverflowIfInc, 2)
   
   val fbOutRegPipe = 2
   val fbDelayFifoPayload = Vec(UInt(output_width bits), 3)
@@ -175,14 +171,14 @@ class TensorCoreChainBf12(chain_len: Int, out_buf_delay: Int,
     fbDelayFifo.io.pop.ready := io.res.ready
   } .otherwise {
     //TODO: check validity of ready delay
-    fbDelayFifo.io.pop.ready := Delay(oBufferLoadValid, out_buf_delay - 2 - fbOutRegPipe, init = False)
+    fbDelayFifo.io.pop.ready := Delay(oBufferLoadValid, out_buf_delay - 2 - fbOutRegPipe)
     io.res.valid := False
   }
 
   //TODO: double check the assignment sequence here
-  tcAccu.io.bf24_a1 := Delay(fbDelayFifoPayload(0), fbOutRegPipe, init = U"24'd0")
-  tcAccu.io.bf24_a2 := Delay(fbDelayFifoPayload(1), fbOutRegPipe, init = U"24'd0")
-  tcAccu.io.bf24_a3 := Delay(fbDelayFifoPayload(2), fbOutRegPipe, init = U"24'd0")
+  tcAccu.io.bf24_a1 := Delay(fbDelayFifoPayload(0), fbOutRegPipe)
+  tcAccu.io.bf24_a2 := Delay(fbDelayFifoPayload(1), fbOutRegPipe)
+  tcAccu.io.bf24_a3 := Delay(fbDelayFifoPayload(2), fbOutRegPipe)
   tcAccu.io.cascade_data_in_col_1 <> tcCoreChainElems(chain_len-2).io.cascade_data_out_col_1
   tcAccu.io.cascade_data_in_col_2 <> tcCoreChainElems(chain_len-2).io.cascade_data_out_col_2
   tcAccu.io.cascade_data_in_col_3 <> tcCoreChainElems(chain_len-2).io.cascade_data_out_col_3
