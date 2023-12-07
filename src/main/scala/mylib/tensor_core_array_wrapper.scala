@@ -39,9 +39,9 @@ class tensor_core_array_wrapper(array_col: Int, array_row: Int, chain_len: Int,
     val rd_addr, wr_addr = in UInt(32 bits)
     val load_start = in UInt(32 bits)
     val hbm_0_ready, hbm_1_ready, hbm_2_ready, hbm_3_ready, hbm_4_ready,
-          hbm_5_ready, hbm_6_ready, hbm_7_ready, hbm_8_ready = in Bool()
+          hbm_5_ready, hbm_6_ready, hbm_7_ready = in Bool()
     val tcarray_in = Vec(slave(MultiPortStream(256, 32, false, true)), 4)
-    val tcarray_out = Vec(master(MultiPortStream(256, 32, true, false)), 5)
+    val tcarray_out = Vec(master(MultiPortStream(256, 32, true, false)), 4)
   }
 
   noIoPrefix()
@@ -80,24 +80,26 @@ class tensor_core_array_wrapper(array_col: Int, array_row: Int, chain_len: Int,
   dataIn(1).payload := combinedDataIn1(dataIn(1).payload.getWidth-1 downto 0)
 
   val data2TcarrayCol = Vec(Stream(UInt(320 bits)), array_col)
-  val data2TcarrayRow = Vec(Stream(UInt(320 bits)), chain_len * array_row)
+  val data2TcarrayRow = Vec(Stream(UInt(320 bits)), array_row)
 
   val dataInColShiftRegs = new InputShiftReg(320, array_col)
   dataInColShiftRegs.io.pushIn <> dataIn(0)
   for (i <- 0 until array_col) (data2TcarrayCol(i) <> dataInColShiftRegs.io.dataOut(i))
-  val dataInRowShiftRegs = new InputShiftReg(320, array_row * chain_len)
+  val dataInRowShiftRegs = new InputShiftReg(320, array_row)
   dataInRowShiftRegs.io.pushIn <> dataIn(1)
-  for (i <- 0 until array_row*chain_len) (data2TcarrayRow(i) <> dataInRowShiftRegs.io.dataOut(i))
+  for (i <- 0 until array_row) (data2TcarrayRow(i) <> dataInRowShiftRegs.io.dataOut(i))
 
-  val tcArray = new TensorCoreChainArray(array_col = array_col, array_row = array_row,
+  val tcArray = new SparseTensorCoreChainArray(array_col = array_col, array_row = array_row,
                                       chain_len = chain_len, out_buf_delay = chain_len*3-3,
                                       col_buf_max_depth = 128, row_buf_max_depth = 128,
                                       output_fifo_depth = 128, output_width = 24, 
-                                      inout_pipe_delay = 4)
+                                      inout_pipe_delay = 4, dwidth = 16)
 
   tcArray.io.matALoad <> data2TcarrayCol
-  for (rowIdx <- 0 until array_row; chainIdx <- 0 until chain_len) {
-      tcArray.io.matBLoad(rowIdx)(chainIdx) <> data2TcarrayRow(rowIdx * chain_len + chainIdx)
+  for (rowIdx <- 0 until array_row) {
+    tcArray.io.matBLoad(rowIdx).valid := data2TcarrayRow(rowIdx).valid
+    tcArray.io.matBLoad(rowIdx).payload := data2TcarrayRow(rowIdx).payload(15 downto 0)
+    data2TcarrayRow(rowIdx).ready := tcArray.io.matBLoad(rowIdx).ready
   }
   tcArray.io.configPorts.tccColBufferCnterRange := U(
       (mat_a_row / array_col) * (mat_a_col / 20), 16 bits)
@@ -106,7 +108,6 @@ class tensor_core_array_wrapper(array_col: Int, array_row: Int, chain_len: Int,
   tcArray.io.configPorts.matBColsPerTccRow := U((mat_b_col/array_row), 16 bits)
   tcArray.io.configPorts.matAColSubGrpLen := U(mat_a_col/(chain_len * 20), 16 bits)
   tcArray.io.calEn := io.start(0).rise()
-  tcArray.io.res_id := io.in_buffer_id
 
   val rdFsm = new StateMachine {
     val rdWordCounter = Counter(mat_a_col / (chain_len * 3))
@@ -158,7 +159,7 @@ class tensor_core_array_wrapper(array_col: Int, array_row: Int, chain_len: Int,
 
   //out logic
   //split output rows into groups of out_grp_size
-  val OUT_GRP_SIZE = 3
+  val OUT_GRP_SIZE = 1
 
   for (g <- 0 until tcArray.io.res.size/OUT_GRP_SIZE) {
     val wrInitCount = Counter(2 bits)
@@ -190,21 +191,14 @@ class tensor_core_array_wrapper(array_col: Int, array_row: Int, chain_len: Int,
     elem.select := selectTcarrayIn
     elem.addr := io.rd_addr
   }
-
-  //  generate mem usage report
-  val col_mem_size = tcArray.colMem.length * 3
-  val row_mem_size = tcArray.rowMem.length * 3
-  val fb_fifo_size = tcArray.tensorArray.length * tcArray.tensorArray(0).length * 2
-  println("total ram blocks: ", (col_mem_size + row_mem_size + fb_fifo_size))
-
 }
 
 object tensor_core_array_wrapper_gen {
   def main(args: Array[String]): Unit = {
     val gen = new DefaultConfig
-    val array_col = 16
-    val array_row = 15
-    val chain_len = 14
+    val array_col = 20
+    val array_row = 4
+    val chain_len = 10
     gen.defaultSpinalConfig.withoutEnumString().generate(new tensor_core_array_wrapper(
       array_col = array_col,
       array_row = array_row,

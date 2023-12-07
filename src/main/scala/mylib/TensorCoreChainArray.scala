@@ -72,8 +72,8 @@ class TensorCoreChainArray(array_col: Int, array_row: Int, chain_len: Int,
   val colMem = Array.fill(array_col)(new in_buffer)
   val rowMem = Array.fill(array_row * chain_len)(new in_buffer)
   //bfp converters
-  val colConverters = Array.fill(array_col)(new FixedBfpConverter())
-  val rowConverters = Array.ofDim[FixedBfpConverter](array_row, chain_len)
+  val colConverters = Array.fill(array_col)(new FixedBf16Converter())
+  val rowConverters = Array.fill(array_row, chain_len)(new FixedBf16Converter())
 
   //buffer write and read
   for (c <- 0 until array_col) {
@@ -103,7 +103,6 @@ class TensorCoreChainArray(array_col: Int, array_row: Int, chain_len: Int,
       rowBufferWrCounter.setName("rowMemWrCounter_" + r + "_" + tcId)
       
       rowMem(r * chain_len + tcId).setName("rowMem_" + r + "_" + tcId)
-      rowConverters(r)(tcId) = new FixedBfpConverter
       rowConverters(r)(tcId).io.dataIn <> io.matBLoad(r)(tcId).asFlow
       io.matBLoad(r)(tcId).ready := True
       rowMem(r * chain_len + tcId).io.wraddress :=

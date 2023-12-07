@@ -16,7 +16,7 @@ class DefaultConfig {
     targetDirectory = "./src/generated",
     oneFilePerComponent = true,
     defaultConfigForClockDomains = defaultClockConfig,
-    removePruned = false
+    removePruned = true,
   )
 
   var defaultSimConfig = SimConfig.withConfig(SpinalConfig(
