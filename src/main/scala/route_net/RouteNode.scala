@@ -10,6 +10,9 @@ class RouteNode(dwidth: Int, fifo_depth: Int) extends Component {
     val datOut0, datOut1 = master Flow(UInt(dwidth bits))
   }
 
+  val datIn0D1 = Delay(io.datIn0, 1)
+  val datIn1D1 = Delay(io.datIn1, 1)
+
   val upperRouteArea = new Area {
     val dat0Fifo, dat1Fifo = StreamFifo(UInt(dwidth bits), fifo_depth)
     val fifoSelCounter = Counter(1 bits)
@@ -17,10 +20,10 @@ class RouteNode(dwidth: Int, fifo_depth: Int) extends Component {
     dat1Fifo.io.pop.ready := Bool(true)
 
     when(io.ctrl0) {
-      dat0Fifo.io.push <> io.datIn0.toStream(null)
+      dat0Fifo.io.push <> datIn0D1.toStream(null)
       dat1Fifo.io.push.setIdle()
     }.otherwise {
-      dat1Fifo.io.push <> io.datIn0.toStream(null)
+      dat1Fifo.io.push <> datIn0D1.toStream(null)
       dat0Fifo.io.push.setIdle()
     }
 
@@ -40,10 +43,10 @@ class RouteNode(dwidth: Int, fifo_depth: Int) extends Component {
     dat1Fifo.io.pop.ready := Bool(true)
 
     when(io.ctrl1) {
-      dat0Fifo.io.push <> io.datIn1.toStream(null)
+      dat0Fifo.io.push <> datIn1D1.toStream(null)
       dat1Fifo.io.push.setIdle()
     }.otherwise {
-      dat1Fifo.io.push <> io.datIn1.toStream(null)
+      dat1Fifo.io.push <> datIn1D1.toStream(null)
       dat0Fifo.io.push.setIdle()
     }
 

@@ -38,7 +38,8 @@ case class MemResRouteNet(num_rep_ports: Int, num_rep_banks: Int, num_unrep_bank
     for (i <- 0 until num_rep_ports * num_rep_banks + num_unrep_banks) {
       allIdsForCurrCache(i) := allIns(i).fire && (allIns(i).payload(id_width - 1 downto 0) === c)
     }
-    colAssoFifos(c).io.push <> MuxOH(allIdsForCurrCache, allInsD1).toStream(null)
+    val selectedIns = Delay(MuxOH(allIdsForCurrCache, allInsD1), 1)
+    colAssoFifos(c).io.push <> selectedIns.toStream(null)
     io.outs(c) <> colAssoFifos(c).io.pop.toFlow
   }
 }

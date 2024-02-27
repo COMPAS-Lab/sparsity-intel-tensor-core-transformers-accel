@@ -41,11 +41,11 @@ class SparseTensorCoreChainArray(array_col: Int, array_row: Int, chain_len: Int,
   val matBCaches = Array.fill(array_row)(BankedMatCache(n_banks = array_col,
                                                         n_reps = array_col,
                                                         rep_bank_ids = repBankedIds,
-                                                        bank_depth = 64,
+                                                        bank_depth = 32,
                                                         n_parallel_vecs = matBVecPara,
                                                         dwidth = dwidth))
   //TODO: route net now fixed to have 20 inputs
-  val memReqRouteNet = Array.fill(array_row)(MemReqRouteNet(6 + log2Up(array_col), 32))
+  val memReqRouteNet = Array.fill(array_row)(MemReqRouteNet(5 + log2Up(array_col), 32))
   val memResRouteNet = Array.fill(array_row)(
     MemResRouteNet(
       num_rep_ports = 20, num_rep_banks = repBankedIds.length,
@@ -108,7 +108,7 @@ class SparseTensorCoreChainArray(array_col: Int, array_row: Int, chain_len: Int,
   for (r <- 0 until array_row) {
     for (c <- 0 until array_col) {
       // mat A indices to the route net
-      memReqRouteNet(r).io.ins(c).payload := Cat(matACaches(c).io.data(5 downto 0), U(c, log2Up(array_col) bits)).asUInt
+      memReqRouteNet(r).io.ins(c).payload := Cat(matACaches(c).io.data(4 downto 0), U(c, log2Up(array_col) bits)).asUInt
       memReqRouteNet(r).io.ins(c).valid := tensorLoadValid(c)
       // MemResRouteNet to each tensor core chain
       memResRouteNet(r).io.outs(c) >> tcArrayInTransposer(r)(c).io.multiVecIn

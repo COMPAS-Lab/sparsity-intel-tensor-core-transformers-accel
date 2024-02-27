@@ -4,43 +4,60 @@ import config.DefaultConfig
 import spinal.core._
 import spinal.lib._
 import intel_ips.out_asym_fifo
+
+class transposer_core(dwidth: Int, num_inputs: Int, num_outputs: Int) extends BlackBox {
+  val io = new Bundle {
+    val clk, reset, next = in Bool()
+    val next_out = out Bool()
+    val X = in Vec(UInt(dwidth bits), num_inputs)
+    val Y = out Vec(UInt(dwidth bits), num_outputs)
+  }
+  // disable the prefix
+  noIoPrefix()
+  // specify the tensor core main clock
+  mapClockDomain(clock = io.clk, reset = io.reset, resetActiveLevel = HIGH)
+
+  private def renameIoX(): Unit = {
+    for (a_id <- 0 until num_inputs) {
+      io.X(a_id).setName("x" + a_id.toString)
+    }
+    for (b_id <- 0 until num_outputs) {
+      io.Y(b_id).setName("y" + b_id.toString)
+    }
+  }
+
+  addPrePopTask(() => renameIoX())
+  addRTLPath(s"./src/main/sverilog/transpose-8192.sv")
+}
+
 case class VecBTransposer(dwidth: Int, num_inputs: Int, chain_len: Int) extends Component {
   val io = new Bundle {
     val multiVecIn = slave Flow (UInt(dwidth * num_inputs bits))
     val singleVecOut = Vec(master Flow (UInt(dwidth * 20 bits)), chain_len)
   }
 
-  // transposition fifo
-  val transFifoGrp = Array.fill(chain_len, 20)(new out_asym_fifo(input_width = dwidth * num_inputs,
-                                                                  output_width = dwidth,
-                                                                  depth = num_inputs, id = 0))
+  val transposerCore = new transposer_core(dwidth, num_inputs, 32)
+  transposerCore.io.X <> io.multiVecIn.payload.subdivideIn(dwidth bits)
+  transposerCore.io.next := io.multiVecIn.valid
 
-  // ctrl counters, put inputs into every transpose fifo
-  val loadCounter = Counter(chain_len * 20)
-  val popCounter = Counter(num_inputs)
+  val sRegSize: Int = ((20.0 * chain_len.toFloat / 32.toFloat).ceil * 32.0).toInt
+  val shiftRegs = Reg(Bits(dwidth * sRegSize bits)) init 0
 
-  // connection
-  for (i <- 0 until chain_len; j <- 0 until 20) {
-    when(io.multiVecIn.fire) {
-      transFifoGrp(i)(j).io.wr_en := (loadCounter === i * 20 + j)
-      loadCounter.increment()
-    }.otherwise {
-      transFifoGrp(i)(j).io.wr_en := False
-    }
-    transFifoGrp(i)(j).io.wr_data := io.multiVecIn.payload
+  val popCount = Counter(sRegSize)
+
+  shiftRegs(num_inputs * dwidth - 1 downto 0) := transposerCore.io.Y.asBits
+  for (i <- 1 until sRegSize) {
+    shiftRegs((i+1) * dwidth - 1 downto i * dwidth) := shiftRegs(i * dwidth - 1 downto (i-1) * dwidth)
   }
 
-  for (c <- 0 until chain_len) {
-    val outPayloadArray = for (tcId <- 0 until 20) yield transFifoGrp(c)(tcId).io.rd_data
-    for (tcId <- 0 until 20) {transFifoGrp(c)(tcId).io.rd_en := popCounter > 0}
-    io.singleVecOut(c).payload := Vec(outPayloadArray).asBits.asUInt
-    io.singleVecOut(c).valid := popCounter > 0
+  val resFromShiftRegs = shiftRegs(dwidth * 20 * chain_len - 1 downto 0).subdivideIn(dwidth * 20 bits)
+  for (i <- 0 until chain_len) {
+    io.singleVecOut(i).payload := resFromShiftRegs(i).asUInt
+    io.singleVecOut(i).valid := popCount.willOverflow
   }
 
-  // ctrl
-  when(loadCounter.willOverflow) {
-    popCounter.increment()
-  }
+  // dummy ctrl logic
+  when(io.multiVecIn.fire) {popCount.increment()}
 }
 
 object VecBTransposerGen {
