@@ -74,6 +74,8 @@ class TensorCoreChainArray(array_col: Int, array_row: Int, chain_len: Int,
   //bfp converters
   val colConverters = Array.fill(array_col)(new FixedBfpConverter())
   val rowConverters = Array.ofDim[FixedBfpConverter](array_row, chain_len)
+  //rowMem data shuffle shifters
+  val rowDataShufflers = Array.fill(array_row, array_col)(BarrelShifter(88, chain_len))
 
   //buffer write and read
   for (c <- 0 until array_col) {
@@ -134,13 +136,19 @@ class TensorCoreChainArray(array_col: Int, array_row: Int, chain_len: Int,
     for (r <- 0 until array_row) {
       val rowMemOut: Vec[UInt] = Vec(UInt(8 * 11 bits), chain_len)
       for (cl <- 0 until chain_len) (rowMemOut(cl) := rowMem(r * chain_len + cl).io.q)
+      // dummy row data shuffle control logic
+      val dataShuffleCtrlBits = CounterFreeRun(chain_len bits)
+      rowDataShufflers(r)(c).io.shiftCtrl << dataShuffleCtrlBits.toFlow()
 
       for (tcId <- 0 until chain_len) {
         // TODO: check timing of the delayed row address
-        tensorArray(r)(c).io.dataIn(tcId).valid :=
+        rowDataShufflers(r)(c).io.dataIn(tcId).valid :=
           (rowMemAddr(r)(tcId) < io.configPorts.tccRowBufferCnterRange && rowMemAddr(r)(tcId) >= 2 * tcId)
-        tensorArray(r)(c).io.dataIn(tcId).payload := Delay(rowMemOut(tcId)(87 downto 8), inout_pipe_delay)
-        tensorArray(r)(c).io.expIn(tcId) := Delay(rowMemOut(tcId)(7 downto 0), inout_pipe_delay)
+        rowDataShufflers(r)(c).io.dataIn(tcId).payload := Delay(rowMemOut(tcId), inout_pipe_delay)
+
+        tensorArray(r)(c).io.dataIn(tcId) << rowDataShufflers(r)(c).io.dataOut(tcId)
+          .translateWith(rowDataShufflers(r)(c).io.dataOut(tcId).payload(87 downto 8))
+        tensorArray(r)(c).io.expIn(tcId) := rowDataShufflers(r)(c).io.dataOut(tcId).payload(7 downto 0)
       }
 
       tensorArray(r)(c).io.loadCascadeIn := delayedLoadCascadeIn(r)
