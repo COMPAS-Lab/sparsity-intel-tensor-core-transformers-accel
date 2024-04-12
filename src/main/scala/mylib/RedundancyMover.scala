@@ -2,7 +2,6 @@ package mylib
 
 import spinal.core._
 import spinal.lib._
-import scala.math.max
 import config.DefaultConfig
 
 class RedundancyMover(num_ports: Int, bitwidth: Int) extends Component {
@@ -25,19 +24,19 @@ class RedundancyMover(num_ports: Int, bitwidth: Int) extends Component {
       }
     } else {
       val placeholder = U(U"1'b1" ## U(0, bitwidth-1 bits))
-      val halfRemovalLower = rmRedundancy(Vec(for(i <- 0 until ports.size/2) yield ports(i)))
-      val halfRemovalUpper = rmRedundancy(Vec(for(i <- ports.size/2 until ports.size) yield ports(i)))
-      halfRemovalUpper.setName("upper_half")
-      halfRemovalLower.setName("lower_half")
+      val halfMoverLower = rmRedundancy(Vec(for(i <- 0 until ports.size/2) yield ports(i)))
+      val halfMoverUpper = rmRedundancy(Vec(for(i <- ports.size/2 until ports.size) yield ports(i)))
+      halfMoverUpper.setName("upper_half")
+      halfMoverLower.setName("lower_half")
 
       var mCount = 0
       for(i <- resPorts.indices) {
-        if(i < halfRemovalLower.size / 2) {
+        if(i < halfMoverLower.size / 2) {
           // no selection span
-          resPorts(i) := halfRemovalLower(i)
-        } else if(i < halfRemovalLower.size) {
+          resPorts(i) := halfMoverLower(i)
+        } else if(i < halfMoverLower.size) {
           //selection span increase from 1 to p/2
-          val upperCandidatesArray = halfRemovalLower(i) +: (for (u <- 0 to mCount) yield halfRemovalUpper(u))
+          val upperCandidatesArray = halfMoverLower(i) +: (for (u <- 0 to mCount) yield halfMoverUpper(u))
           val upperCandidates = Vec(UInt(bitwidth bits), upperCandidatesArray.size)
           for (uCandIdx <- upperCandidates.indices) {
             upperCandidates(uCandIdx) := upperCandidatesArray(uCandIdx)
@@ -45,29 +44,29 @@ class RedundancyMover(num_ports: Int, bitwidth: Int) extends Component {
           upperCandidates.setName("upper_candidates")
           if (upperCandidates.size > 2) {
             val upperSel = Vec(
-              for (l <- halfRemovalLower.size / 2 to i) yield halfRemovalLower(l).msb).sCount(True)
+              for (l <- halfMoverLower.size / 2 to i) yield halfMoverLower(l).msb).sCount(True)
             resPorts(i) := upperCandidates(upperSel)
           } else {
-            resPorts(i) := upperCandidates(halfRemovalLower(i).msb.asUInt)
+            resPorts(i) := upperCandidates(halfMoverLower(i).msb.asUInt)
           }
           mCount += 1
-        } else if (i < halfRemovalLower.size / 2 + halfRemovalUpper.size) {
+        } else if (i < halfMoverLower.size / 2 + halfMoverUpper.size) {
           //static selection span as P/2
           val upperCandidates = Vec(
-            for (u <- (i - halfRemovalLower.size) to (i - halfRemovalLower.size / 2)) yield halfRemovalUpper(u))
+            for (u <- (i - halfMoverLower.size) to (i - halfMoverLower.size / 2)) yield halfMoverUpper(u))
           val upperSel = Vec(
-            for (l <- halfRemovalLower.size / 2 until halfRemovalLower.size) yield halfRemovalLower(l).msb)
+            for (l <- halfMoverLower.size / 2 until halfMoverLower.size) yield halfMoverLower(l).msb)
             .sCount(True)
           resPorts(i) := upperCandidates(upperSel)
         } else {
           // selection span decrease from P/2 to 0
           val upperCandidates = Vec(
-            for(u <- (i - halfRemovalLower.size) until halfRemovalLower.size) yield halfRemovalUpper(u))
+            for(u <- (i - halfMoverLower.size) until halfMoverLower.size) yield halfMoverUpper(u))
           val upperSel = Vec(
-            for (l <- halfRemovalLower.size / 2 until halfRemovalLower.size) yield halfRemovalLower(l).msb)
+            for (l <- halfMoverLower.size / 2 until halfMoverLower.size) yield halfMoverLower(l).msb)
             .sCount(True)
           switch(upperSel) {
-            for (sIdx <- 0 until 2 * halfRemovalLower.size - i) {
+            for (sIdx <- 0 until 2 * halfMoverLower.size - i) {
               is(U(sIdx)) {
                 resPorts(i) := upperCandidates(sIdx)
               }
