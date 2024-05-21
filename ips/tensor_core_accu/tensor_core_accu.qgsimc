@@ -42,7 +42,7 @@
           </parameter>
           <parameter>
             <name>enable_cascade_data_out</name>
-            <value>Yes</value>
+            <value>No</value>
           </parameter>
           <parameter>
             <name>enable_cascade_weight_in</name>
@@ -54,7 +54,7 @@
           </parameter>
           <parameter>
             <name>enable_clr0</name>
-            <value>No</value>
+            <value>Yes</value>
           </parameter>
           <parameter>
             <name>enable_clr1</name>
@@ -89,7 +89,7 @@
         <className>dsp_prime</className>
         <version>1.0</version>
         <name>dsp_prime_0</name>
-        <uniqueName>tensor_core_accu_dsp_prime_10_wcj43fa</uniqueName>
+        <uniqueName>tensor_core_accu_dsp_prime_10_exjexwi</uniqueName>
         <nonce>0</nonce>
         <incidentConnections></incidentConnections>
         <path>tensor_core_accu.dsp_prime_0</path>

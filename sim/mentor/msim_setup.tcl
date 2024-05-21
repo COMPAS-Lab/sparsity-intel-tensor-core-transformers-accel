@@ -104,7 +104,7 @@ if ![info exists QSYS_SIMDIR] {
 }
 
 if ![info exists QUARTUS_INSTALL_DIR] { 
-  set QUARTUS_INSTALL_DIR "C:/intelfpga_pro/20.4/quartus/"
+  set QUARTUS_INSTALL_DIR "/compas/opt/intelFPGA_pro/21.4/quartus/"
 }
 
 if ![info exists USER_DEFINED_COMPILE_OPTIONS] { 

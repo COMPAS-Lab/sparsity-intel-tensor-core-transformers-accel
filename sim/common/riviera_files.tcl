@@ -1,10 +1,11 @@
 
 proc get_design_libraries {} {
   set libraries [dict create]
-  dict set libraries dsp_prime_10      1
-  dict set libraries tensor_core_accu  1
-  dict set libraries tensor_core_entry 1
-  dict set libraries tensor_core       1
+  dict set libraries dsp_prime_10           1
+  dict set libraries tensor_core_accu       1
+  dict set libraries tensor_core_entry_bf12 1
+  dict set libraries tensor_core_start_bf12 1
+  dict set libraries tensor_core_bf12       1
   return $libraries
 }
 
@@ -20,12 +21,14 @@ proc get_common_design_files {USER_DEFINED_COMPILE_OPTIONS USER_DEFINED_VERILOG_
 
 proc get_design_files {USER_DEFINED_COMPILE_OPTIONS USER_DEFINED_VERILOG_COMPILE_OPTIONS USER_DEFINED_VHDL_COMPILE_OPTIONS QSYS_SIMDIR} {
   set design_files [list]
-  lappend design_files "vlog -v2k5 $USER_DEFINED_VERILOG_COMPILE_OPTIONS $USER_DEFINED_COMPILE_OPTIONS  \"[normalize_path "$QSYS_SIMDIR/../ips/tensor_core_accu/dsp_prime_10/sim/tensor_core_accu_dsp_prime_10_wcj43fa.v"]\"  -work dsp_prime_10"  
-  lappend design_files "vlog -v2k5 $USER_DEFINED_VERILOG_COMPILE_OPTIONS $USER_DEFINED_COMPILE_OPTIONS  \"[normalize_path "$QSYS_SIMDIR/../ips/tensor_core_accu/sim/tensor_core_accu.v"]\"  -work tensor_core_accu"                                
-  lappend design_files "vlog -v2k5 $USER_DEFINED_VERILOG_COMPILE_OPTIONS $USER_DEFINED_COMPILE_OPTIONS  \"[normalize_path "$QSYS_SIMDIR/../ips/tensor_core_entry/dsp_prime_10/sim/tensor_core_entry_dsp_prime_10_ha6ksdq.v"]\"  -work dsp_prime_10"
-  lappend design_files "vlog -v2k5 $USER_DEFINED_VERILOG_COMPILE_OPTIONS $USER_DEFINED_COMPILE_OPTIONS  \"[normalize_path "$QSYS_SIMDIR/../ips/tensor_core_entry/sim/tensor_core_entry.v"]\"  -work tensor_core_entry"                             
-  lappend design_files "vlog -v2k5 $USER_DEFINED_VERILOG_COMPILE_OPTIONS $USER_DEFINED_COMPILE_OPTIONS  \"[normalize_path "$QSYS_SIMDIR/../ips/tensor_core/dsp_prime_10/sim/tensor_core_dsp_prime_10_iy4cj7q.v"]\"  -work dsp_prime_10"            
-  lappend design_files "vlog -v2k5 $USER_DEFINED_VERILOG_COMPILE_OPTIONS $USER_DEFINED_COMPILE_OPTIONS  \"[normalize_path "$QSYS_SIMDIR/../ips/tensor_core/sim/tensor_core.v"]\"  -work tensor_core"                                               
+  lappend design_files "vlog -v2k5 $USER_DEFINED_VERILOG_COMPILE_OPTIONS $USER_DEFINED_COMPILE_OPTIONS  \"[normalize_path "$QSYS_SIMDIR/../ips/tensor_core_accu/dsp_prime_10/sim/tensor_core_accu_dsp_prime_10_exjexwi.v"]\"  -work dsp_prime_10"
+  lappend design_files "vlog -v2k5 $USER_DEFINED_VERILOG_COMPILE_OPTIONS $USER_DEFINED_COMPILE_OPTIONS  \"[normalize_path "$QSYS_SIMDIR/../ips/tensor_core_accu/sim/tensor_core_accu.v"]\"  -work tensor_core_accu"
+  lappend design_files "vlog -v2k5 $USER_DEFINED_VERILOG_COMPILE_OPTIONS $USER_DEFINED_COMPILE_OPTIONS  \"[normalize_path "$QSYS_SIMDIR/../ips/tensor_core_start_bf12/dsp_prime_10/sim/tensor_core_start_bf12_dsp_prime_10_6h3jcbq.v"]\"  -work dsp_prime_10"
+  lappend design_files "vlog -v2k5 $USER_DEFINED_VERILOG_COMPILE_OPTIONS $USER_DEFINED_COMPILE_OPTIONS  \"[normalize_path "$QSYS_SIMDIR/../ips/tensor_core_start_bf12/sim/tensor_core_start_bf12.v"]\"  -work tensor_core_start_bf12"
+  lappend design_files "vlog -v2k5 $USER_DEFINED_VERILOG_COMPILE_OPTIONS $USER_DEFINED_COMPILE_OPTIONS  \"[normalize_path "$QSYS_SIMDIR/../ips/tensor_core_entry_bf12/dsp_prime_10/sim/tensor_core_entry_bf12_dsp_prime_10_we4tb7i.v"]\"  -work dsp_prime_10"
+  lappend design_files "vlog -v2k5 $USER_DEFINED_VERILOG_COMPILE_OPTIONS $USER_DEFINED_COMPILE_OPTIONS  \"[normalize_path "$QSYS_SIMDIR/../ips/tensor_core_entry_bf12/sim/tensor_core_entry_bf12.v"]\"  -work tensor_core_entry_bf12"
+  lappend design_files "vlog -v2k5 $USER_DEFINED_VERILOG_COMPILE_OPTIONS $USER_DEFINED_COMPILE_OPTIONS  \"[normalize_path "$QSYS_SIMDIR/../ips/tensor_core_bf12/dsp_prime_10/sim/tensor_core_bf12_dsp_prime_10_t4xs3pq.v"]\"  -work dsp_prime_10"
+  lappend design_files "vlog -v2k5 $USER_DEFINED_VERILOG_COMPILE_OPTIONS $USER_DEFINED_COMPILE_OPTIONS  \"[normalize_path "$QSYS_SIMDIR/../ips/tensor_core_bf12/sim/tensor_core_bf12.v"]\"  -work tensor_core_bf12"
   return $design_files
 }
 

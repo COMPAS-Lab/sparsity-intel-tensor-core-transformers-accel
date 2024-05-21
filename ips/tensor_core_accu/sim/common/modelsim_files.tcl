@@ -19,7 +19,7 @@ namespace eval tensor_core_accu {
   
   proc get_design_files {USER_DEFINED_COMPILE_OPTIONS USER_DEFINED_VERILOG_COMPILE_OPTIONS USER_DEFINED_VHDL_COMPILE_OPTIONS QSYS_SIMDIR} {
     set design_files [list]
-    lappend design_files "vlog $USER_DEFINED_VERILOG_COMPILE_OPTIONS $USER_DEFINED_COMPILE_OPTIONS  \"[normalize_path "$QSYS_SIMDIR/../dsp_prime_10/sim/tensor_core_accu_dsp_prime_10_wcj43fa.v"]\"  -work dsp_prime_10"
+    lappend design_files "vlog $USER_DEFINED_VERILOG_COMPILE_OPTIONS $USER_DEFINED_COMPILE_OPTIONS  \"[normalize_path "$QSYS_SIMDIR/../dsp_prime_10/sim/tensor_core_accu_dsp_prime_10_exjexwi.v"]\"  -work dsp_prime_10"
     lappend design_files "vlog $USER_DEFINED_VERILOG_COMPILE_OPTIONS $USER_DEFINED_COMPILE_OPTIONS  \"[normalize_path "$QSYS_SIMDIR/tensor_core_accu.v"]\"  -work tensor_core_accu"                                     
     return $design_files
   }

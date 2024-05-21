@@ -70,7 +70,7 @@
           </parameter>
           <parameter>
             <name>GUI_LegacyRREQ</name>
-            <value>1</value>
+            <value>0</value>
           </parameter>
           <parameter>
             <name>GUI_MAX_DEPTH</name>
@@ -130,11 +130,11 @@
           </parameter>
           <parameter>
             <name>GUI_delaypipe</name>
-            <value>4</value>
+            <value>5</value>
           </parameter>
           <parameter>
             <name>GUI_diff_widths</name>
-            <value>false</value>
+            <value>true</value>
           </parameter>
           <parameter>
             <name>GUI_msb_usedw</name>
@@ -142,7 +142,7 @@
           </parameter>
           <parameter>
             <name>GUI_output_width</name>
-            <value>8</value>
+            <value>72</value>
           </parameter>
           <parameter>
             <name>GUI_read_aclr_synch</name>
@@ -193,7 +193,7 @@
         <className>fifo</className>
         <version>19.1.0</version>
         <name>fifo_0</name>
-        <uniqueName>out_fifo_fifo_1910_5btp2ny</uniqueName>
+        <uniqueName>out_fifo_fifo_1910_5diqs4y</uniqueName>
         <nonce>0</nonce>
         <incidentConnections></incidentConnections>
         <path>out_fifo.fifo_0</path>

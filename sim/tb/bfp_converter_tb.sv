@@ -1,11 +1,11 @@
 module bfp_converter_tb;
 
   // Parameters
-  localparam V = 10;
-  localparam P = 10;
+  localparam V = 20;
+  localparam P = 20;
   localparam BIT=32;
   localparam FPM=23;
-  localparam BFPM=6;
+  localparam BFPM=3;
   localparam EXP = BIT-FPM-1;
 
   // Ports

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <EnsembleReport name="out_fifo" kind="out_fifo" version="1.0" fabric="QSYS">
- <!-- Format version 20.4 72 (Future versions may contain additional information.) -->
- <!-- 2023.01.02.15:04:40 -->
+ <!-- Format version 21.4 67 (Future versions may contain additional information.) -->
+ <!-- 2024.05.17.17:37:55 -->
  <!-- A collection of modules and connections -->
  <parameter name="AUTO_GENERATION_ID">
   <type>java.lang.Integer</type>
@@ -69,7 +69,7 @@
    name="fifo_0"
    kind="fifo"
    version="19.1.0"
-   entity="out_fifo_fifo_1910_5btp2ny"
+   entity="out_fifo_fifo_1910_5diqs4y"
    library="fifo_1910"
    path="fifo_0"
    hpath="fifo_0"
@@ -103,7 +103,7 @@ the requested settings for a module instance. -->
   </parameter>
   <parameter name="GUI_delaypipe">
    <type>int</type>
-   <value>4</value>
+   <value>5</value>
    <derived>false</derived>
    <enabled>false</enabled>
    <visible>true</visible>
@@ -119,7 +119,7 @@ the requested settings for a module instance. -->
   </parameter>
   <parameter name="GUI_LegacyRREQ">
    <type>int</type>
-   <value>1</value>
+   <value>0</value>
    <derived>false</derived>
    <enabled>true</enabled>
    <visible>true</visible>
@@ -167,7 +167,7 @@ the requested settings for a module instance. -->
   </parameter>
   <parameter name="GUI_output_width">
    <type>int</type>
-   <value>8</value>
+   <value>72</value>
    <derived>false</derived>
    <enabled>false</enabled>
    <visible>false</visible>
@@ -207,7 +207,7 @@ the requested settings for a module instance. -->
   </parameter>
   <parameter name="GUI_diff_widths">
    <type>boolean</type>
-   <value>false</value>
+   <value>true</value>
    <derived>false</derived>
    <enabled>true</enabled>
    <visible>false</visible>
@@ -437,7 +437,7 @@ the requested settings for a module instance. -->
    <visible>true</visible>
    <valid>true</valid>
   </parameter>
-  <interface name="fifo_input" kind="conduit_end" version="20.4">
+  <interface name="fifo_input" kind="conduit_end" version="21.4">
    <!-- The connection points exposed by a module instance for the
 particular module parameters. Connection points and their
 parameters are a RESULT of the module parameters. -->
@@ -512,7 +512,7 @@ parameters are a RESULT of the module parameters. -->
     <role>clk</role>
    </port>
   </interface>
-  <interface name="fifo_output" kind="conduit_end" version="20.4">
+  <interface name="fifo_output" kind="conduit_end" version="21.4">
    <!-- The connection points exposed by a module instance for the
 particular module parameters. Connection points and their
 parameters are a RESULT of the module parameters. -->
@@ -596,8 +596,8 @@ parameters are a RESULT of the module parameters. -->
   <type>com.altera.entityinterfaces.IElementClass</type>
   <subtype>com.altera.entityinterfaces.IMutableConnectionPoint</subtype>
   <displayName>Conduit</displayName>
-  <version>20.4</version>
+  <version>21.4</version>
  </plugin>
- <reportVersion>20.4 72</reportVersion>
+ <reportVersion>21.4 67</reportVersion>
  <uniqueIdentifier></uniqueIdentifier>
 </EnsembleReport>

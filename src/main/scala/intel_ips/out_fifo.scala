@@ -31,7 +31,7 @@ class StreamOutFifo(output_width: Int) extends Component {
   core.io.wrreq := io.push.valid
   io.push.ready := ~core.io.full
 
-  io.pop.payload := core.io.q
-  io.pop.valid := !core.io.empty
   core.io.rdreq := io.pop.ready
+  io.pop.valid := ~core.io.empty
+  io.pop.payload := core.io.q
 }

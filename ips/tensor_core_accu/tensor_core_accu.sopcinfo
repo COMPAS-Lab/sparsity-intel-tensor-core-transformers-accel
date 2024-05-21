@@ -4,8 +4,8 @@
  kind="tensor_core_accu"
  version="1.0"
  fabric="QSYS">
- <!-- Format version 20.4 72 (Future versions may contain additional information.) -->
- <!-- 2022.06.23.14:55:15 -->
+ <!-- Format version 21.4 67 (Future versions may contain additional information.) -->
+ <!-- 2024.05.14.22:02:27 -->
  <!-- A collection of modules and connections -->
  <parameter name="AUTO_GENERATION_ID">
   <type>java.lang.Integer</type>
@@ -73,7 +73,7 @@
    name="dsp_prime_0"
    kind="dsp_prime"
    version="1.0"
-   entity="tensor_core_accu_dsp_prime_10_jua6hty"
+   entity="tensor_core_accu_dsp_prime_10_exjexwi"
    library="dsp_prime_10"
    path="dsp_prime_0"
    hpath="dsp_prime_0"
@@ -106,7 +106,7 @@ the requested settings for a module instance. -->
   </parameter>
   <parameter name="enable_cascade_data_out">
    <type>java.lang.String</type>
-   <value>Yes</value>
+   <value>No</value>
    <derived>false</derived>
    <enabled>true</enabled>
    <visible>true</visible>
@@ -234,7 +234,7 @@ the requested settings for a module instance. -->
    <visible>true</visible>
    <valid>true</valid>
   </parameter>
-  <interface name="clk" kind="conduit_end" version="20.4">
+  <interface name="clk" kind="conduit_end" version="21.4">
    <!-- The connection points exposed by a module instance for the
 particular module parameters. Connection points and their
 parameters are a RESULT of the module parameters. -->
@@ -291,7 +291,7 @@ parameters are a RESULT of the module parameters. -->
     <role>clk</role>
    </port>
   </interface>
-  <interface name="clr0" kind="conduit_end" version="20.4">
+  <interface name="clr0" kind="conduit_end" version="21.4">
    <!-- The connection points exposed by a module instance for the
 particular module parameters. Connection points and their
 parameters are a RESULT of the module parameters. -->
@@ -348,7 +348,7 @@ parameters are a RESULT of the module parameters. -->
     <role>clr</role>
    </port>
   </interface>
-  <interface name="acc_en" kind="conduit_end" version="20.4">
+  <interface name="acc_en" kind="conduit_end" version="21.4">
    <!-- The connection points exposed by a module instance for the
 particular module parameters. Connection points and their
 parameters are a RESULT of the module parameters. -->
@@ -405,7 +405,7 @@ parameters are a RESULT of the module parameters. -->
     <role>acc_en</role>
    </port>
   </interface>
-  <interface name="zero_en" kind="conduit_end" version="20.4">
+  <interface name="zero_en" kind="conduit_end" version="21.4">
    <!-- The connection points exposed by a module instance for the
 particular module parameters. Connection points and their
 parameters are a RESULT of the module parameters. -->
@@ -462,7 +462,7 @@ parameters are a RESULT of the module parameters. -->
     <role>zero_en</role>
    </port>
   </interface>
-  <interface name="bf24_a1" kind="conduit_end" version="20.4">
+  <interface name="bf24_a1" kind="conduit_end" version="21.4">
    <!-- The connection points exposed by a module instance for the
 particular module parameters. Connection points and their
 parameters are a RESULT of the module parameters. -->
@@ -519,7 +519,7 @@ parameters are a RESULT of the module parameters. -->
     <role>data_in</role>
    </port>
   </interface>
-  <interface name="cascade_data_in_col_1" kind="conduit_end" version="20.4">
+  <interface name="cascade_data_in_col_1" kind="conduit_end" version="21.4">
    <!-- The connection points exposed by a module instance for the
 particular module parameters. Connection points and their
 parameters are a RESULT of the module parameters. -->
@@ -576,64 +576,7 @@ parameters are a RESULT of the module parameters. -->
     <role>cascade_data_in</role>
    </port>
   </interface>
-  <interface name="cascade_data_out_col_1" kind="conduit_end" version="20.4">
-   <!-- The connection points exposed by a module instance for the
-particular module parameters. Connection points and their
-parameters are a RESULT of the module parameters. -->
-   <assignment>
-    <name>ui.blockdiagram.direction</name>
-    <value>output</value>
-   </assignment>
-   <parameter name="associatedClock">
-    <type>java.lang.String</type>
-    <value></value>
-    <derived>false</derived>
-    <enabled>true</enabled>
-    <visible>true</visible>
-    <valid>true</valid>
-   </parameter>
-   <parameter name="associatedReset">
-    <type>java.lang.String</type>
-    <value></value>
-    <derived>false</derived>
-    <enabled>true</enabled>
-    <visible>true</visible>
-    <valid>true</valid>
-   </parameter>
-   <parameter name="prSafe">
-    <type>boolean</type>
-    <value>false</value>
-    <derived>false</derived>
-    <enabled>true</enabled>
-    <visible>false</visible>
-    <valid>true</valid>
-   </parameter>
-   <parameter name="deviceFamily">
-    <type>java.lang.String</type>
-    <value>UNKNOWN</value>
-    <derived>false</derived>
-    <enabled>true</enabled>
-    <visible>true</visible>
-    <valid>true</valid>
-   </parameter>
-   <parameter name="generateLegacySim">
-    <type>boolean</type>
-    <value>false</value>
-    <derived>false</derived>
-    <enabled>true</enabled>
-    <visible>true</visible>
-    <valid>true</valid>
-   </parameter>
-   <type>conduit</type>
-   <isStart>false</isStart>
-   <port>
-    <name>cascade_data_out_col_1</name>
-    <direction>Output</direction>
-    <width>32</width>
-    <role>cascade_data_out</role>
-   </port>
-  </interface>
-  <interface name="bf24_a2" kind="conduit_end" version="20.4">
+  <interface name="bf24_a2" kind="conduit_end" version="21.4">
    <!-- The connection points exposed by a module instance for the
 particular module parameters. Connection points and their
 parameters are a RESULT of the module parameters. -->
@@ -690,7 +633,7 @@ parameters are a RESULT of the module parameters. -->
     <role>data_in</role>
    </port>
   </interface>
-  <interface name="cascade_data_in_col_2" kind="conduit_end" version="20.4">
+  <interface name="cascade_data_in_col_2" kind="conduit_end" version="21.4">
    <!-- The connection points exposed by a module instance for the
 particular module parameters. Connection points and their
 parameters are a RESULT of the module parameters. -->
@@ -747,64 +690,7 @@ parameters are a RESULT of the module parameters. -->
     <role>cascade_data_in</role>
    </port>
   </interface>
-  <interface name="cascade_data_out_col_2" kind="conduit_end" version="20.4">
-   <!-- The connection points exposed by a module instance for the
-particular module parameters. Connection points and their
-parameters are a RESULT of the module parameters. -->
-   <assignment>
-    <name>ui.blockdiagram.direction</name>
-    <value>output</value>
-   </assignment>
-   <parameter name="associatedClock">
-    <type>java.lang.String</type>
-    <value></value>
-    <derived>false</derived>
-    <enabled>true</enabled>
-    <visible>true</visible>
-    <valid>true</valid>
-   </parameter>
-   <parameter name="associatedReset">
-    <type>java.lang.String</type>
-    <value></value>
-    <derived>false</derived>
-    <enabled>true</enabled>
-    <visible>true</visible>
-    <valid>true</valid>
-   </parameter>
-   <parameter name="prSafe">
-    <type>boolean</type>
-    <value>false</value>
-    <derived>false</derived>
-    <enabled>true</enabled>
-    <visible>false</visible>
-    <valid>true</valid>
-   </parameter>
-   <parameter name="deviceFamily">
-    <type>java.lang.String</type>
-    <value>UNKNOWN</value>
-    <derived>false</derived>
-    <enabled>true</enabled>
-    <visible>true</visible>
-    <valid>true</valid>
-   </parameter>
-   <parameter name="generateLegacySim">
-    <type>boolean</type>
-    <value>false</value>
-    <derived>false</derived>
-    <enabled>true</enabled>
-    <visible>true</visible>
-    <valid>true</valid>
-   </parameter>
-   <type>conduit</type>
-   <isStart>false</isStart>
-   <port>
-    <name>cascade_data_out_col_2</name>
-    <direction>Output</direction>
-    <width>32</width>
-    <role>cascade_data_out</role>
-   </port>
-  </interface>
-  <interface name="bf24_a3" kind="conduit_end" version="20.4">
+  <interface name="bf24_a3" kind="conduit_end" version="21.4">
    <!-- The connection points exposed by a module instance for the
 particular module parameters. Connection points and their
 parameters are a RESULT of the module parameters. -->
@@ -861,7 +747,7 @@ parameters are a RESULT of the module parameters. -->
     <role>data_in</role>
    </port>
   </interface>
-  <interface name="cascade_data_in_col_3" kind="conduit_end" version="20.4">
+  <interface name="cascade_data_in_col_3" kind="conduit_end" version="21.4">
    <!-- The connection points exposed by a module instance for the
 particular module parameters. Connection points and their
 parameters are a RESULT of the module parameters. -->
@@ -918,64 +804,7 @@ parameters are a RESULT of the module parameters. -->
     <role>cascade_data_in</role>
    </port>
   </interface>
-  <interface name="cascade_data_out_col_3" kind="conduit_end" version="20.4">
-   <!-- The connection points exposed by a module instance for the
-particular module parameters. Connection points and their
-parameters are a RESULT of the module parameters. -->
-   <assignment>
-    <name>ui.blockdiagram.direction</name>
-    <value>output</value>
-   </assignment>
-   <parameter name="associatedClock">
-    <type>java.lang.String</type>
-    <value></value>
-    <derived>false</derived>
-    <enabled>true</enabled>
-    <visible>true</visible>
-    <valid>true</valid>
-   </parameter>
-   <parameter name="associatedReset">
-    <type>java.lang.String</type>
-    <value></value>
-    <derived>false</derived>
-    <enabled>true</enabled>
-    <visible>true</visible>
-    <valid>true</valid>
-   </parameter>
-   <parameter name="prSafe">
-    <type>boolean</type>
-    <value>false</value>
-    <derived>false</derived>
-    <enabled>true</enabled>
-    <visible>false</visible>
-    <valid>true</valid>
-   </parameter>
-   <parameter name="deviceFamily">
-    <type>java.lang.String</type>
-    <value>UNKNOWN</value>
-    <derived>false</derived>
-    <enabled>true</enabled>
-    <visible>true</visible>
-    <valid>true</valid>
-   </parameter>
-   <parameter name="generateLegacySim">
-    <type>boolean</type>
-    <value>false</value>
-    <derived>false</derived>
-    <enabled>true</enabled>
-    <visible>true</visible>
-    <valid>true</valid>
-   </parameter>
-   <type>conduit</type>
-   <isStart>false</isStart>
-   <port>
-    <name>cascade_data_out_col_3</name>
-    <direction>Output</direction>
-    <width>32</width>
-    <role>cascade_data_out</role>
-   </port>
-  </interface>
-  <interface name="bf24_col_1" kind="conduit_end" version="20.4">
+  <interface name="bf24_col_1" kind="conduit_end" version="21.4">
    <!-- The connection points exposed by a module instance for the
 particular module parameters. Connection points and their
 parameters are a RESULT of the module parameters. -->
@@ -1032,7 +861,7 @@ parameters are a RESULT of the module parameters. -->
     <role>result_l</role>
    </port>
   </interface>
-  <interface name="bf24_col_2" kind="conduit_end" version="20.4">
+  <interface name="bf24_col_2" kind="conduit_end" version="21.4">
    <!-- The connection points exposed by a module instance for the
 particular module parameters. Connection points and their
 parameters are a RESULT of the module parameters. -->
@@ -1089,7 +918,7 @@ parameters are a RESULT of the module parameters. -->
     <role>result_l,result_h</role>
    </port>
   </interface>
-  <interface name="bf24_col_3" kind="conduit_end" version="20.4">
+  <interface name="bf24_col_3" kind="conduit_end" version="21.4">
    <!-- The connection points exposed by a module instance for the
 particular module parameters. Connection points and their
 parameters are a RESULT of the module parameters. -->
@@ -1156,13 +985,13 @@ parameters are a RESULT of the module parameters. -->
   <version>1.0</version>
  </plugin>
  <plugin>
-  <instanceCount>16</instanceCount>
+  <instanceCount>13</instanceCount>
   <name>conduit_end</name>
   <type>com.altera.entityinterfaces.IElementClass</type>
   <subtype>com.altera.entityinterfaces.IMutableConnectionPoint</subtype>
   <displayName>Conduit</displayName>
-  <version>20.4</version>
+  <version>21.4</version>
  </plugin>
- <reportVersion>20.4 72</reportVersion>
+ <reportVersion>21.4 67</reportVersion>
  <uniqueIdentifier></uniqueIdentifier>
 </EnsembleReport>

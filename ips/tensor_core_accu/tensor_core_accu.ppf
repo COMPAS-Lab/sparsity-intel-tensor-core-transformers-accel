@@ -13,27 +13,15 @@
      name="cascade_data_in_col_1[31..0]"
      direction="input"
      scope="external" />
-  <pin
-     name="cascade_data_out_col_1[31..0]"
-     direction="output"
-     scope="external" />
   <pin name="bf24_a2[23..0]" direction="input" scope="external" />
   <pin
      name="cascade_data_in_col_2[31..0]"
      direction="input"
      scope="external" />
-  <pin
-     name="cascade_data_out_col_2[31..0]"
-     direction="output"
-     scope="external" />
   <pin name="bf24_a3[23..0]" direction="input" scope="external" />
   <pin
      name="cascade_data_in_col_3[31..0]"
      direction="input"
-     scope="external" />
-  <pin
-     name="cascade_data_out_col_3[31..0]"
-     direction="output"
      scope="external" />
   <pin name="bf24_col_1[23..0]" direction="output" scope="external" />
   <pin name="bf24_col_2[23..0]" direction="output" scope="external" />
