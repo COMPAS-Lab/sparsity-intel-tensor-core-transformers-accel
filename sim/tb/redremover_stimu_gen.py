@@ -17,7 +17,7 @@ def write_to_file(data: np.array, fp: str):
     with Path(fp).open("w") as f:
         for iter in data:
             dat_per_iter = [bin(e)[2:].zfill(DWIDTH) for e in iter]
-            dat_per_iter_hex = "".join(dat_per_iter)
+            dat_per_iter_hex = " ".join(dat_per_iter)
             f.write(dat_per_iter_hex + "\n")
 
 def main():

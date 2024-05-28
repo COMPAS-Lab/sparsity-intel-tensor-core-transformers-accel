@@ -47,7 +47,7 @@ class IndexGenerator(num_ports: Int, bitwidth: Int, placeholder: BigInt) extends
       removers(r).io.upperIns.valid <> True
       val partialOuts = Vec(
         for(i <- 0 until nRemoverInputs) yield interRes(stg + 1)(r * nRemoverInputs + i))
-      partialOuts := removers(r).io.outs
+      partialOuts := removers(r).io.outs.payload
     }
   }
 

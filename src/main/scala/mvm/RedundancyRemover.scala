@@ -14,7 +14,7 @@ case object RemoverOut extends RedRemoverDir
 class RedundancyRemoverFrontend(num_inputs: Int, bitwidth: Int, placeholder: BigInt) extends Component {
   val io = new Bundle {
     val upperIns, lowerIns = slave Flow(Vec(UInt(bitwidth bits), num_inputs / 2))
-    val outs = out Vec(UInt(bitwidth bits), num_inputs * 2)
+    val outs = master Flow(Vec(UInt(bitwidth bits), num_inputs * 2))
     val fifoPopSigLower, fifoPopSigUpper = in Vec(Bool(), num_inputs)
     // handshake wires signaling the finish of
     // a group
@@ -71,7 +71,8 @@ class RedundancyRemoverFrontend(num_inputs: Int, bitwidth: Int, placeholder: Big
         for (fid <- fifos.indices)
           yield (fid, fifos((rateId + fifos.length - fid) % fifos.length).io.occupancy > 2))
     }
-    rotateInOffset := (convertRate(~rateIn) + rotateInOffset) % num_inputs
+    val combinedRateIn = ~rateIn & ~Vec(for(uIn <- io.upperIns.payload) yield uIn.msb).asBits
+    rotateInOffset := (convertRate(combinedRateIn) + rotateInOffset) % num_inputs
     val inRotateRes = rotate(io.upperIns.payload, rotateInOffset, RemoverIn)
     for (fid <- fifos.indices) {
       fifos(fid).io.push.payload <> inRotateRes(fid)
@@ -92,7 +93,7 @@ class RedundancyRemoverFrontend(num_inputs: Int, bitwidth: Int, placeholder: Big
         for (rId <- 0 until num_inputs)
           yield (rId, io.fifoPopSigUpper((fid + rId) % num_inputs))
       ) & fifoPopEn
-      io.outs(fid + num_inputs) <> outRotateRes(fid)
+      io.outs.payload(fid + num_inputs) := outRotateRes(fid)
     }
   }
 
@@ -106,7 +107,8 @@ class RedundancyRemoverFrontend(num_inputs: Int, bitwidth: Int, placeholder: Big
         for (fid <- fifos.indices)
           yield (fid, fifos((rateId + fifos.length - fid) % fifos.length).io.occupancy > 2))
     }
-    rotateInOffset := (convertRate(~rateIn) + rotateInOffset) % num_inputs
+    val combinedRateIn = ~rateIn & ~Vec(for(uIn <- io.lowerIns.payload) yield uIn.msb).asBits
+    rotateInOffset := (convertRate(combinedRateIn) + rotateInOffset) % num_inputs
     val inRotateRes = rotate(io.lowerIns.payload, rotateInOffset, RemoverIn)
     for (fid <- fifos.indices) {
       fifos(fid).io.push.payload <> inRotateRes(fid)
@@ -127,7 +129,7 @@ class RedundancyRemoverFrontend(num_inputs: Int, bitwidth: Int, placeholder: Big
         for (rId <- 0 until num_inputs)
           yield (rId, io.fifoPopSigLower((fid + rId) % num_inputs))
       ) & fifoPopEn
-      io.outs(fid) <> outRotateRes(fid)
+      io.outs.payload(fid) := outRotateRes(fid)
     }
   }
 
@@ -137,6 +139,7 @@ class RedundancyRemoverFrontend(num_inputs: Int, bitwidth: Int, placeholder: Big
   io.sortIterFinished := ~(topFifoNotEmpty | botFifoNotEmpty)
 
   fifoPopEn := False
+  io.outs.valid := False
   val ctrlStateMachine = new StateMachine {
     val topFifoValid = Vec(for(i <- topRemoverFrontend.fifos) yield i.io.pop.valid).reduceBalancedTree(_ & _)
     val botFifoValid = Vec(for(i <- topRemoverFrontend.fifos) yield i.io.pop.valid).reduceBalancedTree(_ & _)
@@ -151,8 +154,10 @@ class RedundancyRemoverFrontend(num_inputs: Int, bitwidth: Int, placeholder: Big
     val sMerge: State = new State {
       whenIsActive{
         fifoPopEn := True
+        io.outs.valid := True
         when(io.sortIterFinished) {
           goto(sWait)
+          io.outs.valid := False
         }
       }
     }
@@ -218,9 +223,9 @@ class RedundancyRemoverBackend(num_outputs: Int, bitwidth: Int, placeholder: Big
 
   private def comp2Outs(ina: UInt, inb: UInt, placeholder: BigInt): Vec[UInt] = {
     val outs = Vec(Reg(UInt(ina.getWidth bits), init = U(0)), 2)
-    when (ina.msb === True || inb.msb === True) {
-      outs(0) := ina
-      outs(1) := inb
+    when (ina.msb | inb.msb) {
+      outs(0) := Mux(ina.msb, inb, ina)
+      outs(1) := U(placeholder)
     } elsewhen (ina === inb) {
       outs(0) := ina
       outs(1) := U(placeholder)
@@ -260,7 +265,7 @@ class RedundancyRemoverBackend(num_outputs: Int, bitwidth: Int, placeholder: Big
   //for outputs greater than 4 the backend is used together with the frontend
   //so it contains an extra layer to reduce half of the input bandwidth from
   //the frontend
-  val compRes = Vec(Vec(Reg(UInt(bitwidth bits), init=U(0)), num_outputs), log2Up(num_outputs) + 1)
+  val compRes = Vec(Vec(UInt(bitwidth bits), num_outputs), log2Up(num_outputs) + 1)
   // stage 1
   val stg1Outs = firstStgComparison(io.ins)
   for (i <- 0 until num_outputs) {compRes(0)(i) := stg1Outs(i).dat}
@@ -279,7 +284,7 @@ class RedundancyRemoverBackend(num_outputs: Int, bitwidth: Int, placeholder: Big
 class RedundancyRemover(num_words: Int, bitwidth: Int, placeholder: BigInt) extends Component {
   val io = new Bundle {
     val upperIns, lowerIns = slave Flow(Vec(UInt(bitwidth bits), num_words / 2))
-    val outs = out Vec(UInt(bitwidth bits), num_words)
+    val outs = master Flow(Vec(UInt(bitwidth bits), num_words))
     val lastGrpIn = in Bool()
     val sortIterFinished = out Bool()
   }
@@ -294,14 +299,15 @@ class RedundancyRemover(num_words: Int, bitwidth: Int, placeholder: BigInt) exte
   frontend.io.lowerIns <> io.lowerIns
   frontend.io.fifoPopSigUpper <> backend.io.stg1CompResUpper
   frontend.io.fifoPopSigLower <> backend.io.stg1CompResLower
-  frontend.io.outs <> backend.io.ins
+  backend.io.ins := frontend.io.outs.payload
   frontend.io.sortIterFinished <> io.sortIterFinished
   frontend.io.lastGrpIn <> io.lastGrpIn
   sortedOuts := backend.io.outs
 
   val redundancyMover = new RedundancyMover(num_words, bitwidth)
   redundancyMover.io.inputSeq := sortedOuts
-  io.outs <> Delay(redundancyMover.io.outputSeq, 1)
+  io.outs.payload := redundancyMover.io.outputSeq
+  io.outs.valid := Delay(frontend.io.outs.valid, (log2Up(num_words) + 1) * 2)
 }
 
 object RedundancyRemoverGen extends App {
