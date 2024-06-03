@@ -11,7 +11,8 @@ sealed trait RedRemoverDir
 case object RemoverIn extends RedRemoverDir
 case object RemoverOut extends RedRemoverDir
 
-class RedundancyRemoverFrontend(num_inputs: Int, bitwidth: Int, placeholder: BigInt) extends Component {
+class RedundancyRemoverFrontend(num_inputs: Int, bitwidth: Int,
+                                placeholder: BigInt, fifo_depth: Int) extends Component {
   val io = new Bundle {
     val upperIns, lowerIns = slave Flow(Vec(UInt(bitwidth bits), num_inputs / 2))
     val outs = master Flow(Vec(UInt(bitwidth bits), num_inputs * 2))
@@ -20,6 +21,7 @@ class RedundancyRemoverFrontend(num_inputs: Int, bitwidth: Int, placeholder: Big
     // a group
     val lastGrpIn = in Bool()
     val sortIterFinished = out Bool()
+    val lastGrpOut = out Bool()
   }
 
   assert(isPow2(num_inputs), "the module only supports ^2 outputs")
@@ -62,7 +64,7 @@ class RedundancyRemoverFrontend(num_inputs: Int, bitwidth: Int, placeholder: Big
 
   val fifoPopEn = Bool()
   val topRemoverFrontend = new Area {
-    val fifos: Array[StreamFifo[UInt]] = Array.fill(num_inputs)(StreamFifo(UInt(bitwidth bits), depth = 3))
+    val fifos: Array[StreamFifo[UInt]] = Array.fill(num_inputs)(StreamFifo(UInt(bitwidth bits), depth = fifo_depth))
     //input side
     val rotateInOffset = Reg(UInt(log2Up(num_inputs) bits), init = U(0))
     val rateIn = Bits(num_inputs / 2 bits)
@@ -72,7 +74,7 @@ class RedundancyRemoverFrontend(num_inputs: Int, bitwidth: Int, placeholder: Big
           yield (fid, fifos((rateId + fifos.length - fid) % fifos.length).io.occupancy > 2))
     }
     val combinedRateIn = ~rateIn & ~Vec(for(uIn <- io.upperIns.payload) yield uIn.msb).asBits
-    rotateInOffset := (convertRate(combinedRateIn) + rotateInOffset) % num_inputs
+    rotateInOffset := Mux(io.lastGrpOut, U(0), (convertRate(combinedRateIn) + rotateInOffset) % num_inputs)
     val inRotateRes = rotate(io.upperIns.payload, rotateInOffset, RemoverIn)
     for (fid <- fifos.indices) {
       fifos(fid).io.push.payload <> inRotateRes(fid)
@@ -86,7 +88,9 @@ class RedundancyRemoverFrontend(num_inputs: Int, bitwidth: Int, placeholder: Big
       for(fid <- fifos.indices)
         yield Mux(fifos(fid).io.pop.valid & fifoPopEn, fifos(fid).io.pop.payload, U(placeholder)))
 
-    rotateOutOffset := ((convertRate(rateOut) + rotateOutOffset) % num_inputs)(rotateOutOffset.getWidth - 1 downto 0)
+    rotateOutOffset := Mux(io.lastGrpOut,
+      U(0),
+      ((convertRate(rateOut) + rotateOutOffset) % num_inputs)(rotateOutOffset.getWidth - 1 downto 0))
     val outRotateRes = rotate(fifoOuts, rotateOutOffset, RemoverOut)
     for (fid <- 0 until num_inputs) {
       fifos(fid).io.pop.ready := rotateOutOffset.muxList(
@@ -98,7 +102,7 @@ class RedundancyRemoverFrontend(num_inputs: Int, bitwidth: Int, placeholder: Big
   }
 
   val botRemoverFrontend = new Area {
-    val fifos: Array[StreamFifo[UInt]] = Array.fill(num_inputs)(StreamFifo(UInt(bitwidth bits), depth = 3))
+    val fifos: Array[StreamFifo[UInt]] = Array.fill(num_inputs)(StreamFifo(UInt(bitwidth bits), depth = fifo_depth))
     //input side
     val rotateInOffset = Reg(UInt(log2Up(num_inputs) bits), init = U(0))
     val rateIn = Bits(num_inputs / 2 bits)
@@ -108,7 +112,7 @@ class RedundancyRemoverFrontend(num_inputs: Int, bitwidth: Int, placeholder: Big
           yield (fid, fifos((rateId + fifos.length - fid) % fifos.length).io.occupancy > 2))
     }
     val combinedRateIn = ~rateIn & ~Vec(for(uIn <- io.lowerIns.payload) yield uIn.msb).asBits
-    rotateInOffset := (convertRate(combinedRateIn) + rotateInOffset) % num_inputs
+    rotateInOffset := Mux(io.lastGrpOut, U(0), (convertRate(combinedRateIn) + rotateInOffset) % num_inputs)
     val inRotateRes = rotate(io.lowerIns.payload, rotateInOffset, RemoverIn)
     for (fid <- fifos.indices) {
       fifos(fid).io.push.payload <> inRotateRes(fid)
@@ -122,7 +126,10 @@ class RedundancyRemoverFrontend(num_inputs: Int, bitwidth: Int, placeholder: Big
       for (fid <- fifos.indices)
         yield Mux(fifos(fid).io.pop.valid & fifoPopEn, fifos(fid).io.pop.payload, U(placeholder)))
 
-    rotateOutOffset := ((convertRate(rateOut) + rotateOutOffset) % num_inputs)(rotateOutOffset.getWidth - 1 downto 0)
+    rotateOutOffset := Mux(
+      io.lastGrpOut,
+      U(0),
+      ((convertRate(rateOut) + rotateOutOffset) % num_inputs)(rotateOutOffset.getWidth - 1 downto 0))
     val outRotateRes = rotate(fifoOuts, rotateOutOffset, RemoverOut)
     for (fid <- 0 until num_inputs) {
       fifos(fid).io.pop.ready := rotateOutOffset.muxList(
@@ -140,6 +147,7 @@ class RedundancyRemoverFrontend(num_inputs: Int, bitwidth: Int, placeholder: Big
 
   fifoPopEn := False
   io.outs.valid := False
+  io.lastGrpOut := False
   val ctrlStateMachine = new StateMachine {
     val topFifoValid = Vec(for(i <- topRemoverFrontend.fifos) yield i.io.pop.valid).reduceBalancedTree(_ & _)
     val botFifoValid = Vec(for(i <- topRemoverFrontend.fifos) yield i.io.pop.valid).reduceBalancedTree(_ & _)
@@ -147,7 +155,8 @@ class RedundancyRemoverFrontend(num_inputs: Int, bitwidth: Int, placeholder: Big
     val sIdle: State = new State with EntryPoint {
       whenIsActive{
         fifoPopEn := False
-        when(topFifoValid & botFifoValid | Delay(io.lastGrpIn, 1, init=False)) (goto(sMerge))
+//        when(topFifoValid & botFifoValid | Delay(io.lastGrpIn, 1, init=False)) (goto(sMerge))
+        when(Delay(io.lastGrpIn, 1, init=False)) (goto(sMerge))
       }
     }
 
@@ -167,6 +176,7 @@ class RedundancyRemoverFrontend(num_inputs: Int, bitwidth: Int, placeholder: Big
         fifoPopEn := True
         lastCompareWaitCounter.increment()
         when(lastCompareWaitCounter.willOverflow) {
+          io.lastGrpOut := True
           goto(sIdle)
         }
       }
@@ -224,17 +234,35 @@ class RedundancyRemoverBackend(num_outputs: Int, bitwidth: Int, placeholder: Big
   private def comp2Outs(ina: UInt, inb: UInt, placeholder: BigInt): Vec[UInt] = {
     val outs = Vec(Reg(UInt(ina.getWidth bits), init = U(0)), 2)
     when (ina.msb | inb.msb) {
-      outs(0) := Mux(ina.msb, inb, ina)
-      outs(1) := U(placeholder)
-    } elsewhen (ina === inb) {
-      outs(0) := ina
-      outs(1) := U(placeholder)
-    } elsewhen (ina > inb) {
-      outs(0) := ina
-      outs(1) := inb
+      // with redundancy
+      val inaVal = ina(bitwidth-2 downto 0)
+      val inbVal = inb(bitwidth-2 downto 0)
+      when(inaVal === inbVal && (ina.msb ^ inb.msb)) {
+        outs(0) := Mux(ina.msb, ina, inb)
+        outs(1) := Mux(ina.msb, ina, inb)
+      } otherwise {
+        when(ina === U(placeholder) || inb === U(placeholder)) {
+          outs(0) := Mux(ina === U(placeholder), inb, ina)
+          outs(1) := Mux(ina === U(placeholder), ina, inb)
+        } otherwise {
+          outs(0) := Mux(inaVal > inbVal, ina, inb)
+          outs(1) := Mux(inaVal > inbVal, inb, ina)
+        }
+      }
     } otherwise {
-      outs(0) := inb
-      outs(1) := ina
+      // wo redundancy
+      when(ina === inb) {
+        //when finding the redundancy, mark the upper one as abandoned,
+        //  but retain the value
+        outs(0) := ina
+        outs(1) := (U"1'b1" ## ina(bitwidth - 2 downto 0)).asUInt
+      } elsewhen (ina > inb) {
+        outs(0) := ina
+        outs(1) := inb
+      } otherwise {
+        outs(0) := inb
+        outs(1) := ina
+      }
     }
     outs
   }
@@ -274,10 +302,30 @@ class RedundancyRemoverBackend(num_outputs: Int, bitwidth: Int, placeholder: Big
     compRes(stg + 1) := singleStageComparison(compRes(stg), stg, placeholder)
   }
 
-  io.outs := compRes.last
   for (i <- 0 until num_outputs) {
     io.stg1CompResLower(i) := stg1Outs(i).popA
     io.stg1CompResUpper(num_outputs - i - 1) := stg1Outs(i).popB
+  }
+
+//  if (num_outputs > 4) {
+//    // fix placeholder-caused large value vanishing
+//    val valVanishFixStg = Vec(UInt(bitwidth bits), compRes.last.size)
+//    for (i <- 0 until valVanishFixStg.size / 2 - 1) {
+//      val fixedCompRes = comp2Outs(compRes.last(i * 2 + 1), compRes.last(i * 2 + 2), placeholder)
+//      valVanishFixStg(i * 2 + 1) := fixedCompRes(0)
+//      valVanishFixStg(i * 2 + 2) := fixedCompRes(1)
+//    }
+//    valVanishFixStg(0) := Delay(compRes.last(0), 1, init = U(0))
+//    valVanishFixStg.last := Delay(compRes.last.last, 1, init = U(0))
+//
+//    // outputs assignment
+//    io.outs := valVanishFixStg
+//  } else {
+//    // for the outputs < 4, no need to fix the value vanishing issue
+//    io.outs := compRes.last
+//  }
+  for (i <- compRes.last.indices) {
+    io.outs(i) := Mux(compRes.last(i).msb, U(placeholder), compRes.last(i))
   }
 }
 
@@ -287,12 +335,13 @@ class RedundancyRemover(num_words: Int, bitwidth: Int, placeholder: BigInt) exte
     val outs = master Flow(Vec(UInt(bitwidth bits), num_words))
     val lastGrpIn = in Bool()
     val sortIterFinished = out Bool()
+    val lastGrpOut = out Bool()
   }
 
   assert(isPow2(num_words), "input size must be power of 2, but got " + num_words)
   val sortedOuts = Vec(Reg(UInt(bitwidth bits), init=U(0)), num_words)
 
-  val frontend = new RedundancyRemoverFrontend(num_words, bitwidth, placeholder)
+  val frontend = new RedundancyRemoverFrontend(num_words, bitwidth, placeholder, fifo_depth = 32)
   val backend = new RedundancyRemoverBackend(num_words, bitwidth, placeholder)
 
   frontend.io.upperIns <> io.upperIns
@@ -304,10 +353,19 @@ class RedundancyRemover(num_words: Int, bitwidth: Int, placeholder: BigInt) exte
   frontend.io.lastGrpIn <> io.lastGrpIn
   sortedOuts := backend.io.outs
 
-  val redundancyMover = new RedundancyMover(num_words, bitwidth)
-  redundancyMover.io.inputSeq := sortedOuts
-  io.outs.payload := redundancyMover.io.outputSeq
-  io.outs.valid := Delay(frontend.io.outs.valid, (log2Up(num_words) + 1) * 2)
+  if (num_words > 2) {
+    val redundancyMover = new RedundancyMover(num_words, bitwidth, placeholder)
+    redundancyMover.io.inputSeq := sortedOuts
+    io.outs.payload := redundancyMover.io.outputSeq
+//    val extraCompDelay: Int = if(num_words > 4) 1 else 0
+    val extraCompDelay: Int = 0
+    io.outs.valid := Delay(frontend.io.outs.valid, (log2Up(num_words) + 1) * 2 + extraCompDelay, init = False)
+    io.lastGrpOut := Delay(frontend.io.lastGrpOut, log2Up(num_words) + 1 + extraCompDelay, init = False)
+  } else {
+    io.outs.payload := sortedOuts
+    io.outs.valid := Delay(frontend.io.outs.valid, log2Up(num_words) + 2, init = False)
+    io.lastGrpOut := Delay(frontend.io.lastGrpOut, 1, init = False)
+  }
 }
 
 object RedundancyRemoverGen extends App {

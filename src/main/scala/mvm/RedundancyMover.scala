@@ -4,7 +4,7 @@ import spinal.core._
 import spinal.lib._
 import config.DefaultConfig
 
-class RedundancyMover(num_ports: Int, bitwidth: Int) extends Component {
+class RedundancyMover(num_ports: Int, bitwidth: Int, placeholder: BigInt) extends Component {
   val io = new Bundle {
     val inputSeq = in Vec(UInt(bitwidth bits), num_ports)
     val outputSeq = out Vec(UInt(bitwidth bits), num_ports)
@@ -23,7 +23,6 @@ class RedundancyMover(num_ports: Int, bitwidth: Int) extends Component {
         }
       }
     } else {
-      val placeholder = U(U"1'b1" ## U(0, bitwidth-1 bits))
       val halfMoverLower = rmRedundancy(Vec(for(i <- 0 until ports.size/2) yield ports(i)))
       val halfMoverUpper = rmRedundancy(Vec(for(i <- ports.size/2 until ports.size) yield ports(i)))
       halfMoverUpper.setName("upper_half")
@@ -72,7 +71,7 @@ class RedundancyMover(num_ports: Int, bitwidth: Int) extends Component {
               }
             }
             default {
-              resPorts(i) := placeholder
+              resPorts(i) := U(placeholder)
             }
           }
         }
@@ -87,6 +86,6 @@ class RedundancyMover(num_ports: Int, bitwidth: Int) extends Component {
 object RedundancyMoverGen {
   def main(args: Array[String]): Unit = {
     val gen = new DefaultConfig
-    gen.defaultSpinalConfig.generateVerilog(new RedundancyMover(16, 11))
+    gen.defaultSpinalConfig.generateVerilog(new RedundancyMover(16, 11, BigInt("11111111111111111", 2)))
   }
 }

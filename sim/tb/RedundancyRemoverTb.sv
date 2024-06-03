@@ -3,7 +3,7 @@
 module RedundancyRemoverTb ();
 
 localparam DWIDTH = 11;
-localparam ITER = 6;
+localparam ITER = 3;
 localparam INWORDS = 4;
 
 logic io_upperIns_valid = '0;
@@ -25,6 +25,7 @@ logic [DWIDTH-1 : 0] io_outs_5;
 logic [DWIDTH-1 : 0] io_outs_6;
 logic [DWIDTH-1 : 0] io_outs_7;
 logic io_lastGrpIn='0;
+logic io_lastGrpOut;
 logic io_sortIterFinished;
 logic io_outs_valid;
 logic clk=1;
@@ -41,17 +42,18 @@ RedundancyRemover dut_RedundancyRemover(
   .io_lowerIns_payload_1 (io_lowerIns_payload_1 ),
   .io_lowerIns_payload_2 (io_lowerIns_payload_2 ),
   .io_lowerIns_payload_3 (io_lowerIns_payload_3 ),
-  .io_outs_payload_0     (io_outs_0             ),
-  .io_outs_payload_1     (io_outs_1             ),
-  .io_outs_payload_2     (io_outs_2             ),
-  .io_outs_payload_3     (io_outs_3             ),
-  .io_outs_payload_4     (io_outs_4             ),
-  .io_outs_payload_5     (io_outs_5             ),
-  .io_outs_payload_6     (io_outs_6             ),
-  .io_outs_payload_7     (io_outs_7             ),
   .io_outs_valid         (io_outs_valid         ),
+  .io_outs_payload_0     (io_outs_0     ),
+  .io_outs_payload_1     (io_outs_1     ),
+  .io_outs_payload_2     (io_outs_2     ),
+  .io_outs_payload_3     (io_outs_3     ),
+  .io_outs_payload_4     (io_outs_4     ),
+  .io_outs_payload_5     (io_outs_5     ),
+  .io_outs_payload_6     (io_outs_6     ),
+  .io_outs_payload_7     (io_outs_7     ),
   .io_lastGrpIn          (io_lastGrpIn          ),
   .io_sortIterFinished   (io_sortIterFinished   ),
+  .io_lastGrpOut         (io_lastGrpOut         ),
   .clk                   (clk                   ),
   .resetn                (resetn                )
 );

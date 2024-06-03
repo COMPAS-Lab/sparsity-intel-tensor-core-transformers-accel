@@ -106,8 +106,14 @@ class tensor_core_array_wrapper(array_col: Int, array_row: Int, chain_len: Int,
     val loadStartCC = BufferCC(io.load_start(0), init = False)
     val idxGenerator = new IndexGenerator(array_col, IDX_BITSIZE, BigInt("10000000000", 2))
     // index generator connection
-    idxGenerator.io.seqIn <> io.tcarray_in(4).data(IDX_BITSIZE * array_col - 1 downto 0).subdivideIn(IDX_BITSIZE bits)
-    val idxGeneratorRes = RegNext(idxGenerator.io.seqOut)
+    val hbmData = io.tcarray_in(4).data(IDX_BITSIZE * array_col - 1 downto 0).subdivideIn(IDX_BITSIZE bits)
+    val hbmDataFlow = Vec(Flow(UInt(hbmData.last.getBitsWidth bits)), hbmData.length)
+    for ((d, f) <- hbmData.zip(hbmDataFlow)) {
+      f.payload := d
+      f.valid := True
+    }
+    idxGenerator.io.seqIn <> hbmDataFlow
+    val idxGeneratorRes = RegNext(idxGenerator.io.seqOut.payload)
     io.idx_res := io.idx_rd_addr(log2Up(array_col)-1 downto 0).muxList(
       for (i <- idxGeneratorRes.indices) yield (i, idxGeneratorRes(i))
     )
@@ -159,7 +165,8 @@ class tensor_core_array_wrapper(array_col: Int, array_row: Int, chain_len: Int,
       }
 
     }
-    println("IdxGenerator latency: " + LatencyAnalysis(idxGenerator.io.seqIn(0), idxGenerator.io.seqOut(0)))
+    println("IdxGenerator latency: " +
+      LatencyAnalysis(idxGenerator.io.seqIn(0).payload, idxGenerator.io.seqOut.payload(0)))
   }
 
   val selectTcarrayIn, startTCarrayIn = Reg(Bool()) init False

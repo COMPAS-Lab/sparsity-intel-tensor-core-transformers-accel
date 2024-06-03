@@ -31,8 +31,8 @@ object RedundancyMoverSim extends App {
   }
 
   val n_ports = 16
-  sim.compile(new RedundancyMover(n_ports, 10)).doSim { dut =>
-    val rep_placeholder = BigInt("1000000000", 2)
+  val rep_placeholder = BigInt("1000000000", 2)
+  sim.compile(new RedundancyMover(n_ports, 10, rep_placeholder)).doSim { dut =>
     val init_candidates = (1 until n_ports).toArray
     for (n_reps <- 1 to n_ports / 2) {
       var rep_choices = repInsertion(init_candidates, n_reps)
