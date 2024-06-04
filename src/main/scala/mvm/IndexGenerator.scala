@@ -87,8 +87,17 @@ class IndexGenerator(num_ports: Int, bitwidth: Int, placeholder: BigInt) extends
     }
   }
 
-  io.lastGrpOut <> removers.last(0).io.lastGrpOut
-  io.seqOut <> removers.last(0).io.outs
+  private val actualOutSize: Int = removers.last(0).io.outs.payload.size
+  val redundancyMover = new RedundancyMover(actualOutSize, bitwidth, placeholder)
+  for (i <- removers.last(0).io.outs.payload.indices) {
+    redundancyMover.io.inputSeq(i) := Mux(
+      removers.last(0).io.outs.payload(i).msb,
+      U(placeholder),
+      removers.last(0).io.outs.payload(i))
+  }
+  io.seqOut.payload := redundancyMover.io.outputSeq
+  io.seqOut.valid := Delay(removers.last(0).io.outs.valid, log2Up(actualOutSize) + 1, init = False)
+  io.lastGrpOut := Delay(removers.last(0).io.lastGrpOut, log2Up(actualOutSize) + 1, init = False)
 }
 
 object IndexGeneratorGen extends App {

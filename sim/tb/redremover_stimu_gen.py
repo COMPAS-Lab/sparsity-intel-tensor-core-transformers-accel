@@ -44,6 +44,7 @@ def gen_data_for_ig_test(attn_fp: str, num_in_lanes: int, res_fp: str = "./ig_st
     res = []
     for input_grp, sorted_grp in zip(input_dat_grps, sorted_grps):
         largest_blk_size = max([len(r) for r in input_grp])
+        grp_minval_pad = min([min(i) for i in input_grp])
         for i in range(largest_blk_size):
             curr_input = []
             for g_idx in range(num_in_lanes):
@@ -51,7 +52,9 @@ def gen_data_for_ig_test(attn_fp: str, num_in_lanes: int, res_fp: str = "./ig_st
                     curr_input.append(PLACEHOLDER)
                 else:
                     if (len(input_grp[g_idx])-1) < i :
-                        curr_input.append(PLACEHOLDER)
+                        # curr_input.append(PLACEHOLDER)
+                        min_bin = bin(grp_minval_pad)[2:].zfill(DWIDTH)
+                        curr_input.append(min_bin)
                     else:
                         tmp_bin = bin(input_grp[g_idx][i])[2:].zfill(DWIDTH)
                         curr_input.append(tmp_bin)
@@ -119,7 +122,7 @@ def check_idxgen_out_with_ref(fp_hw_out: Path, ref: list, num_out_lanes: int):
 def main():
     stimu, ref_out = gen_data_for_ig_test(
         f"./attn_blk_idx.npy", 12, f"./ig_stimulus_l{LAYER}_h{HEAD}.bin")
-    hw_res = check_idxgen_out_with_ref(Path(f"./idxgen_res_l{LAYER}_h{HEAD}.bin"), ref_out, 16)
+    # hw_res = check_idxgen_out_with_ref(Path(f"./idxgen_res_l{LAYER}_h{HEAD}.bin"), ref_out, 16)
     exit()
     # generate stimulus for a single-stage redundancy remover
     gen_dat_a = gen_sorted_dat(6, 8//2, (1, 200))

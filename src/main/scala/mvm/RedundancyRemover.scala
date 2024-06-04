@@ -73,12 +73,12 @@ class RedundancyRemoverFrontend(num_inputs: Int, bitwidth: Int,
         for (fid <- fifos.indices)
           yield (fid, fifos((rateId + fifos.length - fid) % fifos.length).io.occupancy > 2))
     }
-    val combinedRateIn = ~rateIn & ~Vec(for(uIn <- io.upperIns.payload) yield uIn.msb).asBits
+    val combinedRateIn = ~rateIn
     rotateInOffset := Mux(io.lastGrpOut, U(0), (convertRate(combinedRateIn) + rotateInOffset) % num_inputs)
     val inRotateRes = rotate(io.upperIns.payload, rotateInOffset, RemoverIn)
     for (fid <- fifos.indices) {
       fifos(fid).io.push.payload <> inRotateRes(fid)
-      fifos(fid).io.push.valid := ~inRotateRes(fid).msb & io.upperIns.valid
+      fifos(fid).io.push.valid := io.upperIns.valid
     }
 
     //output side
@@ -111,12 +111,12 @@ class RedundancyRemoverFrontend(num_inputs: Int, bitwidth: Int,
         for (fid <- fifos.indices)
           yield (fid, fifos((rateId + fifos.length - fid) % fifos.length).io.occupancy > 2))
     }
-    val combinedRateIn = ~rateIn & ~Vec(for(uIn <- io.lowerIns.payload) yield uIn.msb).asBits
+    val combinedRateIn = ~rateIn
     rotateInOffset := Mux(io.lastGrpOut, U(0), (convertRate(combinedRateIn) + rotateInOffset) % num_inputs)
     val inRotateRes = rotate(io.lowerIns.payload, rotateInOffset, RemoverIn)
     for (fid <- fifos.indices) {
       fifos(fid).io.push.payload <> inRotateRes(fid)
-      fifos(fid).io.push.valid := ~inRotateRes(fid).msb & io.lowerIns.valid
+      fifos(fid).io.push.valid := io.lowerIns.valid
     }
 
     //output side
@@ -198,32 +198,31 @@ class RedundancyRemoverBackend(num_outputs: Int, bitwidth: Int, placeholder: Big
 
   assert(isPow2(num_outputs), "the module only supports ^2 outputs")
 
-  private def comp1Outs(ina: UInt, inb: UInt): comp1OutsRes = {
+  private def comp1Outs(ina: UInt, inb: UInt, popLowerWhenEq: Boolean): comp1OutsRes = {
+    // in the first stage comparison, we do not remove redundancy
     val res = Reg(UInt(ina.getWidth bits), init = U(0))
     val popA = Bool()
     val popB = Bool()
 
-    when(ina.msb ^ inb.msb) {
-      // one of a and b is the placeholder: pop the other
-      res := Mux(ina.msb, inb, ina)
-      popA := ~ina.msb
-      popB := ~inb.msb
-    }.elsewhen(ina.msb & inb.msb) {
-      // both of a and b are placeholders: don't pop
-      res := U(placeholder)
-      popA := False
-      popB := False
-    }.otherwise {
-      // none of a and b is placeholder: normal compare
-      res := Mux(ina < inb, inb, ina)
-      when(ina === inb) {
+    val inaVal = ina(bitwidth-2 downto 0)
+    val inbVal = inb(bitwidth-2 downto 0)
+
+    // normal compare
+    // A: lower in B: upper in
+    res := Mux(inaVal < inbVal, inb, ina)
+    when(ina === inb) {
+      if (popLowerWhenEq) {
         popA := True
+        popB := False
+      } else {
+        popA := False
         popB := True
-      }.otherwise {
-        popA := ina > inb
-        popB := ina < inb
       }
+    }.otherwise {
+      popA := inaVal > inbVal
+      popB := inaVal < inbVal
     }
+
     val outRes = comp1OutsRes(bitwidth)
     outRes.dat := res
     outRes.popA := popA
@@ -233,35 +232,38 @@ class RedundancyRemoverBackend(num_outputs: Int, bitwidth: Int, placeholder: Big
 
   private def comp2Outs(ina: UInt, inb: UInt, placeholder: BigInt): Vec[UInt] = {
     val outs = Vec(Reg(UInt(ina.getWidth bits), init = U(0)), 2)
-    when (ina.msb | inb.msb) {
-      // with redundancy
-      val inaVal = ina(bitwidth-2 downto 0)
-      val inbVal = inb(bitwidth-2 downto 0)
-      when(inaVal === inbVal && (ina.msb ^ inb.msb)) {
-        outs(0) := Mux(ina.msb, ina, inb)
-        outs(1) := Mux(ina.msb, ina, inb)
-      } otherwise {
-        when(ina === U(placeholder) || inb === U(placeholder)) {
-          outs(0) := Mux(ina === U(placeholder), inb, ina)
-          outs(1) := Mux(ina === U(placeholder), ina, inb)
+    val inaVal = ina(bitwidth-2 downto 0)
+    val inbVal = inb(bitwidth-2 downto 0)
+
+    switch((ina.msb ## inb.msb).asBits, coverUnreachable = true) {
+      is(B"2'00") {
+        when(inaVal === inbVal) {
+          // TODO: check here
+          // regarding removed redundancy as smaller
+          outs(0) := ina
+          outs(1) := (U"1'b1" ## ina(bitwidth - 2 downto 0)).asUInt
         } otherwise {
           outs(0) := Mux(inaVal > inbVal, ina, inb)
           outs(1) := Mux(inaVal > inbVal, inb, ina)
         }
       }
-    } otherwise {
-      // wo redundancy
-      when(ina === inb) {
-        //when finding the redundancy, mark the upper one as abandoned,
-        //  but retain the value
-        outs(0) := ina
-        outs(1) := (U"1'b1" ## ina(bitwidth - 2 downto 0)).asUInt
-      } elsewhen (ina > inb) {
-        outs(0) := ina
-        outs(1) := inb
-      } otherwise {
-        outs(0) := inb
-        outs(1) := ina
+      is(B"2'11") {
+        outs(0) := Mux(inaVal > inbVal, ina, inb)
+        outs(1) := Mux(inaVal > inbVal, inb, ina)
+      }
+      is(B"2'01", B"2'10") {
+        when(inaVal === inbVal) {
+          // TODO: check here
+          outs(0) := Mux(ina.msb, inb, ina)
+          outs(1) := Mux(ina.msb, ina, inb)
+        } otherwise {
+          outs(0) := Mux(inaVal > inbVal, ina, inb)
+          outs(1) := Mux(inaVal > inbVal, inb, ina)
+        }
+      }
+      default {
+        outs(0) := U(placeholder)
+        outs(1) := U(placeholder)
       }
     }
     outs
@@ -285,7 +287,8 @@ class RedundancyRemoverBackend(num_outputs: Int, bitwidth: Int, placeholder: Big
   private def firstStgComparison(stgIns: Vec[UInt]): Vec[comp1OutsRes] = {
     val stgOuts = Vec(comp1OutsRes(bitwidth), stgIns.length / 2)
     for (i <- 0 until stgIns.length / 2) {
-      stgOuts(i) := comp1Outs(stgIns(i), stgIns(stgIns.length - 1 - i))
+      val popLowerWhenEq = i < (stgIns.length / 2)
+      stgOuts(i) := comp1Outs(stgIns(i), stgIns(stgIns.length - 1 - i), popLowerWhenEq)
     }
     stgOuts
   }
@@ -324,9 +327,8 @@ class RedundancyRemoverBackend(num_outputs: Int, bitwidth: Int, placeholder: Big
 //    // for the outputs < 4, no need to fix the value vanishing issue
 //    io.outs := compRes.last
 //  }
-  for (i <- compRes.last.indices) {
-    io.outs(i) := Mux(compRes.last(i).msb, U(placeholder), compRes.last(i))
-  }
+  // not to replace
+  io.outs := compRes.last
 }
 
 class RedundancyRemover(num_words: Int, bitwidth: Int, placeholder: BigInt) extends Component {
@@ -353,19 +355,10 @@ class RedundancyRemover(num_words: Int, bitwidth: Int, placeholder: BigInt) exte
   frontend.io.lastGrpIn <> io.lastGrpIn
   sortedOuts := backend.io.outs
 
-  if (num_words > 2) {
-    val redundancyMover = new RedundancyMover(num_words, bitwidth, placeholder)
-    redundancyMover.io.inputSeq := sortedOuts
-    io.outs.payload := redundancyMover.io.outputSeq
-//    val extraCompDelay: Int = if(num_words > 4) 1 else 0
-    val extraCompDelay: Int = 0
-    io.outs.valid := Delay(frontend.io.outs.valid, (log2Up(num_words) + 1) * 2 + extraCompDelay, init = False)
-    io.lastGrpOut := Delay(frontend.io.lastGrpOut, log2Up(num_words) + 1 + extraCompDelay, init = False)
-  } else {
-    io.outs.payload := sortedOuts
-    io.outs.valid := Delay(frontend.io.outs.valid, log2Up(num_words) + 2, init = False)
-    io.lastGrpOut := Delay(frontend.io.lastGrpOut, 1, init = False)
-  }
+  io.outs.payload := sortedOuts
+  io.outs.valid := Delay(frontend.io.outs.valid, log2Up(num_words) + 2, init = False)
+  io.lastGrpOut := Delay(frontend.io.lastGrpOut, 1, init = False)
+
 }
 
 object RedundancyRemoverGen extends App {
