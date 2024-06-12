@@ -73,9 +73,7 @@ class IndexGenerator(num_ports: Int, bitwidth: Int, placeholder: BigInt) extends
         } else if ((equivInputRange.sum / 2).toInt == num_ports) {
           removers(stg)(currInIdx).io.upperIns <> removers(stg-1)(currInIdx * 2).io.outs
           removers(stg)(currInIdx).io.lastGrpIn <> removers(stg-1)(currInIdx * 2).io.lastGrpOut
-          removers(stg)(currInIdx).io.lowerIns.valid := removers(stg-1)(currInIdx * 2).io.outs.valid
-          removers(stg)(currInIdx).io.lowerIns.payload :=
-            Vec(for(pidx <- removers(stg)(currInIdx).io.lowerIns.payload.indices) yield U(placeholder))
+          removers(stg)(currInIdx).io.lowerIns <> removers(stg-1)(currInIdx * 2).io.outs
         } else if ((equivInputRange.sum / 2).toInt < num_ports) {
           removers(stg)(currInIdx).io.upperIns <> removers(stg-1)(currInIdx * 2).io.outs
           removers(stg)(currInIdx).io.lowerIns <> removers(stg-1)(currInIdx * 2 + 1).io.outs
@@ -96,8 +94,16 @@ class IndexGenerator(num_ports: Int, bitwidth: Int, placeholder: BigInt) extends
       removers.last(0).io.outs.payload(i))
   }
   io.seqOut.payload := redundancyMover.io.outputSeq
-  io.seqOut.valid := Delay(removers.last(0).io.outs.valid, log2Up(actualOutSize) + 1, init = False)
-  io.lastGrpOut := Delay(removers.last(0).io.lastGrpOut, log2Up(actualOutSize) + 1, init = False)
+  io.seqOut.valid := Delay(removers.last(0).io.outs.valid, log2Up(actualOutSize), init = False)
+  io.lastGrpOut := Delay(removers.last(0).io.lastGrpOut, log2Up(actualOutSize), init = False)
+
+  // analyze latency
+  var lat = 0.0
+  for (i <- 0 until nStgs) {
+    lat += LatencyAnalysis(removers(i)(0).io.lowerIns.payload(0), removers(i)(0).io.outs.payload(0))
+  }
+  lat += LatencyAnalysis(redundancyMover.io.inputSeq(0), redundancyMover.io.outputSeq(0))
+  println("latency: " + lat)
 }
 
 object IndexGeneratorGen extends App {

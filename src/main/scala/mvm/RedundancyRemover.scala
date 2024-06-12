@@ -17,6 +17,7 @@ class RedundancyRemoverFrontend(num_inputs: Int, bitwidth: Int,
     val upperIns, lowerIns = slave Flow(Vec(UInt(bitwidth bits), num_inputs / 2))
     val outs = master Flow(Vec(UInt(bitwidth bits), num_inputs * 2))
     val fifoPopSigLower, fifoPopSigUpper = in Vec(Bool(), num_inputs)
+    val markRedBitLower, markRedBitUpper = in Vec(Bool(), num_inputs)
     // handshake wires signaling the finish of
     // a group
     val lastGrpIn = in Bool()
@@ -65,20 +66,21 @@ class RedundancyRemoverFrontend(num_inputs: Int, bitwidth: Int,
   val fifoPopEn = Bool()
   val topRemoverFrontend = new Area {
     val fifos: Array[StreamFifo[UInt]] = Array.fill(num_inputs)(StreamFifo(UInt(bitwidth bits), depth = fifo_depth))
+    val isChangingRedBit = Array.fill(num_inputs)(Reg(Bool(), init=False))
     //input side
     val rotateInOffset = Reg(UInt(log2Up(num_inputs) bits), init = U(0))
     val rateIn = Bits(num_inputs / 2 bits)
     for (rateId <- 0 until rateIn.getWidth) {
       rateIn(rateId) := rotateInOffset.muxList(
         for (fid <- fifos.indices)
-          yield (fid, fifos((rateId + fifos.length - fid) % fifos.length).io.occupancy > 2))
+          yield (fid, ~fifos((rateId + fifos.length - fid) % fifos.length).io.push.ready))
     }
-    val combinedRateIn = ~rateIn
+    val combinedRateIn = Mux(io.upperIns.valid, ~rateIn, B(0))
     rotateInOffset := Mux(io.lastGrpOut, U(0), (convertRate(combinedRateIn) + rotateInOffset) % num_inputs)
     val inRotateRes = rotate(io.upperIns.payload, rotateInOffset, RemoverIn)
     for (fid <- fifos.indices) {
       fifos(fid).io.push.payload <> inRotateRes(fid)
-      fifos(fid).io.push.valid := io.upperIns.valid
+      fifos(fid).io.push.valid := io.upperIns.valid & (fifos(fid).io.push.payload =/= U(placeholder))
     }
 
     //output side
@@ -86,10 +88,13 @@ class RedundancyRemoverFrontend(num_inputs: Int, bitwidth: Int,
     val rateOut = ~io.fifoPopSigUpper.asBits.reversed
     val fifoOuts = Vec(
       for(fid <- fifos.indices)
-        yield Mux(fifos(fid).io.pop.valid & fifoPopEn, fifos(fid).io.pop.payload, U(placeholder)))
+        yield Mux(
+          fifos(fid).io.pop.valid & fifoPopEn,
+          ((isChangingRedBit(fid) | fifos(fid).io.pop.payload.msb)
+            ## fifos(fid).io.pop.payload(bitwidth-2 downto 0)).asUInt,
+          U(placeholder)))
 
-    rotateOutOffset := Mux(io.lastGrpOut,
-      U(0),
+    rotateOutOffset := Mux(io.lastGrpOut, U(0),
       ((convertRate(rateOut) + rotateOutOffset) % num_inputs)(rotateOutOffset.getWidth - 1 downto 0))
     val outRotateRes = rotate(fifoOuts, rotateOutOffset, RemoverOut)
     for (fid <- 0 until num_inputs) {
@@ -97,38 +102,45 @@ class RedundancyRemoverFrontend(num_inputs: Int, bitwidth: Int,
         for (rId <- 0 until num_inputs)
           yield (rId, io.fifoPopSigUpper((fid + rId) % num_inputs))
       ) & fifoPopEn
+      isChangingRedBit(fid) := rotateOutOffset.muxList(
+        for (rId <- 0 until num_inputs)
+          yield (rId, io.markRedBitUpper((fid + rId) % num_inputs))
+      ) & fifoPopEn
       io.outs.payload(fid + num_inputs) := outRotateRes(fid)
     }
   }
 
   val botRemoverFrontend = new Area {
     val fifos: Array[StreamFifo[UInt]] = Array.fill(num_inputs)(StreamFifo(UInt(bitwidth bits), depth = fifo_depth))
+    val isChangingRedBit = Array.fill(num_inputs)(Reg(Bool(), init=False))
     //input side
     val rotateInOffset = Reg(UInt(log2Up(num_inputs) bits), init = U(0))
     val rateIn = Bits(num_inputs / 2 bits)
     for (rateId <- 0 until rateIn.getWidth) {
       rateIn(rateId) := rotateInOffset.muxList(
         for (fid <- fifos.indices)
-          yield (fid, fifos((rateId + fifos.length - fid) % fifos.length).io.occupancy > 2))
+          yield (fid, ~fifos((rateId + fifos.length - fid) % fifos.length).io.push.ready))
     }
-    val combinedRateIn = ~rateIn
+    val combinedRateIn = Mux(io.lowerIns.valid, ~rateIn, B(0))
     rotateInOffset := Mux(io.lastGrpOut, U(0), (convertRate(combinedRateIn) + rotateInOffset) % num_inputs)
     val inRotateRes = rotate(io.lowerIns.payload, rotateInOffset, RemoverIn)
     for (fid <- fifos.indices) {
       fifos(fid).io.push.payload <> inRotateRes(fid)
-      fifos(fid).io.push.valid := io.lowerIns.valid
+      fifos(fid).io.push.valid := io.lowerIns.valid & (fifos(fid).io.push.payload =/= U(placeholder))
     }
 
     //output side
     val rotateOutOffset = Reg(UInt(log2Up(num_inputs) bits), init = U(0))
     val rateOut = ~(io.fifoPopSigLower.asBits.reversed)
     val fifoOuts = Vec(
-      for (fid <- fifos.indices)
-        yield Mux(fifos(fid).io.pop.valid & fifoPopEn, fifos(fid).io.pop.payload, U(placeholder)))
+      for(fid <- fifos.indices)
+        yield Mux(
+          fifos(fid).io.pop.valid & fifoPopEn,
+          ((isChangingRedBit(fid) | fifos(fid).io.pop.payload.msb)
+            ## fifos(fid).io.pop.payload(bitwidth-2 downto 0)).asUInt,
+          U(placeholder)))
 
-    rotateOutOffset := Mux(
-      io.lastGrpOut,
-      U(0),
+    rotateOutOffset := Mux(io.lastGrpOut, U(0),
       ((convertRate(rateOut) + rotateOutOffset) % num_inputs)(rotateOutOffset.getWidth - 1 downto 0))
     val outRotateRes = rotate(fifoOuts, rotateOutOffset, RemoverOut)
     for (fid <- 0 until num_inputs) {
@@ -136,11 +148,15 @@ class RedundancyRemoverFrontend(num_inputs: Int, bitwidth: Int,
         for (rId <- 0 until num_inputs)
           yield (rId, io.fifoPopSigLower((fid + rId) % num_inputs))
       ) & fifoPopEn
+      isChangingRedBit(fid) := rotateOutOffset.muxList(
+        for (rId <- 0 until num_inputs)
+          yield (rId, io.markRedBitLower((fid + rId) % num_inputs))
+      ) & fifoPopEn
       io.outs.payload(fid) := outRotateRes(fid)
     }
   }
 
-  // ready signal
+  // ready signal, might be deprecated
   val topFifoNotEmpty: Bool = Vec(for(i <- topRemoverFrontend.fifos) yield i.io.pop.valid).reduceBalancedTree(_ | _)
   val botFifoNotEmpty: Bool = Vec(for(i <- botRemoverFrontend.fifos) yield i.io.pop.valid).reduceBalancedTree(_ | _)
   io.sortIterFinished := ~(topFifoNotEmpty | botFifoNotEmpty)
@@ -149,14 +165,17 @@ class RedundancyRemoverFrontend(num_inputs: Int, bitwidth: Int,
   io.outs.valid := False
   io.lastGrpOut := False
   val ctrlStateMachine = new StateMachine {
-    val topFifoValid = Vec(for(i <- topRemoverFrontend.fifos) yield i.io.pop.valid).reduceBalancedTree(_ & _)
-    val botFifoValid = Vec(for(i <- topRemoverFrontend.fifos) yield i.io.pop.valid).reduceBalancedTree(_ & _)
+    // make sure half of the fifo is loaded before start in case
+    // one fifo can be drained during processing.
+    val startThres = fifo_depth / 2 - 2
+    val topFifoValid = Vec(for(i <- topRemoverFrontend.fifos) yield i.io.occupancy > startThres).reduceBalancedTree(_ & _)
+    val botFifoValid = Vec(for(i <- botRemoverFrontend.fifos) yield i.io.occupancy > startThres).reduceBalancedTree(_ & _)
     val lastCompareWaitCounter = Counter(log2Up(num_inputs/2)+1)
     val sIdle: State = new State with EntryPoint {
       whenIsActive{
         fifoPopEn := False
-//        when(topFifoValid & botFifoValid | Delay(io.lastGrpIn, 1, init=False)) (goto(sMerge))
-        when(Delay(io.lastGrpIn, 1, init=False)) (goto(sMerge))
+        when(topFifoValid & botFifoValid | Delay(io.lastGrpIn, 1, init=False)) (goto(sMerge))
+//        when(Delay(io.lastGrpIn, 1, init=False)) (goto(sMerge))
       }
     }
 
@@ -186,47 +205,71 @@ class RedundancyRemoverFrontend(num_inputs: Int, bitwidth: Int,
 
 case class comp1OutsRes(bitwidth: Int) extends Bundle {
   val dat = UInt(bitwidth bits)
-  val popA, popB = Bool()
+  val popLower, popUpper = Bool()
+  val markRedLower, markRedUpper = Bool()
 }
 
 class RedundancyRemoverBackend(num_outputs: Int, bitwidth: Int, placeholder: BigInt) extends Component {
   val io = new Bundle {
     val ins = in Vec(UInt(bitwidth bits), num_outputs * 2)
     val outs = out Vec(UInt(bitwidth bits), num_outputs)
-    val stg1CompResUpper, stg1CompResLower = out Vec(Bool(), num_outputs)
+    val stg1CompResUpper, stg1CompResLower, stg1EqualResUpper, stg1EqualResLower= out Vec(Bool(), num_outputs)
   }
 
   assert(isPow2(num_outputs), "the module only supports ^2 outputs")
 
   private def comp1Outs(ina: UInt, inb: UInt, popLowerWhenEq: Boolean): comp1OutsRes = {
+    val outRes = comp1OutsRes(bitwidth)
     // in the first stage comparison, we do not remove redundancy
     val res = Reg(UInt(ina.getWidth bits), init = U(0))
-    val popA = Bool()
-    val popB = Bool()
-
     val inaVal = ina(bitwidth-2 downto 0)
     val inbVal = inb(bitwidth-2 downto 0)
 
+    outRes.dat := res
+    outRes.markRedLower := False
+    outRes.markRedUpper := False
     // normal compare
     // A: lower in B: upper in
-    res := Mux(inaVal < inbVal, inb, ina)
-    when(ina === inb) {
-      if (popLowerWhenEq) {
-        popA := True
-        popB := False
-      } else {
-        popA := False
-        popB := True
+    when(inaVal === inbVal) {
+      when(ina === U(placeholder)) {
+        outRes.popLower := False
+        outRes.popUpper := False
+        res := ina
+      } otherwise {
+        when(ina.msb ^ inb.msb) {
+          outRes.popLower := ~ina.msb & inb.msb
+          outRes.popUpper := ina.msb & ~inb.msb
+          res := Mux(ina.msb, inb, ina)
+        } otherwise {
+          if (popLowerWhenEq) {
+            outRes.popLower := True
+            outRes.popUpper := False
+            outRes.markRedUpper := True
+            res := ina
+          } else {
+            outRes.popLower := False
+            outRes.popUpper := True
+            outRes.markRedLower := True
+            res := inb
+          }
+        }
       }
     }.otherwise {
-      popA := inaVal > inbVal
-      popB := inaVal < inbVal
+      when(ina === U(placeholder)) {
+        res := inb
+        outRes.popLower := False
+        outRes.popUpper := True
+      } elsewhen (inb === U(placeholder)) {
+        res := ina
+        outRes.popLower := True
+        outRes.popUpper := False
+      } otherwise {
+        outRes.popLower := inaVal > inbVal
+        outRes.popUpper := inaVal < inbVal
+        res := Mux(inaVal < inbVal, inb, ina)
+      }
     }
 
-    val outRes = comp1OutsRes(bitwidth)
-    outRes.dat := res
-    outRes.popA := popA
-    outRes.popB := popB
     outRes
   }
 
@@ -253,7 +296,6 @@ class RedundancyRemoverBackend(num_outputs: Int, bitwidth: Int, placeholder: Big
       }
       is(B"2'01", B"2'10") {
         when(inaVal === inbVal) {
-          // TODO: check here
           outs(0) := Mux(ina.msb, inb, ina)
           outs(1) := Mux(ina.msb, ina, inb)
         } otherwise {
@@ -287,7 +329,7 @@ class RedundancyRemoverBackend(num_outputs: Int, bitwidth: Int, placeholder: Big
   private def firstStgComparison(stgIns: Vec[UInt]): Vec[comp1OutsRes] = {
     val stgOuts = Vec(comp1OutsRes(bitwidth), stgIns.length / 2)
     for (i <- 0 until stgIns.length / 2) {
-      val popLowerWhenEq = i < (stgIns.length / 2)
+      val popLowerWhenEq = i < (stgIns.length / 4)
       stgOuts(i) := comp1Outs(stgIns(i), stgIns(stgIns.length - 1 - i), popLowerWhenEq)
     }
     stgOuts
@@ -306,28 +348,12 @@ class RedundancyRemoverBackend(num_outputs: Int, bitwidth: Int, placeholder: Big
   }
 
   for (i <- 0 until num_outputs) {
-    io.stg1CompResLower(i) := stg1Outs(i).popA
-    io.stg1CompResUpper(num_outputs - i - 1) := stg1Outs(i).popB
+    io.stg1CompResLower(i) := stg1Outs(i).popLower
+    io.stg1CompResUpper(num_outputs - i - 1) := stg1Outs(i).popUpper
+    io.stg1EqualResLower(i) := stg1Outs(i).markRedLower
+    io.stg1EqualResUpper(num_outputs - i - 1) := stg1Outs(i).markRedUpper
   }
 
-//  if (num_outputs > 4) {
-//    // fix placeholder-caused large value vanishing
-//    val valVanishFixStg = Vec(UInt(bitwidth bits), compRes.last.size)
-//    for (i <- 0 until valVanishFixStg.size / 2 - 1) {
-//      val fixedCompRes = comp2Outs(compRes.last(i * 2 + 1), compRes.last(i * 2 + 2), placeholder)
-//      valVanishFixStg(i * 2 + 1) := fixedCompRes(0)
-//      valVanishFixStg(i * 2 + 2) := fixedCompRes(1)
-//    }
-//    valVanishFixStg(0) := Delay(compRes.last(0), 1, init = U(0))
-//    valVanishFixStg.last := Delay(compRes.last.last, 1, init = U(0))
-//
-//    // outputs assignment
-//    io.outs := valVanishFixStg
-//  } else {
-//    // for the outputs < 4, no need to fix the value vanishing issue
-//    io.outs := compRes.last
-//  }
-  // not to replace
   io.outs := compRes.last
 }
 
@@ -343,13 +369,19 @@ class RedundancyRemover(num_words: Int, bitwidth: Int, placeholder: BigInt) exte
   assert(isPow2(num_words), "input size must be power of 2, but got " + num_words)
   val sortedOuts = Vec(Reg(UInt(bitwidth bits), init=U(0)), num_words)
 
-  val frontend = new RedundancyRemoverFrontend(num_words, bitwidth, placeholder, fifo_depth = 32)
+  // TODO: according to the paper https://ieeexplore.ieee.org/document/7544757,
+  // fifo depth 16 keeps a small enough stall rate;
+  // but we may need to add stall and back pressure to prevent from potential
+  // content loss
+  val frontend = new RedundancyRemoverFrontend(num_words, bitwidth, placeholder, fifo_depth = 16)
   val backend = new RedundancyRemoverBackend(num_words, bitwidth, placeholder)
 
   frontend.io.upperIns <> io.upperIns
   frontend.io.lowerIns <> io.lowerIns
   frontend.io.fifoPopSigUpper <> backend.io.stg1CompResUpper
+  frontend.io.markRedBitUpper <> backend.io.stg1EqualResUpper
   frontend.io.fifoPopSigLower <> backend.io.stg1CompResLower
+  frontend.io.markRedBitLower <> backend.io.stg1EqualResLower
   backend.io.ins := frontend.io.outs.payload
   frontend.io.sortIterFinished <> io.sortIterFinished
   frontend.io.lastGrpIn <> io.lastGrpIn

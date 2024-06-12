@@ -3,10 +3,11 @@ import itertools
 from pathlib import Path
 from math import ceil, log2
 import random
+import argparse
 
 DWIDTH = 9
-LAYER = 25
-HEAD = 12
+LAYER = 22
+HEAD = 19
 PLACEHOLDER="1"*DWIDTH
 
 def get_data_from_attn_npy(ids: np.array, num_in_lanes: int):
@@ -35,7 +36,7 @@ def get_data_from_attn_npy(ids: np.array, num_in_lanes: int):
 
     return input_grps, sorted_res
 
-def gen_data_for_ig_test(attn_fp: str, num_in_lanes: int, res_fp: str = "./ig_stimulus_l25_h14.bin"):
+def gen_data_for_ig_test(attn_fp: str, num_in_lanes: int, res_fp: str):
     layer_idx, head_idx = LAYER, HEAD
     block_ids = np.load(attn_fp, allow_pickle=True)
     input_dat_grps, sorted_grps = \
@@ -54,7 +55,7 @@ def gen_data_for_ig_test(attn_fp: str, num_in_lanes: int, res_fp: str = "./ig_st
                     if (len(input_grp[g_idx])-1) < i :
                         # curr_input.append(PLACEHOLDER)
                         min_bin = bin(grp_minval_pad)[2:].zfill(DWIDTH)
-                        curr_input.append(min_bin)
+                        curr_input.append("1" + min_bin[1:])
                     else:
                         tmp_bin = bin(input_grp[g_idx][i])[2:].zfill(DWIDTH)
                         curr_input.append(tmp_bin)
@@ -98,7 +99,7 @@ def check_idxgen_out_with_ref(fp_hw_out: Path, ref: list, num_out_lanes: int):
     for l in hw_out:
         if l[0:2] == "//":
             continue
-        elif l.strip("\n") == ("1" * DWIDTH * num_out_lanes):
+        elif l.strip("\n") == ("0" * DWIDTH * num_out_lanes):
             hw_out_list.append(curr_grp_list[:])
             curr_grp_list = []
         else:
@@ -109,7 +110,9 @@ def check_idxgen_out_with_ref(fp_hw_out: Path, ref: list, num_out_lanes: int):
     for l_idx, (h, r) in enumerate(zip(hw_out_list, ref)):
         if h != r:
             print(f"l{l_idx}: exact mismatch found!")
-            mismatched_len.append(float(len(h) - len(r))/float(len(h)))
+            print(f"hw out: {h}\nref: {r}")
+
+        mismatched_len.append(float(len(h) - len(r))/float(len(r)))
         unique_h = list(np.unique(h))
         unique_h.sort()
         if unique_h != r:
@@ -120,15 +123,35 @@ def check_idxgen_out_with_ref(fp_hw_out: Path, ref: list, num_out_lanes: int):
     return hw_out_list
 
 def main():
-    stimu, ref_out = gen_data_for_ig_test(
-        f"./attn_blk_idx.npy", 12, f"./ig_stimulus_l{LAYER}_h{HEAD}.bin")
-    # hw_res = check_idxgen_out_with_ref(Path(f"./idxgen_res_l{LAYER}_h{HEAD}.bin"), ref_out, 16)
-    exit()
+    global LAYER, HEAD
+
+    arg_parser = argparse.ArgumentParser(prog="redundancy removal simugen")
+    arg_parser.add_argument('--generate', action='store_true')
+    arg_parser.add_argument('--verify', action='store_true')
+    arg_parser.add_argument('--layer', type=int)
+    arg_parser.add_argument('--head', type=int)
+    args = arg_parser.parse_args()
+
+    if args.layer:
+        LAYER = args.layer
+    if args.head:
+        HEAD = args.head
+
+    if args.generate:
+        stimu, ref_out = gen_data_for_ig_test(
+            f"./attn_blk_idx.npy", 12, f"./ig_stimulus_l{LAYER}_h{HEAD}.bin")
+        print(f"#inputs: {len(stimu)}")
+    
+    if args.verify:
+        stimu, ref_out = gen_data_for_ig_test(
+            f"./attn_blk_idx.npy", 12, f"./ig_stimulus_l{LAYER}_h{HEAD}.bin")
+        hw_res = check_idxgen_out_with_ref(Path(f"./idxgen_res_l{LAYER}_h{HEAD}.bin"), ref_out, 16)
+    
     # generate stimulus for a single-stage redundancy remover
-    gen_dat_a = gen_sorted_dat(6, 8//2, (1, 200))
-    gen_dat_b = gen_sorted_dat(6, 8//2, (1, 200))
-    write_to_file(gen_dat_a, "./sorted_data_upper.bin")
-    write_to_file(gen_dat_b, "./sorted_data_lower.bin")
+    # gen_dat_a = gen_sorted_dat(6, 8//2, (1, 200))
+    # gen_dat_b = gen_sorted_dat(6, 8//2, (1, 200))
+    # write_to_file(gen_dat_a, "./sorted_data_upper.bin")
+    # write_to_file(gen_dat_b, "./sorted_data_lower.bin")
 
 if __name__ == "__main__":
     main()

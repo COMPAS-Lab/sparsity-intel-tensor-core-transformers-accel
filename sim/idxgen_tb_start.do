@@ -10,4 +10,6 @@ view wave
 
 log -r *
 
-do idxgen_wave.do
+run -all
+
+# do idxgen_wave.do

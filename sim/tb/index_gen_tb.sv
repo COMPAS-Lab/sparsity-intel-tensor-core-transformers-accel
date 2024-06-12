@@ -3,11 +3,11 @@
 module index_gen_tb ();
 
 localparam DWIDTH = 9;
-localparam IN_SIZE = 3054;
+localparam IN_SIZE = 3874;
 localparam IN_NUM_WORDS = 12;
 localparam OUT_NUM_WORDS = 2**$clog2(IN_NUM_WORDS);
-localparam integer LAYER = 25;
-localparam integer HEAD = 12;
+localparam integer LAYER = 11;
+localparam integer HEAD = 6;
 
 logic [DWIDTH-1:0] PLACEHOLDER = '1;
 
@@ -205,7 +205,7 @@ initial forever begin
         io_seqOut_payload_0};
     
     if (io_lastGrpOut) begin
-        curr_out[out_counter+1] = '1;
+        curr_out[out_counter+1] = '0;
         out_counter = out_counter + 1;
     end
 

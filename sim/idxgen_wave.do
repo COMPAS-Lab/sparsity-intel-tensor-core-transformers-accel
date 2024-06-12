@@ -47,29 +47,54 @@ add wave -noupdate -radix decimal /index_gen_tb/io_seqOut_payload_3
 add wave -noupdate -radix decimal /index_gen_tb/io_seqOut_payload_2
 add wave -noupdate -radix decimal /index_gen_tb/io_seqOut_payload_1
 add wave -noupdate -radix decimal /index_gen_tb/io_seqOut_payload_0
-add wave -noupdate /index_gen_tb/u_IndexGenerator/removers_0_4/frontend/topRemoverFrontend_fifos_1_io_push_valid
 add wave -noupdate /index_gen_tb/u_IndexGenerator/removers_0_4/frontend/topRemoverFrontend_fifos_1_io_push_ready
 add wave -noupdate /index_gen_tb/u_IndexGenerator/removers_0_4/frontend/topRemoverFrontend_fifos_0_io_push_ready
 add wave -noupdate /index_gen_tb/input_vectors
 add wave -noupdate -divider {last stg in}
-add wave -noupdate /index_gen_tb/u_IndexGenerator/removers_0_2/io_upperIns_valid
-add wave -noupdate -radix decimal /index_gen_tb/u_IndexGenerator/removers_0_2/io_upperIns_payload_0
-add wave -noupdate /index_gen_tb/u_IndexGenerator/removers_0_2/io_lowerIns_valid
-add wave -noupdate -radix decimal /index_gen_tb/u_IndexGenerator/removers_0_2/io_lowerIns_payload_0
-add wave -noupdate /index_gen_tb/u_IndexGenerator/removers_0_2/io_lastGrpOut
-add wave -noupdate /index_gen_tb/u_IndexGenerator/removers_0_2/io_lastGrpIn
-add wave -noupdate /index_gen_tb/u_IndexGenerator/removers_0_2/io_outs_valid
-add wave -noupdate -radix decimal /index_gen_tb/u_IndexGenerator/removers_0_2/io_outs_payload_1
-add wave -noupdate -radix decimal /index_gen_tb/u_IndexGenerator/removers_0_2/io_outs_payload_0
-add wave -noupdate /index_gen_tb/u_IndexGenerator/removers_0_3/io_outs_valid
+add wave -noupdate -radix decimal /index_gen_tb/u_IndexGenerator/removers_0_3/io_upperIns_valid
+add wave -noupdate -radix decimal /index_gen_tb/u_IndexGenerator/removers_0_3/io_upperIns_payload_0
+add wave -noupdate /index_gen_tb/u_IndexGenerator/removers_0_3/frontend/ctrlStateMachine_stateReg
+add wave -noupdate /index_gen_tb/u_IndexGenerator/removers_0_3/frontend/topRemoverFrontend_fifos_1_io_occupancy
+add wave -noupdate /index_gen_tb/u_IndexGenerator/removers_0_3/frontend/topRemoverFrontend_fifos_0_io_occupancy
+add wave -noupdate /index_gen_tb/u_IndexGenerator/removers_0_3/frontend/botRemoverFrontend_fifos_1_io_occupancy
+add wave -noupdate /index_gen_tb/u_IndexGenerator/removers_0_3/frontend/botRemoverFrontend_fifos_0_io_occupancy
+add wave -noupdate -radix decimal /index_gen_tb/u_IndexGenerator/removers_0_3/io_outs_valid
 add wave -noupdate -radix decimal /index_gen_tb/u_IndexGenerator/removers_0_3/io_outs_payload_1
 add wave -noupdate -radix decimal /index_gen_tb/u_IndexGenerator/removers_0_3/io_outs_payload_0
+add wave -noupdate -radix decimal /index_gen_tb/u_IndexGenerator/removers_0_3/io_lowerIns_valid
+add wave -noupdate -radix decimal /index_gen_tb/u_IndexGenerator/removers_0_3/io_lowerIns_payload_0
+add wave -noupdate /index_gen_tb/u_IndexGenerator/removers_0_3/frontend/topRemoverFrontend_fifos_1_io_push_valid
+add wave -noupdate /index_gen_tb/u_IndexGenerator/removers_0_3/frontend/topRemoverFrontend_fifos_1_io_push_ready
+add wave -noupdate /index_gen_tb/u_IndexGenerator/removers_0_3/frontend/topRemoverFrontend_fifos_0_io_push_valid
+add wave -noupdate /index_gen_tb/u_IndexGenerator/removers_0_3/frontend/topRemoverFrontend_fifos_0_io_push_ready
+add wave -noupdate /index_gen_tb/u_IndexGenerator/removers_0_3/frontend/botRemoverFrontend_fifos_1_io_push_valid
+add wave -noupdate /index_gen_tb/u_IndexGenerator/removers_0_3/frontend/botRemoverFrontend_fifos_1_io_push_ready
+add wave -noupdate /index_gen_tb/u_IndexGenerator/removers_0_3/frontend/botRemoverFrontend_fifos_0_io_push_valid
+add wave -noupdate /index_gen_tb/u_IndexGenerator/removers_0_3/frontend/botRemoverFrontend_fifos_0_io_push_ready
+add wave -noupdate -radix decimal /index_gen_tb/u_IndexGenerator/removers_0_3/backend/io_ins_3
+add wave -noupdate -radix decimal /index_gen_tb/u_IndexGenerator/removers_0_3/backend/io_ins_2
+add wave -noupdate -radix decimal /index_gen_tb/u_IndexGenerator/removers_0_3/backend/io_ins_1
+add wave -noupdate -radix decimal /index_gen_tb/u_IndexGenerator/removers_0_3/backend/io_ins_0
 add wave -noupdate -divider {New Divider}
-add wave -noupdate /index_gen_tb/u_IndexGenerator/removers_1_1/io_outs_valid
-add wave -noupdate -radix decimal /index_gen_tb/u_IndexGenerator/removers_1_1/io_outs_payload_3
-add wave -noupdate -radix decimal /index_gen_tb/u_IndexGenerator/removers_1_1/io_outs_payload_2
-add wave -noupdate -radix decimal /index_gen_tb/u_IndexGenerator/removers_1_1/io_outs_payload_1
-add wave -noupdate -radix decimal /index_gen_tb/u_IndexGenerator/removers_1_1/io_outs_payload_0
+add wave -noupdate /index_gen_tb/u_IndexGenerator/removers_1_0/io_lastGrpIn
+add wave -noupdate -radix decimal /index_gen_tb/u_IndexGenerator/removers_1_0/io_upperIns_valid
+add wave -noupdate -radix decimal /index_gen_tb/u_IndexGenerator/removers_1_0/io_upperIns_payload_1
+add wave -noupdate -radix decimal /index_gen_tb/u_IndexGenerator/removers_1_0/io_upperIns_payload_0
+add wave -noupdate -radix decimal /index_gen_tb/u_IndexGenerator/removers_1_0/io_lowerIns_valid
+add wave -noupdate -radix decimal /index_gen_tb/u_IndexGenerator/removers_1_0/io_lowerIns_payload_1
+add wave -noupdate -radix decimal /index_gen_tb/u_IndexGenerator/removers_1_0/io_lowerIns_payload_0
+add wave -noupdate /index_gen_tb/u_IndexGenerator/removers_1_0/backend/compRes_0_3
+add wave -noupdate /index_gen_tb/u_IndexGenerator/removers_1_0/backend/compRes_0_2
+add wave -noupdate /index_gen_tb/u_IndexGenerator/removers_1_0/backend/compRes_0_1
+add wave -noupdate /index_gen_tb/u_IndexGenerator/removers_1_0/backend/compRes_0_0
+add wave -noupdate /index_gen_tb/u_IndexGenerator/removers_1_0/frontend/ctrlStateMachine_stateReg
+add wave -noupdate /index_gen_tb/u_IndexGenerator/removers_1_0/frontend/io_sortIterFinished
+add wave -noupdate /index_gen_tb/u_IndexGenerator/removers_1_0/io_outs_valid
+add wave -noupdate /index_gen_tb/u_IndexGenerator/removers_1_0/io_outs_payload_3
+add wave -noupdate /index_gen_tb/u_IndexGenerator/removers_1_0/io_outs_payload_2
+add wave -noupdate /index_gen_tb/u_IndexGenerator/removers_1_0/io_outs_payload_1
+add wave -noupdate /index_gen_tb/u_IndexGenerator/removers_1_0/io_outs_payload_0
+add wave -noupdate /index_gen_tb/u_IndexGenerator/removers_1_0/io_lastGrpOut
 add wave -noupdate -divider {New Divider}
 add wave -noupdate /index_gen_tb/u_IndexGenerator/removers_3_0/io_lastGrpIn
 add wave -noupdate /index_gen_tb/u_IndexGenerator/removers_3_0/io_upperIns_valid
@@ -232,12 +257,12 @@ add wave -noupdate /index_gen_tb/u_IndexGenerator/removers_3_0/io_outs_payload_1
 add wave -noupdate /index_gen_tb/u_IndexGenerator/removers_3_0/io_outs_payload_0
 add wave -noupdate /index_gen_tb/u_IndexGenerator/removers_3_0/io_lastGrpOut
 TreeUpdate [SetDefaultTree]
-WaveRestoreCursors {{Cursor 1} {68270000 ps} 0} {{Cursor 2} {3264261 ps} 0}
+WaveRestoreCursors {{Cursor 1} {6720922 ps} 0} {{Cursor 2} {6790000 ps} 0}
 quietly wave cursor active 2
 configure wave -namecolwidth 484
 configure wave -valuecolwidth 100
 configure wave -justifyvalue left
-configure wave -signalnamewidth 0
+configure wave -signalnamewidth 1
 configure wave -snapdistance 10
 configure wave -datasetprefix 0
 configure wave -rowmargin 4
@@ -248,4 +273,4 @@ configure wave -griddelta 40
 configure wave -timeline 0
 configure wave -timelineunits ns
 update
-WaveRestoreZoom {3070828 ps} {3292039 ps}
+WaveRestoreZoom {6683179 ps} {7137043 ps}
