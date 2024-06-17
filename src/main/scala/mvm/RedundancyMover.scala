@@ -13,7 +13,7 @@ class RedundancyMover(num_ports: Int, bitwidth: Int, placeholder: BigInt) extend
   assert(isPow2(num_ports) && num_ports >= 4)
 
   private def rmRedundancy(ports: Vec[UInt], stg: Int): Vec[UInt] = {
-    val resPorts = Vec(Reg(UInt(bitwidth bits), init=U(0)), ports.size)
+    val resPorts = Vec(Reg(UInt(bitwidth bits), init=U(placeholder)), ports.size)
     if (ports.size == 2) {
       switch(ports(0).msb ## ports(1).msb) {
         is (B"2'b00", B"2'b11", B"2'b01") {

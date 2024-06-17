@@ -139,13 +139,13 @@ def main():
 
     if args.generate:
         stimu, ref_out = gen_data_for_ig_test(
-            f"./attn_blk_idx.npy", 12, f"./ig_stimulus_l{LAYER}_h{HEAD}.bin")
+            f"./attn_blk_idx.npy", 12, f"./idxgen_stimu/ig_stimulus_l{LAYER}_h{HEAD}.bin")
         print(f"#inputs: {len(stimu)}")
     
     if args.verify:
         stimu, ref_out = gen_data_for_ig_test(
-            f"./attn_blk_idx.npy", 12, f"./ig_stimulus_l{LAYER}_h{HEAD}.bin")
-        hw_res = check_idxgen_out_with_ref(Path(f"./idxgen_res_l{LAYER}_h{HEAD}.bin"), ref_out, 16)
+            f"./attn_blk_idx.npy", 12, f"./idxgen_stimu/ig_stimulus_l{LAYER}_h{HEAD}.bin")
+        hw_res = check_idxgen_out_with_ref(Path(f"./idxgen_stimu/idxgen_res_l{LAYER}_h{HEAD}.bin"), ref_out, 12)
     
     # generate stimulus for a single-stage redundancy remover
     # gen_dat_a = gen_sorted_dat(6, 8//2, (1, 200))

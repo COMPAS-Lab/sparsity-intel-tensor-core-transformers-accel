@@ -113,6 +113,8 @@ class tensor_core_array_wrapper(array_col: Int, array_row: Int, chain_len: Int,
       f.valid := True
     }
     idxGenerator.io.seqIn <> hbmDataFlow
+    //TODO: fix this temp connection
+    idxGenerator.io.lastGrpIn := io.start(0)
     val idxGeneratorRes = RegNext(idxGenerator.io.seqOut.payload)
     io.idx_res := io.idx_rd_addr(log2Up(array_col)-1 downto 0).muxList(
       for (i <- idxGeneratorRes.indices) yield (i, idxGeneratorRes(i))
@@ -165,8 +167,6 @@ class tensor_core_array_wrapper(array_col: Int, array_row: Int, chain_len: Int,
       }
 
     }
-    println("IdxGenerator latency: " +
-      LatencyAnalysis(idxGenerator.io.seqIn(0).payload, idxGenerator.io.seqOut.payload(0)))
   }
 
   val selectTcarrayIn, startTCarrayIn = Reg(Bool()) init False
@@ -194,9 +194,9 @@ class tensor_core_array_wrapper(array_col: Int, array_row: Int, chain_len: Int,
   for (i <- 0 until array_row * chain_len) (data2TcarrayRow(i) <> dataInRowShiftRegs.io.dataOut(i))
 
   val tcArray = new TensorCoreChainArray(array_col = array_col, array_row = array_row,
-    chain_len = chain_len, out_buf_delay = chain_len * 3 - 3,
+    chain_len = chain_len, out_buf_delay = 4,
     col_buf_max_depth = 128, row_buf_max_depth = 128,
-    output_fifo_depth = 128, output_width = 24,
+    output_fifo_depth = 32, output_width = 24,
     inout_pipe_delay = 4)
 
   tcArray.io.matALoad <> data2TcarrayCol
@@ -306,7 +306,7 @@ object tensor_core_array_wrapper_gen extends App {
   val gen = new DefaultConfig
   val array_col = 12
   val array_row = 4
-  val chain_len = 8
+  val chain_len = 12
   gen.defaultSpinalConfig.withoutEnumString().generate(new tensor_core_array_wrapper(
     array_col = array_col,
     array_row = array_row,

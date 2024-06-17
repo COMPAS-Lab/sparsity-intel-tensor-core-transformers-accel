@@ -5,7 +5,7 @@ module index_gen_tb ();
 localparam DWIDTH = 9;
 localparam IN_SIZE = 3874;
 localparam IN_NUM_WORDS = 12;
-localparam OUT_NUM_WORDS = 2**$clog2(IN_NUM_WORDS);
+localparam OUT_NUM_WORDS = 12;
 localparam integer LAYER = 11;
 localparam integer HEAD = 6;
 
@@ -48,10 +48,6 @@ logic [DWIDTH-1:0]   io_seqOut_payload_8;
 logic [DWIDTH-1:0]   io_seqOut_payload_9;
 logic [DWIDTH-1:0]   io_seqOut_payload_10;
 logic [DWIDTH-1:0]   io_seqOut_payload_11;
-logic [DWIDTH-1:0]   io_seqOut_payload_12;
-logic [DWIDTH-1:0]   io_seqOut_payload_13;
-logic [DWIDTH-1:0]   io_seqOut_payload_14;
-logic [DWIDTH-1:0]   io_seqOut_payload_15;
 logic                io_lastGrpIn=0;
 logic                io_lastGrpOut;
 logic                clk=1;
@@ -95,10 +91,6 @@ IndexGenerator u_IndexGenerator(
     .io_seqOut_payload_9  (io_seqOut_payload_9  ),
     .io_seqOut_payload_10 (io_seqOut_payload_10 ),
     .io_seqOut_payload_11 (io_seqOut_payload_11 ),
-    .io_seqOut_payload_12 (io_seqOut_payload_12 ),
-    .io_seqOut_payload_13 (io_seqOut_payload_13 ),
-    .io_seqOut_payload_14 (io_seqOut_payload_14 ),
-    .io_seqOut_payload_15 (io_seqOut_payload_15 ),
     .io_lastGrpIn         (io_lastGrpIn         ),
     .io_lastGrpOut        (io_lastGrpOut        ),
     .clk                  (clk                  ),
@@ -142,7 +134,7 @@ string stimu_path, out_path;
 
 initial begin
     // load stimulus and init circuits
-    stimu_path = $sformatf("./tb/ig_stimulus_l%0d_h%0d.bin", LAYER, HEAD);
+    stimu_path = $sformatf("./tb/idxgen_stimu/ig_stimulus_l%0d_h%0d.bin", LAYER, HEAD);
     $readmemb(stimu_path, input_vectors);
     #41 resetn = 1'b1;
 
@@ -184,40 +176,36 @@ integer outfd, word_idx;
 integer out_counter = 0;
 
 initial forever begin
-    wait(io_seqOut_valid);
+    wait(io_seqOut_valid || io_lastGrpOut);
     @(posedge clk);
-    curr_out[out_counter] = {
-        io_seqOut_payload_15,
-        io_seqOut_payload_14,
-        io_seqOut_payload_13,
-        io_seqOut_payload_12,
-        io_seqOut_payload_11, 
-        io_seqOut_payload_10,
-        io_seqOut_payload_9,
-        io_seqOut_payload_8,
-        io_seqOut_payload_7,
-        io_seqOut_payload_6,
-        io_seqOut_payload_5,
-        io_seqOut_payload_4,
-        io_seqOut_payload_3,
-        io_seqOut_payload_2,
-        io_seqOut_payload_1,
-        io_seqOut_payload_0};
-    
+    if (io_seqOut_valid) begin 
+        curr_out[out_counter] = {
+            io_seqOut_payload_11, 
+            io_seqOut_payload_10,
+            io_seqOut_payload_9,
+            io_seqOut_payload_8,
+            io_seqOut_payload_7,
+            io_seqOut_payload_6,
+            io_seqOut_payload_5,
+            io_seqOut_payload_4,
+            io_seqOut_payload_3,
+            io_seqOut_payload_2,
+            io_seqOut_payload_1,
+            io_seqOut_payload_0};
+        out_counter = out_counter + 1;
+    end
+
     if (io_lastGrpOut) begin
-        curr_out[out_counter+1] = '0;
+        curr_out[out_counter] = '0;
         out_counter = out_counter + 1;
     end
 
     if(iter == IN_SIZE) begin
-        out_path = $sformatf("./tb/idxgen_res_l%0d_h%0d.bin", LAYER, HEAD);
-        $writememb(out_path, curr_out, 0, out_counter);
+        out_path = $sformatf("./tb/idxgen_stimu/idxgen_res_l%0d_h%0d.bin", LAYER, HEAD);
+        $writememb(out_path, curr_out, 0, out_counter-1);
         $display("sim finished");
         $finish();
     end
-    #1
-    out_counter = out_counter + 1;
-
 end
 
 always #5 clk = ! clk;

@@ -146,7 +146,7 @@ class TensorCoreChainArray(array_col: Int, array_row: Int, chain_len: Int,
           (rowMemAddr(r)(tcId) < io.configPorts.tccRowBufferCnterRange && rowMemAddr(r)(tcId) >= 2 * tcId)
         rowDataShufflers(r)(c).io.dataIn(tcId).payload := Delay(rowMemOut(tcId), inout_pipe_delay)
 
-        tensorArray(r)(c).io.dataIn.payload(tcId) << rowDataShufflers(r)(c).io.dataOut(tcId).payload(87 downto 8)
+        tensorArray(r)(c).io.dataIn.payload(tcId) := rowDataShufflers(r)(c).io.dataOut(tcId).payload(87 downto 8)
         tensorArray(r)(c).io.expIn(tcId) := rowDataShufflers(r)(c).io.dataOut(tcId).payload(7 downto 0)
       }
 
@@ -360,18 +360,16 @@ class TensorCoreChainArray(array_col: Int, array_row: Int, chain_len: Int,
   }
 }
 
-object TensorCoreArrayGen {
-  def main(args: Array[String]): Unit = {
-    val gen = new DefaultConfig
-    gen.defaultSpinalConfig.generate(new TensorCoreChainArray(
-      array_col = 12,
-      array_row = 9,
-      chain_len = 34,
-      out_buf_delay = 102-3,
-      col_buf_max_depth = 128,
-      row_buf_max_depth = 128,
-      output_fifo_depth = 128,
-      output_width = 24
-    )).printPruned()
-  }
+object TensorCoreArrayGen extends App{
+  val gen = new DefaultConfig
+  gen.defaultSpinalConfig.generate(new TensorCoreChainArray(
+    array_col = 12,
+    array_row = 4,
+    chain_len = 12,
+    out_buf_delay = 4,
+    col_buf_max_depth = 128,
+    row_buf_max_depth = 128,
+    output_fifo_depth = 32,
+    output_width = 24
+  )).printPruned()
 }
