@@ -167,7 +167,7 @@ class RedundancyRemoverFrontend(num_inputs: Int, bitwidth: Int,
   val ctrlStateMachine = new StateMachine {
     // make sure half of the fifo is loaded before start in case
     // one fifo can be drained during processing.
-    val startThres = fifo_depth / 2 - 2
+    val startThres = fifo_depth / 2
     val topFifoValid = Vec(for(i <- topRemoverFrontend.fifos) yield i.io.occupancy > startThres).reduceBalancedTree(_ & _)
     val botFifoValid = Vec(for(i <- botRemoverFrontend.fifos) yield i.io.occupancy > startThres).reduceBalancedTree(_ & _)
     val lastCompareWaitCounter = Counter(log2Up(num_inputs/2)+1)

@@ -3,11 +3,11 @@
 module index_gen_tb ();
 
 localparam DWIDTH = 9;
-localparam IN_SIZE = 3874;
 localparam IN_NUM_WORDS = 12;
 localparam OUT_NUM_WORDS = 12;
-localparam integer LAYER = 11;
-localparam integer HEAD = 6;
+integer LAYER = 11;
+integer HEAD = 6;
+integer IN_SIZE = 3874;
 
 logic [DWIDTH-1:0] PLACEHOLDER = '1;
 
@@ -97,7 +97,7 @@ IndexGenerator u_IndexGenerator(
     .resetn               (resetn               )
 );
 
-logic [DWIDTH * IN_NUM_WORDS-1:0] input_vectors [IN_SIZE-1:0];
+logic [DWIDTH * IN_NUM_WORDS-1:0] input_vectors [7000-1:0];
 logic [DWIDTH * IN_NUM_WORDS-1:0] curr_ins;
 
 logic [DWIDTH * IN_NUM_WORDS-1:0] concat_ins = '0;
@@ -128,6 +128,13 @@ assign {io_seqIn_0_valid,
         io_seqIn_9_valid, 
         io_seqIn_10_valid,
         io_seqIn_11_valid} = concat_ins_valid;
+
+initial begin
+    $value$plusargs("nlayers=%d", LAYER);
+    $value$plusargs("nheads=%d", HEAD);
+    $value$plusargs("insize=%d", IN_SIZE);
+    $display("simulating l%0dh%0d, total input %0d", LAYER, HEAD, IN_SIZE);
+end
 
 integer iter;
 string stimu_path, out_path;
@@ -171,7 +178,7 @@ initial begin
     @(posedge clk);
 end
 
-logic [DWIDTH * OUT_NUM_WORDS-1:0] curr_out [5000:0];
+logic [DWIDTH * OUT_NUM_WORDS-1:0] curr_out [7000:0];
 integer outfd, word_idx;
 integer out_counter = 0;
 

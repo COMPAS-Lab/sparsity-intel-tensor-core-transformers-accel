@@ -4,10 +4,9 @@ from pathlib import Path
 from math import ceil, log2
 import random
 import argparse
+import os
 
 DWIDTH = 9
-LAYER = 22
-HEAD = 19
 PLACEHOLDER="1"*DWIDTH
 
 def get_data_from_attn_npy(ids: np.array, num_in_lanes: int):
@@ -36,11 +35,10 @@ def get_data_from_attn_npy(ids: np.array, num_in_lanes: int):
 
     return input_grps, sorted_res
 
-def gen_data_for_ig_test(attn_fp: str, num_in_lanes: int, res_fp: str):
-    layer_idx, head_idx = LAYER, HEAD
+def gen_data_for_ig_test(attn_fp: str, num_in_lanes: int, res_fp: str, l_idx, h_idx):
     block_ids = np.load(attn_fp, allow_pickle=True)
     input_dat_grps, sorted_grps = \
-        get_data_from_attn_npy(block_ids[layer_idx][head_idx], num_in_lanes)
+        get_data_from_attn_npy(block_ids[l_idx][h_idx], num_in_lanes)
     
     res = []
     for input_grp, sorted_grp in zip(input_dat_grps, sorted_grps):
@@ -120,33 +118,73 @@ def check_idxgen_out_with_ref(fp_hw_out: Path, ref: list, num_out_lanes: int):
 
     print(f"average length mismatch: {np.mean(mismatched_len)}")
 
-    return hw_out_list
+    return np.mean(mismatched_len)
 
 def main():
-    global LAYER, HEAD
+    l_idx, h_idx = -1, -1
 
     arg_parser = argparse.ArgumentParser(prog="redundancy removal simugen")
     arg_parser.add_argument('--generate', action='store_true')
     arg_parser.add_argument('--verify', action='store_true')
-    arg_parser.add_argument('--layer', type=int)
-    arg_parser.add_argument('--head', type=int)
+    arg_parser.add_argument('--gui', action='store_true')
+    arg_parser.add_argument('--layer', type=int, required=True, default=-1)
+    arg_parser.add_argument('--head', type=int, required=True, default=-1)
+    arg_parser.add_argument('--auto', action="store_true")
     args = arg_parser.parse_args()
 
-    if args.layer:
-        LAYER = args.layer
-    if args.head:
-        HEAD = args.head
+    if args.layer != -1:
+        l_idx = args.layer
+    if args.head != -1:
+        h_idx = args.head
 
     if args.generate:
         stimu, ref_out = gen_data_for_ig_test(
-            f"./attn_blk_idx.npy", 12, f"./idxgen_stimu/ig_stimulus_l{LAYER}_h{HEAD}.bin")
+            f"./tb/idxgen_stimu/attn_blk_idx.npy", 12, 
+            f"./tb/idxgen_stimu/ig_stimulus_l{l_idx}_h{h_idx}.bin")
         print(f"#inputs: {len(stimu)}")
-    
+
     if args.verify:
         stimu, ref_out = gen_data_for_ig_test(
-            f"./attn_blk_idx.npy", 12, f"./idxgen_stimu/ig_stimulus_l{LAYER}_h{HEAD}.bin")
-        hw_res = check_idxgen_out_with_ref(Path(f"./idxgen_stimu/idxgen_res_l{LAYER}_h{HEAD}.bin"), ref_out, 12)
+            f"./tb/idxgen_stimu/attn_blk_idx.npy", 12, 
+            f"./tb/idxgen_stimu/ig_stimulus_l{l_idx}_h{h_idx}.bin",
+            l_idx, h_idx)
+        print(f"python: simulating l{l_idx}h{h_idx}...")
+        os.environ["SPAR_IDXGEN_LAYER"] = str(l_idx)
+        os.environ["SPAR_IDXGEN_HEAD"] = str(h_idx)
+        os.environ["SPAR_IDXGEN_INSIZE"] = str(len(stimu))
+        if (len(stimu) > 7000):
+            raise ValueError("insufficient input vector length found in HW")
+        
+        os.system("vsim -do idxgen_tb_start.do")
+        hw_res_err_rate = check_idxgen_out_with_ref(
+            Path(f"./tb/idxgen_stimu/idxgen_res_l{l_idx}_h{h_idx}.bin"), 
+            ref_out, 12)
     
+    if args.auto:
+        nlayer, nheads = 28, 32
+        heads_failed = []
+        for l_idx, h_idx in itertools.product(range(nlayer), range(nheads)):
+            print(f"python: simulating l{l_idx}h{h_idx}...")
+            stimu, ref_out = gen_data_for_ig_test(
+                f"./tb/idxgen_stimu/attn_blk_idx.npy", 
+                12, 
+                f"./tb/idxgen_stimu/ig_stimulus_l{l_idx}_h{h_idx}.bin")
+            os.environ["SPAR_IDXGEN_LAYER"] = str(l_idx)
+            os.environ["SPAR_IDXGEN_HEAD"] = str(h_idx)
+            os.environ["SPAR_IDXGEN_INSIZE"] = str(len(stimu))
+            if (len(stimu) > 7000):
+                raise ValueError("insufficient input vector length found in HW")
+            
+            os.system("vsim -c -do idxgen_tb_start.do")
+            hw_res_err_rate = check_idxgen_out_with_ref(
+                Path(f"./tb/idxgen_stimu/idxgen_res_l{l_idx}_h{h_idx}.bin"), 
+                ref_out, 12)
+            if(abs(hw_res_err_rate) > 0.0):
+                failed_head = (f"l{l_idx}h{h_idx}", hw_res_err_rate)
+                with open("./tb/idxgen_stimu/heads_failed.txt", "a+") as f:
+                    f.write(f"{failed_head}\n")
+                heads_failed.append(failed_head)
+
     # generate stimulus for a single-stage redundancy remover
     # gen_dat_a = gen_sorted_dat(6, 8//2, (1, 200))
     # gen_dat_b = gen_sorted_dat(6, 8//2, (1, 200))

@@ -99,7 +99,7 @@ class IndexOutWidthConversion(num_inports: Int, num_outports: Int, bitwidth: Int
 
   //out control
   val outBufSel = Bits(2 bits)
-  val lastIn = Delay(io.lastGrpIn, log2Up(num_outports*2)-1, init=False)
+  val lastIn = Delay(io.lastGrpIn, log2Up(num_outports*2), init=False)
   val outValid = Reg(Bool()) init False
   val lastRotateStgCheckFullBit = rotation.lastStgLoadFullUpper ## rotation.lastStgLoadFullLower
   val lastRotateStgCheckNemptyBit = rotation.lastStgLoadNempUpper ## rotation.lastStgLoadNempLower
