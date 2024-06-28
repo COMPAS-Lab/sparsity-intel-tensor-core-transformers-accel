@@ -5,6 +5,7 @@ from math import ceil, log2
 import random
 import argparse
 import os
+import re
 
 DWIDTH = 9
 PLACEHOLDER="1"*DWIDTH
@@ -127,9 +128,10 @@ def main():
     arg_parser.add_argument('--generate', action='store_true')
     arg_parser.add_argument('--verify', action='store_true')
     arg_parser.add_argument('--gui', action='store_true')
-    arg_parser.add_argument('--layer', type=int, required=True, default=-1)
-    arg_parser.add_argument('--head', type=int, required=True, default=-1)
+    arg_parser.add_argument('--layer', type=int, default=-1)
+    arg_parser.add_argument('--head', type=int, default=-1)
     arg_parser.add_argument('--auto', action="store_true")
+    arg_parser.add_argument('--fromlist', action="store_true")
     args = arg_parser.parse_args()
 
     if args.layer != -1:
@@ -166,9 +168,9 @@ def main():
         for l_idx, h_idx in itertools.product(range(nlayer), range(nheads)):
             print(f"python: simulating l{l_idx}h{h_idx}...")
             stimu, ref_out = gen_data_for_ig_test(
-                f"./tb/idxgen_stimu/attn_blk_idx.npy", 
-                12, 
-                f"./tb/idxgen_stimu/ig_stimulus_l{l_idx}_h{h_idx}.bin")
+                f"./tb/idxgen_stimu/attn_blk_idx.npy", 12, 
+                f"./tb/idxgen_stimu/ig_stimulus_l{l_idx}_h{h_idx}.bin", 
+                l_idx, h_idx)
             os.environ["SPAR_IDXGEN_LAYER"] = str(l_idx)
             os.environ["SPAR_IDXGEN_HEAD"] = str(h_idx)
             os.environ["SPAR_IDXGEN_INSIZE"] = str(len(stimu))
@@ -184,6 +186,37 @@ def main():
                 with open("./tb/idxgen_stimu/heads_failed.txt", "a+") as f:
                     f.write(f"{failed_head}\n")
                 heads_failed.append(failed_head)
+
+    if args.fromlist:
+        hlist_file = "./tb/idxgen_stimu/heads_failed_old.txt"
+        head_list = []
+
+        with Path(hlist_file).open("r") as hf:
+            for r in hf.readlines():
+                tmp = r.strip().strip("()").split(",")[0]
+                head_list.append(list(map(int, re.findall(r'\d+', tmp))))
+
+        for helem in head_list:
+            l_idx, h_idx = helem[0], helem[1]
+            print(f"python: simulating l{l_idx}h{h_idx}...")
+            stimu, ref_out = gen_data_for_ig_test(
+                f"./tb/idxgen_stimu/attn_blk_idx.npy", 12, 
+                f"./tb/idxgen_stimu/ig_stimulus_l{l_idx}_h{h_idx}.bin", 
+                l_idx, h_idx)
+            os.environ["SPAR_IDXGEN_LAYER"] = str(l_idx)
+            os.environ["SPAR_IDXGEN_HEAD"] = str(h_idx)
+            os.environ["SPAR_IDXGEN_INSIZE"] = str(len(stimu))
+            if (len(stimu) > 7000):
+                raise ValueError("insufficient input vector length found in HW")
+            
+            os.system("vsim -c -do idxgen_tb_start.do")
+            hw_res_err_rate = check_idxgen_out_with_ref(
+                Path(f"./tb/idxgen_stimu/idxgen_res_l{l_idx}_h{h_idx}.bin"), 
+                ref_out, 12)
+            if(abs(hw_res_err_rate) > 0.0):
+                failed_head = (f"l{l_idx}h{h_idx}", hw_res_err_rate)
+                with open("./tb/idxgen_stimu/heads_failed.txt", "a+") as f:
+                    f.write(f"{failed_head}\n")
 
     # generate stimulus for a single-stage redundancy remover
     # gen_dat_a = gen_sorted_dat(6, 8//2, (1, 200))

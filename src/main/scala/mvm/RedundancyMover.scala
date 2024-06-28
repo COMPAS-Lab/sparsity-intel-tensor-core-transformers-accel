@@ -5,17 +5,18 @@ import spinal.lib._
 import config.DefaultConfig
 import scala.math.min
 
-class RedundancyMover(num_ports: Int, bitwidth: Int, placeholder: BigInt) extends Component {
+class RedundancyMover(num_ports: Int, bitwidth: Int, dest_width: Int, placeholder: BigInt) extends Component {
   val io = new Bundle {
-    val inputSeq = in Vec(UInt(bitwidth bits), num_ports)
-    val outputSeq = out Vec(UInt(bitwidth bits), num_ports)
+    val inputSeq = in Vec(IndexData(bitwidth, dest_width), num_ports)
+    val outputSeq = out Vec(IndexData(bitwidth, dest_width), num_ports)
   }
   assert(isPow2(num_ports) && num_ports >= 4)
 
-  private def rmRedundancy(ports: Vec[UInt], stg: Int): Vec[UInt] = {
-    val resPorts = Vec(Reg(UInt(bitwidth bits), init=U(placeholder)), ports.size)
+  private def rmRedundancy(ports: Vec[IndexData], stg: Int): Vec[IndexData] = {
+    val resPorts = Vec(Reg(IndexData(bitwidth, dest_width),
+      init=IndexData(bitwidth, dest_width, placeholder)), ports.size)
     if (ports.size == 2) {
-      switch(ports(0).msb ## ports(1).msb) {
+      switch(ports(0).idxData.msb ## ports(1).idxData.msb) {
         is (B"2'b00", B"2'b11", B"2'b01") {
           resPorts := ports
         }
@@ -28,15 +29,15 @@ class RedundancyMover(num_ports: Int, bitwidth: Int, placeholder: BigInt) extend
       val halfMoverUpper = rmRedundancy(Vec(for(i <- ports.size/2 until ports.size) yield ports(i)), stg-1)
 
       // selection candidates
-      val srcPorts = Vec(UInt(bitwidth bits), ports.size)
+      val srcPorts = Vec(IndexData(bitwidth, dest_width), ports.size)
       for (i <- 0 until ports.size/2) {
         srcPorts(i) := halfMoverUpper(i)
       }
       for (i <- ports.size/2 until ports.size) {
-        srcPorts(i) := U(placeholder)
+        srcPorts(i) := IndexData(bitwidth, dest_width, placeholder)
       }
 
-      val moveSel = Vec(for (l <- halfMoverLower) yield l.msb).asBits
+      val moveSel = Vec(for (l <- halfMoverLower) yield l.idxData.msb).asBits
       for (outPortIdx <- resPorts.indices) {
         val moveSelBuilder = WhenBuilder()
         for (nCand <- 0 to min(outPortIdx, ports.size/2)) {
@@ -51,7 +52,7 @@ class RedundancyMover(num_ports: Int, bitwidth: Int, placeholder: BigInt) extend
           }
         }
         moveSelBuilder.otherwise {
-          resPorts(outPortIdx) := U(placeholder)
+          resPorts(outPortIdx) := IndexData(bitwidth, dest_width, placeholder)
         }
       }
     }
@@ -64,6 +65,6 @@ class RedundancyMover(num_ports: Int, bitwidth: Int, placeholder: BigInt) extend
 object RedundancyMoverGen {
   def main(args: Array[String]): Unit = {
     val gen = new DefaultConfig
-    gen.defaultSpinalConfig.generateVerilog(new RedundancyMover(4, 9, BigInt("111111111", 2)))
+    gen.defaultSpinalConfig.generateVerilog(new RedundancyMover(4, 9, 12, BigInt("111111111", 2)))
   }
 }

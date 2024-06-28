@@ -11,15 +11,55 @@ sealed trait RedRemoverDir
 case object RemoverIn extends RedRemoverDir
 case object RemoverOut extends RedRemoverDir
 
-class RedundancyRemoverFrontend(num_inputs: Int, bitwidth: Int,
+class IndexData(bitwidth: Int, num_dest_chans: Int) extends Bundle {
+  val idxData = UInt(bitwidth bits)
+  val destId = Bits(num_dest_chans bits)
+
+  override def clearAll(): IndexData.this.type = {
+    this.idxData.clearAll()
+    this.destId.clearAll()
+    this
+  }
+
+  override def getZero: this.type = {
+    val zeroData = new IndexData(bitwidth, num_dest_chans)
+    zeroData.idxData.clearAll()
+    zeroData.destId.clearAll()
+    zeroData.asInstanceOf[this.type]
+  }
+
+  override def clone(): IndexData = new IndexData(bitwidth, num_dest_chans)
+}
+
+object IndexData {
+  def apply(bitwidth: Int, num_dest_chans: Int): IndexData = {
+    val newIdxData = new IndexData(bitwidth, num_dest_chans)
+    newIdxData
+  }
+
+  def apply(bitwidth: Int, num_dest_chans: Int, placeholder: BigInt): IndexData = {
+    val newIdxData = new IndexData(bitwidth, num_dest_chans)
+    newIdxData.idxData := U(placeholder, bitwidth bits)
+    newIdxData.destId.clearAll()
+    newIdxData
+  }
+
+  def apply(idxData: UInt, destId: Bits): IndexData = {
+    val newIdxData = new IndexData(idxData.getWidth, destId.getWidth)
+    newIdxData.idxData := idxData
+    newIdxData.destId := destId
+    newIdxData
+  }
+}
+
+class RedundancyRemoverFrontend(num_inputs: Int, bitwidth: Int, dest_width: Int,
                                 placeholder: BigInt, fifo_depth: Int) extends Component {
   val io = new Bundle {
-    val upperIns, lowerIns = slave Flow(Vec(UInt(bitwidth bits), num_inputs / 2))
-    val outs = master Flow(Vec(UInt(bitwidth bits), num_inputs * 2))
+    val upperIns, lowerIns = slave Flow(Vec(IndexData(bitwidth, dest_width), num_inputs / 2))
+    val outs = master Flow(Vec(IndexData(bitwidth, dest_width), num_inputs * 2))
     val fifoPopSigLower, fifoPopSigUpper = in Vec(Bool(), num_inputs)
     val markRedBitLower, markRedBitUpper = in Vec(Bool(), num_inputs)
-    // handshake wires signaling the finish of
-    // a group
+    // handshake wires signaling the finish of a group
     val lastGrpIn = in Bool()
     val sortIterFinished = out Bool()
     val lastGrpOut = out Bool()
@@ -37,9 +77,9 @@ class RedundancyRemoverFrontend(num_inputs: Int, bitwidth: Int,
     OHToUInt(interRes)
   }
 
-  private def rotate(in: Vec[UInt], rotAmount: UInt, dir: RedRemoverDir): Vec[UInt] = {
+  private def rotate(in: Vec[IndexData], rotAmount: UInt, dir: RedRemoverDir): Vec[IndexData] = {
     val rotateInLen = if (dir == RemoverIn) in.length * 2 else in.length
-    val rotateStgRes = Vec(Vec(UInt(bitwidth bits), rotateInLen), log2Up(rotateInLen) + 1)
+    val rotateStgRes = Vec(Vec(IndexData(bitwidth, dest_width), rotateInLen), log2Up(rotateInLen) + 1)
     rotateStgRes.setName("sstage_rotate")
 
     if (dir == RemoverIn) {
@@ -47,7 +87,7 @@ class RedundancyRemoverFrontend(num_inputs: Int, bitwidth: Int,
         if (i < in.length) {
           rotateStgRes(0)(i) := in(i)
         } else {
-          rotateStgRes(0)(i) := U(placeholder, bitwidth bits)
+          rotateStgRes(0)(i) := IndexData(bitwidth, dest_width, placeholder)
         }
       }
     } else {
@@ -65,7 +105,8 @@ class RedundancyRemoverFrontend(num_inputs: Int, bitwidth: Int,
 
   val fifoPopEn = Bool()
   val topRemoverFrontend = new Area {
-    val fifos: Array[StreamFifo[UInt]] = Array.fill(num_inputs)(StreamFifo(UInt(bitwidth bits), depth = fifo_depth))
+    val fifos: Array[StreamFifo[IndexData]] =
+      Array.fill(num_inputs)(StreamFifo(IndexData(bitwidth, dest_width), depth = fifo_depth))
     val isChangingRedBit = Array.fill(num_inputs)(Reg(Bool(), init=False))
     //input side
     val rotateInOffset = Reg(UInt(log2Up(num_inputs) bits), init = U(0))
@@ -80,7 +121,7 @@ class RedundancyRemoverFrontend(num_inputs: Int, bitwidth: Int,
     val inRotateRes = rotate(io.upperIns.payload, rotateInOffset, RemoverIn)
     for (fid <- fifos.indices) {
       fifos(fid).io.push.payload <> inRotateRes(fid)
-      fifos(fid).io.push.valid := io.upperIns.valid & (fifos(fid).io.push.payload =/= U(placeholder))
+      fifos(fid).io.push.valid := io.upperIns.valid & (fifos(fid).io.push.payload.idxData =/= U(placeholder))
     }
 
     //output side
@@ -88,11 +129,14 @@ class RedundancyRemoverFrontend(num_inputs: Int, bitwidth: Int,
     val rateOut = ~io.fifoPopSigUpper.asBits.reversed
     val fifoOuts = Vec(
       for(fid <- fifos.indices)
-        yield Mux(
-          fifos(fid).io.pop.valid & fifoPopEn,
-          ((isChangingRedBit(fid) | fifos(fid).io.pop.payload.msb)
-            ## fifos(fid).io.pop.payload(bitwidth-2 downto 0)).asUInt,
-          U(placeholder)))
+        yield IndexData(
+          idxData = Mux(fifos(fid).io.pop.valid & fifoPopEn,
+            ((isChangingRedBit(fid) | fifos(fid).io.pop.payload.idxData.msb)
+              ## fifos(fid).io.pop.payload.idxData(bitwidth-2 downto 0)).asUInt,
+            U(placeholder)),
+          destId = fifos(fid).io.pop.payload.destId
+        )
+    )
 
     rotateOutOffset := Mux(io.lastGrpOut, U(0),
       ((convertRate(rateOut) + rotateOutOffset) % num_inputs)(rotateOutOffset.getWidth - 1 downto 0))
@@ -111,7 +155,8 @@ class RedundancyRemoverFrontend(num_inputs: Int, bitwidth: Int,
   }
 
   val botRemoverFrontend = new Area {
-    val fifos: Array[StreamFifo[UInt]] = Array.fill(num_inputs)(StreamFifo(UInt(bitwidth bits), depth = fifo_depth))
+    val fifos: Array[StreamFifo[IndexData]] =
+      Array.fill(num_inputs)(StreamFifo(IndexData(bitwidth, dest_width), depth = fifo_depth))
     val isChangingRedBit = Array.fill(num_inputs)(Reg(Bool(), init=False))
     //input side
     val rotateInOffset = Reg(UInt(log2Up(num_inputs) bits), init = U(0))
@@ -126,7 +171,7 @@ class RedundancyRemoverFrontend(num_inputs: Int, bitwidth: Int,
     val inRotateRes = rotate(io.lowerIns.payload, rotateInOffset, RemoverIn)
     for (fid <- fifos.indices) {
       fifos(fid).io.push.payload <> inRotateRes(fid)
-      fifos(fid).io.push.valid := io.lowerIns.valid & (fifos(fid).io.push.payload =/= U(placeholder))
+      fifos(fid).io.push.valid := io.lowerIns.valid & (fifos(fid).io.push.payload.idxData =/= U(placeholder))
     }
 
     //output side
@@ -134,11 +179,15 @@ class RedundancyRemoverFrontend(num_inputs: Int, bitwidth: Int,
     val rateOut = ~(io.fifoPopSigLower.asBits.reversed)
     val fifoOuts = Vec(
       for(fid <- fifos.indices)
-        yield Mux(
-          fifos(fid).io.pop.valid & fifoPopEn,
-          ((isChangingRedBit(fid) | fifos(fid).io.pop.payload.msb)
-            ## fifos(fid).io.pop.payload(bitwidth-2 downto 0)).asUInt,
-          U(placeholder)))
+        yield IndexData(
+          idxData = Mux(
+            fifos(fid).io.pop.valid & fifoPopEn,
+            ((isChangingRedBit(fid) | fifos(fid).io.pop.payload.idxData.msb)
+              ## fifos(fid).io.pop.payload.idxData(bitwidth-2 downto 0)).asUInt,
+            U(placeholder)),
+          destId = Mux(isChangingRedBit(fid), B(0), fifos(fid).io.pop.payload.destId)
+        )
+    )
 
     rotateOutOffset := Mux(io.lastGrpOut, U(0),
       ((convertRate(rateOut) + rotateOutOffset) % num_inputs)(rotateOutOffset.getWidth - 1 downto 0))
@@ -203,27 +252,29 @@ class RedundancyRemoverFrontend(num_inputs: Int, bitwidth: Int,
   }
 }
 
-case class comp1OutsRes(bitwidth: Int) extends Bundle {
-  val dat = UInt(bitwidth bits)
+case class comp1OutsRes(bitwidth: Int, dest_width: Int) extends Bundle {
+  val dat = IndexData(bitwidth, dest_width)
   val popLower, popUpper = Bool()
   val markRedLower, markRedUpper = Bool()
 }
 
-class RedundancyRemoverBackend(num_outputs: Int, bitwidth: Int, placeholder: BigInt) extends Component {
+class RedundancyRemoverBackend(num_outputs: Int, bitwidth: Int, dest_width: Int,
+                               placeholder: BigInt) extends Component {
   val io = new Bundle {
-    val ins = in Vec(UInt(bitwidth bits), num_outputs * 2)
-    val outs = out Vec(UInt(bitwidth bits), num_outputs)
+    val ins = in Vec(IndexData(bitwidth, dest_width), num_outputs * 2)
+    val outs = out Vec(IndexData(bitwidth, dest_width), num_outputs)
     val stg1CompResUpper, stg1CompResLower, stg1EqualResUpper, stg1EqualResLower= out Vec(Bool(), num_outputs)
   }
 
   assert(isPow2(num_outputs), "the module only supports ^2 outputs")
 
-  private def comp1Outs(ina: UInt, inb: UInt, popLowerWhenEq: Boolean): comp1OutsRes = {
-    val outRes = comp1OutsRes(bitwidth)
+  private def comp1Outs(ina: IndexData, inb: IndexData,
+                        popLowerWhenEq: Boolean): comp1OutsRes = {
+    val outRes = comp1OutsRes(bitwidth, dest_width)
     // in the first stage comparison, we do not remove redundancy
-    val res = Reg(UInt(ina.getWidth bits), init = U(0))
-    val inaVal = ina(bitwidth-2 downto 0)
-    val inbVal = inb(bitwidth-2 downto 0)
+    val res = Reg(IndexData(bitwidth, dest_width), init = IndexData(bitwidth, dest_width).getZero)
+    val inaVal = ina.idxData(bitwidth-2 downto 0)
+    val inbVal = inb.idxData(bitwidth-2 downto 0)
 
     outRes.dat := res
     outRes.markRedLower := False
@@ -231,35 +282,40 @@ class RedundancyRemoverBackend(num_outputs: Int, bitwidth: Int, placeholder: Big
     // normal compare
     // A: lower in B: upper in
     when(inaVal === inbVal) {
-      when(ina === U(placeholder)) {
+      when(ina.idxData === U(placeholder)) {
+        // both a and b are placeholders
         outRes.popLower := False
         outRes.popUpper := False
         res := ina
       } otherwise {
-        when(ina.msb ^ inb.msb) {
-          outRes.popLower := ~ina.msb & inb.msb
-          outRes.popUpper := ina.msb & ~inb.msb
-          res := Mux(ina.msb, inb, ina)
+        when(ina.idxData.msb ^ inb.idxData.msb) {
+          // one of a and b is a placeholder, but their values are
+          // the same
+          outRes.popLower := ~ina.idxData.msb & inb.idxData.msb
+          outRes.popUpper := ina.idxData.msb & ~inb.idxData.msb
+          res := Mux(ina.idxData.msb, inb, ina)
         } otherwise {
+          //none of a and b is a placeholder, need to merge
           if (popLowerWhenEq) {
             outRes.popLower := True
             outRes.popUpper := False
             outRes.markRedUpper := True
-            res := ina
+            res := IndexData(ina.idxData, ina.destId | inb.destId)
           } else {
             outRes.popLower := False
             outRes.popUpper := True
             outRes.markRedLower := True
-            res := inb
+            res := IndexData(inb.idxData, ina.destId | inb.destId)
           }
         }
       }
     }.otherwise {
-      when(ina === U(placeholder)) {
+      // input values are different
+      when(ina.idxData === U(placeholder)) {
         res := inb
         outRes.popLower := False
         outRes.popUpper := True
-      } elsewhen (inb === U(placeholder)) {
+      } elsewhen (inb.idxData === U(placeholder)) {
         res := ina
         outRes.popLower := True
         outRes.popUpper := False
@@ -273,18 +329,19 @@ class RedundancyRemoverBackend(num_outputs: Int, bitwidth: Int, placeholder: Big
     outRes
   }
 
-  private def comp2Outs(ina: UInt, inb: UInt, placeholder: BigInt): Vec[UInt] = {
-    val outs = Vec(Reg(UInt(ina.getWidth bits), init = U(0)), 2)
-    val inaVal = ina(bitwidth-2 downto 0)
-    val inbVal = inb(bitwidth-2 downto 0)
+  private def comp2Outs(ina: IndexData, inb: IndexData, placeholder: BigInt): Vec[IndexData] = {
+    val outs = Vec(Reg(IndexData(bitwidth, dest_width),
+      init = IndexData(bitwidth, dest_width).getZero), 2)
+    val inaVal = ina.idxData(bitwidth-2 downto 0)
+    val inbVal = inb.idxData(bitwidth-2 downto 0)
 
-    switch((ina.msb ## inb.msb).asBits, coverUnreachable = true) {
+    switch((ina.idxData.msb ## inb.idxData.msb).asBits, coverUnreachable = true) {
       is(B"2'00") {
         when(inaVal === inbVal) {
           // TODO: check here
           // regarding removed redundancy as smaller
-          outs(0) := ina
-          outs(1) := (U"1'b1" ## ina(bitwidth - 2 downto 0)).asUInt
+          outs(0) := IndexData(ina.idxData, ina.destId | inb.destId)
+          outs(1) := IndexData((U"1'b1" ## inaVal).asUInt, B(0, dest_width bits))
         } otherwise {
           outs(0) := Mux(inaVal > inbVal, ina, inb)
           outs(1) := Mux(inaVal > inbVal, inb, ina)
@@ -296,23 +353,23 @@ class RedundancyRemoverBackend(num_outputs: Int, bitwidth: Int, placeholder: Big
       }
       is(B"2'01", B"2'10") {
         when(inaVal === inbVal) {
-          outs(0) := Mux(ina.msb, inb, ina)
-          outs(1) := Mux(ina.msb, ina, inb)
+          outs(0) := Mux(ina.idxData.msb, inb, ina)
+          outs(1) := Mux(ina.idxData.msb, ina, inb)
         } otherwise {
           outs(0) := Mux(inaVal > inbVal, ina, inb)
           outs(1) := Mux(inaVal > inbVal, inb, ina)
         }
       }
       default {
-        outs(0) := U(placeholder)
-        outs(1) := U(placeholder)
+        outs(0) := IndexData(bitwidth, dest_width, placeholder)
+        outs(1) := IndexData(bitwidth, dest_width, placeholder)
       }
     }
     outs
   }
 
-  def singleStageComparison(stgIns: Vec[UInt], nStg: Int, placeholder: BigInt): Vec[UInt] = {
-    val stgOuts = Vec(UInt(stgIns(0).getWidth bits), stgIns.length)
+  def singleStageComparison(stgIns: Vec[IndexData], nStg: Int, placeholder: BigInt): Vec[IndexData] = {
+    val stgOuts = Vec(IndexData(bitwidth, dest_width), stgIns.length)
     val nGrps = pow(2, nStg).intValue()
     for (grpIdx <- 0 until nGrps) {
       for (idxInGrp <- 0 until stgIns.length / nGrps / 2) {
@@ -326,8 +383,8 @@ class RedundancyRemoverBackend(num_outputs: Int, bitwidth: Int, placeholder: Big
     stgOuts
   }
 
-  private def firstStgComparison(stgIns: Vec[UInt]): Vec[comp1OutsRes] = {
-    val stgOuts = Vec(comp1OutsRes(bitwidth), stgIns.length / 2)
+  private def firstStgComparison(stgIns: Vec[IndexData]): Vec[comp1OutsRes] = {
+    val stgOuts = Vec(comp1OutsRes(bitwidth, dest_width), stgIns.length / 2)
     for (i <- 0 until stgIns.length / 2) {
       val popLowerWhenEq = i < (stgIns.length / 4)
       stgOuts(i) := comp1Outs(stgIns(i), stgIns(stgIns.length - 1 - i), popLowerWhenEq)
@@ -338,7 +395,7 @@ class RedundancyRemoverBackend(num_outputs: Int, bitwidth: Int, placeholder: Big
   //for outputs greater than 4 the backend is used together with the frontend
   //so it contains an extra layer to reduce half of the input bandwidth from
   //the frontend
-  val compRes = Vec(Vec(UInt(bitwidth bits), num_outputs), log2Up(num_outputs) + 1)
+  val compRes = Vec(Vec(IndexData(bitwidth, dest_width), num_outputs), log2Up(num_outputs) + 1)
   // stage 1
   val stg1Outs = firstStgComparison(io.ins)
   for (i <- 0 until num_outputs) {compRes(0)(i) := stg1Outs(i).dat}
@@ -357,24 +414,27 @@ class RedundancyRemoverBackend(num_outputs: Int, bitwidth: Int, placeholder: Big
   io.outs := compRes.last
 }
 
-class RedundancyRemover(num_words: Int, bitwidth: Int, placeholder: BigInt) extends Component {
+class RedundancyRemover(num_words: Int, bitwidth: Int, dest_width: Int,
+                        placeholder: BigInt, frontend_fifo_depth: Int) extends Component {
   val io = new Bundle {
-    val upperIns, lowerIns = slave Flow(Vec(UInt(bitwidth bits), num_words / 2))
-    val outs = master Flow(Vec(UInt(bitwidth bits), num_words))
+    val upperIns, lowerIns = slave Flow(Vec(IndexData(bitwidth, dest_width), num_words / 2))
+    val outs = master Flow(Vec(IndexData(bitwidth, dest_width), num_words))
     val lastGrpIn = in Bool()
     val sortIterFinished = out Bool()
     val lastGrpOut = out Bool()
   }
 
   assert(isPow2(num_words), "input size must be power of 2, but got " + num_words)
-  val sortedOuts = Vec(Reg(UInt(bitwidth bits), init=U(0)), num_words)
+  val sortedOuts: Vec[IndexData] = Vec(Reg(IndexData(bitwidth, dest_width),
+    init=IndexData(bitwidth, dest_width).getZero), num_words)
 
   // TODO: according to the paper https://ieeexplore.ieee.org/document/7544757,
   // fifo depth 16 keeps a small enough stall rate;
   // but we may need to add stall and back pressure to prevent from potential
   // content loss
-  val frontend = new RedundancyRemoverFrontend(num_words, bitwidth, placeholder, fifo_depth = 16)
-  val backend = new RedundancyRemoverBackend(num_words, bitwidth, placeholder)
+  val frontend = new RedundancyRemoverFrontend(num_words, bitwidth, dest_width,
+    placeholder, frontend_fifo_depth)
+  val backend = new RedundancyRemoverBackend(num_words, bitwidth, dest_width, placeholder)
 
   frontend.io.upperIns <> io.upperIns
   frontend.io.lowerIns <> io.lowerIns
@@ -396,6 +456,7 @@ class RedundancyRemover(num_words: Int, bitwidth: Int, placeholder: BigInt) exte
 object RedundancyRemoverGen extends App {
   val config = new DefaultConfig
   config.defaultSpinalConfig.withoutEnumString().generate(new RedundancyRemover(
-    num_words = 8, bitwidth = 11, placeholder = BigInt("10000000000", 2)
+    num_words = 8, bitwidth = 11, dest_width = 12,
+    placeholder = BigInt("10000000000", 2), frontend_fifo_depth=16
   )).printPruned()
 }

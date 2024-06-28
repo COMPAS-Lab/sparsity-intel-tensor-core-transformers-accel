@@ -101,23 +101,21 @@ class tensor_core_array_wrapper(array_col: Int, array_row: Int, chain_len: Int,
   io.rr_clk <> rrClkCtrl.rrClkDomain.readClockWire
 
   val rrClkRegion = new ClockingArea(rrClkCtrl.rrClkDomain) {
-    private val IDX_BITSIZE = 11
+    private val IDX_BITSIZE = 9
     val idxInStart, idxInSelect = Reg(Bool(), init = False)
     val loadStartCC = BufferCC(io.load_start(0), init = False)
-    val idxGenerator = new IndexGenerator(array_col, IDX_BITSIZE, BigInt("10000000000", 2))
+    val idxGenerator = new IndexGenerator(array_col, IDX_BITSIZE, BigInt("111111111", 2))
     // index generator connection
     val hbmData = io.tcarray_in(4).data(IDX_BITSIZE * array_col - 1 downto 0).subdivideIn(IDX_BITSIZE bits)
-    val hbmDataFlow = Vec(Flow(UInt(hbmData.last.getBitsWidth bits)), hbmData.length)
-    for ((d, f) <- hbmData.zip(hbmDataFlow)) {
-      f.payload := d
-      f.valid := True
+    for (i <- idxGenerator.io.seqIn.indices) {
+      idxGenerator.io.seqIn(i).payload := IndexData(hbmData(i), B(1, array_col bits) |<< i)
+      idxGenerator.io.seqIn(i).valid := True
     }
-    idxGenerator.io.seqIn <> hbmDataFlow
     //TODO: fix this temp connection
     idxGenerator.io.lastGrpIn := io.start(0)
-    val idxGeneratorRes = RegNext(idxGenerator.io.seqOut.payload)
-    io.idx_res := io.idx_rd_addr(log2Up(array_col)-1 downto 0).muxList(
-      for (i <- idxGeneratorRes.indices) yield (i, idxGeneratorRes(i))
+    val idxGeneratorRes: Vec[IndexData] = RegNext(idxGenerator.io.seqOut.payload)
+    io.idx_res := io.idx_rd_addr(log2Up(array_col)-1 downto 0).muxListDc(
+      for (i <- idxGeneratorRes.indices) yield (i, (U"2'd0" ## idxGeneratorRes(i).idxData).asUInt)
     )
 
     io.tcarray_in(4).addr := U(0)
