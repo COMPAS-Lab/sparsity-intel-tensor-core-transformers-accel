@@ -13,9 +13,6 @@ lazy val mylib = (project in file("."))
     libraryDependencies ++= Seq(spinalCore, spinalLib, spinalIdslPlugin)
   )
 
-//exclude files under development
-//unmanagedSources / excludeFilter := "TensorCoreChainSim.scala"
-
 fork := true
 
 

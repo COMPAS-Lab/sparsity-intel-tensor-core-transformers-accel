@@ -100,6 +100,44 @@ object DelayTree {
   }
 }
 
+class blk_delay_core(bitwidth: Int, delay_len: Int, mem_type: String) extends BlackBox {
+  val io = new Bundle {
+    val clk, nrst, ena = in Bool()
+    val dat_in = in Bits(bitwidth bits)
+    val dat_out = out Bits(bitwidth bits)
+  }
+
+  noIoPrefix()
+  mapCurrentClockDomain(clock = io.clk, reset=io.nrst, resetActiveLevel = LOW)
+
+  addGenerics(
+    "LENGTH" -> delay_len,
+    "WIDTH" -> bitwidth,
+    "TYPE" -> mem_type,
+    "REGISTER_OUTPUTS" -> "FALSE"
+  )
+  addRTLPath("./src/main/sverilog/blk_delay_core.sv")
+}
+
+object BlockDelay {
+ def apply[T <: Data](that: T, cycleCount: Int, delay_en: Bool = null): T = {
+   require(cycleCount >= 0,"Negative cycleCount is not allowed in Delay")
+
+   val res: T = cloneOf(that)
+   val delayCore = new blk_delay_core(that.getBitsWidth, cycleCount, mem_type = "ALTERA_BLOCK_RAM")
+
+   if (delay_en != null){
+     delayCore.io.ena := delay_en
+   } else {
+     delayCore.io.ena := True
+   }
+   delayCore.io.dat_in := that.asBits
+   res.assignFromBits(delayCore.io.dat_out)
+
+   res
+ }
+}
+
 class StreamDelay[T <: Data](dataType: HardType[T]) extends Component {
   val io = new Bundle {
     val inputStream = slave Stream(dataType)

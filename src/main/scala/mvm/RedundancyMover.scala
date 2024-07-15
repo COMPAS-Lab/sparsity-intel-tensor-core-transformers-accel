@@ -3,7 +3,7 @@ package mvm
 import spinal.core._
 import spinal.lib._
 import config.DefaultConfig
-import scala.math.min
+import scala.math.{min, pow}
 
 class RedundancyMover(num_ports: Int, bitwidth: Int, dest_width: Int, placeholder: BigInt) extends Component {
   val io = new Bundle {
