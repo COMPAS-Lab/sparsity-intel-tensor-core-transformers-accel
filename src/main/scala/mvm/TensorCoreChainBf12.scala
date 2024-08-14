@@ -8,18 +8,23 @@ import intel_ips._
 import util._
 
 class TensorCoreChainBf12(chain_len: Int, out_buf_delay: Int,
-                      out_fifo_depth: Int, output_width: Int) extends Component {
+                      out_fifo_depth: Int, output_width: Int,
+                          idx_width: Int) extends Component {
   val io = new Bundle {
+    // TODO: how to efficiently use the valid signal?
     val dataIn = slave Flow(Vec(UInt(80 bits), chain_len))
-    val loadCascadeIn = slave Flow(UInt(80 bits))
+    val loadCascadeIn = slave Flow(BfpBlockWithIdx(80, idx_width, 0, 0))
     val expIn = in Vec(UInt(8 bits), chain_len)
     val expCascadeIn = in UInt(8 bits)
     //data valid and data in should be 1 clock earlier than
     //the first loading because of data load reg and load_buf_sel reg
     val dataIterReady = out Bool()
-    val loadReady = out Bool()
-    val res = master Stream(Vec(UInt(output_width bits), 3))
-    val matABroadcastIters, matAColSubGrpLen = in UInt(16 bits)
+    val res = master Flow(Vec(BfpBlockWithIdx(output_width, idx_width, 0, 0), 3))
+    // ctrl signal that switches the selected buffer
+    val doubleBufferCompSel = in Bool()
+    val doubleBufferLoadSel = in Bits(2 bits)
+    val matABroadcastIters = in UInt(16 bits)
+    val dataInLast = in Bool()
     //TODO: deprecate this signal
     val outValid = out Bool()
   }
@@ -54,53 +59,54 @@ class TensorCoreChainBf12(chain_len: Int, out_buf_delay: Int,
   val tcStartPoint = new tensor_core_start_bf12
   val tcCoreChainElems = new Array[tensor_core_bf12](chain_len-1)
   val tcAccu = new tensor_core_accu
+  // small buffer for row index
+  val rIdxBuffer = Array.fill(2, 3)(Reg(UInt(idx_width bits), init=U(0)))
 
   // loading requires 3 extra cycles, align the valid signal
   // with the first compute core here
-  val loadValidD3t = Delay(io.loadCascadeIn.valid, 3)
+  val loadCounter = Counter(chain_len*3, inc=Delay(io.loadCascadeIn.valid, 3))
   // 2 cycle delay valid signal for loading selection
-  val loadValidD2t = Delay(io.loadCascadeIn.valid, 2)
-  val loadCounter, loadSelCounter = Counter(chain_len*3)
-  val loadBufCtrlReg = Reg(UInt(2 bits)) init U"2'b01"
-  val loadBufCtrl = UInt(2 bits)
-  when(loadValidD3t) {loadCounter.increment()}
-  when(loadValidD2t) {loadSelCounter.increment()}
-
-
-  when(loadSelCounter.willOverflow) {
-    loadBufCtrlReg := loadBufCtrlReg.rotateLeft(1)
-  }
-  loadBufCtrl := Mux(loadValidD2t, loadBufCtrlReg, U"2'b00")
-  io.loadReady := loadCounter.willOverflow
+  val loadBufCtrl = Reg(Bits(2 bits), init=B"01")
+  val loadBufSel = RegNext(io.doubleBufferCompSel, init=False)
 
   val inputCounter = DynaCounter(io.matABroadcastIters.getWidth, io.matABroadcastIters)
-  val inDataIterCounter = DynaCounter(io.matAColSubGrpLen.getWidth, io.matAColSubGrpLen)
-
-  val loadBufSel = Reg(Bool()) init False
-  when(io.dataIn.valid) {
-    inputCounter.increment()
-  }
-
-  when(inputCounter.willOverflow) {
-    loadBufSel := !loadBufSel
-    inDataIterCounter.increment()
-  }
   // TODO: consider moving this out to let upper level
   // hardware to count how many mat B col has been sent
   // by itself.
   io.dataIterReady := Delay(inputCounter.willOverflow, 1)
 
+  val delayedCasLoadValidForBufSel = Delay(io.loadCascadeIn.valid, 2, init=False)
+  val delayedCasLoadIdx = Delay(io.loadCascadeIn.payload.rIdx, 2, init=U(0,idx_width bits))
+  when(delayedCasLoadValidForBufSel) {
+    loadBufCtrl := Delay(io.doubleBufferLoadSel, 2, init=B"01")
+  }.otherwise {
+    loadBufCtrl := B(0)
+  }
+
+  when(delayedCasLoadValidForBufSel) {
+    when(loadBufCtrl(0)) {
+      rIdxBuffer(0)(2) := delayedCasLoadIdx
+      rIdxBuffer(0)(1) := rIdxBuffer(0)(2)
+      rIdxBuffer(0)(0) := rIdxBuffer(0)(1)
+    }.otherwise {
+      rIdxBuffer(1)(2) := delayedCasLoadIdx
+      rIdxBuffer(1)(1) := rIdxBuffer(1)(2)
+      rIdxBuffer(1)(0) := rIdxBuffer(1)(1)
+    }
+  }
+
   //output buffer ctrl logic.
   // delayed output valid: 4c of dot lat,3c of accu lat and 2*(chain_len-1)
   // of input delay on the last stage of the chain
   val delayedDataInValidForOut = Delay(io.dataIn.valid, 2*(chain_len-1)+4+3-1-1, init=False)
+  val delayedDataInLast = Delay(io.dataInLast, 2*(chain_len-1)+4+3-1-1, init=False)
   //counting the output iterations for output valid
   val outValidCounter = DynaCounter(io.matABroadcastIters.getWidth, io.matABroadcastIters)
 
   when(Delay(delayedDataInValidForOut, 1, init=False)) (outValidCounter.increment())
   io.outValid := Delay(outValidCounter.willOverflow, 1, init=False)
 
-  connect_data_in(tcEntry.io, io.loadCascadeIn.payload)
+  connect_data_in(tcEntry.io, io.loadCascadeIn.payload.blkData)
   tcEntry.io.shared_exponent_data := io.expCascadeIn
   tcEntry.io.feed_sel <> U"2'd0"
   tcEntry.io.load_buf_sel <> False
@@ -164,40 +170,14 @@ class TensorCoreChainBf12(chain_len: Int, out_buf_delay: Int,
     tcCoreChainElems(i).io.clr1 <> False
   }
 
-  val resValidCounter = DynaCounter(io.matAColSubGrpLen.getWidth, io.matAColSubGrpLen)
-  when(outValidCounter.willOverflow) (resValidCounter.increment())
-  val resValid = Mux(io.matAColSubGrpLen === 1,
-    outValidCounter.willIncrement,
-    resValidCounter.willOverflowIfInc)
-
   // feedback path
-  val oBufferLoadValid = Reg(Bool()) init False
-  val fbLoadCounter = DynaCounter(io.matABroadcastIters.getWidth, io.matABroadcastIters)
-  when(oBufferLoadValid) {
-    fbLoadCounter.increment()
-    when(io.matAColSubGrpLen > 1) {
-      when (fbLoadCounter.willOverflow & resValidCounter === (io.matAColSubGrpLen - 2)) {
-        oBufferLoadValid := False
-      }.otherwise {
-        oBufferLoadValid := delayedDataInValidForOut
-      }
-    }.otherwise {
-      when(fbLoadCounter.willOverflow) {
-        oBufferLoadValid := ~fbLoadCounter.willOverflow
-      }.otherwise {
-        oBufferLoadValid := delayedDataInValidForOut
-      }
-    }
-  } .otherwise {
-    when(~resValidCounter.willOverflowIfInc) {
-      oBufferLoadValid := delayedDataInValidForOut
-    }
-  }
+  val fbBufferLoadValid = Reg(Bool()) init False
+  fbBufferLoadValid := delayedDataInValidForOut & ~delayedDataInLast
 
   val fbDelayFifo = new StreamOutFifo(output_width)
   fbDelayFifo.setName("AccuDelayInst")
   // when the final iter is ready, push the res into output fifo
-  fbDelayFifo.io.push.valid := oBufferLoadValid
+  fbDelayFifo.io.push.valid := fbBufferLoadValid
   fbDelayFifo.io.push.payload := tcAccu.io.bf24_col_3 @@ tcAccu.io.bf24_col_2 @@ tcAccu.io.bf24_col_1
 
   val fbDelayFifoPayload = Vec(UInt(output_width bits), 3)
@@ -205,10 +185,11 @@ class TensorCoreChainBf12(chain_len: Int, out_buf_delay: Int,
   // fbFifo pop ctrl
   val fbFifoPop, isSecIterStarted = Reg(Bool()) init False
   when (isSecIterStarted) {
-    isSecIterStarted := ~resValidCounter.willOverflow
+    isSecIterStarted := ~delayedDataInLast
   }.otherwise {
     // TODO: here we assume the data in will not break during one iteration
-    isSecIterStarted := inDataIterCounter > 0 & io.dataIn.valid.fall()
+    // TODO: double check the fb fifo pop logic here
+    isSecIterStarted := inputCounter.willOverflow & ~io.dataInLast
   }
   fbFifoPop := Delay(io.dataIn.valid & isSecIterStarted,
     2*(chain_len-1) + 3 - 1 - out_buf_delay, init=False)
@@ -230,14 +211,22 @@ class TensorCoreChainBf12(chain_len: Int, out_buf_delay: Int,
   // cascade input reg at the same time
   tcAccu.io.clr0 := False
 
+  val resWithIdx = Vec(BfpBlockWithIdx(output_width, idx_width, 0, 0), 3)
+  val accuOutVec = Vec(tcAccu.io.bf24_col_1.resize(output_width),
+    tcAccu.io.bf24_col_2.resize(output_width),
+    tcAccu.io.bf24_col_3.resize(output_width))
+  for (bCol <- 0 until 3) {
+      when(loadBufSel) {
+        resWithIdx(bCol).rIdx := rIdxBuffer(1)(bCol)
+        resWithIdx(bCol).blkData := accuOutVec(bCol)
+      }.otherwise {
+        resWithIdx(bCol).rIdx := rIdxBuffer(0)(bCol)
+        resWithIdx(bCol).blkData := accuOutVec(bCol)
+      }
+  }
 
-  val outFifo = new StreamOutFifo(output_width)
-  // when the final iter is ready, push the res into output fifo
-  outFifo.io.push.valid := Mux(io.matAColSubGrpLen === 1,
-    resValid,
-    resValidCounter.willOverflowIfInc & Delay(fbEnable, 4, init=False))
-  outFifo.io.push.payload := tcAccu.io.bf24_col_3 @@ tcAccu.io.bf24_col_2 @@ tcAccu.io.bf24_col_1
-  io.res << outFifo.io.pop.translateWith(outFifo.io.pop.payload.subdivideIn(output_width bits))
+  io.res.payload := resWithIdx
+  io.res.valid := delayedDataInValidForOut
 }
 
 object TensorCoreChainBf12Gen {
@@ -248,6 +237,7 @@ object TensorCoreChainBf12Gen {
         chain_len=12,
         out_buf_delay=4,
         out_fifo_depth=32,
-        output_width=24)).printPruned()
+        output_width=24,
+        idx_width=9)).printPruned()
   }
 }

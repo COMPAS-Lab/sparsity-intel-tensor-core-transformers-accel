@@ -9,6 +9,7 @@ case class GeneralBarrelShifter[T <: Data](dataType: HardType[T], num_input_cell
     val dataIn = Vec(slave Flow (dataType), num_input_cells)
     val dataOut = Vec(master Flow (dataType), num_input_cells)
     val shiftCtrl = slave Flow(UInt(log2Up(num_input_cells) bits))
+    val shiftEn = in Bool()
   }
 
   assert(num_input_cells % 2 == 0)
@@ -18,16 +19,20 @@ case class GeneralBarrelShifter[T <: Data](dataType: HardType[T], num_input_cell
 
   for (s <- 1 until numStages + 1; i <- 0 until num_input_cells) {
     shiftRegs(s)(i).init(Flow(dataType).getZero)
-    when(shiftCtrlReg(s-1)(s-1)) {
-      val stageRotAmt: Int = if(s < numStages) pow(2, s-1).intValue() else num_input_cells / 2
-      shiftRegs(s)(i) << shiftRegs(s - 1)((i + stageRotAmt) % num_input_cells)
-    }.otherwise {
-      shiftRegs(s)(i) << shiftRegs(s - 1)(i)
+    when(io.shiftEn) {
+      when(shiftCtrlReg(s - 1)(s - 1)) {
+        val stageRotAmt: Int = if (s < numStages) pow(2, s - 1).intValue() else num_input_cells / 2
+        shiftRegs(s)(i) << shiftRegs(s - 1)((i + stageRotAmt) % num_input_cells)
+      }.otherwise {
+        shiftRegs(s)(i) << shiftRegs(s - 1)(i)
+      }
     }
   }
   for ( i <- 0 until num_input_cells) {
-    shiftRegs(0)(i).init(Flow(dataType).getZero)
-    shiftRegs(0)(i) << io.dataIn(i)
+    when(io.shiftEn) {
+      shiftRegs(0)(i).init(Flow(dataType).getZero)
+      shiftRegs(0)(i) << io.dataIn(i)
+    }
     io.dataOut(i) << shiftRegs(numStages)(i)
   }
 

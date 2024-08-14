@@ -30,6 +30,7 @@ class StreamOutAsymFifo(input_width: Int, output_width: Int) extends Component {
     val pop = master Stream(UInt(output_width bits))
   }
 
+  assert(input_width % output_width == 0)
   val core = new out_asym_fifo(input_width, output_width, depth=64)
 
   core.setName("AsymFifoCore")

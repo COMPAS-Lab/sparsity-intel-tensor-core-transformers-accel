@@ -8,31 +8,6 @@ import intel_ips._
 import util._
 import scala.math.{min, pow}
 
-case class TensorCoreChainArrayConfigPorts() extends Bundle {
-  // matAColSubGrpLen: iterations to load the matrix A columns (or 3-row sub-blocks)
-  // matAColSubGrpLen = matACols / (chain len x 10)
-  val matAColSubGrpLen = UInt (16 bits)
-  // matBColsPerTccRow: number of iterations to take matB sub columns
-  //   it is the number of B columns computed by a tensor core chain row.
-  //   matBColsPerTccRow = matBCols / array_row
-  //   it equals to the chain_loading_latency when the Dot Product
-  //   hides the matA loading latency just fine.
-  // TODO: may make this a static parameter
-  val matBColsPerTccRow = UInt (16 bits)
-  // Tensor Core Chain row buffer counter boundary:
-  //   calculated as Ceil(matBCols / array_row) * Ceil(matACols / (chain_len * 10.0))
-  val tccRowBufferCnterRange = UInt (16 bits)
-  // Tensor Core Chain col buffer counter boundary:
-  //   each mat A blk has the size of 3 x matACols:
-  //   matABlksInColBuf = ((matARows / 3.0).ceil / array_col).ceil.toInt
-  //   the number of iters to read each blk of mat A
-  //   matABlkCols = (matACols / 10.0).ceil.toInt
-  //   total number of counter to read mat A:
-  //   tccColBufferCnterRange = matABlksInColBuf * matABlkCols * 3
-  val tccColBufferCnterRange = UInt (16 bits)
-  val tccRowBufferId = UInt(log2Up(128) bits)
-}
-
 case class BfpBlockWithIdx(dwidth: Int,
                       ridx_width: Int,
                       cidx_width: Int,
@@ -71,26 +46,32 @@ class ColBlkGapRemover(num_ports: Int,
                     bitwidth: Int,
                     dest_width: Int,
                     tcchain_id: Int) extends Component {
+  // gap remover translates the destination to the valid signal of the flow
   val io = new Bundle {
     val inputSeq = in Vec(BfpBlockWithIdx(bitwidth, 0, 0, dest_width), num_ports)
     val outputSeq = Vec(master Flow(BfpBlockWithIdx(bitwidth, 0, 0, 0)), num_ports)
+    val en = in Bool()
   }
   assert(num_ports >= 4)
 
-  private def rmRedundancy(ports: Vec[Flow[BfpBlockWithIdx]], stg: Int): Vec[Flow[BfpBlockWithIdx]] = {
+  private def rmRedundancy(ports: Vec[Flow[BfpBlockWithIdx]],
+                           stg: Int,
+                           shiftEn: Bool): Vec[Flow[BfpBlockWithIdx]] = {
     val resPorts = Vec(RegFlow(BfpBlockWithIdx(bitwidth, 0, 0, 0)), ports.size)
     if (ports.size == 2) {
-      switch(ports(0).valid ## ports(1).valid) {
-        is (B"2'b00", B"2'b11", B"2'b10") {
-          resPorts := ports
-        }
-        is (B"2'b01") {
-          resPorts := Vec(ports(1), ports(0))
+      when(shiftEn) {
+        switch(ports(0).valid ## ports(1).valid) {
+          is(B"2'b00", B"2'b11", B"2'b10") {
+            resPorts := ports
+          }
+          is(B"2'b01") {
+            resPorts := Vec(ports(1), ports(0))
+          }
         }
       }
     } else {
-      val halfMoverLower = rmRedundancy(Vec(for(i <- 0 until ports.size / 2) yield ports(i)), stg - 1)
-      val halfMoverUpper = rmRedundancy(Vec(for(i <- ports.size/2 until ports.size) yield ports(i)), stg-1)
+      val halfMoverLower = rmRedundancy(Vec(for(i <- 0 until ports.size / 2) yield ports(i)), stg - 1, shiftEn)
+      val halfMoverUpper = rmRedundancy(Vec(for(i <- ports.size/2 until ports.size) yield ports(i)), stg-1, shiftEn)
 
       // selection candidates
       val srcPorts = Vec(Flow(BfpBlockWithIdx(bitwidth, 0, 0, 0)), ports.size)
@@ -103,20 +84,22 @@ class ColBlkGapRemover(num_ports: Int,
 
       val moveSel = ~Vec(for (l <- halfMoverLower) yield l.valid).asBits
       for (outPortIdx <- resPorts.indices) {
-        val moveSelBuilder = WhenBuilder()
-        for (nCand <- 0 to min(outPortIdx, ports.size/2)) {
-          val selEntry = (~B(0, ports.size/2 bits) << U(nCand))(ports.size/2-1 downto 0)
-          moveSelBuilder.when(moveSel === selEntry) {
-            resPorts(outPortIdx) := srcPorts(outPortIdx - nCand)
+        when(shiftEn) {
+          val moveSelBuilder = WhenBuilder()
+          for (nCand <- 0 to min(outPortIdx, ports.size / 2)) {
+            val selEntry = (~B(0, ports.size / 2 bits) << U(nCand))(ports.size / 2 - 1 downto 0)
+            moveSelBuilder.when(moveSel === selEntry) {
+              resPorts(outPortIdx) := srcPorts(outPortIdx - nCand)
+            }
           }
-        }
-        if (outPortIdx < ports.size/2) {
-          moveSelBuilder.when(moveSel(outPortIdx downto 0) === B(0)) {
-            resPorts(outPortIdx) := halfMoverLower(outPortIdx)
+          if (outPortIdx < ports.size / 2) {
+            moveSelBuilder.when(moveSel(outPortIdx downto 0) === B(0)) {
+              resPorts(outPortIdx) := halfMoverLower(outPortIdx)
+            }
           }
-        }
-        moveSelBuilder.otherwise {
-          resPorts(outPortIdx) << Flow(BfpBlockWithIdx(bitwidth, 0, 0, 0)).setIdle()
+          moveSelBuilder.otherwise {
+            resPorts(outPortIdx) << Flow(BfpBlockWithIdx(bitwidth, 0, 0, 0)).setIdle()
+          }
         }
       }
     }
@@ -135,7 +118,7 @@ class ColBlkGapRemover(num_ports: Int,
     }
   }
 
-  val outFlows = rmRedundancy(inputFlows, log2Up(actual_insize))
+  val outFlows = rmRedundancy(inputFlows, log2Up(actual_insize), io.en)
   for (i <- 0 until num_ports) {
     io.outputSeq(i) << outFlows(i)
   }
@@ -145,62 +128,126 @@ class TensorCoreChainArray(array_col: Int, array_row: Int, chain_len: Int, idx_w
                            col_buffer_depth: Int, row_buffer_depth: Int,
                            out_buf_delay: Int, //should be (matBCols / array_row).ceil.toInt - 3
                            output_fifo_depth: Int, output_width: Int,
-                           idx_placeholder: BigInt, inout_pipe_delay: Int = 5) extends Component {
+                           idx_placeholder: BigInt, inout_pipe_delay: Int = 5,
+                           num_matb_cols: Int = 128) extends Component {
   val io = new Bundle {
     val matALoad = Vec(slave Stream (BfpBlockWithIdx(88, idx_width, 0, 0)), array_col)
     val matBLoad = Vec(slave Stream(UInt(88 bits)), array_row)
     val sortedColIdx = slave Stream(IndexData(idx_width, array_col))
-    val calEn = in Bool()
-    val res = Vec(master Stream (UInt(output_width * 3 bits)), array_row)
+    // colIdxFifoNotEmpty is asserted when colIdxFifo has at least
+    // half of the loading
+    val calEn, colIdxFifoNotEmpty  = in Bool()
+    val res = Vec(master Stream (UInt((output_width + idx_width) * 3 bits)), array_row)
     // config ports
-    val configPorts =  in (TensorCoreChainArrayConfigPorts())
+    val tccRowBufferId = in UInt(log2Up(num_matb_cols) bits)
   }
   //parameters
-  val idxdata_idx_width = io.sortedColIdx.payload.idxData.getWidth
-  val idxdata_dest_width = io.sortedColIdx.payload.destId.getWidth
-  val NUM_MATB_VEC_PER_ROW = 128 / array_row
+  val IDXDATA_IDX_WIDTH: Int = io.sortedColIdx.payload.idxData.getWidth
+  val IDXDATA_DEST_WIDTH: Int = io.sortedColIdx.payload.destId.getWidth
+  val NUM_MATB_VEC_PER_ROW: Int = num_matb_cols / array_row
+  // TODO: fix parameters here
+  val MAT_B_FETCH_II = chain_len + 1
 
   //adding pipes to the ctrl signals
-  val calEnDelay = Delay(io.calEn, 6)
-  val configDelay = Delay(io.configPorts, 6)
-
-  val rowBufferRdCounter = Array.fill(array_row){
-    DynaCounter(16, configDelay.tccRowBufferCnterRange + (chain_len-1) * 2)
-  }
-  val colBufferRdCounter = Array.fill(array_col){
-    DynaCounter(16, configDelay.tccColBufferCnterRange)
-  }
-
-  val tensorLoadValid = Reg(Bits(array_col bits)) init 0
-  val tensorDataValid = Reg(Bits(array_row bits)) init 0
+  val calEnDelay = Delay(io.calEn, 3)
+  val colIdxFifoNotEmptyDelay = Delay(io.colIdxFifoNotEmpty, 3)
 
   val tensorArray = Array.ofDim[TensorCoreChainBf12](array_row, array_col)
   for (r <- 0 until array_row; c <- 0 until array_col) {
     // out buf delay = number of B columns in each tensor core chain row - 3
     tensorArray(r)(c) = new TensorCoreChainBf12(chain_len, out_buf_delay = out_buf_delay,
-                                              out_fifo_depth = output_fifo_depth, output_width = output_width)
+                                              out_fifo_depth = output_fifo_depth, output_width = output_width,
+                                              idx_width = idx_width)
     tensorArray(r)(c).setName("u_tc_core_r_" + r + "_c_" + c)
   }
 
+  //signals between datapath and ctrl logic
+  // start signal for mat a loading
+  val cascadeLoadStart = Bool()
+  val cascadeLoadEnLocal = Reg(Bits(array_col bits), init=B(0))
+  //  tensor core chain inner double buffer switch signal
+  val switchArowLoadBuff = Bool()
+  val tccInnerBufSelLoad = Reg(Bits(array_col bits), init=B(0))
+  val tccInnerBuffSelComp = Bits(array_col bits)
+  // used to halt mat b broadcast when waiting for the mat a load
+  val matBLoadPipelineEn = Bool()
+  // reset for the mat b broadcast subvector cell finish flag
+  val clearMatmulCellFinFlags = Bool()
+
   //input buffers
   val bufferArea = new Area {
+    // buffer and ctrl signal def
     val colBuffer = Array.fill(array_col)(StreamFifo(BfpBlockWithIdx(88, idx_width, 0, 0), col_buffer_depth))
     val rowMem = Array.fill(array_row, NUM_MATB_VEC_PER_ROW)(Mem(UInt(88 bits), row_buffer_depth))
-
-    io.sortedColIdx.ready := True
-    //col buffer write and read
-    for (c <- 0 until array_col) {
-      colBuffer(c).io.push << io.matALoad(c)
-      colBuffer(c).io.pop.ready := tensorLoadValid(c)
-    }
+    val colBufferOutReg = Vec(Reg(BfpBlockWithIdx(88, idx_width, 0, 0)), array_col)
+    val isCurrSubgrpALoaded = Reg(Bool(), init=False)
+    val isColBufferEmpty = Vec(for(c <- colBuffer) yield c.io.pop.valid).orR
 
     // row buffer write and read
-    val rowBufferWriteAddr = Counter(row_buffer_depth)
-    val rowBufferBlkOut = Vec(
-      Vec(BfpBlockWithIdx(88, 0, 0, idxdata_dest_width), chain_len), array_row)
+    val rowBufferWriteAddr = Array.fill(array_row)(Counter(row_buffer_depth))
+    val rowBufferBlkOut = Flow(Vec(
+      Vec(BfpBlockWithIdx(88, 0, 0, IDXDATA_DEST_WIDTH), chain_len), array_row))
+
+    val isVecALast = Vec(for(cReg <- colBufferOutReg) yield cReg.rIdx === U(idx_placeholder))
+    val isLastSubVecMultIter = Reg(Bits(array_col bits), init=B(0).resized)
+    val isCurrCasBufLoaded = Bits(array_col bits)
+    val isMatmulCellFinished =
+      Vec(Reg(Bits(chain_len bits), init=B(0).resized), array_col)
+    val isCurrSubvecMatmulFinished = Bits(array_col bits)
+
+    //col cascade loading data and ctrl
+    for (c <- 0 until array_col) {
+      val cascadeLoadCounter = Counter(chain_len+1)
+      //casLoadAmt: 0 -> current 1 -> last
+      val lastCasLoadAmt = Reg(UInt(log2Up(chain_len+1) bits))
+      val aRowBuffLoad3colFactor = Counter(3)
+
+      isCurrSubvecMatmulFinished(c) := CountOne(isMatmulCellFinished(c)) === lastCasLoadAmt
+      isCurrCasBufLoaded(c) :=
+        (~colBuffer(c).io.pop.valid) | isVecALast(c) | (cascadeLoadCounter === U(chain_len))
+
+      when(cascadeLoadEnLocal(c)) {
+        when(isCurrCasBufLoaded(c)) {
+          when(cascadeLoadStart && colBuffer(c).io.pop.valid) {
+            cascadeLoadCounter.clear()
+            lastCasLoadAmt := cascadeLoadCounter
+            isLastSubVecMultIter(c) := isVecALast(c)
+            cascadeLoadEnLocal(c) := True
+          }.otherwise {
+            cascadeLoadEnLocal(c) := False
+          }
+        }.otherwise {
+          aRowBuffLoad3colFactor.increment()
+          when(aRowBuffLoad3colFactor.willOverflow) {
+            cascadeLoadCounter.increment()
+          }
+        }
+      }.otherwise {
+        // don't reset/set cascadeLoadCounter/lastCasloadAmt as the
+        // row controller needs to check isCurrCasBufLoaded to know
+        // if safe to start next iter
+        when(cascadeLoadStart && colBuffer(c).io.pop.valid) {
+          cascadeLoadCounter.clear()
+          lastCasLoadAmt := cascadeLoadCounter
+          isLastSubVecMultIter(c) := isVecALast(c)
+          cascadeLoadEnLocal(c) := True
+        }
+      }
+
+      colBufferOutReg(c).init(colBufferOutReg(c).getZero)
+      when(cascadeLoadEnLocal(c)) {
+        colBufferOutReg(c) := colBuffer(c).io.pop.payload
+      }
+      colBuffer(c).io.push << io.matALoad(c)
+      colBuffer(c).io.pop.ready := cascadeLoadEnLocal(c)
+    }
+
+    // row broadcast data and ctrl
+    rowBufferBlkOut.valid := Delay(matBLoadPipelineEn, MAT_B_FETCH_II)
     for (r <- 0 until array_row) {
       val rowBuffParaRd = Vec(UInt(88 bits), NUM_MATB_VEC_PER_ROW)
-      val rowBuffWrCtrl = Reg(Bits(chain_len bits), init=B(0))
+      val rowBuffWrCtrl =
+        Reg(Bits(chain_len bits), init=B(chain_len bits, 0 -> true, default -> false))
       val rowBuffParaOut = Vec(UInt(88 bits), chain_len)
       val rowTransBuffRdAddr = Reg(UInt(log2Up(NUM_MATB_VEC_PER_ROW * 2) bits), init=U(0))
       val transposeBuffer = Array.fill(chain_len)(
@@ -210,34 +257,36 @@ class TensorCoreChainArray(array_col: Int, array_row: Int, chain_len: Int, idx_w
           num_out_words = 1,
           wr_depth = 2)
       )
-      io.matBLoad(r).ready := True
 
       val transposeBufferWrAddr = Reg(UInt(1 bits), init=U(0))
-
+      // global write buffer signal
+      when(io.matBLoad(r).fire) {
+        rowBufferWriteAddr(r).increment()
+      }
       for (vecId <- 0 until NUM_MATB_VEC_PER_ROW) {
         // row buffer write logic
         rowMem(r)(vecId).write(
-          address = rowBufferWriteAddr,
-          enable = io.configPorts.tccRowBufferId === (r * NUM_MATB_VEC_PER_ROW + vecId),
+          address = rowBufferWriteAddr(r),
+          enable = io.tccRowBufferId === (r * NUM_MATB_VEC_PER_ROW + vecId),
           data = io.matBLoad(r).payload
         )
 
         // row buffer read logic
         rowBuffParaRd(vecId) := rowMem(r)(vecId).readSync(
           address = io.sortedColIdx.payload.idxData,
-          enable = io.sortedColIdx.fire
+          enable = matBLoadPipelineEn
         )
       }
 
-      when(io.sortedColIdx.fire) {
+      when(matBLoadPipelineEn) {
         rowBuffWrCtrl := rowBuffWrCtrl.rotateLeft(1)
         transposeBufferWrAddr := ~transposeBufferWrAddr
-        rowTransBuffRdAddr := (rowTransBuffRdAddr + 1)(rowTransBuffRdAddr.getWidth-1 downto 0)
+        rowTransBuffRdAddr := (rowTransBuffRdAddr + 1).resized
       }
 
       for (transBufId <- transposeBuffer.indices) {
         transposeBuffer(transBufId).io.dataIn := rowBuffParaRd
-        transposeBuffer(transBufId).io.wrEn := rowBuffWrCtrl(transBufId)
+        transposeBuffer(transBufId).io.wrEn := Mux(matBLoadPipelineEn, rowBuffWrCtrl(transBufId), False)
         transposeBuffer(transBufId).io.wrAddr := transposeBufferWrAddr
         rowBuffParaOut(transBufId) := transposeBuffer(transBufId).io.dataOut.as(UInt(88 bits))
         transposeBuffer(transBufId).io.rdAddr := rowTransBuffRdAddr
@@ -246,17 +295,20 @@ class TensorCoreChainArray(array_col: Int, array_row: Int, chain_len: Int, idx_w
       // buffer read path
       val bufferedIdx = History(
          io.sortedColIdx.payload,
-         length = chain_len + 1,
-         when = io.sortedColIdx.fire,
-         init = IndexData(idxdata_idx_width, idxdata_dest_width, idx_placeholder)
-       )
+         length = MAT_B_FETCH_II,
+         when = matBLoadPipelineEn,
+         init = IndexData(IDXDATA_IDX_WIDTH, IDXDATA_DEST_WIDTH, idx_placeholder)
+      )
       for (clenId <- 0 until chain_len) {
-        rowBufferBlkOut(r)(clenId).blkData := transposeBuffer(clenId).io.dataOut.as(UInt(88 bits))
-        rowBufferBlkOut(r)(clenId).destId := bufferedIdx(clenId).destId
+        rowBufferBlkOut.payload(r)(clenId).blkData := transposeBuffer(clenId).io.dataOut.as(UInt(88 bits))
+        rowBufferBlkOut.payload(r)(clenId).destId := bufferedIdx(clenId).destId
       }
     }
   }
 
+  //TODO: fix skipper and rotator delay here
+  val skipShuffDelay = 2 * log2Up(chain_len)
+  val tcchainDatInValid = Delay(bufferArea.rowBufferBlkOut.valid, skipShuffDelay, init=False)
   // data connection from row/col buffer to the tensor core chains
   for (c <- 0 until array_col) {
     val delayedLoadCascadeIn = DelayTree(
@@ -266,235 +318,265 @@ class TensorCoreChainArray(array_col: Int, array_row: Int, chain_len: Int, idx_w
     val delayedRowIdx = DelayTree(
       bufferArea.colBuffer(c).io.pop.rIdx, log2Up(array_row))
 
+    when(switchArowLoadBuff) {
+      tccInnerBufSelLoad(c) := ~tccInnerBufSelLoad(c)
+    }
+    tccInnerBuffSelComp(c) := ~tccInnerBufSelLoad(c)
+
     for (r <- 0 until array_row) {
       // dummy row data shuffle control logic
       val dataShuffleCtrlBits = RegFlow(UInt(log2Up(chain_len) bits))
       val numAccptBlks = Reg(UInt(log2Up(chain_len) bits), init=U(0))
       val dataShuffler = GeneralBarrelShifter(BfpBlockWithIdx(88, 0, 0, 0), chain_len)
+      val dataShufflerOutReg = Vec(Reg(BfpBlockWithIdx(88, 0, 0, 0)), chain_len)
+      dataShufflerOutReg.foreach(_.init(BfpBlockWithIdx(88, 0, 0, 0).getZero))
 
       val skipper = new ColBlkGapRemover(
         num_ports = chain_len,
         bitwidth = 88,
-        dest_width = idxdata_dest_width,
-        tcchain_id = c)
+        dest_width = IDXDATA_DEST_WIDTH,
+        tcchain_id = c
+      )
+      skipper.io.en := matBLoadPipelineEn
+
+      if(r == 0) {
+        for (cell <- 0 until chain_len) {
+          when(clearMatmulCellFinFlags & bufferArea.isCurrSubvecMatmulFinished(c)) {
+            bufferArea.isMatmulCellFinished(c)(cell) := False
+          }.elsewhen(dataShuffler.io.dataOut(cell).valid) {
+            bufferArea.isMatmulCellFinished(c)(cell) := True
+          }
+        }
+      }
 
       dataShuffler.io.shiftCtrl << dataShuffleCtrlBits
+      dataShuffler.io.shiftEn := matBLoadPipelineEn
+      // TODO: this is a unused valid signal inside tcc,
+      //  not sure how to use this
+      tensorArray(r)(c).io.dataIn.valid := True
       for (tcId <- 0 until chain_len) {
         // datapath from row buffer out to skipper:
-        skipper.io.inputSeq(tcId) <> bufferArea.rowBufferBlkOut(r)(tcId)
+        skipper.io.inputSeq(tcId) <> bufferArea.rowBufferBlkOut.payload(r)(tcId)
 
         // TODO: check timing of the delayed row address
         dataShuffler.io.dataIn(tcId) << skipper.io.outputSeq(tcId)
+        when(dataShuffler.io.dataOut(tcId).valid & matBLoadPipelineEn) {
+          dataShufflerOutReg(tcId) := dataShuffler.io.dataOut(tcId).payload
+        } otherwise {
+          dataShufflerOutReg(tcId).clearAll()
+        }
 
-        tensorArray(r)(c).io.dataIn.payload(tcId) := dataShuffler.io.dataOut(tcId).payload.blkData(87 downto 8)
-        tensorArray(r)(c).io.expIn(tcId) := dataShuffler.io.dataOut(tcId).payload.blkData(7 downto 0)
+        tensorArray(r)(c).io.dataIn.payload(tcId) := dataShufflerOutReg(tcId).blkData(87 downto 8)
+        tensorArray(r)(c).io.expIn(tcId) := dataShufflerOutReg(tcId).blkData(7 downto 0)
       }
 
-      numAccptBlks := (numAccptBlks + CountOne(Vec(for (elem <- skipper.io.outputSeq) yield elem.valid)))(log2Up(chain_len)-1 downto 0)
+      // reconstruct load cascade input
+      val delayedCasInWithIdx = BfpBlockWithIdx(80, idx_width, 0, 0)
+      delayedCasInWithIdx.fromUInt((delayedRowIdx(r) ## delayedLoadCascadeIn(r)).asUInt)
+      numAccptBlks := (numAccptBlks + CountOne(Vec(for (elem <- skipper.io.outputSeq) yield elem.valid))).resized
       dataShuffleCtrlBits.valid := skipper.io.outputSeq(0).valid
       dataShuffleCtrlBits.payload := numAccptBlks
-      tensorArray(r)(c).io.loadCascadeIn.payload := delayedLoadCascadeIn(r)
+      tensorArray(r)(c).io.loadCascadeIn.payload := delayedCasInWithIdx
       tensorArray(r)(c).io.expCascadeIn := delayedExpCascadeIn(r)
-      tensorArray(r)(c).io.loadCascadeIn.valid := Delay(tensorLoadValid(c), 1 + 2 + inout_pipe_delay)
-      tensorArray(r)(c).io.dataIn.valid := Delay(tensorDataValid(r), 1 + 2 + inout_pipe_delay)
+      tensorArray(r)(c).io.loadCascadeIn.valid := Delay(cascadeLoadEnLocal(c), 1 + 2 + inout_pipe_delay)
       // tensor core input iters: number of iterations to take matB sub columns
       //   it is the number of B columns for a tensor core chain row.
       //   it equals to the chain_loading_latency when the Dot Product
       //   hides the matA loading latency just fine.
       tensorArray(r)(c).io.matABroadcastIters := U(NUM_MATB_VEC_PER_ROW, 16 bits)
-      tensorArray(r)(c).io.matAColSubGrpLen := configDelay.matAColSubGrpLen
+      tensorArray(r)(c).io.doubleBufferLoadSel := (tccInnerBufSelLoad(c) ## (~tccInnerBufSelLoad(c))).asBits
+      tensorArray(r)(c).io.doubleBufferCompSel := tccInnerBuffSelComp(c)
     }
   }
 
   // compute control path
   //row buffer ctrl
-  for (r <- 0 until array_row) {
-    val rowCtrlFsm = new StateMachine {
-      val loadRdy, dataInIterReady, resOutValid = Bool()
-      loadRdy := tensorArray(r)(0).io.loadReady
-      dataInIterReady := tensorArray(r)(0).io.dataIterReady
-      resOutValid := tensorArray(r)(0).io.outValid
-      val dataInFinish = Reg(Bool()) init False
-      val computeIterCounter =
-        DynaCounter(configDelay.matAColSubGrpLen.getWidth, configDelay.matAColSubGrpLen-1)
-      val resValidCounter =
-        DynaCounter(configDelay.matAColSubGrpLen.getWidth, configDelay.matAColSubGrpLen-1)
+  val rowCtrlFsm = new StateMachine {
+    val matBFetchCounter = Counter(chain_len)
+    val matBDataFeedCounter = Counter(NUM_MATB_VEC_PER_ROW)
+//    val tcchainDelayCounter = Counter(2*(chain_len-1)+4+3-1-1)
+    // default
+    io.matBLoad.foreach(_.ready := False)
+    io.sortedColIdx.ready := False
+    matBLoadPipelineEn := False
+    clearMatmulCellFinFlags := False
 
-      loadRdy.setName("row_loadRdy_" + r)
-      dataInIterReady.setName("row_dataInIterReady_" + r)
-      resOutValid.setName("row_resOutValid_" + r)
-      computeIterCounter.setName("row_computeIterCounter_" + r)
-      resValidCounter.setName("row_resValidCounter_" + r)
+    val sIdle: State = new State with EntryPoint {
+      whenIsActive {
+        matBFetchCounter.clear()
+        matBDataFeedCounter.clear()
+        matBLoadPipelineEn := False
+        io.matBLoad.foreach(_.ready := True)
+        io.sortedColIdx.ready := False
+        when(bufferArea.isCurrSubgrpALoaded) {goto(sPreload)}
+      }
+    }
 
-      val sIdle: State = new State with EntryPoint {
-        whenIsActive {
-          rowBufferRdCounter(r).clear()
-          computeIterCounter.clear()
-          resValidCounter.clear()
-          tensorDataValid(r) := False
-          dataInFinish := False
-          when(calEnDelay) {
-            goto(sPreLoad)
+    val sPreload: State = new State {
+      whenIsActive {
+        io.sortedColIdx.ready := True
+        matBLoadPipelineEn := True
+        when(io.sortedColIdx.fire) {matBFetchCounter.increment()}
+        when(matBFetchCounter.willOverflow) {
+          goto(sCompute)
+        }
+      }
+    }
+
+    val sCompute: State = new State {
+      whenIsActive {
+        matBLoadPipelineEn := True
+        matBDataFeedCounter.increment()
+        io.sortedColIdx.ready := True
+        when(bufferArea.rowBufferBlkOut.valid) {matBFetchCounter.increment()}
+        // check data validity every mat B broadcast iteration
+        when(matBDataFeedCounter.willOverflow) {
+          matBDataFeedCounter.clear()
+          // if curr compute iter has finished tc chain
+          when(bufferArea.isCurrSubvecMatmulFinished.orR) {
+            // if there is still mat b to broadcast
+            clearMatmulCellFinFlags := True
+            when(tcchainDatInValid) {
+              // if compute cannot be covered by next grps of mat a load
+              // hold to wait for next mat A load grp
+              when(~bufferArea.isCurrSubgrpALoaded) {
+                goto(sWaitALoad)
+                io.sortedColIdx.ready := False
+                matBLoadPipelineEn := False
+              }
+            }.otherwise{
+              goto(sCompFin)
+            }
           }
         }
       }
+    }
 
-      val sPreLoad: State = new State {
-        whenIsActive {
-          when(loadRdy) {
-            goto(sCompute)
-          }
-        }
+    val sWaitALoad: State = new State {
+      whenIsActive {
+        io.sortedColIdx.ready := False
+        matBLoadPipelineEn := False
+        when(bufferArea.isCurrSubgrpALoaded) {goto(sCompute)}
       }
+    }
 
-      val sCompute: State = new State {
-        onEntry {
-          tensorDataValid(r) := True
-          rowBufferRdCounter(r).increment()
-        }
-        whenIsActive {
-          when(dataInFinish === False) {
-            rowBufferRdCounter(r).increment()
-          } otherwise {
-            rowBufferRdCounter(r).clear()
-            tensorDataValid(r) := False
-          }
-          when(rowBufferRdCounter(r).willOverflow) {
-            dataInFinish := True
-          }
-          when(dataInIterReady)(computeIterCounter.increment())
-          when(Delay(computeIterCounter.willOverflow, 1)) {
-            goto(sWriteRes)
-          }
-        }
+    val sCompFin: State = new State {
+      whenIsActive{
+         // keep sending mat B data until the last subgroup
+         // finishes
+         io.sortedColIdx.ready := False
+         matBDataFeedCounter.increment()
+         matBLoadPipelineEn := ~matBDataFeedCounter.willOverflow
+         when(matBDataFeedCounter.willOverflow){
+           goto(sIdle)
+         }
       }
+    }
+  }
 
-      val sWriteRes: State = new State {
-        whenIsActive {
-          when(resOutValid)(resValidCounter.increment())
-          when(Delay(resValidCounter.willOverflow, 1)) {
+  //col buffer ctrl
+  val colCtrlFsm = new StateMachine {
+    val currSubGrpALoadFin = Bool()
+
+    currSubGrpALoadFin := False
+    cascadeLoadStart := False
+    switchArowLoadBuff := False
+
+    val sIdle: State = new State with EntryPoint {
+      whenIsActive {
+        bufferArea.isCurrSubgrpALoaded := False
+        when(calEnDelay && colIdxFifoNotEmptyDelay) {goto(sWaitIdx)}
+      }
+    }
+
+    val sWaitIdx: State = new State {
+      //load first mat A row from col mem here
+      whenIsActive {
+        cascadeLoadStart := True
+        when(bufferArea.isVecALast.andR) {
+          bufferArea.isCurrSubgrpALoaded := True
+          when(io.sortedColIdx.valid) {
+            switchArowLoadBuff := True
+            goto(sLoadAVec)
+          } .otherwise {
             goto(sIdle)
           }
+          currSubGrpALoadFin := True
+        }
+      }
+    }
+
+    val sLoadAVec: State = new State {
+      onEntry {
+        bufferArea.isCurrSubgrpALoaded := False
+        switchArowLoadBuff := False
+      }
+      whenIsActive {
+        cascadeLoadStart := True
+        bufferArea.isCurrSubgrpALoaded := False
+        // check if finishing one mat A subvector load
+        when(bufferArea.isCurrCasBufLoaded.andR) {
+          bufferArea.isCurrSubgrpALoaded := True
+          switchArowLoadBuff := True
+          // check if need to wait computation
+          when(bufferArea.isCurrSubvecMatmulFinished.orR) {
+            // check if need to send more mat a rows
+            when(bufferArea.isColBufferEmpty) {
+              cascadeLoadStart := False
+              goto(sIdle)
+            }
+          }.otherwise {
+            cascadeLoadStart := False
+            goto(sWaitComplete)
+          }
+        }
+      }
+    }
+
+    val sWaitComplete: State = new State {
+      whenIsActive {
+        when(bufferArea.isCurrSubvecMatmulFinished.orR) {
+          // check if need to send more mat A rows
+          when(bufferArea.isColBufferEmpty) {
+            cascadeLoadStart := False
+            goto(sIdle)
+          }
+        }.otherwise {
+          goto(sLoadAVec)
         }
       }
     }
   }
-  //col buffer ctrl
-  for (c <- 0 until array_col) {
-    val colCtrlFsm = new StateMachine {
-      val loadRdy, dataInIterReady, resOutValid = Bool()
-      loadRdy := tensorArray(0)(c).io.loadReady
-      dataInIterReady := tensorArray(0)(c).io.dataIterReady
-      resOutValid := tensorArray(0)(c).io.outValid
-      val loadFinish = Reg(Bool()) init False
 
-      val loadIterCounter, computeIterCounter = {
-        DynaCounter(configDelay.matAColSubGrpLen.getWidth, configDelay.matAColSubGrpLen-1)
-      }
-      val resValidCounter =
-        DynaCounter(configDelay.matAColSubGrpLen.getWidth, configDelay.matAColSubGrpLen-1)
-
-      loadRdy.setName("col_loadRdy_" + c)
-      dataInIterReady.setName("col_dataInIterReady_" + c)
-      resOutValid.setName("col_resOutValid_" + c)
-      computeIterCounter.setName("col_computeIterCounter_" + c)
-      loadIterCounter.setName("col_loadIterCounter_" + c)
-      resValidCounter.setName("col_resValidCounter_" + c)
-
-      val sIdle: State = new State with EntryPoint {
-        whenIsActive {
-          colBufferRdCounter(c).clear()
-          computeIterCounter.clear()
-          resValidCounter.clear()
-          tensorLoadValid(c) := False
-          loadFinish := False
-          when(calEnDelay) {
-            goto(sPreLoad)
-          }
-        }
-      }
-
-      val sPreLoad: State = new State {
-        onEntry {
-          colBufferRdCounter(c).increment()
-          tensorLoadValid(c) := True
-          loadIterCounter.clear()
-        }
-        whenIsActive {
-          colBufferRdCounter(c).increment()
-          when(loadRdy) {
-            loadIterCounter.increment()
-            goto(sCompute)
-          }
-        }
-      }
-
-      val sCompute: State = new State {
-        whenIsActive {
-          when(loadFinish === False) {
-            colBufferRdCounter(c).increment()
-          } otherwise {
-            colBufferRdCounter(c).clear()
-            tensorLoadValid(c) := False
-          }
-          when(colBufferRdCounter(c).willOverflow) {
-            loadFinish := True
-          }
-
-          when(resOutValid)(resValidCounter.increment())
-          when(loadRdy)(loadIterCounter.increment())
-          when(dataInIterReady)(computeIterCounter.increment())
-          when(Delay(computeIterCounter.willOverflow, 1)) {
-            goto(sWriteRes)
-          }
-        }
-      }
-
-      val sWriteRes: State = new State {
-        whenIsActive {
-          when(resOutValid)(resValidCounter.increment())
-          when(Delay(resValidCounter.willOverflow, 1)) {
-            goto(sIdle)
-          }
-        }
-      }
+  //output control
+  val isLastOutGrp = Reg(Bool(), init=False)
+  val outBufferWrCounter = Counter(NUM_MATB_VEC_PER_ROW)
+  val outBufferWr = Delay(isLastOutGrp, 2*(chain_len-1)+4+3-1-1, init=False)
+  when(isLastOutGrp) {
+    outBufferWrCounter.increment()
+    when(outBufferWrCounter.willOverflow) {
+      isLastOutGrp :=
+        bufferArea.isCurrSubvecMatmulFinished.andR & bufferArea.isLastSubVecMultIter.andR
     }
+  }.otherwise {
+    isLastOutGrp :=
+      bufferArea.isCurrSubvecMatmulFinished.andR & bufferArea.isLastSubVecMultIter.andR
   }
 
   //output buffer path
   val outputBufferSelOut =
-    Vec(Vec(Flow(UInt(output_width * 3 bits)), array_col), array_row)
+    Vec(Vec(Flow(UInt((output_width + idx_width) * 3 bits)), array_col), array_row)
 
   for (r <- 0 until array_row; c <- 0 until array_col) {
-    val tcChainId = r * array_col + c
+    tensorArray(r)(c).io.dataInLast := isLastOutGrp
     outputBufferSelOut(r)(c).payload := tensorArray(r)(c).io.res.payload.asBits.asUInt
-    outputBufferSelOut(r)(c).valid := tensorArray(r)(c).io.res.valid
-    tensorArray(r)(c).io.res.ready := True
+    outputBufferSelOut(r)(c).valid := tensorArray(r)(c).io.res.valid & outBufferWr
   }
 
   // TODO: verify function of shift regs
-  // val outShiftRegs = new Array[OutputShiftReg](array_row)
-  // val outResDelayUnblocked = Vec(Flow (UInt(output_width * 3 bits)), array_row)
-  // val outBuffer = new Array[StreamFifo[UInt]](array_row)
-  val outBuffer = new Array[StreamOutAsymFifo](array_row)
+  val outBuffer = Array.fill(array_row)(
+    new StreamOutAsymFifo((output_width+idx_width) * 3 * array_col, (output_width+idx_width) * 3))
   for (regIdx <- 0 until array_row) {
-    // outShiftRegs(regIdx) = new OutputShiftReg(output_width * 3, array_col)
-    
-    // for (col <- 0 until array_col) {
-      //temperarly break the back pressure from output shift register to
-      // check timing
-      // outShiftRegs(regIdx).io.resIn(col) << Delay(outputBufferSelOut(regIdx)(col), 4)
-      // outShiftRegs(regIdx).io.resIn(col).valid := Delay(outputBufferSelOut(regIdx)(col).valid, 4)
-      // outShiftRegs(regIdx).io.resIn(col).payload := Delay(outputBufferSelOut(regIdx)(col).payload, 4)
-    // }
-
-    // outResDelayUnblocked(regIdx) << outShiftRegs(regIdx).io.popOut
-    // outBuffer(regIdx) = StreamFifo(UInt(outResDelayUnblocked(regIdx).payload.getWidth bits), 64)
-    // outBuffer(regIdx).io.push.payload := Delay(outResDelayUnblocked(regIdx).payload, 4,
-    //   init=outResDelayUnblocked(regIdx).payload.getZero)
-    // outBuffer(regIdx).io.push.valid := Delay(outResDelayUnblocked(regIdx).valid, 4, init=False)
-
-    outBuffer(regIdx) = new StreamOutAsymFifo(output_width * 3 * array_col, output_width * 3)
     outBuffer(regIdx).io.push.valid := Delay(outputBufferSelOut(regIdx)(0).valid, inout_pipe_delay)
     outBuffer(regIdx).io.push.payload := 
       Delay(

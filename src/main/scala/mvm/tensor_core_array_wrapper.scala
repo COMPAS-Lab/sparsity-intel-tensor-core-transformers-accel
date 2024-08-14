@@ -5,8 +5,6 @@ import spinal.lib._
 import spinal.lib.fsm._
 import config._
 import intel_ips._
-import spinal.core.fiber.Handle
-import util._
 
 case class MultiPortStream(dWidth: Int, addrWidth: Int, hasAlmostFull: Boolean, hasAlmostEmpty: Boolean) extends Bundle with IMasterSlave {
   val start, select = Bool()
@@ -211,16 +209,11 @@ class tensor_core_array_wrapper(array_col: Int, array_row: Int, chain_len: Int,
 
   tcArray.io.matALoad <> data2TcarrayCol
   tcArray.io.matBLoad <> data2TcarrayRow
-  tcArray.io.sortedColIdx.valid := False
-  tcArray.io.sortedColIdx.payload <> tcArray.io.sortedColIdx.payload.getZero
-  tcArray.io.configPorts.tccColBufferCnterRange := U(
-    (mat_a_row / array_col) * (mat_a_col / 20), 16 bits)
-  tcArray.io.configPorts.tccRowBufferCnterRange := U(
-    (mat_b_col / array_row) * (mat_a_col / (chain_len * 20)), 16 bits)
-  tcArray.io.configPorts.matBColsPerTccRow := U((mat_b_col / array_row), 16 bits)
-  tcArray.io.configPorts.matAColSubGrpLen := U(mat_a_col / (chain_len * 20), 16 bits)
-  tcArray.io.configPorts.tccRowBufferId := rowIdCount
+  tcArray.io.sortedColIdx.valid := io.start(1)
+  tcArray.io.sortedColIdx.payload <> IndexData(io.in_buffer_id.resize(9), io.in_buffer_id.resize(12).asBits)
+  tcArray.io.colIdxFifoNotEmpty := True
   tcArray.io.calEn := io.start(0).rise()
+  tcArray.io.tccRowBufferId := io.in_buffer_id.resized
 
   val rdFsm = new StateMachine {
     val rdWordCounter = Counter(mat_a_col / (chain_len * 3))
@@ -279,7 +272,7 @@ class tensor_core_array_wrapper(array_col: Int, array_row: Int, chain_len: Int,
     val outValid =
       List.tabulate(OUT_GRP_SIZE)(i => tcArray.io.res(g * OUT_GRP_SIZE + i).valid).reduce((a, b) => a && b)
     val outPop = Reg(Bool()) init False
-    val dataOutStream = Stream(UInt(72 * OUT_GRP_SIZE bits))
+    val dataOutStream = Stream(UInt((24+9) * 3 * OUT_GRP_SIZE bits))
 
     when(outValid.rise() && ~wrInitCount.willOverflowIfInc) {
       wrInitCount.increment()
@@ -288,6 +281,7 @@ class tensor_core_array_wrapper(array_col: Int, array_row: Int, chain_len: Int,
     }
     outPop := wrInitCount.willOverflowIfInc && io.tcarray_out(g).almost_full
     dataOutStream.valid := outValid
+    // combine each group output payloads together in dataOutStream.payload
     dataOutStream.payload :=
       List.tabulate(OUT_GRP_SIZE)(i => tcArray.io.res(g * OUT_GRP_SIZE + i).payload).reduce((a, b) => a @@ b)
     dataOutStream.ready := outPop
@@ -305,6 +299,7 @@ class tensor_core_array_wrapper(array_col: Int, array_row: Int, chain_len: Int,
     elem.addr := io.rd_addr
   }
 
+  // TODO: fix mem usage computation here
   //  generate mem usage report
 //  val col_mem_size = tcArray.colMem.length * 3
 //  val row_mem_size = tcArray.rowMem.length * 3

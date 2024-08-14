@@ -4,7 +4,9 @@ module TensorCoreChainTb;
 
 // Parameters
 localparam CHAIN_LEN = 12;
+// number of dot cols in the tensor core
 localparam NUM_COLS = 3;
+// how many grps of mat A to load
 localparam NUM_ITERS = 8;
 
 localparam NUM_B_COLS = 32;
