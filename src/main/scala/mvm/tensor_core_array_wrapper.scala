@@ -191,12 +191,12 @@ class tensor_core_array_wrapper(array_col: Int, array_row: Int, chain_len: Int,
   for (i <- 0 until array_row) (data2TcarrayRow(i) <> dataInRowShiftRegs.io.dataOut(i))
 
   val tcArray = new TensorCoreChainArray(
-    array_col = 12,
-    array_row = 4,
-    chain_len = 12,
+    array_col = array_col,
+    array_row = array_row,
+    chain_len = chain_len,
     idx_width = 9,
-    col_buffer_depth = 1024,
-    row_buffer_depth = 512,
+    col_buffer_depth = 128,
+    row_buffer_depth = 256,
     out_buf_delay = 4,
     output_fifo_depth = 32,
     output_width = 24,
@@ -265,14 +265,14 @@ class tensor_core_array_wrapper(array_col: Int, array_row: Int, chain_len: Int,
 
   //out logic
   //split output rows into groups of out_grp_size
-  val OUT_GRP_SIZE = 2
+  val OUT_GRP_SIZE = 3
 
   for (g <- 0 until tcArray.io.res.size / OUT_GRP_SIZE) {
     val wrInitCount = Counter(2 bits)
     val outValid =
       List.tabulate(OUT_GRP_SIZE)(i => tcArray.io.res(g * OUT_GRP_SIZE + i).valid).reduce((a, b) => a && b)
     val outPop = Reg(Bool()) init False
-    val dataOutStream = Stream(UInt((24+9) * 3 * OUT_GRP_SIZE bits))
+    val dataOutStream = Stream(UInt((24 + 9) * 3 * OUT_GRP_SIZE bits))
 
     when(outValid.rise() && ~wrInitCount.willOverflowIfInc) {
       wrInitCount.increment()
@@ -310,8 +310,8 @@ class tensor_core_array_wrapper(array_col: Int, array_row: Int, chain_len: Int,
 object tensor_core_array_wrapper_gen extends App {
   val gen = new DefaultConfig
   val array_col = 12
-  val array_row = 4
-  val chain_len = 12
+  val array_row = 6
+  val chain_len = 8
   gen.defaultSpinalConfig.withoutEnumString().generate(new tensor_core_array_wrapper(
     array_col = array_col,
     array_row = array_row,

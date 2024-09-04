@@ -29,8 +29,8 @@ case class GeneralBarrelShifter[T <: Data](dataType: HardType[T], num_input_cell
     }
   }
   for ( i <- 0 until num_input_cells) {
+    shiftRegs(0)(i).init(Flow(dataType).getZero)
     when(io.shiftEn) {
-      shiftRegs(0)(i).init(Flow(dataType).getZero)
       shiftRegs(0)(i) << io.dataIn(i)
     }
     io.dataOut(i) << shiftRegs(numStages)(i)

@@ -5,6 +5,7 @@ import argparse
 import math
 import itertools
 from enum import Enum
+import torch
 
 def float_to_hex(f: float):
 	# Courtesy of https://stackoverflow.com/a/23624284
@@ -66,30 +67,53 @@ class BFP():
         else:
             return -1
 
-    def to_bfp(self, blk_list: list) -> list:
+    def to_bfp(self, blk_list: list, idx: tuple = None) -> list:
+        '''
+        expect tensor size - data: (nblks, c, 20) idx: (nblks,)
+        return: (nblks, blks_str) as list
+        '''
         res = []
 
-        for hex_l in blk_list:
-            blk_elems = [hex_l[start : start + 8] for start in range(0, self.blk_size() * 8, 8)]
-            exps = [int(hex_to_bin(e, 32)[1:9], 2) for e in blk_elems]
-            mants = [hex_to_bin(e, 32)[9:9+self.mant_bits()+1] for e in blk_elems]
-            signs = [hex_to_bin(e, 32)[0] for e in blk_elems]
-            
-            blk_res = bin(max(exps)-2)[2:].zfill(8)
+        def int_idx_to_bin(index: int, width: int) -> str:
+            return "0" + bin(index)[2:].zfill(width)
 
-            for i in range(len(blk_elems)):
-                mant_with_sign = "0" * (self.mant_bits() + 2) \
-                    if blk_elems[i] == "00000000" else "1" + mants[i]
-                shifted_mant = "0" * (self.mant_bits() + 2) \
-                    if (max(exps) - exps[i]) > len(mant_with_sign) \
-                    else mant_with_sign[0:len(mant_with_sign) - (max(exps) - exps[i]) + 1].zfill(len(mant_with_sign))
-                final_mant = twos_comp(shifted_mant, signs[i])[0:self.mant_bits() + 1]
-                blk_res += final_mant
+        if idx:
+            assert(len(idx[0]) == len(idx[1]))
+            assert(len(idx[0]) == len(blk_list))
 
-            res.append(blk_res)
+            # set bitwidth of ridx
+            max_idx = np.amax(idx[0]+idx[1])
+            idx_bitwidth = len(bin(int(max_idx))[2:])
+            print(f"select idx bitwidth as {idx_bitwidth}")
+
+        # bfp conversion and idx attaching
+        for rec_idx, blk in enumerate(blk_list):
+            for sub_r, blk_r in enumerate(blk):
+                blk_elems = [float_to_hex(f) for f in blk_r]
+                exps = [int(hex_to_bin(e, 32)[1:9], 2) for e in blk_elems]
+                mants = [hex_to_bin(e, 32)[9:9+self.mant_bits()+1] for e in blk_elems]
+                signs = [hex_to_bin(e, 32)[0] for e in blk_elems]
                 
+                # TODO: be careful for the situation where part of the inputs are zero
+                blk_res = bin(max(max(exps)-2, 0))[2:].zfill(8)
+
+                for i in range(len(blk_elems)):
+                    mant_with_sign = "0" * (self.mant_bits() + 2) \
+                        if blk_elems[i] == "00000000" else "1" + mants[i]
+                    shifted_mant = "0" * (self.mant_bits() + 2) \
+                        if (max(exps) - exps[i]) > len(mant_with_sign) \
+                        else mant_with_sign[0:len(mant_with_sign) - (max(exps) - exps[i]) + 1].zfill(len(mant_with_sign))
+                    final_mant = twos_comp(shifted_mant, signs[i])[0:self.mant_bits() + 1]
+                    blk_res += final_mant
+
+                if idx:
+                    blk_res = int_idx_to_bin(idx[0][rec_idx], idx_bitwidth) + \
+                                int_idx_to_bin(idx[1][rec_idx], idx_bitwidth) + blk_res
+
+                res.append(blk_res)
+            
         return res
-    
+
     def gen_bfp_friendly_data(self, size: tuple):
         gen_mask = np.random.randint(low=0, high=len(self.randgen_cand), size=size)
         res = np.zeros(size, dtype=float)
@@ -98,95 +122,97 @@ class BFP():
 
         return res
 
-def mat_a_gen(three_vec_len: int, chain_len: int, bfp_type: BFP):
+DAT_PATH = "./sparse_matmul_data"
+
+def mat_a_gen(mat_src_name: str, bfp_type: BFP):
     '''
     assuming mat A is a 3xthree_vec_len mat block:
     '''
-    matA = bfp_type.gen_bfp_friendly_data((3, three_vec_len))
+    mat_a_src = np.load(DAT_PATH + f"/{mat_src_name}_val.npy")
+    mat_a_src_ridx = np.load(DAT_PATH + f"/{mat_src_name}_ridx.npy")    
+    mat_a_src_cidx = np.load(DAT_PATH + f"/{mat_src_name}_cidx.npy")
 
-    # matA = np.array(list(range(3 * three_vec_len))) / 100.0
-    # matA = matA.reshape((3, three_vec_len))
-    np.save("mat_a_fp32.npy", matA)
+    assert mat_a_src.shape[-1] == bfp_type.blk_size(), "block size mismatch"
 
-    compute_iter = math.ceil(float(three_vec_len) / float(chain_len) / 20)
-    
+    # extract one head
+    headgrp_vals, headgrp_ridx, headgrp_cidx = [], [], []
+    curr_head_val, curr_head_ridx, curr_head_cidx = [], [], []
+    for ridx, cidx, val in zip(mat_a_src_ridx, mat_a_src_cidx, mat_a_src):
+        if ridx == -1 and cidx == -1:
+            headgrp_vals.append(curr_head_val.copy())
+            headgrp_ridx.append(curr_head_ridx.copy())
+            headgrp_cidx.append(curr_head_cidx.copy())
+            curr_head_val, curr_head_ridx, curr_head_cidx = [], [], []
+        else:
+            curr_head_val.append(val)
+            curr_head_ridx.append(ridx)
+            curr_head_cidx.append(cidx)
+
+    # fetch a head
+    hidx = 24
+    print(f"get {len(headgrp_ridx)} heads in total, selecting head {hidx}")
+    src_val, src_ridx, src_cidx = headgrp_vals[hidx], headgrp_ridx[hidx], headgrp_cidx[hidx] 
+
     # prepare mat a
-    hexMatARes = []
-    # each iteration, the chain finishes 3x(chain_lenx10) elements in A
-    chunkedMatA = matA.reshape(3, compute_iter * chain_len, bfp_type.blk_size())
-    # send each group of A iteratively
-    for currFinishedCol in np.arange(0, chunkedMatA.shape[1], chain_len, dtype=int):
-        # fill the chain reversely, so A's first column is in the first
-        # tensor core, and last column the last tensor core
-        for colIdx in np.arange(chain_len-1, -1, -1, dtype=int):
-            # load 3 banks of the cache for each tensor core
-            for r in range(0, 3):
-                # print("assembling chunk r{} c{}".format(r, colIdx+currFinishedCol))
-                tempRes = list(map(float_to_hex, chunkedMatA[r][colIdx + currFinishedCol]))
-                tempRes = "".join(tempRes)
-                # print("res len", len(tempRes))
-                hexMatARes.append(tempRes)
+    bfp_res = bfp_type.to_bfp(src_val, (src_ridx, src_cidx))
 
-    fname = "MAT_A_FP32.hex"
+    fname = DAT_PATH + "/" + f"MAT_A_{bfp_type.format_name()}.bin"
     with open(fname, "w+", encoding='utf-8') as f:
-        for i in hexMatARes:
+        for i in bfp_res:
             f.write(i + "\n")
-        print("{} lines written to A.".format(len(hexMatARes)))
+        print("{} lines written to A.".format(len(bfp_res)))
+        print(f"mat A total size: {len(bfp_res) * len(bfp_res[0]) / 1024. / 1024. / 8:.2f} MB")
 
-    # bfp conversion
-    bfp_coverted = bfp_type.to_bfp(hexMatARes)
-    fname = f"MAT_A_{bfp_type.format_name()}.bin"
-    with open(fname, "w+", encoding='utf-8') as f:
-        for i in bfp_coverted:
-            f.write(i + "\n")
-        print("{} lines written to A.".format(len(bfp_coverted)))
+    # construct dense mat from selected head to compute gold reference
+    coo_pairs = []
+    for br, bc, bv in zip(src_ridx, src_cidx, src_val):
+        curr_cids = [bc * bfp_type.blk_size() + i for i in range(bfp_type.blk_size())]
+        # TODO: multiply 3 or not?
+        curr_rids = [br * 3 + i for i in range(3)]
+        for v_r, rid in enumerate(curr_rids):
+            for v_c, cid in enumerate(curr_cids):
+                coo_pairs.append((rid, cid, bv[v_r][v_c]))
+
+    coo_pairs = sorted(coo_pairs)
+    assert(len(coo_pairs) == len(src_val) * 3 * bfp_type.blk_size())
     
-    return matA
+    coo_idx = [[p[0] for p in coo_pairs], [p[1] for p in coo_pairs]]
+    coo_vals = [p[2] for p in coo_pairs]
+    mat_shape = max(coo_idx[0] + coo_idx[1])
+    mat = torch.sparse_coo_tensor(coo_idx, coo_vals, size=(mat_shape, mat_shape)).to_dense().numpy()
+    
+    return mat
 
 def mat_b_gen(size: tuple, chain_len: int, bfp_type: BFP):
     # matB = np.random.uniform(low=0., high=1.0, size=size).astype('f')
     # matB = np.random.randint(low=0, high=2, size=size)
     matB = bfp_type.gen_bfp_friendly_data(size)
     print(matB.shape)
-    np.save("mat_b_fp32.npy", matB)
     
-    # prepare mat b
-    hexMatBRes = []
-    chunkedBTrans = np.transpose(matB).reshape(size[1], -1, chain_len, bfp_type.blk_size())
-    for iter in range(chunkedBTrans.shape[1]):
-        # each iteration, the chain consumes chain_lenx3 original cols to 
-        # hide the load latency
-        for r in range(chunkedBTrans.shape[0]):
-            # each block of an original col contains chain_lenx10 elements
-            para_input_grp = ""
-            for sub_col in range(chain_len):
-                # print("assembling B chunk r{} c{}".format(col*chain_len+sub_col, row))
-                tempRes = list(map(float_to_hex, chunkedBTrans[r][iter][sub_col]))
-                tempRes = "".join(tempRes)
-                para_input_grp += tempRes
-            
-            hexMatBRes.append(para_input_grp)
+    # pad mat b to align with chain_len x BFP size
+    align_size = chain_len * bfp_type.blk_size()
+    required_padding_size = int(align_size - size[0] % align_size)
+    if required_padding_size > 0:
+        padded_matB = np.pad(
+            matB, 
+            pad_width=((0, required_padding_size), (0, 0)), 
+            mode="constant", 
+            constant_values=0.0)
+    else:
+        padded_matB = matB
 
-    fname = "MAT_B_FP32.hex"
-    with open(fname, "w+", encoding="utf-8") as f:
-        for i in hexMatBRes:
-            f.write(i + "\n")
-        print("{} lines written to B.".format(len(hexMatBRes)))
-
+    chunkedBTrans = np.transpose(padded_matB).reshape(-1, 1, bfp_type.blk_size())
     # bfp conversion
-    bfp_res = []
-    for i in hexMatBRes:
-        blk_grp = [i[b*20*8:(b+1)*20*8] for b in range(chain_len)]
-        bfp_blk_res = bfp_type.to_bfp(blk_grp)
-        bfp_res.append("".join(bfp_blk_res))
+    bfp_res = bfp_type.to_bfp(list(chunkedBTrans))
 
-    fname = f"MAT_B_{bfp_type.format_name()}.bin"
+    fname = DAT_PATH + "/" + f"MAT_B_{bfp_type.format_name()}.bin"
     with open(fname, "w+", encoding='utf-8') as f:
         for i in bfp_res:
             f.write(i + "\n")
         print("{} lines written to B.".format(len(bfp_res)))
-    
+        print(f"mat B total size: {len(bfp_res) * len(bfp_res[0]) / 1024. / 1024. / 8 :.2f} MB")
 
+    
     return matB
 
 def check_outputs(sim_out_fname: str, ori_fname, num_tc_rows: int, num_tc_cols: int):
@@ -268,11 +294,9 @@ def prepare_single_input_files(input_path: str):
 def main(args: dict):
     if args['inputs_gen']:
         chain_len = int(args['chain_len'])
-        matAColSubGrpLen = int(args['compute_iter'])
 
-        matA = mat_a_gen(chain_len * 20 * matAColSubGrpLen, \
-                            chain_len, BFP(BfpType.BFP_12))
-        matB = mat_b_gen((chain_len * 20 * matAColSubGrpLen, 32), 
+        matA = mat_a_gen("if2y5NE5b", BFP(BfpType.BFP_12))
+        matB = mat_b_gen((matA.shape[1], 128), 
                             chain_len, BFP(BfpType.BFP_12))
         res = np.matmul(matA, matB)
         print(f"mat a shape: {matA.shape}, mat b shape: {matB.shape}, res shape: {res.shape}")
@@ -291,6 +315,11 @@ def main(args: dict):
     if args['create-binary']:
         path = str(args['create-binary'])
         prepare_single_input_files(path)
+
+    if args['test']:
+        bfp_format = BFP(BfpType.BFP_12)
+        res = bfp_format.to_bfp([np.zeros((1, 20), dtype=float)])
+        print(res)
   
 if __name__ == "__main__":
     arg_parser = argparse.ArgumentParser()
@@ -308,10 +337,12 @@ if __name__ == "__main__":
                                 action="store", dest="correct_res")
     arg_parser.add_argument("-cb", "--create-binary", help="create binary file for on-chip test", \
                                 action="store", dest="create-binary")
+    arg_parser.add_argument("-tt", "--test", help="temp testing entry", \
+                                action="store_true", default=False)
     
     args = vars(arg_parser.parse_args())
 
-    if args['inputs_gen'] and (args['chain_len'] is None or args['compute_iter'] is None):
+    if args['inputs_gen'] and args['chain_len'] is None:
         arg_parser.error("inputs generation requires a chain length AND a compute iteration!")
 
     if args['outputs-check'] and args['correct_res'] is None:

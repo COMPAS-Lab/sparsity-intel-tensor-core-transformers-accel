@@ -15,7 +15,7 @@
 // synopsys translate_off
 `timescale 1 ps / 1 ps
 // synopsys translate_on
-module  asym_buffer  (
+module  spram_megafunc  (
     clock,
     data,
     rdaddress,
@@ -24,8 +24,8 @@ module  asym_buffer  (
     q);
 
     input    clock;
-    input  [2815:0]  data;
-    input  [5:0]  rdaddress;
+    input  [87:0]  data;
+    input  [0:0]  rdaddress;
     input  [0:0]  wraddress;
     input    wren;
     output [87:0]  q;
@@ -80,7 +80,7 @@ module  asym_buffer  (
         altera_syncram_component.intended_device_family  = "Stratix 10",
         altera_syncram_component.lpm_type  = "altera_syncram",
         altera_syncram_component.numwords_a  = 2,
-        altera_syncram_component.numwords_b  = 64,
+        altera_syncram_component.numwords_b  = 2,
         altera_syncram_component.operation_mode  = "DUAL_PORT",
         altera_syncram_component.outdata_aclr_b  = "NONE",
         altera_syncram_component.outdata_sclr_b  = "NONE",
@@ -89,8 +89,8 @@ module  asym_buffer  (
         altera_syncram_component.ram_block_type  = "M20K",
         altera_syncram_component.read_during_write_mode_mixed_ports  = "DONT_CARE",
         altera_syncram_component.widthad_a  = 1,
-        altera_syncram_component.widthad_b  = 6,
-        altera_syncram_component.width_a  = 2816,
+        altera_syncram_component.widthad_b  = 1,
+        altera_syncram_component.width_a  = 88,
         altera_syncram_component.width_b  = 88,
         altera_syncram_component.width_byteena_a  = 1;
 

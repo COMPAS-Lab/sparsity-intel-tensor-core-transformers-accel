@@ -6,7 +6,7 @@ import spinal.lib.fsm._
 import config._
 import intel_ips._
 import util._
-import scala.math.{min, pow}
+import scala.math.{min, pow, ceil}
 
 case class BfpBlockWithIdx(dwidth: Int,
                       ridx_width: Int,
@@ -144,7 +144,8 @@ class TensorCoreChainArray(array_col: Int, array_row: Int, chain_len: Int, idx_w
   //parameters
   val IDXDATA_IDX_WIDTH: Int = io.sortedColIdx.payload.idxData.getWidth
   val IDXDATA_DEST_WIDTH: Int = io.sortedColIdx.payload.destId.getWidth
-  val NUM_MATB_VEC_PER_ROW: Int = num_matb_cols / array_row
+  val NUM_MATB_VEC_PER_ROW: Int = ceil(num_matb_cols.toFloat / array_row.toFloat).toInt
+  val TRANSRAM_FOLDING_FACTOR: Int = 2
   // TODO: fix parameters here
   val MAT_B_FETCH_II = chain_len + 1
 
@@ -171,6 +172,7 @@ class TensorCoreChainArray(array_col: Int, array_row: Int, chain_len: Int, idx_w
   val tccInnerBuffSelComp = Bits(array_col bits)
   // used to halt mat b broadcast when waiting for the mat a load
   val matBLoadPipelineEn = Bool()
+  val matBLoadPipelineEnDelayed = Delay(matBLoadPipelineEn, 5, init=False)
   // reset for the mat b broadcast subvector cell finish flag
   val clearMatmulCellFinFlags = Bool()
 
@@ -178,13 +180,14 @@ class TensorCoreChainArray(array_col: Int, array_row: Int, chain_len: Int, idx_w
   val bufferArea = new Area {
     // buffer and ctrl signal def
     val colBuffer = Array.fill(array_col)(StreamFifo(BfpBlockWithIdx(88, idx_width, 0, 0), col_buffer_depth))
-    val rowMem = Array.fill(array_row, NUM_MATB_VEC_PER_ROW)(Mem(UInt(88 bits), row_buffer_depth))
+    val rowMem = Array.fill(array_row, NUM_MATB_VEC_PER_ROW / TRANSRAM_FOLDING_FACTOR)(
+      Mem(UInt(88 bits), row_buffer_depth * TRANSRAM_FOLDING_FACTOR))
     val colBufferOutReg = Vec(Reg(BfpBlockWithIdx(88, idx_width, 0, 0)), array_col)
     val isCurrSubgrpALoaded = Reg(Bool(), init=False)
     val isColBufferEmpty = Vec(for(c <- colBuffer) yield c.io.pop.valid).orR
 
     // row buffer write and read
-    val rowBufferWriteAddr = Array.fill(array_row)(Counter(row_buffer_depth))
+    val rowBufferWriteAddr = Array.fill(array_row)(Counter(row_buffer_depth * TRANSRAM_FOLDING_FACTOR))
     val rowBufferBlkOut = Flow(Vec(
       Vec(BfpBlockWithIdx(88, 0, 0, IDXDATA_DEST_WIDTH), chain_len), array_row))
 
@@ -243,27 +246,27 @@ class TensorCoreChainArray(array_col: Int, array_row: Int, chain_len: Int, idx_w
     }
 
     // row broadcast data and ctrl
-    rowBufferBlkOut.valid := Delay(matBLoadPipelineEn, MAT_B_FETCH_II)
+    rowBufferBlkOut.valid := Delay(matBLoadPipelineEnDelayed, MAT_B_FETCH_II)
     for (r <- 0 until array_row) {
-      val rowBuffParaRd = Vec(UInt(88 bits), NUM_MATB_VEC_PER_ROW)
+      val rowBuffParaRd = Vec(UInt(88 bits), NUM_MATB_VEC_PER_ROW / TRANSRAM_FOLDING_FACTOR)
       val rowBuffWrCtrl =
         Reg(Bits(chain_len bits), init=B(chain_len bits, 0 -> true, default -> false))
-      val rowBuffParaOut = Vec(UInt(88 bits), chain_len)
-      val rowTransBuffRdAddr = Reg(UInt(log2Up(NUM_MATB_VEC_PER_ROW * 2) bits), init=U(0))
+      val rowTransBuffRdAddr = Counter(NUM_MATB_VEC_PER_ROW * 2)
+      val transposeBufferWrAddr = Counter(2 * TRANSRAM_FOLDING_FACTOR)
       val transposeBuffer = Array.fill(chain_len)(
-        AsymBuffer(
+        AsymBufferN2One(
           bitwidth = 88,
-          num_in_words = NUM_MATB_VEC_PER_ROW,
-          num_out_words = 1,
-          wr_depth = 2)
+          num_in_words = NUM_MATB_VEC_PER_ROW / TRANSRAM_FOLDING_FACTOR,
+          wr_depth = 2 * TRANSRAM_FOLDING_FACTOR,
+          folding_factor = TRANSRAM_FOLDING_FACTOR
+        )
       )
 
-      val transposeBufferWrAddr = Reg(UInt(1 bits), init=U(0))
       // global write buffer signal
       when(io.matBLoad(r).fire) {
         rowBufferWriteAddr(r).increment()
       }
-      for (vecId <- 0 until NUM_MATB_VEC_PER_ROW) {
+      for (vecId <- 0 until NUM_MATB_VEC_PER_ROW / TRANSRAM_FOLDING_FACTOR) {
         // row buffer write logic
         rowMem(r)(vecId).write(
           address = rowBufferWriteAddr(r),
@@ -273,22 +276,21 @@ class TensorCoreChainArray(array_col: Int, array_row: Int, chain_len: Int, idx_w
 
         // row buffer read logic
         rowBuffParaRd(vecId) := rowMem(r)(vecId).readSync(
-          address = io.sortedColIdx.payload.idxData,
-          enable = matBLoadPipelineEn
+          address = io.sortedColIdx.payload.idxData.resized,
+          enable = matBLoadPipelineEnDelayed
         )
       }
 
-      when(matBLoadPipelineEn) {
+      when(matBLoadPipelineEnDelayed) {
         rowBuffWrCtrl := rowBuffWrCtrl.rotateLeft(1)
-        transposeBufferWrAddr := ~transposeBufferWrAddr
-        rowTransBuffRdAddr := (rowTransBuffRdAddr + 1).resized
+        transposeBufferWrAddr.increment()
+        rowTransBuffRdAddr.increment()
       }
 
       for (transBufId <- transposeBuffer.indices) {
         transposeBuffer(transBufId).io.dataIn := rowBuffParaRd
-        transposeBuffer(transBufId).io.wrEn := Mux(matBLoadPipelineEn, rowBuffWrCtrl(transBufId), False)
+        transposeBuffer(transBufId).io.wrEn := Mux(matBLoadPipelineEnDelayed, rowBuffWrCtrl(transBufId), False)
         transposeBuffer(transBufId).io.wrAddr := transposeBufferWrAddr
-        rowBuffParaOut(transBufId) := transposeBuffer(transBufId).io.dataOut.as(UInt(88 bits))
         transposeBuffer(transBufId).io.rdAddr := rowTransBuffRdAddr
       }
 
@@ -296,11 +298,11 @@ class TensorCoreChainArray(array_col: Int, array_row: Int, chain_len: Int, idx_w
       val bufferedIdx = History(
          io.sortedColIdx.payload,
          length = MAT_B_FETCH_II,
-         when = matBLoadPipelineEn,
+         when = matBLoadPipelineEnDelayed,
          init = IndexData(IDXDATA_IDX_WIDTH, IDXDATA_DEST_WIDTH, idx_placeholder)
       )
       for (clenId <- 0 until chain_len) {
-        rowBufferBlkOut.payload(r)(clenId).blkData := transposeBuffer(clenId).io.dataOut.as(UInt(88 bits))
+        rowBufferBlkOut.payload(r)(clenId).blkData := transposeBuffer(clenId).io.dataOut
         rowBufferBlkOut.payload(r)(clenId).destId := bufferedIdx(clenId).destId
       }
     }
@@ -337,7 +339,7 @@ class TensorCoreChainArray(array_col: Int, array_row: Int, chain_len: Int, idx_w
         dest_width = IDXDATA_DEST_WIDTH,
         tcchain_id = c
       )
-      skipper.io.en := matBLoadPipelineEn
+      skipper.io.en := matBLoadPipelineEnDelayed
 
       if(r == 0) {
         for (cell <- 0 until chain_len) {
@@ -350,7 +352,7 @@ class TensorCoreChainArray(array_col: Int, array_row: Int, chain_len: Int, idx_w
       }
 
       dataShuffler.io.shiftCtrl << dataShuffleCtrlBits
-      dataShuffler.io.shiftEn := matBLoadPipelineEn
+      dataShuffler.io.shiftEn := matBLoadPipelineEnDelayed
       // TODO: this is a unused valid signal inside tcc,
       //  not sure how to use this
       tensorArray(r)(c).io.dataIn.valid := True
@@ -360,7 +362,7 @@ class TensorCoreChainArray(array_col: Int, array_row: Int, chain_len: Int, idx_w
 
         // TODO: check timing of the delayed row address
         dataShuffler.io.dataIn(tcId) << skipper.io.outputSeq(tcId)
-        when(dataShuffler.io.dataOut(tcId).valid & matBLoadPipelineEn) {
+        when(dataShuffler.io.dataOut(tcId).valid & matBLoadPipelineEnDelayed) {
           dataShufflerOutReg(tcId) := dataShuffler.io.dataOut(tcId).payload
         } otherwise {
           dataShufflerOutReg(tcId).clearAll()
