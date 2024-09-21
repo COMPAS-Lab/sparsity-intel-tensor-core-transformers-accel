@@ -156,9 +156,12 @@ class TensorCoreChainArray(array_col: Int, array_row: Int, chain_len: Int, idx_w
   val tensorArray = Array.ofDim[TensorCoreChainBf12](array_row, array_col)
   for (r <- 0 until array_row; c <- 0 until array_col) {
     // out buf delay = number of B columns in each tensor core chain row - 3
-    tensorArray(r)(c) = new TensorCoreChainBf12(chain_len, out_buf_delay = out_buf_delay,
-                                              out_fifo_depth = output_fifo_depth, output_width = output_width,
-                                              idx_width = idx_width)
+    tensorArray(r)(c) = new TensorCoreChainBf12(
+      chain_len,
+      out_buf_delay = out_buf_delay,
+      output_width = output_width,
+      idx_width = idx_width
+    )
     tensorArray(r)(c).setName("u_tc_core_r_" + r + "_c_" + c)
   }
 
@@ -258,7 +261,8 @@ class TensorCoreChainArray(array_col: Int, array_row: Int, chain_len: Int, idx_w
           bitwidth = 88,
           num_in_words = NUM_MATB_VEC_PER_ROW / TRANSRAM_FOLDING_FACTOR,
           wr_depth = 2 * TRANSRAM_FOLDING_FACTOR,
-          folding_factor = TRANSRAM_FOLDING_FACTOR
+          folding_factor = TRANSRAM_FOLDING_FACTOR,
+          megfunc_type = "spram"
         )
       )
 
@@ -270,7 +274,9 @@ class TensorCoreChainArray(array_col: Int, array_row: Int, chain_len: Int, idx_w
         // row buffer write logic
         rowMem(r)(vecId).write(
           address = rowBufferWriteAddr(r),
-          enable = io.tccRowBufferId === (r * NUM_MATB_VEC_PER_ROW + vecId),
+          enable =
+            io.tccRowBufferId.resize(log2Up(NUM_MATB_VEC_PER_ROW / TRANSRAM_FOLDING_FACTOR * array_row)) ===
+              (r * NUM_MATB_VEC_PER_ROW / TRANSRAM_FOLDING_FACTOR + vecId),
           data = io.matBLoad(r).payload
         )
 
@@ -329,41 +335,32 @@ class TensorCoreChainArray(array_col: Int, array_row: Int, chain_len: Int, idx_w
       // dummy row data shuffle control logic
       val dataShuffleCtrlBits = RegFlow(UInt(log2Up(chain_len) bits))
       val numAccptBlks = Reg(UInt(log2Up(chain_len) bits), init=U(0))
-      val dataShuffler = GeneralBarrelShifter(BfpBlockWithIdx(88, 0, 0, 0), chain_len)
       val dataShufflerOutReg = Vec(Reg(BfpBlockWithIdx(88, 0, 0, 0)), chain_len)
       dataShufflerOutReg.foreach(_.init(BfpBlockWithIdx(88, 0, 0, 0).getZero))
 
-      val skipper = new ColBlkGapRemover(
-        num_ports = chain_len,
-        bitwidth = 88,
-        dest_width = IDXDATA_DEST_WIDTH,
-        tcchain_id = c
-      )
-      skipper.io.en := matBLoadPipelineEnDelayed
+      val distributor = ClosNet(chain_len, 88, array_col, c)
 
       if(r == 0) {
         for (cell <- 0 until chain_len) {
           when(clearMatmulCellFinFlags & bufferArea.isCurrSubvecMatmulFinished(c)) {
             bufferArea.isMatmulCellFinished(c)(cell) := False
-          }.elsewhen(dataShuffler.io.dataOut(cell).valid) {
+          }.elsewhen(distributor.io.outputSeq(cell).valid) {
             bufferArea.isMatmulCellFinished(c)(cell) := True
           }
         }
       }
+      distributor.io.en := matBLoadPipelineEnDelayed
 
-      dataShuffler.io.shiftCtrl << dataShuffleCtrlBits
-      dataShuffler.io.shiftEn := matBLoadPipelineEnDelayed
       // TODO: this is a unused valid signal inside tcc,
       //  not sure how to use this
       tensorArray(r)(c).io.dataIn.valid := True
       for (tcId <- 0 until chain_len) {
         // datapath from row buffer out to skipper:
-        skipper.io.inputSeq(tcId) <> bufferArea.rowBufferBlkOut.payload(r)(tcId)
+        distributor.io.inputSeq(tcId) <> bufferArea.rowBufferBlkOut.payload(r)(tcId)
 
         // TODO: check timing of the delayed row address
-        dataShuffler.io.dataIn(tcId) << skipper.io.outputSeq(tcId)
-        when(dataShuffler.io.dataOut(tcId).valid & matBLoadPipelineEnDelayed) {
-          dataShufflerOutReg(tcId) := dataShuffler.io.dataOut(tcId).payload
+        when(distributor.io.outputSeq(tcId).valid & matBLoadPipelineEnDelayed) {
+          dataShufflerOutReg(tcId) := distributor.io.outputSeq(tcId).payload
         } otherwise {
           dataShufflerOutReg(tcId).clearAll()
         }
@@ -375,8 +372,8 @@ class TensorCoreChainArray(array_col: Int, array_row: Int, chain_len: Int, idx_w
       // reconstruct load cascade input
       val delayedCasInWithIdx = BfpBlockWithIdx(80, idx_width, 0, 0)
       delayedCasInWithIdx.fromUInt((delayedRowIdx(r) ## delayedLoadCascadeIn(r)).asUInt)
-      numAccptBlks := (numAccptBlks + CountOne(Vec(for (elem <- skipper.io.outputSeq) yield elem.valid))).resized
-      dataShuffleCtrlBits.valid := skipper.io.outputSeq(0).valid
+      numAccptBlks := (numAccptBlks + CountOne(Vec(for (elem <- distributor.io.outputSeq) yield elem.valid))).resized
+      dataShuffleCtrlBits.valid := distributor.io.outputSeq(0).valid
       dataShuffleCtrlBits.payload := numAccptBlks
       tensorArray(r)(c).io.loadCascadeIn.payload := delayedCasInWithIdx
       tensorArray(r)(c).io.expCascadeIn := delayedExpCascadeIn(r)
@@ -577,7 +574,12 @@ class TensorCoreChainArray(array_col: Int, array_row: Int, chain_len: Int, idx_w
 
   // TODO: verify function of shift regs
   val outBuffer = Array.fill(array_row)(
-    new StreamOutAsymFifo((output_width+idx_width) * 3 * array_col, (output_width+idx_width) * 3))
+    new StreamOutAsymFifo(
+      input_width = (output_width+idx_width) * 3 * array_col,
+      output_width = (output_width+idx_width) * 3,
+      depth=output_fifo_depth
+    )
+  )
   for (regIdx <- 0 until array_row) {
     outBuffer(regIdx).io.push.valid := Delay(outputBufferSelOut(regIdx)(0).valid, inout_pipe_delay)
     outBuffer(regIdx).io.push.payload := 

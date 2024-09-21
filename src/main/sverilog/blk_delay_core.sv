@@ -106,7 +106,8 @@ generate
         .OVERFLOW_CHECKING( "ON" ),
         .ENABLE_ECC( "FALSE" ),
         .ALLOW_RWCYCLE_WHEN_FULL( "ON" ),
-        .USE_EAB( "ON" )
+        .USE_EAB( "ON" ),
+        .LPM_HINT( "RAM_BLOCK_TYPE=M20K" )
       ) internal_fifo (
         .clock( clk ),
         .aclr( 1'b0 ),

@@ -24,14 +24,14 @@ class out_asym_fifo(input_width: Int, output_width: Int, depth: Int, id: Int = 0
   addRTLPath(s"./src/main/sverilog/out_asym_fifo.sv")
 }
 
-class StreamOutAsymFifo(input_width: Int, output_width: Int) extends Component {
+class StreamOutAsymFifo(input_width: Int, output_width: Int, depth: Int) extends Component {
   val io = new Bundle {
     val push = slave Stream(UInt(input_width bits))
     val pop = master Stream(UInt(output_width bits))
   }
 
   assert(input_width % output_width == 0)
-  val core = new out_asym_fifo(input_width, output_width, depth=64)
+  val core = new out_asym_fifo(input_width, output_width, depth=depth)
 
   core.setName("AsymFifoCore")
   core.io.wr_data := io.push.payload

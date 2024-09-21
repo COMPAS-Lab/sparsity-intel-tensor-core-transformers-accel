@@ -8,8 +8,7 @@ import intel_ips._
 import util._
 
 class TensorCoreChainBf12(chain_len: Int, out_buf_delay: Int,
-                      out_fifo_depth: Int, output_width: Int,
-                          idx_width: Int) extends Component {
+                      output_width: Int, idx_width: Int) extends Component {
   val io = new Bundle {
     // TODO: how to efficiently use the valid signal?
     val dataIn = slave Flow(Vec(UInt(80 bits), chain_len))
@@ -135,7 +134,7 @@ class TensorCoreChainBf12(chain_len: Int, out_buf_delay: Int,
 
   for (i <- 0 until chain_len-1) {
     tcCoreChainElems(i) = new tensor_core_bf12
-    //TODO: replace input delay chain by FIFO
+    // FIFO-based delay chain
     val delayedDataIn = BlockDelay(io.dataIn.payload(i+1), 2*(i+1))
     connect_data_in(tcCoreChainElems(i).io, delayedDataIn)
     val delayedExpIn = BlockDelay(io.expIn(i+1), 2*(i+1))
@@ -174,7 +173,7 @@ class TensorCoreChainBf12(chain_len: Int, out_buf_delay: Int,
   val fbBufferLoadValid = Reg(Bool()) init False
   fbBufferLoadValid := delayedDataInValidForOut & ~delayedDataInLast
 
-  val fbDelayFifo = new StreamOutFifo(output_width)
+  val fbDelayFifo = new StreamOutFifo(output_width * 3, 32, "M20K")
   fbDelayFifo.setName("AccuDelayInst")
   // when the final iter is ready, push the res into output fifo
   fbDelayFifo.io.push.valid := fbBufferLoadValid
@@ -236,7 +235,6 @@ object TensorCoreChainBf12Gen {
       new TensorCoreChainBf12(
         chain_len=12,
         out_buf_delay=4,
-        out_fifo_depth=32,
         output_width=24,
         idx_width=9)).printPruned()
   }
