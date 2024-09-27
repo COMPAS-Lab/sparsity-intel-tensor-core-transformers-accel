@@ -31,7 +31,8 @@ case class MultiPortStream(dWidth: Int, addrWidth: Int, hasAlmostFull: Boolean, 
 
 class tensor_core_array_wrapper(array_col: Int, array_row: Int, chain_len: Int,
                                 mat_a_row: Int, mat_a_col: Int, mat_b_col: Int,
-                                num_hbms: Int) extends Component {
+                                num_hbms: Int, idx_placeholder: BigInt = BigInt("111111111", 2)
+                               ) extends Component {
   val io = new Bundle {
     val refclk = in Bool()
     val rr_clk = out Bool()
@@ -110,7 +111,7 @@ class tensor_core_array_wrapper(array_col: Int, array_row: Int, chain_len: Int,
       idxGenerator.io.seqIn(i).valid := True
     }
     //TODO: fix this temp connection
-    idxGenerator.io.lastGrpIn := io.start(0)
+    idxGenerator.io.lastGrpIn := Delay(io.start(0), 2)
     val idxGeneratorRes: Vec[IndexData] = RegNext(idxGenerator.io.seqOut.payload)
     io.idx_res := io.idx_rd_addr(log2Up(array_col)-1 downto 0).muxListDc(
       for (i <- idxGeneratorRes.indices) yield (i, (U"2'd0" ## idxGeneratorRes(i).idxData).asUInt)
@@ -168,7 +169,7 @@ class tensor_core_array_wrapper(array_col: Int, array_row: Int, chain_len: Int,
   val selectTcarrayIn, startTCarrayIn = Reg(Bool()) init False
   val selectTcarrayOut, startTCarrayOut = Reg(Bool()) init False
 
-  val data2TcarrayCol = Vec(Stream(BfpBlockWithIdx(88, 9, 0, 0)), array_col)
+  val data2TcarrayCol = Vec(Stream(BfpBlockWithIdx(88, 9, 0, 0, idx_placeholder)), array_col)
   val data2TcarrayRow = Vec(Stream(UInt(88 bits)), array_row)
 //  val data2IdxGenerator = Vec(UInt(IDX_BITSIZE bits), array_col)
 
@@ -182,7 +183,7 @@ class tensor_core_array_wrapper(array_col: Int, array_row: Int, chain_len: Int,
   val dataInColShiftRegs = new InputShiftReg(data2TcarrayCol(0).payload.getBitsWidth, array_col)
   dataInColShiftRegs.io.pushIn <> dataColIn
   for (i <- 0 until array_col) {
-    val dataInColShiftRegsOut = BfpBlockWithIdx(88, 9, 0, 0)
+    val dataInColShiftRegsOut = BfpBlockWithIdx(88, 9, 0, 0, idx_placeholder)
     dataInColShiftRegsOut.fromUInt(dataInColShiftRegs.io.dataOut(i).payload)
     data2TcarrayCol(i) << dataInColShiftRegs.io.dataOut(i).translateWith(dataInColShiftRegsOut)
   }
@@ -200,7 +201,7 @@ class tensor_core_array_wrapper(array_col: Int, array_row: Int, chain_len: Int,
     out_buf_delay = 4,
     output_fifo_depth = 32,
     output_width = 24,
-    idx_placeholder = BigInt("111111111", 2),
+    idx_placeholder = idx_placeholder,
     inout_pipe_delay = 4
   )
 
@@ -209,7 +210,7 @@ class tensor_core_array_wrapper(array_col: Int, array_row: Int, chain_len: Int,
 
   tcArray.io.matALoad <> data2TcarrayCol
   tcArray.io.matBLoad <> data2TcarrayRow
-  tcArray.io.sortedColIdx.valid := io.start(1)
+  tcArray.io.sortedColIdx.valid := Delay(io.start(1), 2)
   tcArray.io.sortedColIdx.payload <> IndexData(io.in_buffer_id.resize(9), io.in_buffer_id.resize(12).asBits)
   tcArray.io.colIdxFifoNotEmpty := True
   tcArray.io.calEn := io.start(0).rise()

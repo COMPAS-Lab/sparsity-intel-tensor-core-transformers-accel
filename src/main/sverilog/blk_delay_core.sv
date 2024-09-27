@@ -84,7 +84,7 @@ generate
     assign dat_out[WIDTH-1:0] = data[WIDTH-1:0];
 
   end else begin
-    if( TYPE=="ALTERA_BLOCK_RAM" && LENGTH>=3 ) begin
+    if( (TYPE == "MLAB" || TYPE == "M20K") && LENGTH>=3 ) begin
 
       logic [WIDTH-1:0] fifo_out;
       logic full;
@@ -107,7 +107,7 @@ generate
         .ENABLE_ECC( "FALSE" ),
         .ALLOW_RWCYCLE_WHEN_FULL( "ON" ),
         .USE_EAB( "ON" ),
-        .LPM_HINT( "RAM_BLOCK_TYPE=M20K" )
+        .LPM_HINT( $sformatf("RAM_BLOCK_TYPE=%s",TYPE) )
       ) internal_fifo (
         .clock( clk ),
         .aclr( 1'b0 ),

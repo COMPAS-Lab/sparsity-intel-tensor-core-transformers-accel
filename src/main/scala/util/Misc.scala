@@ -68,24 +68,26 @@ object DynaCounter {
   }
 }
 
-class DelayTree(num_bit: Int, stage: Int) extends Component {
+class DelayTree(num_bit: Int, n_outputs: Int) extends Component {
   val io = new Bundle {
     val dataIn = in UInt(num_bit bits)
-    val dataOut = out Vec(UInt(num_bit bits), pow(2, stage).toInt)
+    val dataOut = out Vec(UInt(num_bit bits), n_outputs)
   }
 
   private var finishedOuts: Int = 0
   private def tree_recurse(e: UInt, curr_stage: Int): Unit = {
-    if (curr_stage < stage-1) {
+    if (curr_stage < log2Up(n_outputs)-1) {
       val a, b = Reg(UInt(num_bit bits))
       tree_recurse(a, curr_stage+1)
       tree_recurse(b, curr_stage+1)
       a := e
       b := e
     } else {
-      io.dataOut(finishedOuts) := e
-      io.dataOut(finishedOuts+1) := e
-      finishedOuts += 2
+      if (finishedOuts < n_outputs) {
+        io.dataOut(finishedOuts) := e
+        io.dataOut(finishedOuts + 1) := e
+        finishedOuts += 2
+      }
     }
   }
 
@@ -93,8 +95,8 @@ class DelayTree(num_bit: Int, stage: Int) extends Component {
 }
 
 object DelayTree {
-  def apply(src: UInt, stage: Int): Vec[UInt] = {
-    val tree = new DelayTree(src.getWidth, stage)
+  def apply(src: UInt, n_outputs: Int): Vec[UInt] = {
+    val tree = new DelayTree(src.getWidth, n_outputs)
     tree.io.dataIn := src
     tree.io.dataOut
   }
@@ -114,17 +116,17 @@ class blk_delay_core(bitwidth: Int, delay_len: Int, mem_type: String) extends Bl
     "LENGTH" -> delay_len,
     "WIDTH" -> bitwidth,
     "TYPE" -> mem_type,
-    "REGISTER_OUTPUTS" -> "FALSE"
+    "REGISTER_OUTPUTS" -> "TRUE"
   )
   addRTLPath("./src/main/sverilog/blk_delay_core.sv")
 }
 
 object BlockDelay {
- def apply[T <: Data](that: T, cycleCount: Int, delay_en: Bool = null): T = {
+ def apply[T <: Data](that: T, cycleCount: Int, mem_type: String, delay_en: Bool = null): T = {
    require(cycleCount >= 0,"Negative cycleCount is not allowed in Delay")
 
    val res: T = cloneOf(that)
-   val delayCore = new blk_delay_core(that.getBitsWidth, cycleCount, mem_type = "ALTERA_BLOCK_RAM")
+   val delayCore = new blk_delay_core(that.getBitsWidth, cycleCount, mem_type = mem_type)
 
    if (delay_en != null){
      delayCore.io.ena := delay_en
