@@ -15,4 +15,4 @@ lazy val mylib = (project in file("."))
 
 fork := true
 
-
+cleanFiles += baseDirectory.value / "src/generated"

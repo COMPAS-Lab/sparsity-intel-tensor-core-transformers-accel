@@ -169,115 +169,85 @@ class IndexOutWidthConversion(num_inports: Int, num_outports: Int,
 
 class IndexGenerator(num_ports: Int, bitwidth: Int, placeholder: BigInt) extends Component {
   val io = new Bundle {
-    val seqIn = Vec(slave Flow(IndexData(bitwidth, num_ports)), num_ports)
-    val seqOut = master Flow(Vec(IndexData(bitwidth, num_ports), num_ports))
-    val lastGrpIn = in Bool()
+    val seqIn = Vec(slave Stream(IndexData(bitwidth, num_ports)), num_ports)
+    val seqOut = master Stream(IndexData(bitwidth, num_ports))
+    val lastGrpIns = in Bits(num_ports bits)
     val lastGrpOut = out Bool()
   }
 
-  private def combineLastGrpOut(grpInA: Bool, grpInB: Bool): Bool = {
-    val grpOut = Bool()
-    val grpOutFlag = Reg(UInt(2 bits)) init 0
+  def combineLastSig(sig0: Bool, sig1: Bool): Bool = {
+    val res = Bool()
+    val isSig0Rised, isSig1Rised = Reg(Bool(), init=False)
 
-    grpOut := False
-
-    when(grpOutFlag === U"2'd0") {
-      when(grpInA & grpInB) {
-        grpOutFlag := U"2'd0"
-        grpOut := True
-      }.elsewhen(grpInA | grpInB) {
-        grpOutFlag := U"2'd1"
+    when(isSig0Rised || isSig1Rised) {
+      res := (isSig0Rised & sig1) | (isSig1Rised & sig0)
+      when ((isSig0Rised & sig1) | (isSig1Rised & sig0)) {
+        res := True
+        isSig0Rised.clear()
+        isSig1Rised.clear()
       }.otherwise {
-        grpOutFlag := U"2'd0"
+        res := False
       }
-    }.elsewhen(grpOutFlag === U"2'd1") {
-      when(grpInA | grpInB) {
-        grpOutFlag := U"2'd0"
-        grpOut := True
-      }
-    }
-    grpOut
-  }
-
-  val totalIns = pow(2, log2Up(num_ports)).toInt
-  val nStgs = log2Up(num_ports)
-  val interRes = Vec(Vec(IndexData(bitwidth, num_ports), totalIns), nStgs - 1)
-
-  // declare redremovers
-  val removers = List.tabulate(nStgs)(
-    i => Array.fill(pow(2, nStgs-i-1).toInt)(
-      new RedundancyRemover(pow(2, i+1).toInt, bitwidth, num_ports, placeholder, 16)))
-
-  for (stg <- 0 until nStgs) {
-    val nRemoverInputs: Int = pow(2, stg+1).toInt
-    if (stg == 0) {
-      // deal with irregularity in the first stage
-      // TODO: current hw generation logic does not support odd number of inputs
-      for (currInIdx <- removers(stg).indices) {
-        if ((currInIdx*2) < num_ports) {
-          removers(stg)(currInIdx).io.upperIns.payload(0) <> io.seqIn(currInIdx * nRemoverInputs).payload
-          removers(stg)(currInIdx).io.lowerIns.payload(0) <> io.seqIn(currInIdx * nRemoverInputs + 1).payload
-          removers(stg)(currInIdx).io.upperIns.valid <> io.seqIn(currInIdx * nRemoverInputs).valid
-          removers(stg)(currInIdx).io.lowerIns.valid <> io.seqIn(currInIdx * nRemoverInputs + 1).valid
-          removers(stg)(currInIdx).io.lastGrpIn <> io.lastGrpIn
-        }
-      }
-    } else {
-      val equivInputRangeFactor = pow(2, stg+1).toInt
-      for (currInIdx <- removers(stg).indices) {
-        val equivInputRange = List(equivInputRangeFactor * currInIdx, equivInputRangeFactor * (currInIdx + 1))
-        if (equivInputRange.last <= num_ports) {
-          removers(stg)(currInIdx).io.upperIns <> removers(stg-1)(currInIdx * 2).io.outs
-          removers(stg)(currInIdx).io.lowerIns <> removers(stg-1)(currInIdx * 2 + 1).io.outs
-          removers(stg)(currInIdx).io.lastGrpIn <> combineLastGrpOut(
-            removers(stg-1)(currInIdx * 2).io.lastGrpOut, removers(stg-1)(currInIdx * 2 + 1).io.lastGrpOut
-          )
-        } else if ((equivInputRange.sum / 2).toInt == num_ports) {
-          removers(stg)(currInIdx).io.upperIns <> removers(stg-1)(currInIdx * 2).io.outs
-          removers(stg)(currInIdx).io.lastGrpIn <> removers(stg-1)(currInIdx * 2).io.lastGrpOut
-          removers(stg)(currInIdx).io.lowerIns <> removers(stg-1)(currInIdx * 2).io.outs
-        } else if ((equivInputRange.sum / 2).toInt < num_ports) {
-          removers(stg)(currInIdx).io.upperIns <> removers(stg-1)(currInIdx * 2).io.outs
-          removers(stg)(currInIdx).io.lowerIns <> removers(stg-1)(currInIdx * 2 + 1).io.outs
-          removers(stg)(currInIdx).io.lastGrpIn <> combineLastGrpOut(
-            removers(stg-1)(currInIdx * 2).io.lastGrpOut, removers(stg-1)(currInIdx * 2 + 1).io.lastGrpOut
-          )
-        }
+    }.otherwise{
+      when(sig0 & sig1) {
+        res := True
+      }.otherwise {
+        res := False
+        isSig0Rised := sig0
+        isSig1Rised := sig1
       }
     }
+
+    res
   }
 
-  private val actualOutSize: Int = removers.last(0).io.outs.payload.size
-  val redundancyMover = new RedundancyMover(actualOutSize, bitwidth, num_ports, placeholder)
-  for (i <- removers.last(0).io.outs.payload.indices) {
-    redundancyMover.io.inputSeq(i) := Mux(
-      removers.last(0).io.outs.payload(i).idxData.msb,
-      IndexData(bitwidth, num_ports, placeholder),
-      removers.last(0).io.outs.payload(i))
+  def stage(datElem: Vec[Stream[IndexData]], lastElem: Bits, level: Int): (Stream[IndexData], Bool) = {
+    if (datElem.length == 1) return (datElem.head, lastElem(0))
+    val logicCount = (datElem.length + 1) / 2
+    val stageLogic = Vec(Stream(IndexData(bitwidth, num_ports)), logicCount)
+    val stageLast = Bits(logicCount bits)
+
+    for (i <- 0 until logicCount) {
+      val stgRes = Stream(IndexData(bitwidth, num_ports))
+      val stgLastRes = Bool()
+      if (i * 2 + 1 < datElem.length) {
+        val redRemover = new MergeSortRedundancyRemoverUnit(bitwidth, num_ports, placeholder, 32)
+        redRemover.io.idx_ins(0) << datElem(i * 2)
+        redRemover.io.idx_ins(1) << datElem(i * 2 + 1)
+        redRemover.io.lastGrpIns := lastElem(i * 2 + 1) ## lastElem(i * 2)
+        stgLastRes := redRemover.io.lastGrpOut
+        stgRes << redRemover.io.idx_outs
+      }
+      else {
+//        val redRepeater = new MergeSortRedundancyRemoverRepeater(bitwidth, num_ports, 32)
+//        redRepeater.io.idx_in << datElem(i * 2)
+//        redRepeater.io.lastGrpIn := lastElem(i * 2)
+//        stgRes << redRepeater.io.idx_out
+//        redRepeater.io.neighborFire := stageLogic(i-1).valid
+//
+//        stgLastRes := redRepeater.io.lastGrpOut
+
+        stgRes.valid := datElem(i * 2).valid
+        datElem(i * 2).ready := stgRes.ready
+        stgRes.payload.idxData := Mux(
+          Vec(for(s <- stageLogic) yield s.ready).asBits.andR,
+          datElem(i * 2).payload.idxData,
+          U"1'b1" @@ datElem(i * 2).payload.idxData(bitwidth-2 downto 0))
+        stgRes.payload.destId := datElem(i * 2).payload.destId
+        stgLastRes := lastElem(i * 2)
+      }
+
+      stageLogic(i) << stgRes
+      stageLast(i) := stgLastRes
+    }
+    stage(stageLogic, stageLast, level + 1)
   }
 
-  val uniqueOut = Flow(Vec(IndexData(bitwidth, num_ports), pow(2, log2Up(num_ports)).toInt))
-  val uniqueLastGrp = Delay(removers.last(0).io.lastGrpOut, log2Up(actualOutSize), init = False)
+  val idxGenRes = stage(io.seqIn, io.lastGrpIns, 0)
 
-  uniqueOut.payload := redundancyMover.io.outputSeq
-  uniqueOut.valid := Delay(removers.last(0).io.outs.valid, log2Up(actualOutSize), init = False)
-//  io.seqOut.payload := redundancyMover.io.outputSeq
-//  io.seqOut.valid := Delay(removers.last(0).io.outs.valid, log2Up(actualOutSize), init = False)
-//  io.lastGrpOut := Delay(removers.last(0).io.lastGrpOut, log2Up(actualOutSize), init = False)
+  io.seqOut << idxGenRes._1
+  io.lastGrpOut := idxGenRes._2
 
-  val idxOutWidthConversion = new IndexOutWidthConversion(actualOutSize, num_ports, bitwidth, num_ports, placeholder)
-  idxOutWidthConversion.io.idxIn << uniqueOut
-  idxOutWidthConversion.io.lastGrpIn <> uniqueLastGrp
-  io.seqOut << idxOutWidthConversion.io.idxOut
-  io.lastGrpOut <> idxOutWidthConversion.io.lastGrpOut
-
-  // analyze latency
-  var lat = 0.0
-  for (i <- 0 until nStgs) {
-    lat += LatencyAnalysis(removers(i)(0).io.lowerIns.payload(0).idxData, removers(i)(0).io.outs.payload(0).idxData)
-  }
-  lat += LatencyAnalysis(redundancyMover.io.inputSeq(0).idxData, redundancyMover.io.outputSeq(0).idxData)
-  println("latency: " + lat)
 }
 
 object IndexGeneratorGen extends App {

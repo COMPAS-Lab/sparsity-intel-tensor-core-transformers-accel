@@ -52,6 +52,228 @@ object IndexData {
   }
 }
 
+class MergeSortRedundancyRemoverRepeater(bitwidth: Int, dest_width: Int,
+                                         fifo_depth: Int) extends Component {
+  val io = new Bundle {
+    val idx_in = slave Stream (IndexData(bitwidth, dest_width))
+    val idx_out = master Stream (IndexData(bitwidth, dest_width))
+    val lastGrpIn = in Bool()
+    val lastGrpOut = out Bool()
+    val neighborFire = in Bool()
+  }
+
+  val coreFifo = StreamFifo(IndexData(bitwidth, dest_width), fifo_depth)
+
+  coreFifo.io.push << io.idx_in
+  io.idx_out.payload := coreFifo.io.pop.payload
+
+  val isValidAligned = Reg(Bool(), init=False)
+  val isLastCapped = Reg(Bool(), init=False)
+
+  when(isValidAligned) {
+    io.idx_out.valid := coreFifo.io.pop.valid
+    coreFifo.io.pop.ready := io.idx_out.ready
+    isValidAligned := coreFifo.io.pop.valid
+  }.otherwise {
+    io.idx_out.valid := False
+    isValidAligned := coreFifo.io.pop.valid & io.neighborFire
+    coreFifo.io.pop.ready := False
+  }
+
+  when(isLastCapped) {
+    io.lastGrpOut := False
+    when(coreFifo.io.pop.fire.fall()) {
+      io.lastGrpOut := True
+      isLastCapped := False
+    }
+  }.otherwise {
+    isLastCapped := io.lastGrpIn
+    io.lastGrpOut := False
+  }
+}
+
+class MergeSortRedundancyRemoverUnit(bitwidth: Int, dest_width: Int,
+                                     placeholder: BigInt, fifo_depth: Int) extends Component {
+  val io = new Bundle {
+    val idx_ins = Vec(slave Stream(IndexData(bitwidth, dest_width)), 2)
+    val idx_outs = master Stream(IndexData(bitwidth, dest_width))
+    val lastGrpIns = in Bits(2 bits)
+    val lastGrpOut = out Bool()
+  }
+
+  val fifos = Array.fill(2)(StreamFifo(IndexData(bitwidth, dest_width), fifo_depth))
+  val fifoPopEn = Bool()
+
+  io.idx_outs.setOutputAsReg()
+  io.lastGrpOut.setOutputAsReg()
+
+  // input logic
+  for (fidx <- 0 until 2) {
+    fifos(fidx).io.push.payload := io.idx_ins(fidx).payload
+    fifos(fidx).io.push.valid := io.idx_ins(fidx).valid & (~io.idx_ins(fidx).payload.idxData.msb)
+    io.idx_ins(fidx).ready := fifos(fidx).io.push.ready
+  }
+
+  // ctrl
+  val ctrlStateMachine = new StateMachine {
+    // make sure half of the fifo is loaded before start in case
+    // one fifo can be drained during processing.
+    //    val startThres = fifo_depth / 2
+    val topChanValid, botChanValid = Reg(Bool(), init=False)
+    val lastCompareFinished = Vec(for(f <- fifos) yield f.io.pop.valid).reduceBalancedTree((a, b) => a | b)
+    val insRecved = Reg(Bits(2 bits), init=B"2'b00")
+    val hasNoInput = Reg(Bool(), init=True)
+
+    fifoPopEn := False
+
+    val sIdle: State = new State with EntryPoint {
+      whenIsActive{
+        io.lastGrpOut := False
+        fifoPopEn := False
+        insRecved := io.lastGrpIns
+        topChanValid := fifos(0).io.pop.valid
+        botChanValid := fifos(1).io.pop.valid
+        for (inRecv <- 0 until 2)
+          insRecved(inRecv) := Mux(insRecved(inRecv), True, io.lastGrpIns(inRecv))
+        when(insRecved.andR)(goto(sWait))
+          .elsewhen(topChanValid & botChanValid)(goto(sMerge))
+        when(hasNoInput) {
+          hasNoInput := ~(fifos(0).io.push.valid | fifos(1).io.push.valid)
+        }
+      }
+    }
+
+    val sMerge: State = new State {
+      whenIsActive{
+        topChanValid.clear()
+        botChanValid.clear()
+        io.lastGrpOut := False
+        fifoPopEn := True
+        for (inRecv <- 0 until 2)
+          insRecved(inRecv) := Mux(insRecved(inRecv), True, io.lastGrpIns(inRecv))
+        when(insRecved.andR) {
+          when(lastCompareFinished) {
+            goto(sWait)
+          }.otherwise{
+            io.lastGrpOut := True
+            goto(sIdle)
+          }
+        }
+      }
+    }
+
+    val sWait: State = new State {
+      onEntry {
+        insRecved.clearAll()
+      }
+      whenIsActive{
+        topChanValid.clear()
+        botChanValid.clear()
+        fifoPopEn := True
+        when(~lastCompareFinished & (hasNoInput | io.idx_outs.fire)) {
+          io.lastGrpOut := True
+          hasNoInput := True
+          goto(sIdle)
+        }
+      }
+    }
+  }
+
+  when(fifoPopEn) {
+    fifos.foreach(_.io.pop.ready := False)
+    when(io.idx_outs.ready) {
+      switch(fifos(0).io.pop.valid ## fifos(1).io.pop.valid) {
+        is(B"2'b01") {
+          val cachedLkAhdIn = io.idx_ins(0).payload.idxData
+          val lookAheadRes = Delay(
+            fifos(1).io.pop.payload.idxData(bitwidth-2 downto 0) > cachedLkAhdIn(bitwidth-2 downto 0), 1)
+
+          when(Delay(io.idx_ins(0).valid, 1)) {
+            when(lookAheadRes) {
+              fifos(1).io.pop.ready := True
+              io.idx_outs.valid := True
+              io.idx_outs.payload := fifos(1).io.pop.payload
+            }.otherwise {
+              fifos(1).io.pop.ready := False
+              io.idx_outs.valid := False
+              io.idx_outs.payload := IndexData(bitwidth, dest_width, placeholder)
+            }
+          }.elsewhen(ctrlStateMachine.insRecved(0)) {
+            fifos(1).io.pop.ready := True
+            io.idx_outs.valid := True
+            io.idx_outs.payload := fifos(1).io.pop.payload
+          }.elsewhen(ctrlStateMachine.isActive(ctrlStateMachine.sWait)) {
+            fifos(1).io.pop.ready := True
+            io.idx_outs.valid := True
+            io.idx_outs.payload := fifos(1).io.pop.payload
+          } .otherwise {
+            fifos(1).io.pop.ready := False
+            io.idx_outs.valid := False
+            io.idx_outs.payload := IndexData(bitwidth, dest_width, placeholder)
+          }
+        }
+
+        is(B"2'b10") {
+          val cachedLkAhdIn = io.idx_ins(1).payload.idxData
+          val lookAheadRes = Delay(
+            fifos(0).io.pop.payload.idxData(bitwidth-2 downto 0) > cachedLkAhdIn(bitwidth-2 downto 0), 1)
+
+          when(Delay(io.idx_ins(1).valid, 1)) {
+            when(lookAheadRes) {
+              fifos(0).io.pop.ready := True
+              io.idx_outs.valid := True
+              io.idx_outs.payload := fifos(0).io.pop.payload
+            }.otherwise {
+              fifos(0).io.pop.ready := False
+              io.idx_outs.valid := False
+              io.idx_outs.payload := IndexData(bitwidth, dest_width, placeholder)
+            }
+          }.elsewhen(ctrlStateMachine.insRecved(1)) {
+            fifos(0).io.pop.ready := True
+            io.idx_outs.valid := True
+            io.idx_outs.payload := fifos(0).io.pop.payload
+          }.elsewhen(ctrlStateMachine.isActive(ctrlStateMachine.sWait)) {
+            fifos(0).io.pop.ready := True
+            io.idx_outs.valid := True
+            io.idx_outs.payload := fifos(0).io.pop.payload
+          } .otherwise {
+            fifos(0).io.pop.ready := False
+            io.idx_outs.valid := False
+            io.idx_outs.payload := IndexData(bitwidth, dest_width, placeholder)
+          }
+        }
+
+        is(B"2'b11") {
+          io.idx_outs.valid := True
+          when(fifos(0).io.pop.payload.idxData > fifos(1).io.pop.payload.idxData) {
+            fifos(0).io.pop.ready := True
+            io.idx_outs.payload := fifos(0).io.pop.payload
+          }.elsewhen(fifos(0).io.pop.payload.idxData < fifos(1).io.pop.payload.idxData) {
+            fifos(1).io.pop.ready := True
+            io.idx_outs.payload := fifos(1).io.pop.payload
+          }.otherwise {
+            fifos.foreach(_.io.pop.ready := True)
+            io.idx_outs.payload := IndexData(
+              idxData = fifos(0).io.pop.payload.idxData,
+              destId = Vec(for (f <- fifos) yield f.io.pop.payload.destId).reduceBalancedTree((a, b) => a | b)
+            )
+          }
+        }
+
+        default {
+          io.idx_outs.valid := False
+          io.idx_outs.payload := IndexData(bitwidth, dest_width, placeholder)
+          fifos.foreach(_.io.pop.ready := False)
+        }
+      }
+    }
+  }.otherwise {
+    io.idx_outs.valid := False
+    io.idx_outs.payload := IndexData(bitwidth, dest_width, placeholder)
+    fifos.foreach(_.io.pop.ready := False)
+  }
+}
+
 class RedundancyRemoverFrontend(num_inputs: Int, bitwidth: Int, dest_width: Int,
                                 placeholder: BigInt, fifo_depth: Int) extends Component {
   val io = new Bundle {

@@ -270,9 +270,9 @@ class TensorCoreChainArray(array_col: Int, array_row: Int, chain_len: Int, idx_w
 
       for (transBufId <- transposeBuffer.indices) {
         transposeBuffer(transBufId).io.dataIn := rowBuffParaRd
-        transposeBuffer(transBufId).io.wrEn := rowBuffWrCtrl(transBufId)
-        transposeBuffer(transBufId).io.wrAddr := transposeBufferWrAddr
-        transposeBuffer(transBufId).io.rdAddr := rowTransBuffRdAddr
+        transposeBuffer(transBufId).io.wrEn := Delay(rowBuffWrCtrl(transBufId), 2)
+        transposeBuffer(transBufId).io.wrAddr := Delay(transposeBufferWrAddr.value, 2)
+        transposeBuffer(transBufId).io.rdAddr := Delay(rowTransBuffRdAddr.value, 2)
         transposeBuffer(transBufId).io.rdEn := True
       }
 
@@ -337,8 +337,8 @@ class TensorCoreChainArray(array_col: Int, array_row: Int, chain_len: Int, idx_w
       //   it equals to the chain_loading_latency when the Dot Product
       //   hides the matA loading latency just fine.
       tensorArray(r)(c).io.matABroadcastIters := U(NUM_MATB_VEC_PER_ROW, 16 bits)
-      tensorArray(r)(c).io.doubleBufferLoadSel := tccInnerBufSelLoad(c) ## (~tccInnerBufSelLoad(c))
-      tensorArray(r)(c).io.doubleBufferCompSel := tccInnerBuffSelComp(c)
+      tensorArray(r)(c).io.doubleBufferLoadSel := Delay(tccInnerBufSelLoad(c) ## (~tccInnerBufSelLoad(c)), 2)
+      tensorArray(r)(c).io.doubleBufferCompSel := Delay(tccInnerBuffSelComp(c), 2)
     }
   }
 
@@ -526,8 +526,8 @@ class TensorCoreChainArray(array_col: Int, array_row: Int, chain_len: Int, idx_w
 
   for (r <- 0 until array_row; c <- 0 until array_col) {
     tensorArray(r)(c).io.dataInLast := isLastOutGrp
-    outputBufferSelOut(r)(c).payload := tensorArray(r)(c).io.res.payload.asBits.asUInt
-    outputBufferSelOut(r)(c).valid := tensorArray(r)(c).io.res.valid & outBufferWr
+    outputBufferSelOut(r)(c).payload := Delay(tensorArray(r)(c).io.res.payload.asBits.asUInt, inout_pipe_delay)
+    outputBufferSelOut(r)(c).valid := Delay(tensorArray(r)(c).io.res.valid & outBufferWr, inout_pipe_delay)
   }
 
   // TODO: verify function of shift regs
@@ -539,12 +539,9 @@ class TensorCoreChainArray(array_col: Int, array_row: Int, chain_len: Int, idx_w
     )
   )
   for (regIdx <- 0 until array_row) {
-    outBuffer(regIdx).io.push.valid := Delay(outputBufferSelOut(regIdx)(0).valid, inout_pipe_delay)
-    outBuffer(regIdx).io.push.payload := 
-      Delay(
-        List.tabulate(array_col)(i => outputBufferSelOut(regIdx)(i).payload).reduce((a, b) => a @@ b),
-        inout_pipe_delay
-      )
+    outBuffer(regIdx).io.push.valid := outputBufferSelOut(regIdx)(0).valid
+    outBuffer(regIdx).io.push.payload :=
+      List.tabulate(array_col)(i => outputBufferSelOut(regIdx)(i).payload).reduce((a, b) => a @@ b)
     
     io.res(regIdx) << outBuffer(regIdx).io.pop
   }

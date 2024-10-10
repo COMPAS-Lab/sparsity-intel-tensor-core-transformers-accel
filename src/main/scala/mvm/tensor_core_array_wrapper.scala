@@ -5,6 +5,7 @@ import spinal.lib._
 import spinal.lib.fsm._
 import config._
 import intel_ips._
+import spinal.core.Component.push
 
 case class MultiPortStream(dWidth: Int, addrWidth: Int, hasAlmostFull: Boolean, hasAlmostEmpty: Boolean) extends Bundle with IMasterSlave {
   val start, select = Bool()
@@ -34,16 +35,12 @@ class tensor_core_array_wrapper(array_col: Int, array_row: Int, chain_len: Int,
                                 num_hbms: Int, idx_placeholder: BigInt = BigInt("111111111", 2)
                                ) extends Component {
   val io = new Bundle {
-    val refclk = in Bool()
-    val rr_clk = out Bool()
     val start, iter = in UInt (8 bits)
     val in_buffer_id = in UInt (16 bits)
     val rd_addr, wr_addr = in UInt (32 bits)
     val load_start = in UInt (32 bits)
     val hbm_ready = Array.fill(num_hbms)(in Bool())
     // TODO: temp ports for idx gen only, deprecated in the future
-    val idx_rd_addr = in UInt(32 bits)
-    val idx_res = out UInt(11 bits)
     val tcarray_in = Vec(slave(MultiPortStream(256, 32, false, true)), 5)
     val tcarray_out = Vec(master(MultiPortStream(256, 32, true, false)), 2)
   }
@@ -80,46 +77,26 @@ class tensor_core_array_wrapper(array_col: Int, array_row: Int, chain_len: Int,
     elem.port_error.setName("port_error_" + elem.getName())
   }
 
-  val rrClkCtrl = new Area {
-    val rr_clk_gen = new rr_clk_pll
-    rr_clk_gen.io.refclk <> io.refclk
-    rr_clk_gen.io.rst <> ! clrn
-
-    val rrClkDomain = ClockDomain.internal(
-      name = "rr_clk_domain",
-      frequency = FixedFrequency(150 MHz)
-    )
-
-    rrClkDomain.clock := rr_clk_gen.io.outclk_0
-    rrClkDomain.reset := ResetCtrl.asyncAssertSyncDeassert(
-      input = ! clrn || ! rr_clk_gen.io.locked,
-      clockDomain = rrClkDomain
-    )
-  }
-
-  io.rr_clk <> rrClkCtrl.rrClkDomain.readClockWire
-
-  val rrClkRegion = new ClockingArea(rrClkCtrl.rrClkDomain) {
+  val idxGenRegion = new Area {
     private val IDX_BITSIZE = 9
     val idxInStart, idxInSelect = Reg(Bool(), init = False)
     val loadStartCC = BufferCC(io.load_start(0), init = False)
     val idxGenerator = new IndexGenerator(array_col, IDX_BITSIZE, BigInt("111111111", 2))
     // index generator connection
-    val hbmData = io.tcarray_in(4).data(IDX_BITSIZE * array_col - 1 downto 0).subdivideIn(IDX_BITSIZE bits)
+    val hbmData = Delay(
+      io.tcarray_in(4).data(IDX_BITSIZE * array_col - 1 downto 0).subdivideIn(IDX_BITSIZE bits), 2)
+    val hbmDataTlast = Bits(array_col bits)
     for (i <- idxGenerator.io.seqIn.indices) {
       idxGenerator.io.seqIn(i).payload := IndexData(hbmData(i), B(1, array_col bits) |<< i)
-      idxGenerator.io.seqIn(i).valid := True
+      idxGenerator.io.seqIn(i).valid := hbmData(i).msb
+      hbmDataTlast(i) := hbmData(i).msb
     }
     //TODO: fix this temp connection
-    idxGenerator.io.lastGrpIn := Delay(io.start(0), 2)
-    val idxGeneratorRes: Vec[IndexData] = RegNext(idxGenerator.io.seqOut.payload)
-    io.idx_res := io.idx_rd_addr(log2Up(array_col)-1 downto 0).muxListDc(
-      for (i <- idxGeneratorRes.indices) yield (i, (U"2'd0" ## idxGeneratorRes(i).idxData).asUInt)
-    )
+    idxGenerator.io.lastGrpIns := hbmDataTlast
+//    val idxGeneratorRes: Stream[IndexData] = idxGenerator.io.seqOut
+    val idxGenFifo = StreamFifo(IndexData(IDX_BITSIZE, array_col), 128)
+    idxGenFifo.io.push << idxGenerator.io.seqOut
 
-    io.tcarray_in(4).addr := U(0)
-    io.tcarray_in(4).start <> idxInStart
-    io.tcarray_in(4).select <> idxInSelect
     // index read control
     val idxRdFsm = new StateMachine {
       val rdWordCounter = Counter(mat_a_col / (chain_len * 3))
@@ -162,8 +139,11 @@ class tensor_core_array_wrapper(array_col: Int, array_row: Int, chain_len: Int,
         }
         onExit(idxInSelect.clear())
       }
-
     }
+
+    io.tcarray_in(4).addr := idxRdFsm.rdWordCounter.resized
+    io.tcarray_in(4).start <> idxInStart
+    io.tcarray_in(4).select := idxInSelect & idxGenFifo.io.push.ready
   }
 
   val selectTcarrayIn, startTCarrayIn = Reg(Bool()) init False
@@ -171,7 +151,6 @@ class tensor_core_array_wrapper(array_col: Int, array_row: Int, chain_len: Int,
 
   val data2TcarrayCol = Vec(Stream(BfpBlockWithIdx(88, 9, 0, 0, idx_placeholder)), array_col)
   val data2TcarrayRow = Vec(Stream(UInt(88 bits)), array_row)
-//  val data2IdxGenerator = Vec(UInt(IDX_BITSIZE bits), array_col)
 
   val dataColIn = Stream(UInt(data2TcarrayCol(0).payload.getBitsWidth bits))
   val dataRowIn = Stream(UInt(data2TcarrayRow(0).payload.getBitsWidth bits))
@@ -210,8 +189,7 @@ class tensor_core_array_wrapper(array_col: Int, array_row: Int, chain_len: Int,
 
   tcArray.io.matALoad <> data2TcarrayCol
   tcArray.io.matBLoad <> data2TcarrayRow
-  tcArray.io.sortedColIdx.valid := Delay(io.start(1), 2)
-  tcArray.io.sortedColIdx.payload <> IndexData(io.in_buffer_id.resize(9), io.in_buffer_id.resize(12).asBits)
+  tcArray.io.sortedColIdx << idxGenRegion.idxGenFifo.io.pop
   tcArray.io.colIdxFifoNotEmpty := True
   tcArray.io.calEn := io.start(0).rise()
   tcArray.io.tccRowBufferId := io.in_buffer_id.resized
