@@ -13,22 +13,30 @@ case class AsymBufferN2One(bitwidth: Int,
   val io = new Bundle {
     val wrAddr = in UInt(log2Up(wr_depth) bits)
     val dataIn = in Vec(UInt(bitwidth bits), num_in_words)
-    val rdAddr = in UInt(log2Up(num_in_words * wr_depth) bits)
     val dataOut = out UInt(bitwidth bits)
     val wrEn, rdEn = in Bool()
   }
 
   val asymBufferCore = Array.fill(num_in_words)(new spram_megafunc(bitwidth, wr_depth, "MLAB"))
+  val rdSel = Counter(num_in_words)
+  val asymBufferRd = Counter(wr_depth)
+
+  when(io.rdEn) {rdSel.increment()}
+  when(rdSel === (num_in_words - log2Up(num_in_words) + 1) && rdSel.willIncrement) {
+    asymBufferRd.increment()
+  }
+
   for (coreIdx <- asymBufferCore.indices) {
     asymBufferCore(coreIdx).io.data := io.dataIn(coreIdx)
     asymBufferCore(coreIdx).io.wren := io.wrEn
     asymBufferCore(coreIdx).io.wraddress := io.wrAddr
-    asymBufferCore(coreIdx).io.rdaddress := io.rdAddr(log2Up(wr_depth) - 1 downto 0)
+    asymBufferCore(coreIdx).io.rdaddress := asymBufferRd.value
   }
 
-  val selAddr = io.rdAddr(log2Up(num_in_words * wr_depth) - 1 downto log2Up(wr_depth))
-  val selAddrBuffer = History(selAddr, log2Up(asymBufferCore.length), io.rdEn)
+  val rdEnDelayed = History(io.rdEn, log2Up(asymBufferCore.length) + 1)
+  val selAddrBuffer = History(rdSel.value, log2Up(asymBufferCore.length))
   val inputVec = Vec(for(buf <- asymBufferCore) yield (buf.io.q))
+
 
   def stage(elements: Vec[UInt], level: Int): UInt = {
     if (elements.length == 1) return elements.head
@@ -37,7 +45,7 @@ case class AsymBufferN2One(bitwidth: Int,
 
     for (i <- 0 until logicCount) {
       val muxSelRes = Reg(UInt(elements.head.getWidth bits), init=U(0))
-      when(io.rdEn) {
+      when(rdEnDelayed(level)) {
         if (i * 2 + 1 < elements.length)
           muxSelRes := Mux(selAddrBuffer(level)(level), elements(i * 2 + 1), elements(i * 2))
         else

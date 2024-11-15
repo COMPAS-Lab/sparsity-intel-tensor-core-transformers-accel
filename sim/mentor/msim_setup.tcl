@@ -103,6 +103,10 @@ if ![info exists QSYS_SIMDIR] {
   set QSYS_SIMDIR "./../"
 }
 
+if ![info exists SIMLIB_DIR] { 
+  set SIMLIB_DIR "/var/services/homes/tianchu.ji/mackeson-home/simlib/quartus_modelsim_simlib/verilog_libs"
+}
+
 if ![info exists QUARTUS_INSTALL_DIR] { 
   set QUARTUS_INSTALL_DIR "/compas/opt/intelFPGA_pro/21.4/quartus/"
 }
@@ -199,6 +203,21 @@ if [string is false -strict [modelsim_ae_select $FORCE_MODELSIM_AE_SELECTION]] {
   vmap       fourteennm_ver     ./libraries/fourteennm_ver/    
   ensure_lib                    ./libraries/fourteennm_ct1_ver/
   vmap       fourteennm_ct1_ver ./libraries/fourteennm_ct1_ver/
+} else {
+  ensure_lib                    $SIMLIB_DIR/altera_ver/        
+  vmap       altera_ver         $SIMLIB_DIR/altera_ver/        
+  ensure_lib                    $SIMLIB_DIR/lpm_ver/           
+  vmap       lpm_ver            $SIMLIB_DIR/lpm_ver/           
+  ensure_lib                    $SIMLIB_DIR/sgate_ver/         
+  vmap       sgate_ver          $SIMLIB_DIR/sgate_ver/         
+  ensure_lib                    $SIMLIB_DIR/altera_mf_ver/     
+  vmap       altera_mf_ver      $SIMLIB_DIR/altera_mf_ver/     
+  ensure_lib                    $SIMLIB_DIR/altera_lnsim_ver/  
+  vmap       altera_lnsim_ver   $SIMLIB_DIR/altera_lnsim_ver/  
+  ensure_lib                    $SIMLIB_DIR/fourteennm_ver/    
+  vmap       fourteennm_ver     $SIMLIB_DIR/fourteennm_ver/    
+  ensure_lib                    $SIMLIB_DIR/fourteennm_ct1_ver/
+  vmap       fourteennm_ct1_ver $SIMLIB_DIR/fourteennm_ct1_ver/
 }
 set design_libraries [dict create]
 set design_libraries [dict merge $design_libraries [get_design_libraries]]
@@ -276,6 +295,11 @@ alias elab_debug {
   foreach library $logical_libraries { append elabcommand " -L $library" }
   append elabcommand " $TOP_LEVEL_NAME"
   eval vsim -voptargs=+acc $elabcommand
+}
+
+# save current waveform
+alias save_wcfg {
+  write format wave -window .main_pane.wave.interior.cs.body.pw.wf /compas/mackeson-homes/tianchu.ji/HGO/proj/intel-tensor-core-matmul/sim/tcarray_tb_add_wave.do
 }
 
 # ----------------------------------------

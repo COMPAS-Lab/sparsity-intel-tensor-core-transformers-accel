@@ -249,11 +249,5 @@ def main():
                 with open("./tb/idxgen_stimu/heads_failed.txt", "a+") as f:
                     f.write(f"{failed_head}\n")
 
-    # generate stimulus for a single-stage redundancy remover
-    # gen_dat_a = gen_sorted_dat(6, 8//2, (1, 200))
-    # gen_dat_b = gen_sorted_dat(6, 8//2, (1, 200))
-    # write_to_file(gen_dat_a, "./sorted_data_upper.bin")
-    # write_to_file(gen_dat_b, "./sorted_data_lower.bin")
-
 if __name__ == "__main__":
     main()

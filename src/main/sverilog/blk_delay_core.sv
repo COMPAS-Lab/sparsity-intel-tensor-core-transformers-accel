@@ -98,16 +98,16 @@ generate
       end
 
       scfifo #(
-        .LPM_WIDTH( WIDTH ),
-        .LPM_NUMWORDS( LENGTH ),   // must be at least 4
-        .LPM_WIDTHU( CNTR_W ),
-        .LPM_SHOWAHEAD( "ON" ),
-        .UNDERFLOW_CHECKING( "ON" ),
-        .OVERFLOW_CHECKING( "ON" ),
-        .ENABLE_ECC( "FALSE" ),
-        .ALLOW_RWCYCLE_WHEN_FULL( "ON" ),
-        .USE_EAB( "ON" ),
-        .LPM_HINT( $sformatf("RAM_BLOCK_TYPE=%s",TYPE) )
+        .lpm_width( WIDTH ),
+        .lpm_numwords( LENGTH ),   // must be at least 4
+        .lpm_widthu( CNTR_W ),
+        .lpm_showahead( "ON" ),
+        .underflow_checking( "ON" ),
+        .overflow_checking( "ON" ),
+        .enable_ecc( "FALSE" ),
+        .allow_rwcycle_when_full( "ON" ),
+        .use_eab( "ON" ),
+        .lpm_hint( "RAM_BLOCK_TYPE=M20K" )
       ) internal_fifo (
         .clock( clk ),
         .aclr( 1'b0 ),

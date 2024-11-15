@@ -27,6 +27,19 @@ def twos_comp(x: str, sign: str):
             new_x += "1" if b == "0" else "0"
         res = bin(int(new_x, 2) + 1)[2:]
         return "1" + res
+    
+def find_nearest(array: list, value: float):
+    array = np.asarray(array)
+    idx = (np.abs(array - value)).argmin()
+    # print(f"selecting {array[idx]} at {idx}")
+    return idx
+
+def compute_thrpt(a_h, a_w, b_w, total_latency, freq):
+    # compute throughput
+    total_ops = a_h * a_w * 2 * b_w
+    time_latency = total_latency * 1./freq * 1e-6
+    flops = total_ops / time_latency / 1e12
+    return flops
 
 class BfpType(Enum):
     BFP_12 = 0
@@ -78,60 +91,113 @@ class BFP():
     def is_vec_tail(self, vec: str, idx_size: tuple) -> bool:
         res = False
         ridx_size, cidx_size = idx_size
-        if vec == (("1" * (ridx_size + 1) + "1" * (cidx_size + 1) + "0" * self.blk_bits()) ) :
+        if vec == ("1" * ridx_size + "0" * self.blk_bits()) :
             res = True
 
         return res
 
-    def to_bfp(self, blk_list: list, idx: tuple = None, insert_vec_tail = True) -> tuple:
+    def to_bfp(self, blk_list: list, idx: tuple = None, insert_vec_tail = True, ridx_size=0, cidx_size=0, enable_row_subgrps=False) -> tuple:
         '''
         expect tensor size - data: (nblks, c, 20) idx: (nblks,)
         return: (nblks, blks_str), int, int as list
         '''
         res = []
-        ridx_size, cidx_size = 0, 0
-
         def int_idx_to_bin(index: int, width: int) -> str:
-            return "0" + bin(index)[2:].zfill(width)
+            return "0" + bin(index)[2:].zfill(width-1)
+        
+        def vec_to_bfp_block(blk_r):
+            fp32_blk_elems = [f for f in blk_r]
+            blk_elems = [float_to_hex(f) for f in blk_r]
+            exps = [int(hex_to_bin(e, 32)[1:9], 2) for e in blk_elems]
+            mants = [hex_to_bin(e, 32)[9:9+self.mant_bits()+1] for e in blk_elems]
+            signs = [hex_to_bin(e, 32)[0] for e in blk_elems]
+            
+            # TODO: be careful for the situation where part of the inputs are zero
+            blk_res = bin(max(max(exps)-2, 0))[2:].zfill(8)
+
+            for i in range(len(blk_elems)):
+                mant_with_sign = "0" * (self.mant_bits() + 2) \
+                    if blk_elems[i] == "00000000" else "1" + mants[i]
+                ## nearest val rounding
+                possible_vals = [v*(2**(max(exps)-2-127)) for v in range(2**self.mant_bits())]
+                possible_mants = [bin(int(v))[2:].zfill(self.mant_bits()) for v in range(2**self.mant_bits())]
+                if signs[i] == "1":
+                    possible_vals = [0-v for v in possible_vals]
+                final_mant = possible_mants[find_nearest(possible_vals, fp32_blk_elems[i])]
+                final_mant = twos_comp(final_mant, signs[i])
+                ## truncation rounding:
+                # shifted_mant = "0" * (self.mant_bits() + 2) \
+                #     if (max(exps) - exps[i]) > len(mant_with_sign) \
+                #     else mant_with_sign[0:len(mant_with_sign) - (max(exps) - exps[i]) + 1].zfill(len(mant_with_sign))
+                # final_mant = twos_comp(shifted_mant, signs[i])[0:self.mant_bits() + 1]
+                blk_res += final_mant
+            return blk_res
 
         if idx:
             assert(len(idx[0]) == len(idx[1]))
             assert(len(idx[0]) == len(blk_list))
-
-            # set bitwidth of ridx
             max_ridx = np.amax(idx[0])
+            req_ridx_size = len(bin(int(max_ridx))[2:]) + 1
             max_cidx = np.amax(idx[1])
-            ridx_size = len(bin(int(max_ridx))[2:])
-            cidx_size = len(bin(int(max_cidx))[2:])
+            req_cidx_size = len(bin(int(max_cidx))[2:]) + 1
+            
+            # set bitwidth of ridx
+            ridx_size = ridx_size if ridx_size > 0 else req_ridx_size
+            cidx_size = cidx_size if cidx_size > 0 else req_cidx_size
+
+            assert((ridx_size >= req_ridx_size) and (cidx_size >= req_cidx_size))
             print(f"select idx bitwidth as {ridx_size}, {cidx_size}")
         
         last_ridx = idx[0][0] if idx else None
         # bfp conversion and idx attaching
-        for rec_idx, blk in enumerate(blk_list):
-            if idx:
-                curr_ridx = idx[0][rec_idx]
-                if insert_vec_tail and curr_ridx > last_ridx:
-                    # insert vector tail into the list
-                    res.append("1" * (ridx_size + 1) + "1" * (cidx_size + 1) + "0" * self.blk_bits())
-                    last_ridx = curr_ridx
+        if enable_row_subgrps:
+            curr_row_blks = [[] for i in range(3)]
+            for rec_idx, blk in enumerate(blk_list):
+                # blk is a 3xblk_size block
+                if insert_vec_tail and idx:
+                    curr_ridx = idx[0][rec_idx]
+                    if curr_ridx > last_ridx:
+                        # insert vector tail into the list
+                        tail_blk = "1" * ridx_size + "0" * self.blk_bits()
+                        last_ridx = curr_ridx
+                        for sub_row in curr_row_blks:
+                            sub_row.append(tail_blk)
+                        res.append(curr_row_blks)
+                        curr_row_blks = [[] for i in range(3)]
 
-            for sub_r, blk_r in enumerate(blk):
-                blk_elems = [float_to_hex(f) for f in blk_r]
-                exps = [int(hex_to_bin(e, 32)[1:9], 2) for e in blk_elems]
-                mants = [hex_to_bin(e, 32)[9:9+self.mant_bits()+1] for e in blk_elems]
-                signs = [hex_to_bin(e, 32)[0] for e in blk_elems]
+                # expand each 3-row group
+                for sub_r, blk_r in enumerate(blk):
+                    blk_res = vec_to_bfp_block(blk_r)
+                    if idx:
+                        blk_res = int_idx_to_bin(idx[0][rec_idx], ridx_size) + blk_res
+
+                    assert(len(blk_res) == (88 + ridx_size))
+                    
+                    # push new blocks in the row on the top so that it will be written in the file first,
+                    # then loaded into the deeper tc cores
+                    curr_row_blks[sub_r] = [blk_res] + curr_row_blks[sub_r]
+
+                # append last group to the result
+                if rec_idx == len(blk_list) - 1:
+                    if insert_vec_tail and idx:
+                        # insert vector tail into the list
+                        tail_blk = "1" * ridx_size + "0" * self.blk_bits()
+                        last_ridx = curr_ridx
+                        for sub_row in curr_row_blks:
+                            sub_row.append(tail_blk)
+                        res.append(curr_row_blks)
+                        curr_row_blks = [[] for i in range(3)]
+
+        else:
+            for rec_idx, blk in enumerate(blk_list):
+                if idx:
+                    curr_ridx = idx[0][rec_idx]
+                    if insert_vec_tail and curr_ridx > last_ridx:
+                        # insert vector tail into the list
+                        res.append("1" * (ridx_size + 1) + "1" * (cidx_size + 1) + "0" * self.blk_bits())
+                        last_ridx = curr_ridx
                 
-                # TODO: be careful for the situation where part of the inputs are zero
-                blk_res = bin(max(max(exps)-2, 0))[2:].zfill(8)
-
-                for i in range(len(blk_elems)):
-                    mant_with_sign = "0" * (self.mant_bits() + 2) \
-                        if blk_elems[i] == "00000000" else "1" + mants[i]
-                    shifted_mant = "0" * (self.mant_bits() + 2) \
-                        if (max(exps) - exps[i]) > len(mant_with_sign) \
-                        else mant_with_sign[0:len(mant_with_sign) - (max(exps) - exps[i]) + 1].zfill(len(mant_with_sign))
-                    final_mant = twos_comp(shifted_mant, signs[i])[0:self.mant_bits() + 1]
-                    blk_res += final_mant
+                blk_res = vec_to_bfp_block(blk)
 
                 if idx:
                     blk_res = int_idx_to_bin(idx[0][rec_idx], ridx_size) + \
@@ -141,48 +207,75 @@ class BFP():
             
         return res, (ridx_size, cidx_size)
 
-    def idx_redremove_gen(self, idx: tuple, n_shared_chans: int):
+    def idx_redremove_gen(self, idx: tuple, n_shared_chans: int, ridx_size=0, cidx_size=0):
         '''
         expect size - idx: (nblks,)
         '''
         res = []
-        ridx_size, cidx_size = 0, 0
 
         def int_idx_to_bin(index: int, width: int) -> str:
-            return "0" + bin(index)[2:].zfill(width)
+            return "0" + bin(index)[2:].zfill(width-1)
+
+        def construct_idx_dest_pair(curr_blk_list: list) -> list[tuple]:
+            idx_dest_pairs = []
+
+            total_idx_count = len(list(itertools.chain(*curr_blk_list)))
+            sorted_idx_res = list(np.unique(list(itertools.chain(*curr_blk_list))))
+
+            print(f"col idx remain rate: {len(sorted_idx_res) / total_idx_count:.4f}")
+            sorted_idx_res.sort(reverse=True)
+            curr_sorted_res_bitmasks = ["0"] * n_shared_chans
+            for unrep_elem in sorted_idx_res:
+                curr_sorted_res_bitmasks = ["0"] * n_shared_chans
+                for tc_col in range(n_shared_chans):
+                    if unrep_elem in curr_blk_list[tc_col]:
+                        curr_sorted_res_bitmasks[n_shared_chans - 1 - tc_col] = "1"
+
+                idx_dest_pairs.append((unrep_elem, "".join(curr_sorted_res_bitmasks)))
+
+            return idx_dest_pairs
 
         assert(len(idx[0]) == len(idx[1]))
 
         # set bitwidth of ridx
         max_ridx = np.amax(idx[0])
+        req_ridx_size = len(bin(int(max_ridx))[2:]) + 1
         max_cidx = np.amax(idx[1])
-        ridx_size = len(bin(int(max_ridx))[2:])
-        cidx_size = len(bin(int(max_cidx))[2:])
+        req_cidx_size = len(bin(int(max_cidx))[2:]) + 1
+        
+        # set bitwidth of ridx
+        ridx_size = ridx_size if ridx_size > 0 else req_ridx_size
+        cidx_size = cidx_size if cidx_size > 0 else req_cidx_size
+
+        assert((ridx_size >= req_ridx_size) and (cidx_size >= req_cidx_size))
         print(f"select idx bitwidth as {ridx_size}, {cidx_size}")
         
         last_ridx = idx[0][0] if idx else None
-        curr_idx_blk = []
+        curr_idx_blk = [[] for i in range(n_shared_chans)]
         curr_rowblk_counter = 0
         idx_grps = []
         # bfp conversion and idx attaching
         for rec_idx in range(len(idx[0])):
             curr_ridx = idx[0][rec_idx]
             if curr_ridx > last_ridx:
+                last_ridx = curr_ridx
                 curr_rowblk_counter += 1
 
             if curr_rowblk_counter == n_shared_chans:
-                curr_unique_idx = list(np.unique(curr_idx_blk))
-                idx_grps += [int_idx_to_bin(i, cidx_size) for i in curr_unique_idx] + ["1" * (cidx_size+1)]
-                curr_idx_blk = []
+                curr_unique_idx_desp_pair = construct_idx_dest_pair(curr_idx_blk)
+                idx_grps += [(int_idx_to_bin(i[0], cidx_size), i[1]) for i in curr_unique_idx_desp_pair] 
+                idx_grps += [("1" * cidx_size, "0" * n_shared_chans)]
+                curr_idx_blk = [[] for i in range(n_shared_chans)]
                 curr_rowblk_counter = 0
 
-            curr_idx_blk.append(idx[1][rec_idx])
+            curr_idx_blk[curr_rowblk_counter].append(idx[1][rec_idx])
 
             # tail
             if rec_idx == len(idx[0])-1:
-                curr_unique_idx = list(np.unique(curr_idx_blk))
-                idx_grps += [int_idx_to_bin(i, cidx_size) for i in curr_unique_idx] + ["1" * (cidx_size+1)]
-                curr_idx_blk = []
+                curr_unique_idx_desp_pair = construct_idx_dest_pair(curr_idx_blk)
+                idx_grps += [(int_idx_to_bin(i[0], cidx_size), i[1]) for i in curr_unique_idx_desp_pair] 
+                idx_grps += [("1" * cidx_size, "0" * n_shared_chans)]
+                curr_idx_blk = [[] for i in range(n_shared_chans)]
                 curr_rowblk_counter = 0
 
         return idx_grps
@@ -198,7 +291,7 @@ class BFP():
 
 DAT_PATH = "./sparse_matmul_data"
 
-def mat_a_gen(mat_src_name: str, bfp_type: BFP, n_blocks_split: int = 1):
+def mat_a_gen(mat_src_name: str, bfp_type: BFP, n_blocks_split: int = 1, ridx_size = 9, cidx_size=9, bfp_friendly_dat = False):
     '''
     assuming mat A is a 3xthree_vec_len mat block:
     '''
@@ -218,7 +311,10 @@ def mat_a_gen(mat_src_name: str, bfp_type: BFP, n_blocks_split: int = 1):
             headgrp_cidx.append(curr_head_cidx.copy())
             curr_head_val, curr_head_ridx, curr_head_cidx = [], [], []
         else:
-            curr_head_val.append(val)
+            if bfp_friendly_dat:
+                curr_head_val.append(bfp_type.gen_bfp_friendly_data((3, 20)))
+            else:
+                curr_head_val.append(val)
             curr_head_ridx.append(ridx)
             curr_head_cidx.append(cidx)
 
@@ -228,8 +324,17 @@ def mat_a_gen(mat_src_name: str, bfp_type: BFP, n_blocks_split: int = 1):
     src_val, src_ridx, src_cidx = headgrp_vals[hidx], headgrp_ridx[hidx], headgrp_cidx[hidx] 
 
     # prepare mat a
-    bfp_res, idx_width = bfp_type.to_bfp(src_val, (src_ridx, src_cidx), insert_vec_tail = True)
-    idx_after_redremove = bfp_type.idx_redremove_gen((src_ridx, src_cidx), n_blocks_split)
+    # pad rows to align with number of TC cols
+    curr_num_rows = len(np.unique(src_ridx))
+    nrows_to_pad = math.ceil(curr_num_rows / n_blocks_split) * n_blocks_split - curr_num_rows
+    src_val = src_val + [np.zeros((3, bfp_type.blk_size()))] * nrows_to_pad
+    src_ridx = src_ridx + [curr_num_rows + i for i in range(nrows_to_pad)]
+    src_cidx = src_cidx + [0] * nrows_to_pad
+
+    bfp_res, idx_width = bfp_type.to_bfp(src_val, (src_ridx, src_cidx), 
+                                         insert_vec_tail = True, ridx_size=ridx_size, cidx_size=cidx_size,
+                                         enable_row_subgrps = True)
+    idx_after_redremove = bfp_type.idx_redremove_gen((src_ridx, src_cidx), n_blocks_split, ridx_size=ridx_size, cidx_size=cidx_size)
 
     fnames = [DAT_PATH + "/" + f"MAT_A_{bfp_type.format_name()}_b{b_size}.bin" for b_size in range(n_blocks_split)]
     fps = [open(fname, "w+", encoding='utf-8') for fname in fnames]
@@ -237,21 +342,29 @@ def mat_a_gen(mat_src_name: str, bfp_type: BFP, n_blocks_split: int = 1):
     idx_fp = open(idx_fname, "w+", encoding='utf-8')
 
     f_idx = 0
-    for i in bfp_res:
-        if bfp_type.is_vec_tail(i, idx_width):
-            fps[f_idx].write(i + "\n")
-            f_idx = int((f_idx + 1) % n_blocks_split)
-        else:
-            fps[f_idx].write(i + "\n")
+    n_blks = 0
+    for big_row in bfp_res:
+        assert(len(big_row[0]) == len(big_row[1]) and len(big_row[1]) == len(big_row[2]))
+        n_blks += 3 * len(big_row[0])
+        for b_idx in range(len(big_row[0])-1):
+            fps[f_idx].write(big_row[0][b_idx] + "\n")
+            fps[f_idx].write(big_row[1][b_idx] + "\n")
+            fps[f_idx].write(big_row[2][b_idx] + "\n")
 
-    print("{} lines written to A.".format(len(bfp_res)))
-    print(f"mat A total size: {len(bfp_res) * len(bfp_res[0]) / 1024. / 1024. / 8:.2f} MB")
+        if bfp_type.is_vec_tail(big_row[0][b_idx+1], idx_width):
+            fps[f_idx].write(big_row[0][b_idx+1] + "\n")
+            assert(len(big_row[0][b_idx+1]) == len(big_row[2][b_idx]))
+            f_idx = int((f_idx + 1) % n_blocks_split)
+
+    print("{} big rows written to A.".format(len(bfp_res)))
+    print(f"mat A total size: {n_blks * 88 / 1024. / 1024. / 8:.2f} MB")
 
     for f in fps:
         f.close()
 
     print("generate reduced index...")
-    idx_fp.writelines("\n".join(idx_after_redremove))
+    for idx_pair in idx_after_redremove:
+        idx_fp.write(idx_pair[0] + idx_pair[1] + "\n")
     idx_fp.close()
 
     # construct dense mat from selected head to compute gold reference
@@ -291,14 +404,15 @@ def mat_b_gen(size: tuple, chain_len: int, bfp_type: BFP, n_blocks_split: int = 
     else:
         padded_matB = matB
 
+    print(f"padded mat b size: {padded_matB.shape}")
     matb_blk_size = math.ceil(size[1] / n_blocks_split)
     for matb_blk_idx in range(n_blocks_split):
         # fetch a block
-        blk_size_range_h = matb_blk_idx * matb_blk_idx
+        blk_size_range_h = matb_blk_idx * matb_blk_size
         blk_size_range_t = min(blk_size_range_h + matb_blk_size, size[1])
         matb_blk = padded_matB[:, blk_size_range_h:blk_size_range_t]
         # transpose
-        chunkedBTrans = np.transpose(matb_blk).reshape(-1, 1, bfp_type.blk_size())
+        chunkedBTrans = np.transpose(matb_blk).reshape(-1, bfp_type.blk_size())
         # bfp conversion
         bfp_res, _ = bfp_type.to_bfp(list(chunkedBTrans))
 
@@ -393,12 +507,18 @@ def main(args: dict):
         hw_row = 6
         hw_col = 12
 
-        matA = mat_a_gen("if2y5NE5b", BFP(BfpType.BFP_12), hw_col)
+        if args["data_path"]:
+            matA = mat_a_gen(args["data_path"], BFP(BfpType.BFP_12), hw_col, ridx_size=12, cidx_size=9, bfp_friendly_dat=True)
+        else:
+            matA = mat_a_gen("midsize", BFP(BfpType.BFP_12), hw_col, ridx_size=12, cidx_size=9, bfp_friendly_dat=True)
+
         matB = mat_b_gen((matA.shape[1], 128), 
                             chain_len, BFP(BfpType.BFP_12), hw_row)
         res = np.matmul(matA, matB)
         print(f"mat a shape: {matA.shape}, mat b shape: {matB.shape}, res shape: {res.shape}")
-        np.save("mult_a_b_fp32_res.npy", res)
+        np.save("sparse_matmul_data/mult_a_b_fp32_mata.npy", matA)
+        np.save("sparse_matmul_data/mult_a_b_fp32_matb.npy", matB)
+        np.save("sparse_matmul_data/mult_a_b_fp32_res.npy", res)
 
     if args['outputs-check']:
         fname = str(args['outputs-check'])
@@ -418,6 +538,10 @@ def main(args: dict):
         bfp_format = BFP(BfpType.BFP_12)
         res = bfp_format.to_bfp([np.zeros((1, 20), dtype=float)])
         print(res)
+
+    if args['throughput']:
+        tp = compute_thrpt(4355, 4355, 128, 17901, 300)
+        print(f"thr:{tp:.4f}")
   
 if __name__ == "__main__":
     arg_parser = argparse.ArgumentParser()
@@ -437,7 +561,10 @@ if __name__ == "__main__":
                                 action="store", dest="create-binary")
     arg_parser.add_argument("-tt", "--test", help="temp testing entry", \
                                 action="store_true", default=False)
-    
+    arg_parser.add_argument("-th", "--throughput", help="temp compute throughput", \
+                                action="store_true", default=False)
+    arg_parser.add_argument("-dp", "--data_path", help="data path of mat a", \
+                                action="store", default=None)
     args = vars(arg_parser.parse_args())
 
     if args['inputs_gen'] and args['chain_len'] is None:
