@@ -105,8 +105,11 @@ logic          io_res_5_valid;
 logic          io_res_5_ready;
 logic [(24+RIDX_BITWIDTH)*3-1:0]   io_res_5_payload;
 logic [7:0]    io_configRowBuffWrBound;
+logic [15:0]   io_latCounter;
+logic          softClrnArea_newReset=0;
+
+
 logic          clk=0;
-logic          resetn=0;
 
 
 // Mat A: 9x90, each ceil 8 bitsx10 elems + 1 shared exp 
@@ -220,7 +223,7 @@ initial begin
   stimu_path = "./tb/sparse_matmul_data/IDX_GEN.bin";
   $readmemb(stimu_path, index_stimu);
 
-  #61 resetn = 1'b1;
+  #61 softClrnArea_newReset = 1'b1;
 
 end
 
@@ -244,7 +247,7 @@ generate
 
       mat_a_load_ptr[col_buffer_port_ptr] = 0;
       
-      wait(resetn == 1);
+      wait(softClrnArea_newReset == 1);
       repeat(3) begin @(posedge clk); end
       while (! $isunknown(mat_a_stimu[col_buffer_port_ptr][mat_a_load_ptr[col_buffer_port_ptr]])) begin
         #1
@@ -283,7 +286,7 @@ generate
 
       mat_b_load_ptr[row_buffer_port_ptr] = 0;
 
-      wait(resetn == 1);
+      wait(softClrnArea_newReset == 1);
       repeat(3) begin @(posedge clk); end
       while (! $isunknown(mat_b_stimu[row_buffer_port_ptr][mat_b_load_ptr[row_buffer_port_ptr]])) begin
         #1
@@ -322,7 +325,7 @@ initial begin
   index_stimu_slow_ptr = 0;
   io_colIdxFifoNotEmpty = 1'b0;
   
-  wait(resetn == 1);
+  wait(softClrnArea_newReset == 1);
   repeat(3) begin @(posedge clk); end
 
   while (! $isunknown(index_stimu[index_stimu_slow_ptr])) begin
@@ -348,7 +351,7 @@ initial begin
   io_sortedColIdxFast_payload_destId = '0;
   index_stimu_fast_ptr = 0;
   
-  wait(resetn == 1);
+  wait(softClrnArea_newReset == 1);
   repeat(3) begin @(posedge clk); end
 
   while (! $isunknown(index_stimu[index_stimu_fast_ptr])) begin
@@ -391,6 +394,8 @@ assign {io_res_5_ready,
        io_res_1_ready,
        io_res_0_ready} = io_res_ready;
 
+
+
 initial begin
   io_calEn = 1'b0;
   io_res_ready = 1'b0;
@@ -398,7 +403,7 @@ initial begin
   // e.g., seq len = 4355, rowBuffWrBound = 4480/20 = 224
   io_configRowBuffWrBound = 8'd224;
 
-  wait(resetn & io_matBLoad_0_valid & io_matBLoad_0_ready);
+  wait(softClrnArea_newReset & io_matBLoad_0_valid & io_matBLoad_0_ready);
   repeat (10) begin @(posedge clk); end
   wait(io_matBLoad_0_valid == 0);
   repeat (4) begin @(posedge clk); end

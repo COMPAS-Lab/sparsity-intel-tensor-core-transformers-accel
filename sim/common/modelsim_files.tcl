@@ -21,14 +21,14 @@ proc get_common_design_files {USER_DEFINED_COMPILE_OPTIONS USER_DEFINED_VERILOG_
 
 proc get_design_files {USER_DEFINED_COMPILE_OPTIONS USER_DEFINED_VERILOG_COMPILE_OPTIONS USER_DEFINED_VHDL_COMPILE_OPTIONS QSYS_SIMDIR} {
   set design_files [list]
-  lappend design_files "vlog $USER_DEFINED_VERILOG_COMPILE_OPTIONS $USER_DEFINED_COMPILE_OPTIONS  \"[normalize_path "$QSYS_SIMDIR/../ips/tensor_core_accu/dsp_prime_10/sim/tensor_core_accu_dsp_prime_10_exjexwi.v"]\"  -work dsp_prime_10"
-  lappend design_files "vlog $USER_DEFINED_VERILOG_COMPILE_OPTIONS $USER_DEFINED_COMPILE_OPTIONS  \"[normalize_path "$QSYS_SIMDIR/../ips/tensor_core_accu/sim/tensor_core_accu.v"]\"  -work tensor_core_accu"                                
-  lappend design_files "vlog $USER_DEFINED_VERILOG_COMPILE_OPTIONS $USER_DEFINED_COMPILE_OPTIONS  \"[normalize_path "$QSYS_SIMDIR/../ips/tensor_core_entry_bf12/dsp_prime_10/sim/tensor_core_entry_bf12_dsp_prime_10_we4tb7i.v"]\"  -work dsp_prime_10"
-  lappend design_files "vlog $USER_DEFINED_VERILOG_COMPILE_OPTIONS $USER_DEFINED_COMPILE_OPTIONS  \"[normalize_path "$QSYS_SIMDIR/../ips/tensor_core_entry_bf12/sim/tensor_core_entry_bf12.v"]\"  -work tensor_core_entry_bf12"
-  lappend design_files "vlog $USER_DEFINED_VERILOG_COMPILE_OPTIONS $USER_DEFINED_COMPILE_OPTIONS  \"[normalize_path "$QSYS_SIMDIR/../ips/tensor_core_bf12/dsp_prime_10/sim/tensor_core_bf12_dsp_prime_10_t4xs3pq.v"]\"  -work dsp_prime_10"
-  lappend design_files "vlog $USER_DEFINED_VERILOG_COMPILE_OPTIONS $USER_DEFINED_COMPILE_OPTIONS  \"[normalize_path "$QSYS_SIMDIR/../ips/tensor_core_bf12/sim/tensor_core_bf12.v"]\"  -work tensor_core_bf12"
-  lappend design_files "vlog $USER_DEFINED_VERILOG_COMPILE_OPTIONS $USER_DEFINED_COMPILE_OPTIONS  \"[normalize_path "$QSYS_SIMDIR/../ips/tensor_core_start_bf12/dsp_prime_10/sim/tensor_core_start_bf12_dsp_prime_10_6h3jcbq.v"]\"  -work dsp_prime_10"
-  lappend design_files "vlog $USER_DEFINED_VERILOG_COMPILE_OPTIONS $USER_DEFINED_COMPILE_OPTIONS  \"[normalize_path "$QSYS_SIMDIR/../ips/tensor_core_start_bf12/sim/tensor_core_start_bf12.v"]\"  -work tensor_core_start_bf12"
+  lappend design_files "vlog $USER_DEFINED_VERILOG_COMPILE_OPTIONS $USER_DEFINED_COMPILE_OPTIONS  \"[normalize_path "$QSYS_SIMDIR/../nx10-matmul-project/ips/tensor_core_accu/dsp_prime_10/sim/tensor_core_accu_dsp_prime_10_exjexwi.v"]\"  -work dsp_prime_10"
+  lappend design_files "vlog $USER_DEFINED_VERILOG_COMPILE_OPTIONS $USER_DEFINED_COMPILE_OPTIONS  \"[normalize_path "$QSYS_SIMDIR/../nx10-matmul-project/ips/tensor_core_accu/sim/tensor_core_accu.v"]\"  -work tensor_core_accu"                                
+  lappend design_files "vlog $USER_DEFINED_VERILOG_COMPILE_OPTIONS $USER_DEFINED_COMPILE_OPTIONS  \"[normalize_path "$QSYS_SIMDIR/../nx10-matmul-project/ips/tensor_core_entry_bf12/dsp_prime_10/sim/tensor_core_entry_bf12_dsp_prime_10_we4tb7i.v"]\"  -work dsp_prime_10"
+  lappend design_files "vlog $USER_DEFINED_VERILOG_COMPILE_OPTIONS $USER_DEFINED_COMPILE_OPTIONS  \"[normalize_path "$QSYS_SIMDIR/../nx10-matmul-project/ips/tensor_core_entry_bf12/sim/tensor_core_entry_bf12.v"]\"  -work tensor_core_entry_bf12"
+  lappend design_files "vlog $USER_DEFINED_VERILOG_COMPILE_OPTIONS $USER_DEFINED_COMPILE_OPTIONS  \"[normalize_path "$QSYS_SIMDIR/../nx10-matmul-project/ips/tensor_core_bf12/dsp_prime_10/sim/tensor_core_bf12_dsp_prime_10_t4xs3pq.v"]\"  -work dsp_prime_10"
+  lappend design_files "vlog $USER_DEFINED_VERILOG_COMPILE_OPTIONS $USER_DEFINED_COMPILE_OPTIONS  \"[normalize_path "$QSYS_SIMDIR/../nx10-matmul-project/ips/tensor_core_bf12/sim/tensor_core_bf12.v"]\"  -work tensor_core_bf12"
+  lappend design_files "vlog $USER_DEFINED_VERILOG_COMPILE_OPTIONS $USER_DEFINED_COMPILE_OPTIONS  \"[normalize_path "$QSYS_SIMDIR/../nx10-matmul-project/ips/tensor_core_start_bf12/dsp_prime_10/sim/tensor_core_start_bf12_dsp_prime_10_6h3jcbq.v"]\"  -work dsp_prime_10"
+  lappend design_files "vlog $USER_DEFINED_VERILOG_COMPILE_OPTIONS $USER_DEFINED_COMPILE_OPTIONS  \"[normalize_path "$QSYS_SIMDIR/../nx10-matmul-project/ips/tensor_core_start_bf12/sim/tensor_core_start_bf12.v"]\"  -work tensor_core_start_bf12"
   return $design_files
 }
 

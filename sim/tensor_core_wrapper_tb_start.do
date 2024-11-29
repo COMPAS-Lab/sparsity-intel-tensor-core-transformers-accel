@@ -1,9 +1,9 @@
+set FORCE_MODELSIM_AE_SELECTION "true"
 set QSYS_SIMDIR .
 source $QSYS_SIMDIR/mentor/msim_setup.tcl
 
-dev_com
 com
-vlog ./tb/TensorCoreWrapperTb.sv ../nx10-matmul-project/src/tensor_core_array_wrapper.sv ../src/generated/TensorCoreChainArray.v
+vlog ./tb/TensorCoreWrapperTb.sv ../src/generated/*.v ../src/main/sverilog/blk_delay_core.sv ../src/main/sverilog/out_asym_fifo.sv
 set TOP_LEVEL_NAME TensorCoreWrapperTb
 
 #vlib work
@@ -22,12 +22,9 @@ view signals
 view structure
 view wave
 
+log TensorCoreWrapperTb/dut/*
+log TensorCoreWrapperTb/dut/softClrnArea_tcArray/*
+
 do tcwrapper_tb_add_wave.do
 
-log -r *
-
-
-
-
-
-
+run 5us

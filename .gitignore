@@ -38,6 +38,7 @@ bin/
 *.json
 *.vcd
 !tester/src/test/resources/*.vhd
+temp*
 
 # Simulation
 simWorkspace/

@@ -63,7 +63,7 @@ logic                           io_seqOut_ready=1;
 logic [DWIDTH-1:0]              io_seqOut_payload_idxData;
 logic [11:0]                    io_seqOut_payload_destId;
 logic [11:0]                    io_lastGrpIns='0;
-logic                           io_lastGrpOut=0;
+logic                           io_lastGrpOut;
 logic                           clk=1;
 logic                           resetn=0;
 
