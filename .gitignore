@@ -53,6 +53,7 @@ sim/libraries/
 *.bin
 *.hex
 *.mem
+*.mmr
 *.npy
 
 # python
