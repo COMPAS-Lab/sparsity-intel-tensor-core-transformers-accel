@@ -140,10 +140,10 @@ class TensorCoreChainBf12(chain_len: Int, out_buf_delay: Int,
   for (i <- 0 until chain_len-1) {
     tcCoreChainElems(i) = new tensor_core_bf12
     // FIFO-based delay chain
-    val delayedDataIn = BlockDelay(io.dataIn.payload(i+1), 2*(i+1), "M20K")
-    connect_data_in(tcCoreChainElems(i).io, delayedDataIn)
-    val delayedExpIn = BlockDelay(io.expIn(i+1), 2*(i+1), "M20K")
-    tcCoreChainElems(i).io.shared_exponent_data <> delayedExpIn
+//    val delayedDataIn = BlockDelay(io.dataIn.payload(i+1), 2*(i+1), "M20K")
+    connect_data_in(tcCoreChainElems(i).io, io.dataIn.payload(i+1))
+//    val delayedExpIn = BlockDelay(io.expIn(i+1), 2*(i+1), "M20K")
+    tcCoreChainElems(i).io.shared_exponent_data <> io.expIn(i+1)
     val loadBufCompSelEnCounter = Counter(chain_len * 3, inc = delayedCasLoadValidForBufSel)
 
     if (i == 0) {
@@ -162,8 +162,6 @@ class TensorCoreChainBf12(chain_len: Int, out_buf_delay: Int,
     tcCoreChainElems(i).io.zero_en <> False
     tcCoreChainElems(i).io.acc_en <> False
     tcCoreChainElems(i).io.load_buf_sel <> loadBufSelDelayed(i)
-//    tcCoreChainElems(i).io.load_bb_one <> loadBufCtrl(0)
-//    tcCoreChainElems(i).io.load_bb_two <> loadBufCtrl(1)
     tcCoreChainElems(i).io.load_bb_one := loadBufCtrl(0) & (loadBufCompSelEnCounter > ((i+1)*3-1))
     tcCoreChainElems(i).io.load_bb_two := loadBufCtrl(1) & (loadBufCompSelEnCounter > ((i+1)*3-1))
     tcCoreChainElems(i).io.feed_sel := U"2'd1"
@@ -239,9 +237,9 @@ class TensorCoreChainBf12(chain_len: Int, out_buf_delay: Int,
   tcAccu.io.clr0 := False
 
   val accuOutVec = Vec(
-    tcAccu.io.bf24_col_1.resize(output_width),
-    tcAccu.io.bf24_col_2.resize(output_width),
-    tcAccu.io.bf24_col_3.resize(output_width)
+    tcAccu.io.bf24_col_1.asBits.resizeLeft(output_width).asUInt,
+    tcAccu.io.bf24_col_2.asBits.resizeLeft(output_width).asUInt,
+    tcAccu.io.bf24_col_3.asBits.resizeLeft(output_width).asUInt
   )
   val resWithIdx = Vec(BfpBlockWithIdx(output_width, ridx_width, 0, 0), 3)
 

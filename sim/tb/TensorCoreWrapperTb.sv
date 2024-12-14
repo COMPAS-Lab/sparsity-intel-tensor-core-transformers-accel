@@ -5,7 +5,7 @@ module TensorCoreWrapperTb;
 localparam NUM_COL_HBMS = 5;
 localparam NUM_ROW_HBMS = 6;
 
-localparam MAT_A_RD_BOUND = 3400;
+localparam MAT_A_RD_BOUND = 10200;
 localparam IDX_RD_BOUND = 2391;
 
 logic         clrn=0;                                            // 0: global reset 
@@ -92,7 +92,7 @@ assign port_error_tcarray_in_5 = 0;
 assign port_error_tcarray_out_0 = 0;
 assign port_error_tcarray_out_1 = 0;
 
-logic [255:0] col_hbm_ins [NUM_COL_HBMS-1:0][$];
+logic [511:0] col_hbm_ins [$];
 logic [255:0] idx_hbm_ins [$];
 logic [255:0] row_hbm_ins [NUM_ROW_HBMS-1:0][$];
 
@@ -101,10 +101,13 @@ string stimu_path_a, stimu_path_b, out_path;
 
 //matrix a and b buffer load
 initial begin
-  for (hbm_col_idx = 0; hbm_col_idx < NUM_COL_HBMS; hbm_col_idx++) begin
-    stimu_path_a = $sformatf("./tb/sparse_matmul_data/onchip/onchip_mat_a_hbm%0d.mem", hbm_col_idx);
-    $readmemh(stimu_path_a, col_hbm_ins[hbm_col_idx]);
-  end
+  // for (hbm_col_idx = 0; hbm_col_idx < NUM_COL_HBMS; hbm_col_idx++) begin
+  //   stimu_path_a = $sformatf("./tb/sparse_matmul_data/onchip/onchip_mat_a_hbm%0d.mem", hbm_col_idx);
+  //   $readmemh(stimu_path_a, col_hbm_ins[hbm_col_idx]);
+  // end
+
+  stimu_path_a = "./tb/sparse_matmul_data/onchip/onchip_mat_a_hbm.mem";
+  $readmemh(stimu_path_a, col_hbm_ins);
 
   for (hbm_row_idx = 0; hbm_row_idx < NUM_ROW_HBMS; hbm_row_idx++) begin
     stimu_path_b = $sformatf("./tb/sparse_matmul_data/onchip/onchip_mat_b_hbm%0d.mem", hbm_row_idx);
@@ -224,43 +227,43 @@ initial begin
   @(posedge clk);
 end
 
+// load mat A
 initial begin
-  wait(start_tcarray_in_1);
+  wait(start_tcarray_in_1 && start_tcarray_in_2);
   @(posedge clk);
 
   for(col_rd_ptr_0=0; col_rd_ptr_0<wr_addr; col_rd_ptr_0++) begin
     #1
-    data_tcarray_in_1 = col_hbm_ins[0][col_rd_ptr_0];
-    data_tcarray_in_2 = col_hbm_ins[1][col_rd_ptr_0];
-    wait(select_tcarray_in_1 & select_tcarray_in_2);
+    {data_tcarray_in_2, data_tcarray_in_1} = col_hbm_ins[col_rd_ptr_0];
+    wait(select_tcarray_in_1 && select_tcarray_in_2);
     @(posedge clk);
   end
 end
 
-initial begin
-  wait(start_tcarray_in_1);
-  @(posedge clk);
+// initial begin
+//   wait(start_tcarray_in_1);
+//   @(posedge clk);
 
-  for(col_rd_ptr_1=0; col_rd_ptr_1<wr_addr; col_rd_ptr_1++) begin
-    #1
-    data_tcarray_in_3 = col_hbm_ins[2][col_rd_ptr_1];
-    data_tcarray_in_4 = col_hbm_ins[3][col_rd_ptr_1];
-    wait(select_tcarray_in_3 & select_tcarray_in_4);
-    @(posedge clk);
-  end
-end
+//   for(col_rd_ptr_1=0; col_rd_ptr_1<wr_addr; col_rd_ptr_1++) begin
+//     #1
+//     data_tcarray_in_3 = col_hbm_ins[2][col_rd_ptr_1];
+//     data_tcarray_in_4 = col_hbm_ins[3][col_rd_ptr_1];
+//     wait(select_tcarray_in_3 & select_tcarray_in_4);
+//     @(posedge clk);
+//   end
+// end
 
-initial begin
-  wait(start_tcarray_in_1);
-  @(posedge clk);
+// initial begin
+//   wait(start_tcarray_in_1);
+//   @(posedge clk);
 
-  for(col_rd_ptr_2=0; col_rd_ptr_2<wr_addr; col_rd_ptr_2++) begin
-    #1
-    data_tcarray_in_5 = col_hbm_ins[4][col_rd_ptr_2];
-    wait(select_tcarray_in_5);
-    @(posedge clk);
-  end
-end
+//   for(col_rd_ptr_2=0; col_rd_ptr_2<wr_addr; col_rd_ptr_2++) begin
+//     #1
+//     data_tcarray_in_5 = col_hbm_ins[4][col_rd_ptr_2];
+//     wait(select_tcarray_in_5);
+//     @(posedge clk);
+//   end
+// end
 
 assign almost_full_tcarray_out_0 = 0;
 assign almost_full_tcarray_out_1 = 0;

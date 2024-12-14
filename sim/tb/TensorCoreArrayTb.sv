@@ -7,7 +7,7 @@ localparam CHAIN_LEN = 8;
 localparam TC_ROW_SIZE = 6;
 localparam TC_COL_SIZE = 12;
 localparam RIDX_BITWIDTH = 12;
-localparam CIDX_BITWIDTH = 9;
+localparam CIDX_BITWIDTH = 10;
 
 // Ports
 logic          io_matALoad_0_valid;
@@ -211,7 +211,7 @@ string stimu_path, out_path;
 //matrix a and b buffer load
 initial begin
   for (tc_col_idx = 0; tc_col_idx < TC_COL_SIZE; tc_col_idx++) begin
-    stimu_path = $sformatf("./tb/sparse_matmul_data/MAT_A_BFP12_b%0d.bin", tc_col_idx);
+    stimu_path = $sformatf("./tb/sparse_matmul_data/MAT_A_BFP12_b%0d_h581.bin", tc_col_idx);
     $readmemb(stimu_path, mat_a_stimu[tc_col_idx]);
   end
 
@@ -220,7 +220,7 @@ initial begin
     $readmemb(stimu_path, mat_b_stimu[tc_row_idx]);
   end 
 
-  stimu_path = "./tb/sparse_matmul_data/IDX_GEN.bin";
+  stimu_path = "./tb/sparse_matmul_data/IDX_GEN_h581.bin";
   $readmemb(stimu_path, index_stimu);
 
   #61 softClrnArea_newReset = 1'b1;
@@ -401,7 +401,7 @@ initial begin
   io_res_ready = 1'b0;
   // rowBuffWrBound is the length of each mat b vector
   // e.g., seq len = 4355, rowBuffWrBound = 4480/20 = 224
-  io_configRowBuffWrBound = 8'd224;
+  io_configRowBuffWrBound = 8'd228;
 
   wait(softClrnArea_newReset & io_matBLoad_0_valid & io_matBLoad_0_ready);
   repeat (10) begin @(posedge clk); end

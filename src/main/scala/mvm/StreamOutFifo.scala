@@ -10,9 +10,10 @@ class StreamOutFifo(output_width: Int,
   val io = new Bundle {
     val push = slave Stream(UInt(output_width bits))
     val pop = master Stream(UInt(output_width bits))
+    val almostFull = out Bool()
   }
 
-  val core = new scfifo(output_width, depth, ram_type)
+  val core = new scfifo(output_width, depth, ram_type, afull_thres = (depth / 2).toInt)
 
   core.setName("FifoCore")
   core.io.data := io.push.payload
@@ -22,6 +23,7 @@ class StreamOutFifo(output_width: Int,
   core.io.rdreq := io.pop.ready
   io.pop.valid := ~core.io.empty
   io.pop.payload := core.io.q
+  io.almostFull := core.io.almost_full
 
   core.io.aclr.clear()
   core.io.sclr.clear()

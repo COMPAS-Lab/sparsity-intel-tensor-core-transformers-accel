@@ -3,7 +3,7 @@ package intel_ips
 import spinal.core._
 import spinal.lib._
 
-class scfifo(output_width: Int, depth: Int, ram_type: String) extends BlackBox {
+class scfifo(output_width: Int, depth: Int, ram_type: String, afull_thres: Int = 0) extends BlackBox {
   addGenerics(
     "lpm_width" -> output_width,
     "lpm_numwords" -> depth,
@@ -18,6 +18,11 @@ class scfifo(output_width: Int, depth: Int, ram_type: String) extends BlackBox {
     "underflow_checking" -> "ON",
     "use_eab" -> "ON",
   )
+
+  if (afull_thres > 0) {
+    addGeneric("almost_full_value", afull_thres)
+  }
+
   val io = new Bundle {
     val clock = in Bool()
     val wrreq, rdreq = in Bool()

@@ -6,30 +6,6 @@ quietly virtual function -install /TensorCoreArrayTb/dut -env /TensorCoreArrayTb
 quietly virtual function -install /TensorCoreArrayTb/dut -env /TensorCoreArrayTb/dut { &{ sim:/TensorCoreArrayTb/dut/u_tc_core_r_0_c_11_io_res_payload_1_blkData(23), sim:/TensorCoreArrayTb/dut/u_tc_core_r_0_c_11_io_res_payload_1_blkData(22), sim:/TensorCoreArrayTb/dut/u_tc_core_r_0_c_11_io_res_payload_1_blkData(21), sim:/TensorCoreArrayTb/dut/u_tc_core_r_0_c_11_io_res_payload_1_blkData(20), sim:/TensorCoreArrayTb/dut/u_tc_core_r_0_c_11_io_res_payload_1_blkData(19), sim:/TensorCoreArrayTb/dut/u_tc_core_r_0_c_11_io_res_payload_1_blkData(18), sim:/TensorCoreArrayTb/dut/u_tc_core_r_0_c_11_io_res_payload_1_blkData(17), sim:/TensorCoreArrayTb/dut/u_tc_core_r_0_c_11_io_res_payload_1_blkData(16), sim:/TensorCoreArrayTb/dut/u_tc_core_r_0_c_11_io_res_payload_1_blkData(15), sim:/TensorCoreArrayTb/dut/u_tc_core_r_0_c_11_io_res_payload_1_blkData(14), sim:/TensorCoreArrayTb/dut/u_tc_core_r_0_c_11_io_res_payload_1_blkData(13), sim:/TensorCoreArrayTb/dut/u_tc_core_r_0_c_11_io_res_payload_1_blkData(12), sim:/TensorCoreArrayTb/dut/u_tc_core_r_0_c_11_io_res_payload_1_blkData(11), sim:/TensorCoreArrayTb/dut/u_tc_core_r_0_c_11_io_res_payload_1_blkData(10), sim:/TensorCoreArrayTb/dut/u_tc_core_r_0_c_11_io_res_payload_1_blkData(9), sim:/TensorCoreArrayTb/dut/u_tc_core_r_0_c_11_io_res_payload_1_blkData(8), sim:/TensorCoreArrayTb/dut/u_tc_core_r_0_c_11_io_res_payload_1_blkData(7), sim:/TensorCoreArrayTb/dut/u_tc_core_r_0_c_11_io_res_payload_1_blkData(6), sim:/TensorCoreArrayTb/dut/u_tc_core_r_0_c_11_io_res_payload_1_blkData(5), sim:/TensorCoreArrayTb/dut/u_tc_core_r_0_c_11_io_res_payload_1_blkData(4), sim:/TensorCoreArrayTb/dut/u_tc_core_r_0_c_11_io_res_payload_1_blkData(3), sim:/TensorCoreArrayTb/dut/u_tc_core_r_0_c_11_io_res_payload_1_blkData(2), sim:/TensorCoreArrayTb/dut/u_tc_core_r_0_c_11_io_res_payload_1_blkData(1), sim:/TensorCoreArrayTb/dut/u_tc_core_r_0_c_11_io_res_payload_1_blkData(0) , '0', '0', '0', '0', '0', '0', '0', '0'}} u_tc_core_r_0_c_11_io_res_payload_1_blkData_23_0
 quietly virtual function -install /TensorCoreArrayTb/dut -env /TensorCoreArrayTb/dut { &{ sim:/TensorCoreArrayTb/dut/u_tc_core_r_0_c_11_io_res_payload_2_blkData(23), sim:/TensorCoreArrayTb/dut/u_tc_core_r_0_c_11_io_res_payload_2_blkData(22), sim:/TensorCoreArrayTb/dut/u_tc_core_r_0_c_11_io_res_payload_2_blkData(21), sim:/TensorCoreArrayTb/dut/u_tc_core_r_0_c_11_io_res_payload_2_blkData(20), sim:/TensorCoreArrayTb/dut/u_tc_core_r_0_c_11_io_res_payload_2_blkData(19), sim:/TensorCoreArrayTb/dut/u_tc_core_r_0_c_11_io_res_payload_2_blkData(18), sim:/TensorCoreArrayTb/dut/u_tc_core_r_0_c_11_io_res_payload_2_blkData(17), sim:/TensorCoreArrayTb/dut/u_tc_core_r_0_c_11_io_res_payload_2_blkData(16), sim:/TensorCoreArrayTb/dut/u_tc_core_r_0_c_11_io_res_payload_2_blkData(15), sim:/TensorCoreArrayTb/dut/u_tc_core_r_0_c_11_io_res_payload_2_blkData(14), sim:/TensorCoreArrayTb/dut/u_tc_core_r_0_c_11_io_res_payload_2_blkData(13), sim:/TensorCoreArrayTb/dut/u_tc_core_r_0_c_11_io_res_payload_2_blkData(12), sim:/TensorCoreArrayTb/dut/u_tc_core_r_0_c_11_io_res_payload_2_blkData(11), sim:/TensorCoreArrayTb/dut/u_tc_core_r_0_c_11_io_res_payload_2_blkData(10), sim:/TensorCoreArrayTb/dut/u_tc_core_r_0_c_11_io_res_payload_2_blkData(9), sim:/TensorCoreArrayTb/dut/u_tc_core_r_0_c_11_io_res_payload_2_blkData(8), sim:/TensorCoreArrayTb/dut/u_tc_core_r_0_c_11_io_res_payload_2_blkData(7), sim:/TensorCoreArrayTb/dut/u_tc_core_r_0_c_11_io_res_payload_2_blkData(6), sim:/TensorCoreArrayTb/dut/u_tc_core_r_0_c_11_io_res_payload_2_blkData(5), sim:/TensorCoreArrayTb/dut/u_tc_core_r_0_c_11_io_res_payload_2_blkData(4), sim:/TensorCoreArrayTb/dut/u_tc_core_r_0_c_11_io_res_payload_2_blkData(3), sim:/TensorCoreArrayTb/dut/u_tc_core_r_0_c_11_io_res_payload_2_blkData(2), sim:/TensorCoreArrayTb/dut/u_tc_core_r_0_c_11_io_res_payload_2_blkData(1), sim:/TensorCoreArrayTb/dut/u_tc_core_r_0_c_11_io_res_payload_2_blkData(0) , '0', '0', '0', '0', '0', '0', '0', '0'}} u_tc_core_r_0_c_11_io_res_payload_2_blkData_23_0
 quietly WaveActivateNextPane {} 0
-add wave -noupdate /TensorCoreArrayTb/dut/resetn
-add wave -noupdate /TensorCoreArrayTb/io_matBLoad_0_valid
-add wave -noupdate /TensorCoreArrayTb/io_matBLoad_0_ready
-add wave -noupdate /TensorCoreArrayTb/io_matBLoad_0_payload
-add wave -noupdate /TensorCoreArrayTb/dut/matBLoadPipelineEnDelayed
-add wave -noupdate -divider rowmem00
-add wave -noupdate /TensorCoreArrayTb/dut/bufferArea_rowMem_0_0/io_data
-add wave -noupdate /TensorCoreArrayTb/dut/bufferArea_rowMem_0_0/io_wren
-add wave -noupdate -radix unsigned /TensorCoreArrayTb/dut/bufferArea_rowMem_0_0/io_wraddress
-add wave -noupdate /TensorCoreArrayTb/dut/bufferArea_rowMem_0_0/io_rdaddress
-add wave -noupdate /TensorCoreArrayTb/dut/bufferArea_rowMem_0_0/io_q
-add wave -noupdate -divider rowmem01
-add wave -noupdate /TensorCoreArrayTb/dut/bufferArea_rowMem_0_1/io_data
-add wave -noupdate /TensorCoreArrayTb/dut/bufferArea_rowMem_0_1/io_wren
-add wave -noupdate -radix unsigned /TensorCoreArrayTb/dut/bufferArea_rowMem_0_1/io_wraddress
-add wave -noupdate /TensorCoreArrayTb/dut/bufferArea_rowMem_0_1/io_rdaddress
-add wave -noupdate /TensorCoreArrayTb/dut/bufferArea_rowMem_0_1/io_q
-add wave -noupdate -divider rowmem02
-add wave -noupdate /TensorCoreArrayTb/dut/bufferArea_rowMem_0_2/io_data
-add wave -noupdate /TensorCoreArrayTb/dut/bufferArea_rowMem_0_2/io_wren
-add wave -noupdate -radix unsigned /TensorCoreArrayTb/dut/bufferArea_rowMem_0_2/io_wraddress
-add wave -noupdate /TensorCoreArrayTb/dut/bufferArea_rowMem_0_2/io_rdaddress
-add wave -noupdate /TensorCoreArrayTb/dut/bufferArea_rowMem_0_2/io_q
-add wave -noupdate -radix unsigned /TensorCoreArrayTb/dut/bufferArea_rowBuffWrAddr_0_value
 add wave -noupdate -divider {idx fifo}
 add wave -noupdate /TensorCoreArrayTb/dut/bufferArea_preArowPop3Fac_0_value
 add wave -noupdate -divider compute
@@ -37,8 +13,9 @@ add wave -noupdate /TensorCoreArrayTb/dut/bufferArea_rowMem_0_0/clk
 add wave -noupdate /TensorCoreArrayTb/dut/io_sortedColIdxFast_valid
 add wave -noupdate /TensorCoreArrayTb/dut/io_sortedColIdxFast_ready
 add wave -noupdate /TensorCoreArrayTb/dut/io_sortedColIdxFast_payload_idxData
-add wave -noupdate /TensorCoreArrayTb/dut/io_sortedColIdxFast_payload_destId
 add wave -noupdate /TensorCoreArrayTb/dut/io_calEn
+add wave -noupdate /TensorCoreArrayTb/dut/rowCtrlFsm_stateReg
+add wave -noupdate /TensorCoreArrayTb/dut/colCtrlFsm_stateReg
 add wave -noupdate -radix unsigned /TensorCoreArrayTb/dut/bufferArea_rowMemRdAddr
 add wave -noupdate /TensorCoreArrayTb/dut/transposeBufWrFbufSel_0_value
 add wave -noupdate -radix binary /TensorCoreArrayTb/dut/bufferArea_rowBuffWrCtrl_0
@@ -67,7 +44,6 @@ add wave -noupdate /TensorCoreArrayTb/dut/bufferArea_rowBufferBlkOut_payload_0_5
 add wave -noupdate /TensorCoreArrayTb/dut/bufferArea_rowBufferBlkOut_payload_0_6_blkData
 add wave -noupdate /TensorCoreArrayTb/dut/bufferArea_rowBufferBlkOut_payload_0_7_blkData
 add wave -noupdate /TensorCoreArrayTb/dut/matBLoadPipelineEnDelayed
-add wave -noupdate -radix ascii /TensorCoreArrayTb/dut/bufferArea_rowMemRdStateMachine_stateReg_string
 add wave -noupdate /TensorCoreArrayTb/dut/bufferArea_rowMemRdStateMachine_rowMemRdValid
 add wave -noupdate /TensorCoreArrayTb/dut/bufferArea_rowMemRdStateMachine_rdPropaCounter_value
 add wave -noupdate /TensorCoreArrayTb/dut/isTransRamRdValid_0
@@ -80,7 +56,6 @@ add wave -noupdate /TensorCoreArrayTb/dut/bufferArea_transposeBufferOccuCtrl_0
 add wave -noupdate /TensorCoreArrayTb/dut/io_sortedColIdxFast_valid
 add wave -noupdate /TensorCoreArrayTb/dut/io_sortedColIdxFast_ready
 add wave -noupdate /TensorCoreArrayTb/dut/io_sortedColIdxFast_payload_idxData
-add wave -noupdate /TensorCoreArrayTb/dut/io_sortedColIdxFast_payload_destId
 add wave -noupdate -divider vert_cas_load
 add wave -noupdate /TensorCoreArrayTb/dut/bufferArea_colBuffer_0/io_push_valid
 add wave -noupdate /TensorCoreArrayTb/dut/bufferArea_colBuffer_0/io_push_ready
@@ -88,9 +63,7 @@ add wave -noupdate /TensorCoreArrayTb/dut/bufferArea_colBuffer_0/io_push_payload
 add wave -noupdate /TensorCoreArrayTb/dut/bufferArea_colBuffer_0/io_pop_valid
 add wave -noupdate /TensorCoreArrayTb/dut/bufferArea_colBuffer_0/io_pop_ready
 add wave -noupdate /TensorCoreArrayTb/dut/bufferArea_colBuffer_0/io_pop_payload
-add wave -noupdate -radix ascii /TensorCoreArrayTb/dut/colCtrlFsm_stateReg_string
 add wave -noupdate /TensorCoreArrayTb/dut/bufferArea_isCurrCasBufLoaded
-add wave -noupdate -radix ascii /TensorCoreArrayTb/dut/rowCtrlFsm_stateReg_string
 add wave -noupdate /TensorCoreArrayTb/dut/bufferArea_isCurrSubgrpALoaded
 add wave -noupdate /TensorCoreArrayTb/dut/io_sortedColIdxSlow_valid
 add wave -noupdate /TensorCoreArrayTb/dut/io_sortedColIdxSlow_ready
@@ -206,7 +179,6 @@ add wave -noupdate /TensorCoreArrayTb/dut/matBLoadPipelineEn
 add wave -noupdate /TensorCoreArrayTb/dut/u_tc_core_r_0_c_0/io_dataIn_valid
 add wave -noupdate /TensorCoreArrayTb/dut/matBEn4BubbleIns
 add wave -noupdate /TensorCoreArrayTb/dut/matBEn4BubbleInsDelayed
-add wave -noupdate -radix ascii /TensorCoreArrayTb/dut/u_tc_core_r_0_c_0/fbFifoPopCtrlFsm_stateReg_string
 add wave -noupdate /TensorCoreArrayTb/dut/u_tc_core_r_0_c_0/fbFifoPop
 add wave -noupdate /TensorCoreArrayTb/dut/u_tc_core_r_0_c_0/delayedDataInLastForAccu
 add wave -noupdate /TensorCoreArrayTb/dut/u_tc_core_r_0_c_0/delayedDataInValidForAccu
@@ -254,8 +226,8 @@ add wave -noupdate /TensorCoreArrayTb/dut/outBuffer_0/io_pop_valid
 add wave -noupdate /TensorCoreArrayTb/dut/outBuffer_0/io_pop_ready
 add wave -noupdate /TensorCoreArrayTb/dut/outBuffer_0/io_pop_payload
 TreeUpdate [SetDefaultTree]
-WaveRestoreCursors {{Cursor 1} {53045000 ps} 0} {{Cursor 3} {53285000 ps} 0}
-quietly wave cursor active 2
+WaveRestoreCursors {{Cursor 1} {169379494 ps} 0} {{Cursor 3} {168955000 ps} 0}
+quietly wave cursor active 1
 configure wave -namecolwidth 397
 configure wave -valuecolwidth 227
 configure wave -justifyvalue left
@@ -270,4 +242,4 @@ configure wave -griddelta 40
 configure wave -timeline 0
 configure wave -timelineunits ns
 update
-WaveRestoreZoom {53394685 ps} {54558174 ps}
+WaveRestoreZoom {167006033 ps} {171308122 ps}

@@ -40,6 +40,12 @@ def find_nearest(array: list, value: float):
     # print(f"selecting {array[idx]} at {idx}")
     return idx
 
+def pad_str_dat_to_len(dat: str, tar_len: int, padding_val = "0"):
+    ori_len = len(dat)
+    assert ori_len <= tar_len, "target len must > original len"
+    padded = (tar_len - ori_len) * padding_val + dat
+    return padded
+
 def update_or_create_json(file_path, a):
     """
     Updates or creates a JSON file.
@@ -532,44 +538,27 @@ def prepare_onchip_input_files(input_path: str, n_shared_chans: int, n_hbm_chans
     assert len(np.unique([len(m) for m in mat_data])) == 1, "mat a data not aligned"
 
     # split into upper and lower mem files
-    n_hbm_grps = 3
-    n_hbm_grp_bwidth = 500
-    n_chans_in_hbm_grp = n_hbm_grp_bwidth // (88 + ridx_width)
-
+    n_chans_in_hbm_grp = 4
+    n_hbms = 2
     n_hbm_bwidth = 256
-    n_hbm_chans_per_grp = math.ceil(n_hbm_grp_bwidth / n_hbm_bwidth)
-    hbm_dat = [[] for i in range(n_hbm_chans)]
+
+    hbm_dat = []
+    for rid in range(total_len):
+        for cid in range(n_shared_chans // n_chans_in_hbm_grp):
+            partial_dat = ""
+            for hid in range(n_chans_in_hbm_grp):
+                mapped_cid = cid * n_chans_in_hbm_grp + hid
+                partial_dat = pad_str_dat_to_len(
+                    mat_data[mapped_cid][rid], 
+                    n_hbm_bwidth * n_hbms//n_chans_in_hbm_grp) + partial_dat
+
+            hbm_dat.append(bin_to_hex(partial_dat, n_hbms * n_hbm_bwidth) + "\n")
 
     print(f"total len: {total_len}")
-    update_or_create_json(input_path + f"onchip/onchip_sizes.json", {"mat a size": total_len})
+    update_or_create_json(input_path + f"onchip/onchip_sizes.json", {"mat a size": len(hbm_dat)})
 
-    for hbm_grp_idx in range(n_hbm_grps):
-        # first group them into large hbm grps
-        for r in range(total_len):
-            hbm_grp_word = ""
-            for chan_idx in np.arange(hbm_grp_idx * n_chans_in_hbm_grp, (hbm_grp_idx + 1) * n_chans_in_hbm_grp, 1):
-                # print(f"r {r} channnel id: {chan_idx}")
-                if chan_idx >= n_shared_chans:
-                    # fill 0s to the rest of unused hbm payload bits
-                    hbm_grp_word = "0" * (88 + ridx_width) + hbm_grp_word
-                else:
-                    hbm_grp_word = mat_data[chan_idx][r] + hbm_grp_word
-            
-            if len(hbm_grp_word) < (n_hbm_bwidth * n_hbm_chans_per_grp):
-                hbm_grp_word = (n_hbm_bwidth * n_hbm_chans_per_grp - len(hbm_grp_word)) * "0" + hbm_grp_word
-
-            hbm_word = ""
-            for hbm_idx in range(hbm_grp_idx * n_hbm_chans_per_grp, (hbm_grp_idx + 1) * n_hbm_chans_per_grp, 1):
-                if hbm_idx < n_hbm_chans:
-                    # print(f"splitting r{r} to hbm {hbm_idx}")
-                    upper_idx = (n_hbm_chans_per_grp - hbm_idx % 2) * n_hbm_bwidth
-                    hbm_word = hbm_grp_word[upper_idx - n_hbm_bwidth:upper_idx]
-                    hbm_dat[hbm_idx].append(bin_to_hex(hbm_word, 256) + "\n")
-
-
-    for i in range(n_hbm_chans):
-        with open(input_path + f"onchip/onchip_mat_a_hbm{i}.mem", "w", encoding="utf-8") as f:
-            f.writelines(hbm_dat[i])
+    with open(input_path + f"onchip/onchip_mat_a_hbm.mem", "w", encoding="utf-8") as f:
+        f.writelines(hbm_dat)
 
 def prepare_onchip_idx_file(
         input_path: str, n_shared_chans: int, cidx_width: tuple, head_idx: int, align_to=256):
@@ -636,15 +625,15 @@ def main(args: dict):
         if args["data_path"]:
             matA = mat_a_gen(args["data_path"], BFP(BfpType.BFP_12), hw_col, ridx_size=12, cidx_size=10, bfp_friendly_dat=False)
         else:
-            matA = mat_a_gen("midsize", BFP(BfpType.BFP_12), hw_col, ridx_size=12, cidx_size=10, bfp_friendly_dat=False)
+            matA = mat_a_gen("midsize", BFP(BfpType.BFP_12), hw_col, ridx_size=12, cidx_size=10, bfp_friendly_dat=True)
 
-        # matB = mat_b_gen((matA.shape[1], 128), 
-        #                     chain_len, BFP(BfpType.BFP_12), hw_row)
-        # res = np.matmul(matA, matB)
-        # print(f"mat a shape: {matA.shape}, mat b shape: {matB.shape}, res shape: {res.shape}")
+        matB = mat_b_gen((matA.shape[1], 128), 
+                            chain_len, BFP(BfpType.BFP_12), hw_row)
+        res = np.matmul(matA, matB)
+        print(f"mat a shape: {matA.shape}, mat b shape: {matB.shape}, res shape: {res.shape}")
         np.save("sparse_matmul_data/mult_a_b_fp32_mata.npy", matA)
-        # np.save("sparse_matmul_data/mult_a_b_fp32_matb.npy", matB)
-        # np.save("sparse_matmul_data/mult_a_b_fp32_res.npy", res)
+        np.save("sparse_matmul_data/mult_a_b_fp32_matb.npy", matB)
+        np.save("sparse_matmul_data/mult_a_b_fp32_res.npy", res)
 
     if args['outputs-check']:
         fname = str(args['outputs-check'])

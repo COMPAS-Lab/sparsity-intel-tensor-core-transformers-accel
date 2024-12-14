@@ -33,6 +33,9 @@ case class MultiPortStream(dWidth: Int, addrWidth: Int, hasAlmostFull: Boolean, 
     start := False
     select := False
     addr.clearAll()
+    if (this.isMasterInterface) {
+      data.clearAll()
+    }
   }
 }
 
@@ -47,13 +50,13 @@ class tensor_core_array_wrapper(array_col: Int, array_row: Int, chain_len: Int,
     val load_start = in UInt (32 bits)
     val hbm_ready = Array.fill(num_hbms)(in Bool())
     // TODO: temp ports for idx gen only, deprecated in the future
-    val tcarray_in = Vec(slave(MultiPortStream(256, 32, false, true)), 6)
+    val tcarray_in = Vec(slave(MultiPortStream(256, 32, false, true)), 3)
     val tcarray_out = Vec(master(MultiPortStream(256, 32, true, false)), 2)
   }
 
   // input list:
   // tcarray_in_0: col input, idx input
-  // tcarray_in_1,2\3,4\5: row input
+  // tcarray_in_1/2: row input
 
   // shared tcarray in channel address table
   // io.load_start(n downto 0) === 0 -> tcArray.io.matBLoad(0)
@@ -99,9 +102,9 @@ class tensor_core_array_wrapper(array_col: Int, array_row: Int, chain_len: Int,
     elem.port_error.setName("port_error_" + elem.getName())
   }
 
-  val loadStart = Delay(io.start(0), 4)
-  val softClrn = Delay(io.start(1), 4)
-  val calStart = Delay(io.start(2), 4)
+  val loadStart = Delay(io.start(0), 6)
+  val softClrn = Delay(io.start(1), 6)
+  val calStart = Delay(io.start(2), 6)
 
   val softClrnArea = new ResetArea(softClrn, false) {
     val bufferSelCC = Delay(io.load_start, 4)
@@ -177,40 +180,22 @@ class tensor_core_array_wrapper(array_col: Int, array_row: Int, chain_len: Int,
       data2TcarrayRow(i).valid := data2TcarrayRowValid(i) & io.tcarray_in(0).select
     }
 
-    val nColChansPerHbmGp = 5
     val data2TcarrayCol = Vec(Stream(BfpBlockWithIdx(88, idx_width.r, 0, 0)), array_col)
-    val hbmGpList = Array(Array(1, 2), Array(3, 4), Array(5))
-    val hbmGpTcolChans = Array(
-      Array(0,1,2,3,4),
-      Array(5,6,7,8,9),
-      Array(10, 11)
-    )
-    val data2TcarrayColValid = Bits(array_col bits)
-
-    for (gp <- hbmGpList.indices) {
-      val data2ColHbmGp = (for(o <- hbmGpList(gp)) yield io.tcarray_in(o).data).reduce((a, b) => b @@ a)
-      val data2ColHbmGpVec =
-        data2ColHbmGp((88 + idx_width.r) * hbmGpTcolChans(gp).length - 1 downto 0)
-          .subdivideIn(hbmGpTcolChans(gp).length slices)
-
-      for ((tcCol, inGrpIdx) <- hbmGpTcolChans(gp).zipWithIndex) {
-        data2TcarrayCol(tcCol).payload.fromUInt(data2ColHbmGpVec(inGrpIdx))
-        data2TcarrayCol(tcCol).valid := data2TcarrayColValid(tcCol) &
-          io.tcarray_in(hbmGpList(gp).last).select &
-          (data2TcarrayCol(tcCol).payload.rIdx(idx_width.r - 2, 2 bits) =/= U"b10")
-      }
-    }
-
+    val MATA_CHAN_PER_GRP = 4
+    val HBM_MATA_CHAN_GRP = Array(1, 2)
+    val combDataFromHbm =
+      Vec(for (ihbm <- HBM_MATA_CHAN_GRP) yield io.tcarray_in(ihbm).data)
+        .asBits.subdivideIn(MATA_CHAN_PER_GRP slices)
     val tcArray = new TensorCoreChainArray(
       array_col = array_col,
       array_row = array_row,
       chain_len = chain_len,
       idx_width = idx_width,
-      col_buffer_depth = 1024,
+      col_buffer_depth = 2048,
       row_buffer_depth = 512,
       out_buf_delay = 4,
       output_fifo_depth = 512,
-      output_width = 24,
+      output_width = 12,
       inout_pipe_delay = 4,
       debug_en = true
     )
@@ -281,10 +266,10 @@ class tensor_core_array_wrapper(array_col: Int, array_row: Int, chain_len: Int,
                   selSelect := tcArray.io.matBLoad(i).ready
                 }
               }
+            }
 
-              default {
-                selSelect := False
-              }
+            default {
+              selSelect := False
             }
           }
 
@@ -317,66 +302,92 @@ class tensor_core_array_wrapper(array_col: Int, array_row: Int, chain_len: Int,
     io.tcarray_in(0).select := idxGenRowSharedRdFsm.selSelect
 
     // TC array col inputs ctrl
-    for (i <- hbmGpList.indices) {
-      val colRdFsm = new StateMachine {
-        val rdWordCounter = DynaCounter(32, wrAddrCC).setName("colRdFsm_" + i + "_rdCounter")
-        // wait for multiport fifo depth / 8 + 16 cycles according to Gidel Doc
-        val startAssertCounter = Counter(512 / 8 + 16)
+    val colRdFsm = new StateMachine {
+      val rdWordCounter = DynaCounter(32, wrAddrCC).setName("colRdFsm_0_rdCounter")
+      // wait for multiport fifo depth / 8 + 16 cycles according to Gidel Doc
+      val startAssertCounter = Counter(512 / 8 + 16)
 
-        val ports_err_reduce = Vec(for(c <- hbmGpList(i)) yield io.tcarray_in(c).port_error)
-        val inAlmostEmpty = Vec(for(c <- hbmGpList(i)) yield io.tcarray_in(c).almost_empty)
+      val ports_err_reduce = io.tcarray_in(1).port_error
+      val inAlmostEmpty = io.tcarray_in(1).port_error
 
-        val chanStart = Bool()
-        val chanSel = Bool()
+      val chanStart = Bool()
+      val chanSel = Bool()
+      val tcColSel = Reg(Bits(array_col/MATA_CHAN_PER_GRP bits),
+        init=B(array_col/MATA_CHAN_PER_GRP bits, 0 -> true, default -> false))
 
-        chanStart := False
-        chanSel := False
-        for (c <- hbmGpTcolChans(i)) data2TcarrayColValid(c) := False
+      chanStart := False
+      chanSel := False
+      data2TcarrayCol.foreach(_.valid := False)
+      data2TcarrayCol.foreach(_.payload.setDefault())
 
-        val sIdle: State = new State with EntryPoint {
-          onEntry {
-            rdWordCounter.clear()
-            startAssertCounter.clear()
-          }
-          whenIsActive {
-            when(calStart.rise() && Vec(io.hbm_ready.slice(1, 5)).andR) {
-              goto(sWait)
-            }
-          }
+      val sIdle: State = new State with EntryPoint {
+        onEntry {
+          rdWordCounter.clear()
+          startAssertCounter.clear()
         }
-
-        val sWait: State = new State {
-          whenIsActive {
-            chanStart := True
-            startAssertCounter.increment()
-
-            when(ports_err_reduce.asBits.orR) {
-              goto(sIdle)
-            }.elsewhen(startAssertCounter.willOverflow && ~(inAlmostEmpty.asBits.orR)) {
-              goto(sSend)
-            }
-          }
-        }
-
-        val sSend: State = new State {
-          whenIsActive {
-            for (c <- hbmGpTcolChans(i)) {data2TcarrayColValid(c) := True}
-            //TODO: parameterize this
-            chanSel := Vec(for(o <- hbmGpTcolChans(i)) yield tcArray.io.matALoad(o).ready).andR
-            when(chanSel) {
-              rdWordCounter.increment()
-            }
-            when(rdWordCounter.willOverflow) {
-              goto(sIdle)
-            }
+        whenIsActive {
+          when(calStart.rise() && Vec(io.hbm_ready.slice(1, 5)).andR) {
+            goto(sWait)
           }
         }
       }
 
-      for(hbmChan <- hbmGpList(i)) {
-        io.tcarray_in(hbmChan).addr.clearAll()
-        io.tcarray_in(hbmChan).start := colRdFsm.chanStart
-        io.tcarray_in(hbmChan).select := colRdFsm.chanSel
+      val sWait: State = new State {
+        whenIsActive {
+          chanStart := True
+          startAssertCounter.increment()
+
+          when(ports_err_reduce) {
+            goto(sIdle)
+          }.elsewhen(startAssertCounter.willOverflow && ~inAlmostEmpty) {
+            goto(sSend)
+          }
+        }
+      }
+
+      val sSend: State = new State {
+        whenIsActive {
+          for (c <- 0 until array_col/MATA_CHAN_PER_GRP) {
+            val colWidth = data2TcarrayCol(c).payload.getBitsWidth
+            for (gid <- 0 until MATA_CHAN_PER_GRP) {
+              val colPayload = combDataFromHbm(gid).resize(colWidth)
+              // don't push padded data into col buffer, those data are for hbm channel's intra col alignment
+              data2TcarrayCol(c * MATA_CHAN_PER_GRP + gid).valid :=
+                tcColSel(c) & ~(colPayload.resizeLeft(2) === B"2'b10")
+              when(tcColSel(c)) {
+                data2TcarrayCol(c * MATA_CHAN_PER_GRP + gid).payload.fromUInt(colPayload.asUInt)
+              }
+            }
+          }
+          //TODO: parameterize this
+          val colReadys = Bits(MATA_CHAN_PER_GRP * ceil(array_col/MATA_CHAN_PER_GRP).toInt bits)
+          for (cid <- colReadys.bitsRange) {
+            if (cid < data2TcarrayCol.length) {
+              colReadys(cid) := data2TcarrayCol(cid).ready
+            } else {
+              colReadys(cid) := True
+            }
+          }
+          val tcarrayColInRdyGrp = colReadys.subdivideIn(array_col/MATA_CHAN_PER_GRP slices)
+          chanSel := OhMux(tcColSel, Vec(for(i <- tcarrayColInRdyGrp) yield i.andR))
+          when(chanSel) {
+            rdWordCounter.increment()
+            tcColSel := tcColSel.rotateLeft(1)
+          }
+          when(rdWordCounter.willOverflow) {
+            goto(sIdle)
+          }
+        }
+      }
+    }
+
+    for(hbmChanId <- 1 until io.tcarray_in.size) {
+      if (HBM_MATA_CHAN_GRP.contains(hbmChanId)) {
+        io.tcarray_in(hbmChanId).addr.clearAll()
+        io.tcarray_in(hbmChanId).start := colRdFsm.chanStart
+        io.tcarray_in(hbmChanId).select := colRdFsm.chanSel
+      } else {
+        io.tcarray_in(hbmChanId).disablePort()
       }
     }
 
@@ -385,18 +396,25 @@ class tensor_core_array_wrapper(array_col: Int, array_row: Int, chain_len: Int,
     val OUT_GRP_SIZE = tcArray.io.res.size / io.tcarray_out.size
 
     for (g <- 0 until tcArray.io.res.size / OUT_GRP_SIZE) {
-      val wrInitCount = Counter(2 bits)
+      val wrInitCount = Counter(512 / 8 + 16)
       val outValid =
         List.tabulate(OUT_GRP_SIZE)(i => tcArray.io.res(g * OUT_GRP_SIZE + i).valid).reduce((a, b) => a && b)
-      val outPop = Reg(Bool()) init False
+      val outPopEn, outStart = Reg(Bool()) init False
       val dataOutStream = Stream(UInt((24 * 3 + idx_width.r) * OUT_GRP_SIZE bits))
 
-      when(outValid.rise() && ~wrInitCount.willOverflowIfInc) {
-        wrInitCount.increment()
-      }.elsewhen(outValid && wrInitCount.willOverflowIfInc) {
+      when(outStart) {
+        when(outPopEn) {
+          outPopEn := dataOutStream.valid
+          outStart := dataOutStream.valid
+        }.otherwise {
+          wrInitCount.increment()
+          outPopEn := wrInitCount.willOverflow
+        }
+      }.otherwise {
+        outStart := dataOutStream.valid
         wrInitCount.clear()
       }
-      outPop := wrInitCount.willOverflowIfInc && io.tcarray_out(g).almost_full
+
       dataOutStream.valid := outValid
       // combine each group output payloads together in dataOutStream.payload
       // assuming the results from the same TCC shares the index
@@ -406,20 +424,23 @@ class tensor_core_array_wrapper(array_col: Int, array_row: Int, chain_len: Int,
           tcArrayResGrp(0)(24 + idx_width.r - 1 downto 24) @@
             tcArrayResGrp(2)(23 downto 0) @@ tcArrayResGrp(1)(23 downto 0) @@ tcArrayResGrp(0)(23 downto 0)
       }
-      dataOutStream.ready := outPop
+      dataOutStream.ready := outPopEn & ~io.tcarray_out(g).almost_full
       for (i <- 0 until OUT_GRP_SIZE) (tcArray.io.res(g * OUT_GRP_SIZE + i).ready := dataOutStream.ready)
 
-      io.tcarray_out(g).start := ~wrInitCount.willOverflowIfInc
-      io.tcarray_out(g).select := outPop && outValid
+      io.tcarray_out(g).start := outStart & ~outPopEn
+      io.tcarray_out(g).select := dataOutStream.ready
       io.tcarray_out(g).addr.clearAll()
       io.tcarray_out(g).data := dataOutStream.payload.resize(io.tcarray_out(g).data.getWidth bits)
     }
   }
 
+  // temporarily disable unused ports
+//  io.tcarray_out(1).disablePort()
+
   // TODO: fix mem usage computation here
   //  generate mem usage report
-//  val col_mem_size = tcArray.colMem.length * 3
-//  val row_mem_size = tcArray.rowMem.length * 3
+//  val col_mem_size = softClrnArea.tcArray.bufferArea.colBuffer.length * 3
+//  val row_mem_size = softClrnArea.tcArray.bufferArea.rowMem.length * 3
 //  val fb_fifo_size = tcArray.tensorArray.length * tcArray.tensorArray(0).length * 2
 //  println("total ram blocks: ", (col_mem_size + row_mem_size + fb_fifo_size))
 }
@@ -429,7 +450,6 @@ object tensor_core_array_wrapper_gen extends App {
   val array_col = 12
   val array_row = 6
   val chain_len = 8
-  val max_seq_len = 4480
   val ridx_width = 12
   val cidx_width = 10
 
