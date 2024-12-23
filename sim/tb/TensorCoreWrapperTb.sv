@@ -2,7 +2,7 @@
 
 module TensorCoreWrapperTb;
 
-localparam NUM_COL_HBMS = 5;
+// localparam NUM_COL_HBMS = 5;
 localparam NUM_ROW_HBMS = 6;
 
 localparam MAT_A_RD_BOUND = 10200;
@@ -101,11 +101,6 @@ string stimu_path_a, stimu_path_b, out_path;
 
 //matrix a and b buffer load
 initial begin
-  // for (hbm_col_idx = 0; hbm_col_idx < NUM_COL_HBMS; hbm_col_idx++) begin
-  //   stimu_path_a = $sformatf("./tb/sparse_matmul_data/onchip/onchip_mat_a_hbm%0d.mem", hbm_col_idx);
-  //   $readmemh(stimu_path_a, col_hbm_ins[hbm_col_idx]);
-  // end
-
   stimu_path_a = "./tb/sparse_matmul_data/onchip/onchip_mat_a_hbm.mem";
   $readmemh(stimu_path_a, col_hbm_ins);
 
@@ -327,7 +322,7 @@ initial begin
   mata_in_req_bd = calculate_bandwidth(running_lat, 300.0, mata_in_sum);
   $display("Mat A input bandwidth: %0.2f GB/s", mata_in_req_bd);
 
-  matb_out_sum = real'(dut.softClrnArea_tcArray.debug_out_counter_value) * 6 * 12 * (3 * 24 + 12) / 8;
+  matb_out_sum = real'(dut.softClrnArea_tcArray.debug_out_counter_value) * 12 * 3 * (80 + 12) / 8;
   matb_out_req_bd = calculate_bandwidth(running_lat, 300.0, matb_out_sum);
   $display("Output bandwidth: %0.2f GB/s", matb_out_req_bd);
 

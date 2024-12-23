@@ -88,22 +88,10 @@ logic          io_calEn;
 logic          io_colIdxFifoNotEmpty;
 logic          io_res_0_valid;
 logic          io_res_0_ready;
-logic [(24+RIDX_BITWIDTH)*3-1:0]   io_res_0_payload;
+logic [255:0]  io_res_0_payload;
 logic          io_res_1_valid;
 logic          io_res_1_ready;
-logic [(24+RIDX_BITWIDTH)*3-1:0]   io_res_1_payload;
-logic          io_res_2_valid;
-logic          io_res_2_ready;
-logic [(24+RIDX_BITWIDTH)*3-1:0]   io_res_2_payload;
-logic          io_res_3_valid;
-logic          io_res_3_ready;
-logic [(24+RIDX_BITWIDTH)*3-1:0]   io_res_3_payload;
-logic          io_res_4_valid;
-logic          io_res_4_ready;
-logic [(24+RIDX_BITWIDTH)*3-1:0]   io_res_4_payload;
-logic          io_res_5_valid;
-logic          io_res_5_ready;
-logic [(24+RIDX_BITWIDTH)*3-1:0]   io_res_5_payload;
+logic [255:0]  io_res_1_payload;
 logic [7:0]    io_configRowBuffWrBound;
 logic [15:0]   io_latCounter;
 logic          softClrnArea_newReset=0;
@@ -118,9 +106,8 @@ logic [88+RIDX_BITWIDTH-1:0] mat_a_stimu [TC_COL_SIZE-1:0][$];
 logic [88-1:0] mat_b_stimu [TC_ROW_SIZE-1:0][$];
 // unique(indices)
 logic [CIDX_BITWIDTH+TC_COL_SIZE-1:0] index_stimu [$];
-// res: 3x9 matrix, each 24 bit
-// TODO: fix res size here
-logic [(24+RIDX_BITWIDTH)*3-1:0] res [$];
+// res: each goes to a HBM channel
+logic [511:0] res [$];
 
 TensorCoreChainArray dut(.*);
 
@@ -369,30 +356,18 @@ initial begin
   io_sortedColIdxFast_payload_destId = '0;
 end
 
-logic [(24+RIDX_BITWIDTH)*3-1:0] io_res_payload [TC_ROW_SIZE-1:0];
-logic [TC_ROW_SIZE-1:0] io_res_valid;
-logic [TC_ROW_SIZE-1:0] io_res_ready;
+logic [511:0] io_res_payload;
+logic [1:0] io_res_valid;
+logic [1:0] io_res_ready;
 
-assign io_res_payload = {io_res_5_payload, 
-                          io_res_4_payload,
-                          io_res_3_payload,
-                          io_res_2_payload,
-                          io_res_1_payload,
+assign io_res_payload = {io_res_1_payload,
                           io_res_0_payload};
 
-assign io_res_valid = {io_res_5_valid,
-                        io_res_4_valid,
-                        io_res_3_valid,
-                        io_res_2_valid,
-                        io_res_1_valid,
+assign io_res_valid = {io_res_1_valid,
                         io_res_0_valid};
                         
-assign {io_res_5_ready, 
-       io_res_4_ready,
-       io_res_3_ready,
-       io_res_2_ready,
-       io_res_1_ready,
-       io_res_0_ready} = io_res_ready;
+assign {io_res_1_ready,
+        io_res_0_ready} = io_res_ready;
 
 
 
@@ -409,7 +384,7 @@ initial begin
   repeat (4) begin @(posedge clk); end
   #1
   io_calEn = 1'b1;
-  io_res_ready = 1'b1;
+  io_res_ready = '1;
 
   repeat(3) begin @(posedge clk); end;
   io_calEn = 1'b0;

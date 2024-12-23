@@ -24,7 +24,9 @@ view wave
 
 log TensorCoreWrapperTb/dut/*
 log TensorCoreWrapperTb/dut/softClrnArea_tcArray/*
+log TensorCoreWrapperTb/dut/softClrnArea_tcArray/outBuffer_0/*
+log TensorCoreWrapperTb/dut/softClrnArea_tcArray/outBuffer_1/*
 
 do tcwrapper_tb_add_wave.do
 
-run 5us
+run 160us

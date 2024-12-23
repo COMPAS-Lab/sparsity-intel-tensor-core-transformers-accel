@@ -61,11 +61,16 @@ class DynaCounter(width: Int) extends ImplicitArea[UInt] {
 }
 
 object DynaCounter {
-  def apply(width: Int, overflowVal: UInt): DynaCounter = {
+//  def apply(width: Int, overflowVal: UInt): DynaCounter = {
+//    val dynaCounter = new DynaCounter(width)
+//    dynaCounter.overflowVal := overflowVal-1
+//    dynaCounter
+//  }
+
+  def apply(width: Int, overflowVal: UInt): DynaCounter = new Composite(overflowVal) {
     val dynaCounter = new DynaCounter(width)
     dynaCounter.overflowVal := overflowVal-1
-    dynaCounter
-  }
+  }.dynaCounter
 }
 
 class DelayTree(num_bit: Int, n_outputs: Int) extends Component {
@@ -126,18 +131,55 @@ object BlockDelay {
    require(cycleCount >= 0,"Negative cycleCount is not allowed in Delay")
 
    val res: T = cloneOf(that)
-   val delayCore = new blk_delay_core(that.getBitsWidth, cycleCount, mem_type = mem_type)
+   val preDelayCs: Int = 3
+   val bDelayCycleCount: Int = if (cycleCount > preDelayCs) cycleCount-preDelayCs else cycleCount
+   val delayCore = new blk_delay_core(that.getBitsWidth, bDelayCycleCount, mem_type = mem_type)
 
    if (delay_en != null){
      delayCore.io.ena := delay_en
    } else {
      delayCore.io.ena := True
    }
-   delayCore.io.dat_in := that.asBits
-   res.assignFromBits(delayCore.io.dat_out)
 
+   if (cycleCount > preDelayCs) {
+     val preDelayDat = Delay(that.asBits, cycleCount-preDelayCs, when = delay_en)
+     delayCore.io.dat_in := preDelayDat
+   } else {
+     delayCore.io.dat_in := that.asBits
+   }
+
+   res.assignFromBits(delayCore.io.dat_out)
    res
  }
+}
+
+object StreamWidthConv{
+  def apply[T <: Data](that: Stream[Vec[T]], out_width: Int): Stream[Vec[T]] = new Composite(that) {
+    require(that.payload.length < out_width, "stream width conversion only supports narrow to wide conversion")
+
+    val resPayload = Vec(Reg(cloneOf(that.payload.last), init=cloneOf(that.payload.last).getZero), out_width)
+    val inCounter = Counter(out_width / that.payload.length) init 0
+    val res = Stream(Vec(cloneOf(that.payload.last), out_width))
+
+
+    that.ready := res.ready
+    when(that.fire || (that.ready && inCounter.willOverflowIfInc)) {
+      inCounter.increment()
+    }
+    when(inCounter.willOverflow) {
+      resPayload.foreach(_.clearAll())
+    }
+    res.valid := inCounter.willOverflowIfInc
+    res.payload := resPayload
+
+    for (gIdx <- 0 until out_width / that.payload.length) {
+      when(that.fire && (inCounter === gIdx)) {
+        for (el <- that.payload.indices) {
+          resPayload(gIdx * that.payload.length + el) := that.payload(el)
+        }
+      }
+    }
+  }.res
 }
 
 class StreamDelay[T <: Data](dataType: HardType[T]) extends Component {

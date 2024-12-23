@@ -454,9 +454,10 @@ def mat_b_gen(size: tuple, chain_len: int, bfp_type: BFP, n_blocks_split: int = 
     matb_blk_size = math.ceil(size[1] / n_blocks_split)
     for matb_blk_idx in range(n_blocks_split):
         # fetch a block
-        blk_size_range_h = matb_blk_idx * matb_blk_size
-        blk_size_range_t = min(blk_size_range_h + matb_blk_size, size[1])
-        matb_blk = padded_matB[:, blk_size_range_h:blk_size_range_t]
+        vec_ids = [vec*n_blocks_split + matb_blk_idx for vec in range(matb_blk_size) if vec*n_blocks_split + matb_blk_idx < size[1]]
+        # blk_size_range_h = matb_blk_idx * matb_blk_size
+        # blk_size_range_t = min(blk_size_range_h + matb_blk_size, size[1])
+        matb_blk = padded_matB[:, vec_ids]
         # transpose
         chunkedBTrans = np.transpose(matb_blk).reshape(-1, bfp_type.blk_size())
         # bfp conversion
@@ -649,7 +650,7 @@ def main(args: dict):
         path = str(args['create-binary'])
         prepare_onchip_input_files(path, hw_col, 5, 12, 581)
         prepare_onchip_idx_file(path, hw_col, 10, 581)
-        # prepare_onchip_matb_file(path, 6)
+        prepare_onchip_matb_file(path, 6)
     
     if args['test']:
         bfp_format = BFP(BfpType.BFP_12)

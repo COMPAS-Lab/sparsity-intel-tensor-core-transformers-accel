@@ -40,9 +40,7 @@ case class MultiPortStream(dWidth: Int, addrWidth: Int, hasAlmostFull: Boolean, 
 }
 
 class tensor_core_array_wrapper(array_col: Int, array_row: Int, chain_len: Int,
-                                idx_width: IdxWidth, mat_a_col: Int,
-                                num_hbms: Int
-                               ) extends Component {
+                                idx_width: IdxWidth, num_hbms: Int) extends Component {
   val io = new Bundle {
     val start, iter = in UInt (8 bits)
     val lat_counter = out UInt (16 bits)
@@ -75,6 +73,8 @@ class tensor_core_array_wrapper(array_col: Int, array_row: Int, chain_len: Int,
   //rdAddr: stop ptr for idx and row
   //wrAddr: stop ptr for col
 
+  val CTRL_REG_DELAY = 5
+
   noIoPrefix()
   val clrn = ClockDomain.current.readResetWire
   ClockDomain.current.clock.unsetName().setName("clk")
@@ -102,14 +102,14 @@ class tensor_core_array_wrapper(array_col: Int, array_row: Int, chain_len: Int,
     elem.port_error.setName("port_error_" + elem.getName())
   }
 
-  val loadStart = Delay(io.start(0), 6)
-  val softClrn = Delay(io.start(1), 6)
-  val calStart = Delay(io.start(2), 6)
+  val loadStart = Delay(io.start(0), CTRL_REG_DELAY)
+  val softClrn = Delay(io.start(1), CTRL_REG_DELAY)
+  val calStart = Delay(io.start(2), CTRL_REG_DELAY)
 
   val softClrnArea = new ResetArea(softClrn, false) {
-    val bufferSelCC = Delay(io.load_start, 4)
-    val rdAddrCC = Delay(io.rd_addr, 4)
-    val wrAddrCC = Delay(io.wr_addr, 4)
+    val bufferSelCC = Delay(io.load_start, CTRL_REG_DELAY)
+    val rdAddrCC = Delay(io.rd_addr, CTRL_REG_DELAY)
+    val wrAddrCC = Delay(io.wr_addr, CTRL_REG_DELAY)
 
     val idxGenerator = new IndexGenerator(array_col, idx_width.c, BigInt("1" * idx_width.c, 2))
     val idxGenFifoFast, idxGenFifoSlow = StreamFifo(IndexData(idx_width.c, array_col), 128)
@@ -176,8 +176,8 @@ class tensor_core_array_wrapper(array_col: Int, array_row: Int, chain_len: Int,
     val data2TcarrayRow = Vec(Stream(UInt(88 bits)), array_row)
     val data2TcarrayRowValid = Bits(array_row bits)
     for (i <- 0 until array_row) {
-      data2TcarrayRow(i).payload := io.tcarray_in(0).data(87 downto 0)
-      data2TcarrayRow(i).valid := data2TcarrayRowValid(i) & io.tcarray_in(0).select
+      data2TcarrayRow(i).payload := Delay(io.tcarray_in(0).data(87 downto 0), 4)
+      data2TcarrayRow(i).valid := Delay(data2TcarrayRowValid(i) & io.tcarray_in(0).select, 4)
     }
 
     val data2TcarrayCol = Vec(Stream(BfpBlockWithIdx(88, idx_width.r, 0, 0)), array_col)
@@ -194,10 +194,12 @@ class tensor_core_array_wrapper(array_col: Int, array_row: Int, chain_len: Int,
       col_buffer_depth = 2048,
       row_buffer_depth = 512,
       out_buf_delay = 4,
-      output_fifo_depth = 512,
-      output_width = 12,
-      inout_pipe_delay = 4,
-      debug_en = true
+      output_fifo_depth = 128,
+      output_width = 24,
+      inout_pipe_delay = 5,
+      n_out_chans = 2,
+      n_words_outchan = 2,
+      debug_en = false,
     )
 
     tcArray.io.matALoad <> data2TcarrayCol
@@ -205,9 +207,9 @@ class tensor_core_array_wrapper(array_col: Int, array_row: Int, chain_len: Int,
     tcArray.io.sortedColIdxSlow << idxGenFifoSlow.io.pop
     tcArray.io.sortedColIdxFast << idxGenFifoFast.io.pop
     tcArray.io.colIdxFifoNotEmpty := idxGenFifoSlow.io.occupancy > 32
-    tcArray.io.calEn := Delay(calStart.rise(), 3)
-    tcArray.io.configRowBuffWrBound := Delay(io.iter, 3).resized
-    io.lat_counter := Delay(tcArray.io.latCounter, 3)
+    tcArray.io.calEn := Delay(calStart.rise(), CTRL_REG_DELAY)
+    tcArray.io.configRowBuffWrBound := Delay(io.iter, CTRL_REG_DELAY).resized
+    io.lat_counter := Delay(tcArray.io.latCounter, CTRL_REG_DELAY)
 
     val idxGenRowSharedRdFsm = new StateMachine {
       val rdWordCounter = DynaCounter(32, rdAddrCC)
@@ -238,7 +240,7 @@ class tensor_core_array_wrapper(array_col: Int, array_row: Int, chain_len: Int,
       val sWait: State = new State {
         whenIsActive {
           startAssertCounter.increment()
-          selStart := True
+          selStart := startAssertCounter < 5
 
           when(ports_err_reduce.asBits.orR) {
             goto(sIdle)
@@ -334,7 +336,7 @@ class tensor_core_array_wrapper(array_col: Int, array_row: Int, chain_len: Int,
 
       val sWait: State = new State {
         whenIsActive {
-          chanStart := True
+          chanStart := startAssertCounter < 5
           startAssertCounter.increment()
 
           when(ports_err_reduce) {
@@ -392,45 +394,58 @@ class tensor_core_array_wrapper(array_col: Int, array_row: Int, chain_len: Int,
     }
 
     //out logic
-    //split output rows into groups of out_grp_size
-    val OUT_GRP_SIZE = tcArray.io.res.size / io.tcarray_out.size
+    for (g <- tcArray.io.res.indices) {
+      val outHbmWrFsm = new StateMachine {
+        val wrInitCount = Counter(512 / 8 + 16)
 
-    for (g <- 0 until tcArray.io.res.size / OUT_GRP_SIZE) {
-      val wrInitCount = Counter(512 / 8 + 16)
-      val outValid =
-        List.tabulate(OUT_GRP_SIZE)(i => tcArray.io.res(g * OUT_GRP_SIZE + i).valid).reduce((a, b) => a && b)
-      val outPopEn, outStart = Reg(Bool()) init False
-      val dataOutStream = Stream(UInt((24 * 3 + idx_width.r) * OUT_GRP_SIZE bits))
+        io.tcarray_out(g).select := False
+        io.tcarray_out(g).start := False
+        tcArray.io.res(g).ready := False
+        io.tcarray_out(g).addr.clearAll()
+        io.tcarray_out(g).data := tcArray.io.res(g).payload
 
-      when(outStart) {
-        when(outPopEn) {
-          outPopEn := dataOutStream.valid
-          outStart := dataOutStream.valid
-        }.otherwise {
-          wrInitCount.increment()
-          outPopEn := wrInitCount.willOverflow
+        val sIdle: State = new State with EntryPoint {
+          whenIsActive {
+            wrInitCount.clear()
+            when(calStart.rise()) {
+              goto(sWait)
+            }
+          }
         }
-      }.otherwise {
-        outStart := dataOutStream.valid
-        wrInitCount.clear()
-      }
 
-      dataOutStream.valid := outValid
-      // combine each group output payloads together in dataOutStream.payload
-      // assuming the results from the same TCC shares the index
-      for (outId <- 0 until OUT_GRP_SIZE) {
-        val tcArrayResGrp = tcArray.io.res(g * OUT_GRP_SIZE + outId).payload.subdivideIn(3 slices)
-        dataOutStream.payload((24 * 3 + idx_width.r) * (outId + 1) - 1 downto (24 * 3 + idx_width.r) * outId) :=
-          tcArrayResGrp(0)(24 + idx_width.r - 1 downto 24) @@
-            tcArrayResGrp(2)(23 downto 0) @@ tcArrayResGrp(1)(23 downto 0) @@ tcArrayResGrp(0)(23 downto 0)
-      }
-      dataOutStream.ready := outPopEn & ~io.tcarray_out(g).almost_full
-      for (i <- 0 until OUT_GRP_SIZE) (tcArray.io.res(g * OUT_GRP_SIZE + i).ready := dataOutStream.ready)
+        val sWait: State = new State {
+          whenIsActive {
+            wrInitCount.increment()
+            io.tcarray_out(g).start := wrInitCount < 5
+            when(wrInitCount.willOverflow) {
+              when(tcArray.io.res(g).valid && ~io.tcarray_out(g).almost_full) {
+                goto(sSend)
+              }.otherwise {
+                goto(sPause)
+              }
+            }
+          }
+        }
 
-      io.tcarray_out(g).start := outStart & ~outPopEn
-      io.tcarray_out(g).select := dataOutStream.ready
-      io.tcarray_out(g).addr.clearAll()
-      io.tcarray_out(g).data := dataOutStream.payload.resize(io.tcarray_out(g).data.getWidth bits)
+        val sSend: State = new State {
+          whenIsActive {
+            io.tcarray_out(g).select := True
+            tcArray.io.res(g).ready := True
+            when(~tcArray.io.res(g).valid || io.tcarray_out(g).almost_full) {
+              goto(sPause)
+            }
+          }
+        }
+
+        val sPause: State = new State {
+          whenIsActive {
+            io.tcarray_out(g).select := False
+            when(tcArray.io.res(g).valid && ~io.tcarray_out(g).almost_full) {
+              goto(sSend)
+            }
+          }
+        }
+      }
     }
   }
 
@@ -458,7 +473,6 @@ object tensor_core_array_wrapper_gen extends App {
     array_row = array_row,
     chain_len = chain_len,
     idx_width = IdxWidth(ridx_width, cidx_width),
-    mat_a_col = chain_len * array_row * 20 * 2,
-    num_hbms = 8
+    num_hbms = 5
   ))
 }

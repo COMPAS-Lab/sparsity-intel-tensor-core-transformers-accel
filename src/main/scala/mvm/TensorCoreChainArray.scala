@@ -132,8 +132,9 @@ class TensorCoreChainArray(array_col: Int, array_row: Int, chain_len: Int, idx_w
                            col_buffer_depth: Int, row_buffer_depth: Int,
                            out_buf_delay: Int, //should be (matBCols / array_row).ceil.toInt - 3
                            output_fifo_depth: Int, output_width: Int,
-                           inout_pipe_delay: Int = 5,
-                           num_matb_cols: Int = 128, debug_en: Boolean = false) extends Component {
+                           inout_pipe_delay: Int = 5, num_matb_cols: Int = 128,
+                           n_out_chans: Int = 2, n_words_outchan: Int = 2,
+                           debug_en: Boolean = false) extends Component {
   val io = new Bundle {
     val matALoad = Vec(slave Stream (BfpBlockWithIdx(88, idx_width.r, 0, 0)), array_col)
     val matBLoad = Vec(slave Stream(UInt(88 bits)), array_row)
@@ -141,7 +142,7 @@ class TensorCoreChainArray(array_col: Int, array_row: Int, chain_len: Int, idx_w
     // colIdxFifoNotEmpty is asserted when colIdxFifo has at least
     // half of the loading
     val calEn, colIdxFifoNotEmpty  = in Bool()
-    val res = Vec(master Stream(UInt((output_width + idx_width.r) * 3 bits)), array_row)
+    val res = Vec(master Stream(UInt(256 bits)), n_out_chans)
     // config port
     val configRowBuffWrBound = in UInt(log2Up(row_buffer_depth) bits)
     val latCounter = out UInt(16 bits)
@@ -159,6 +160,8 @@ class TensorCoreChainArray(array_col: Int, array_row: Int, chain_len: Int, idx_w
   val ROWMEM2TCC_TOTAL_DELAY = MATB_EN_DELAY + TRANSRAM_RD_II + TRANS2TCC_DELAY
   val COL_BB_INSERT2TCC_DELAY = 2
   val COLBUF2TCC_TOTAL_DELAY = 1 + COL_BB_INSERT2TCC_DELAY
+  // output parameters
+  val OUT_BLK_SIZE = 18
 
   //adding pipes to the ctrl signals
   val calEnDelay = Delay(io.calEn, 3)
@@ -521,17 +524,10 @@ class TensorCoreChainArray(array_col: Int, array_row: Int, chain_len: Int, idx_w
   val chainTimeCorrectedExpIn = Vec(Vec(UInt(8 bits), chain_len), array_row)
   for (r <- 0 until array_row) {
     for (tcId <- 0 until chain_len) {
-      if (tcId > 0) {
-        chainTimeCorrectedDataIn(r)(tcId) :=
-          BlockDelay(bufferArea.rowBufferBlkOut.payload(r)(tcId).blkData(79 downto 0), 2*tcId, "M20K")
-        chainTimeCorrectedExpIn(r)(tcId) :=
-          BlockDelay(bufferArea.rowBufferBlkOut.payload(r)(tcId).blkData(87 downto 80), 2*tcId, "M20K")
-      } else {
-        chainTimeCorrectedDataIn(r)(tcId) :=
-          bufferArea.rowBufferBlkOut.payload(r)(tcId).blkData(79 downto 0)
-        chainTimeCorrectedExpIn(r)(tcId) :=
-          bufferArea.rowBufferBlkOut.payload(r)(tcId).blkData(87 downto 80)
-      }
+      chainTimeCorrectedDataIn(r)(tcId) :=
+        BlockDelay(bufferArea.rowBufferBlkOut.payload(r)(tcId).blkData(79 downto 0), 2*tcId, "M20K")
+      chainTimeCorrectedExpIn(r)(tcId) :=
+        BlockDelay(bufferArea.rowBufferBlkOut.payload(r)(tcId).blkData(87 downto 80), 2*tcId, "M20K")
     }
   }
 
@@ -745,41 +741,53 @@ class TensorCoreChainArray(array_col: Int, array_row: Int, chain_len: Int, idx_w
 
   //output control
   //output buffer path
-  val outputBufferSelOut =
-    Vec(Vec(Flow(UInt(output_width * 3 + idx_width.r bits)), array_col), array_row)
+  val outputBufferSelOut = Array.fill(array_row, array_col, 3)(UInt(output_width bits))
+  val outputRidx = Array.fill(array_col)(UInt(idx_width.r bits))
+  val outBfpConv = Array.fill(array_col, 3)(new FixedBfp12Converter(OUT_BLK_SIZE))
 
   for (c <- 0 until array_col) {
+    outputRidx(c) :=
+      BlockDelay(tensorArray.last(c).io.res.payload(0).rIdx, inout_pipe_delay + outBfpConv(0)(0).CONV_DELAY, "MLAB")
     for (r <- 0 until array_row) {
       tensorArray(r)(c).io.dataInLast :=
         Delay(bufferArea.isLastSubVecMultIter(c), ROWMEM2TCC_TOTAL_DELAY + 1) | matBEn4BubbleInsDelayed
-      outputBufferSelOut(r)(c).payload := Delay(
-        Vec(
-          tensorArray(r)(c).io.res.payload(0).rIdx,
-          tensorArray(r)(c).io.res.payload(2).blkData,
-          tensorArray(r)(c).io.res.payload(1).blkData,
-          tensorArray(r)(c).io.res.payload(0).blkData,
-        ),
-        inout_pipe_delay
-      )
-      outputBufferSelOut(r)(c).valid :=
-        Delay(tensorArray(r)(c).io.res.valid & tensorArray(r)(c).io.dataOutLast, inout_pipe_delay)
     }
   }
 
-  // TODO: verify function of shift regs
-  val outBuffer = Array.fill(array_row)(
+  for (c <- 0 until array_col) {
+    for (b <- 0 until 3) {
+      for (r <- 0 until array_row) {
+        outputBufferSelOut(r)(c)(b) := Delay(tensorArray(r)(c).io.res.payload(b).blkData, inout_pipe_delay)
+      }
+
+      val colOutGrp = Stream(Vec(UInt(output_width bits), array_row))
+      colOutGrp.setName("colOutGrp_" + c + "_" + b)
+      colOutGrp.valid :=
+        Delay(tensorArray.last(c).io.res.valid & tensorArray.last(c).io.dataOutLast, inout_pipe_delay, init=False)
+      colOutGrp.payload := Vec(for (r <- 0 until array_row) yield outputBufferSelOut(r)(c)(b))
+      val outConvedDat = StreamWidthConv(colOutGrp, OUT_BLK_SIZE)
+      outConvedDat.setName("outConvedDat_" + c + "_" + b)
+      outBfpConv(c)(b).io.dataIn << outConvedDat.toFlow
+    }
+  }
+  // TODO: fix 88 bit width conversion
+  val outBuffer = Array.fill(n_out_chans)(
     new StreamOutAsymFifo(
-      input_width = (output_width * 3 + idx_width.r) * array_col,
-      output_width = (output_width+idx_width.r) * 3,
+      input_width = (outBfpConv(0)(0).io.dataOut.payload.getBitsWidth + idx_width.r) * 3 * array_col / n_out_chans,
+      output_width = (outBfpConv(0)(0).io.dataOut.payload.getBitsWidth + idx_width.r) * n_words_outchan,
       depth=output_fifo_depth
     )
   )
-  for (regIdx <- 0 until array_row) {
-    outBuffer(regIdx).io.push.valid := outputBufferSelOut(regIdx)(0).valid
-    outBuffer(regIdx).io.push.payload :=
-      List.tabulate(array_col)(i => outputBufferSelOut(regIdx)(i).payload).reduce((a, b) => b @@ a)
+  for (regIdx <- 0 until n_out_chans) {
+    outBuffer(regIdx).io.push.valid := outBfpConv(regIdx * array_col / n_out_chans)(0).io.dataOut.valid
+    outBuffer(regIdx).io.push.payload := Vec(
+      for {
+        i <- regIdx * array_col / n_out_chans until (regIdx + 1) * array_col / n_out_chans;
+        j <- 0 until 3
+      } yield outputRidx(i) @@ outBfpConv(i)(j).io.dataOut.payload
+    ).asBits.asUInt
     
-    io.res(regIdx) << outBuffer(regIdx).io.pop
+    io.res(regIdx) << outBuffer(regIdx).io.pop.translateWith(outBuffer(regIdx).io.pop.payload.resize(256 bits))
   }
 
   // perf and debug counters
@@ -815,7 +823,7 @@ class TensorCoreChainArray(array_col: Int, array_row: Int, chain_len: Int, idx_w
       .setName("debug_idx_slow_counter")
       .dontSimplifyIt()
       .init(U(0))
-    val outPshCounter = Counter(65536, inc = outputBufferSelOut(0)(0).valid)
+    val outPshCounter = Counter(65536, inc = outBfpConv(0)(0).io.dataOut.valid)
       .setName("debug_out_counter")
       .dontSimplifyIt()
       .init(U(0))
@@ -825,6 +833,7 @@ class TensorCoreChainArray(array_col: Int, array_row: Int, chain_len: Int, idx_w
         .dontSimplifyIt()
         .init(U(0))
     }
+    outBuffer.foreach(_.io.push.ready.dontSimplifyIt())
   }
 }
 

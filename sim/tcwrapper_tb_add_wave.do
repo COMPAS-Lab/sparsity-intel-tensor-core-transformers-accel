@@ -180,9 +180,22 @@ add wave -noupdate /TensorCoreWrapperTb/dut/softClrnArea_idxGenFifoFast/io_push_
 add wave -noupdate /TensorCoreWrapperTb/dut/softClrnArea_idxGenFifoSlow/io_push_valid
 add wave -noupdate /TensorCoreWrapperTb/dut/softClrnArea_idxGenFifoSlow/io_push_ready
 add wave -noupdate -radix unsigned /TensorCoreWrapperTb/dut/softClrnArea_idxGenFifoSlow/io_push_payload_idxData
+add wave -noupdate -divider output
+add wave -noupdate /TensorCoreWrapperTb/dut/start_tcarray_out_0
+add wave -noupdate /TensorCoreWrapperTb/dut/select_tcarray_out_0
+add wave -noupdate /TensorCoreWrapperTb/dut/data_tcarray_out_0
+add wave -noupdate /TensorCoreWrapperTb/dut/addr_tcarray_out_0
+add wave -noupdate /TensorCoreWrapperTb/dut/almost_full_tcarray_out_0
+add wave -noupdate /TensorCoreWrapperTb/dut/port_error_tcarray_out_0
+add wave -noupdate /TensorCoreWrapperTb/dut/softClrnArea_tcArray/outBuffer_0/io_push_valid
+add wave -noupdate /TensorCoreWrapperTb/dut/softClrnArea_tcArray/outBuffer_0/io_push_ready
+add wave -noupdate /TensorCoreWrapperTb/dut/softClrnArea_tcArray/outBuffer_0/io_push_payload
+add wave -noupdate /TensorCoreWrapperTb/dut/softClrnArea_tcArray/outBuffer_0/io_pop_valid
+add wave -noupdate /TensorCoreWrapperTb/dut/softClrnArea_tcArray/outBuffer_0/io_pop_ready
+add wave -noupdate /TensorCoreWrapperTb/dut/softClrnArea_tcArray/outBuffer_0/io_pop_payload
 TreeUpdate [SetDefaultTree]
-WaveRestoreCursors {{Cursor 1} {41445000 ps} 0} {{Cursor 2} {10065000 ps} 0}
-quietly wave cursor active 2
+WaveRestoreCursors {{Cursor 1} {58015961 ps} 0} {{Cursor 2} {10065000 ps} 0}
+quietly wave cursor active 1
 configure wave -namecolwidth 328
 configure wave -valuecolwidth 100
 configure wave -justifyvalue left
@@ -197,4 +210,4 @@ configure wave -griddelta 40
 configure wave -timeline 0
 configure wave -timelineunits ns
 update
-WaveRestoreZoom {6341776 ps} {12468269 ps}
+WaveRestoreZoom {15150883 ps} {175995133 ps}
