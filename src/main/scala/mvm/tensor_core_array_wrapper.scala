@@ -42,10 +42,10 @@ case class MultiPortStream(dWidth: Int, addrWidth: Int, hasAlmostFull: Boolean, 
 class tensor_core_array_wrapper(array_col: Int, array_row: Int, chain_len: Int,
                                 idx_width: IdxWidth, num_hbms: Int) extends Component {
   val io = new Bundle {
-    val start, iter = in UInt (8 bits)
+    val tc_ctrl, mbvec_size = in UInt (8 bits)
     val lat_counter = out UInt (16 bits)
-    val rd_addr, wr_addr = in UInt (32 bits)
-    val load_start = in UInt (32 bits)
+    val mbidx_rd_bound, ma_rd_bound = in UInt (32 bits)
+    val buf_ld_sel = in UInt (32 bits)
     val hbm_ready = Array.fill(num_hbms)(in Bool())
     // TODO: temp ports for idx gen only, deprecated in the future
     val tcarray_in = Vec(slave(MultiPortStream(256, 32, false, true)), 3)
@@ -57,21 +57,16 @@ class tensor_core_array_wrapper(array_col: Int, array_row: Int, chain_len: Int,
   // tcarray_in_1/2: row input
 
   // shared tcarray in channel address table
-  // io.load_start(n downto 0) === 0 -> tcArray.io.matBLoad(0)
-  // io.load_start(n downto 0) === 1 -> tcArray.io.matBLoad(1)
-  // io.load_start(n downto 0) === 2 -> tcArray.io.matBLoad(2)
-  // io.load_start(n downto 0) === 3 -> tcArray.io.matBLoad(3)
-  // io.load_start(n downto 0) === 4 -> tcArray.io.matBLoad(4)
-  // io.load_start(n downto 0) === 5 -> tcArray.io.matBLoad(5)
-  // io.load_start(n downto 0) === 6 -> idxGenerator
+  // io.buf_ld_sel(n downto 0) === 1 -> tcArray.io.matBLoad
+  // io.buf_ld_sel(n downto 0) === 0 -> idxGenerator
 
   // control regs:
-  // io.start(0): start load
-  // io.start(1): soft reset
-  // io.start(2): cal en start
+  // io.tc_ctrl(0): start load
+  // io.tc_ctrl(1): soft reset
+  // io.tc_ctrl(2): cal en start
 
-  //rdAddr: stop ptr for idx and row
-  //wrAddr: stop ptr for col
+  //mbidx_rd_bound: stop ptr for idx and row
+  //ma_rd_bound: stop ptr for col
 
   val CTRL_REG_DELAY = 5
 
@@ -102,14 +97,14 @@ class tensor_core_array_wrapper(array_col: Int, array_row: Int, chain_len: Int,
     elem.port_error.setName("port_error_" + elem.getName())
   }
 
-  val loadStart = Delay(io.start(0), CTRL_REG_DELAY)
-  val softClrn = Delay(io.start(1), CTRL_REG_DELAY)
-  val calStart = Delay(io.start(2), CTRL_REG_DELAY)
+  val loadStart = Delay(io.tc_ctrl(0), CTRL_REG_DELAY)
+  val softClrn = Delay(io.tc_ctrl(1), CTRL_REG_DELAY)
+  val calStart = Delay(io.tc_ctrl(2), CTRL_REG_DELAY)
 
   val softClrnArea = new ResetArea(softClrn, false) {
-    val bufferSelCC = Delay(io.load_start, CTRL_REG_DELAY)
-    val rdAddrCC = Delay(io.rd_addr, CTRL_REG_DELAY)
-    val wrAddrCC = Delay(io.wr_addr, CTRL_REG_DELAY)
+    val bufferSelCC = Delay(io.buf_ld_sel, CTRL_REG_DELAY)
+    val mbidxRdBoundCC = Delay(io.mbidx_rd_bound, CTRL_REG_DELAY)
+    val maRdBoundCC = Delay(io.ma_rd_bound, CTRL_REG_DELAY)
 
     val idxGenerator = new IndexGenerator(array_col, idx_width.c, BigInt("1" * idx_width.c, 2))
     val idxGenFifoFast, idxGenFifoSlow = StreamFifo(IndexData(idx_width.c, array_col), 128)
@@ -173,12 +168,10 @@ class tensor_core_array_wrapper(array_col: Int, array_row: Int, chain_len: Int,
     idxGenerator.io.seqOut.ready := idxGenFifoSlow.io.push.ready & idxGenFifoFast.io.push.ready
 
     // TC Array data path from HBM to TC Array
-    val data2TcarrayRow = Vec(Stream(UInt(88 bits)), array_row)
-    val data2TcarrayRowValid = Bits(array_row bits)
-    for (i <- 0 until array_row) {
-      data2TcarrayRow(i).payload := Delay(io.tcarray_in(0).data(87 downto 0), 4)
-      data2TcarrayRow(i).valid := Delay(data2TcarrayRowValid(i) & io.tcarray_in(0).select, 4)
-    }
+    val data2TcarrayRow = Stream(UInt(88 bits))
+    val data2TcarrayRowValid = Bool()
+    data2TcarrayRow.payload := Delay(io.tcarray_in(0).data(87 downto 0), 4)
+    data2TcarrayRow.valid := Delay(data2TcarrayRowValid & io.tcarray_in(0).select, 4)
 
     val data2TcarrayCol = Vec(Stream(BfpBlockWithIdx(88, idx_width.r, 0, 0)), array_col)
     val MATA_CHAN_PER_GRP = 4
@@ -208,16 +201,15 @@ class tensor_core_array_wrapper(array_col: Int, array_row: Int, chain_len: Int,
     tcArray.io.sortedColIdxFast << idxGenFifoFast.io.pop
     tcArray.io.colIdxFifoNotEmpty := idxGenFifoSlow.io.occupancy > 32
     tcArray.io.calEn := Delay(calStart.rise(), CTRL_REG_DELAY)
-    tcArray.io.configRowBuffWrBound := Delay(io.iter, CTRL_REG_DELAY).resized
+    tcArray.io.configRowBuffWrBound := Delay(io.mbvec_size, CTRL_REG_DELAY).resized
     io.lat_counter := Delay(tcArray.io.latCounter, CTRL_REG_DELAY)
 
     val idxGenRowSharedRdFsm = new StateMachine {
-      val rdWordCounter = DynaCounter(32, rdAddrCC)
+      val rdWordCounter = DynaCounter(32, mbidxRdBoundCC)
       // wait for multiport fifo depth / 8 + 16 cycles according to Gidel Doc
-      val startAssertCounter = Counter(512/8+16)
+      val startAssertCounter = Counter(4)
 
       val ports_err_reduce = io.tcarray_in(0).port_error
-      val inAlmostEmpty = io.tcarray_in(0).almost_empty
 
       val selStart, selSelect = Bool()
       tcArrayIn4IdxGenValid := False
@@ -232,19 +224,18 @@ class tensor_core_array_wrapper(array_col: Int, array_row: Int, chain_len: Int,
           startAssertCounter.clear()
           when(loadStart.rise() && io.hbm_ready(0)) {
             goto(sWait)
-            selStart := True
           }
         }
       }
 
       val sWait: State = new State {
         whenIsActive {
-          startAssertCounter.increment()
-          selStart := startAssertCounter < 5
-
           when(ports_err_reduce.asBits.orR) {
             goto(sIdle)
-          }.elsewhen(startAssertCounter.willOverflow && ~(inAlmostEmpty.asBits.orR)) {
+          }.elsewhen(~startAssertCounter.willOverflowIfInc) {
+            startAssertCounter.increment()
+            selStart := True
+          }.elsewhen(~io.tcarray_in(0).almost_empty) {
             goto(sSend)
           }
         }
@@ -252,26 +243,14 @@ class tensor_core_array_wrapper(array_col: Int, array_row: Int, chain_len: Int,
 
       val sSend: State = new State {
         whenIsActive {
-          switch(bufferSelCC(log2Up(tcArray.io.matBLoad.size + 1)-1 downto 0)) {
-            for (i <- 0 until (tcArray.io.matBLoad.size + 1)) {
-              if (i == tcArray.io.matBLoad.size) {
-                is(i) {
-                  tcArrayIn4IdxGenValid := True
-                  selSelect := True
-                  when(Vec(for(i <- tcArrayIn4IdxGen) yield i.msb).andR) {
-                    goto(sPause)
-                  }
-                }
-              } else {
-                is(i) {
-                  data2TcarrayRowValid(i) := True
-                  selSelect := tcArray.io.matBLoad(i).ready
-                }
-              }
-            }
-
-            default {
-              selSelect := False
+          when(bufferSelCC(0)) {
+            data2TcarrayRowValid := True
+            selSelect := tcArray.io.matBLoad.ready
+          }.otherwise{
+            tcArrayIn4IdxGenValid := True
+            selSelect := True
+            when(Vec(for (i <- tcArrayIn4IdxGen) yield i.msb).andR) {
+              goto(sPause)
             }
           }
 
@@ -305,12 +284,12 @@ class tensor_core_array_wrapper(array_col: Int, array_row: Int, chain_len: Int,
 
     // TC array col inputs ctrl
     val colRdFsm = new StateMachine {
-      val rdWordCounter = DynaCounter(32, wrAddrCC).setName("colRdFsm_0_rdCounter")
+      val rdWordCounter = DynaCounter(32, maRdBoundCC).setName("colRdFsm_0_rdCounter")
       // wait for multiport fifo depth / 8 + 16 cycles according to Gidel Doc
-      val startAssertCounter = Counter(512 / 8 + 16)
+      val startAssertCounter = Counter(4)
 
-      val ports_err_reduce = io.tcarray_in(1).port_error
-      val inAlmostEmpty = io.tcarray_in(1).port_error
+      val ports_err_reduce = io.tcarray_in(1).port_error | io.tcarray_in(2).port_error
+      val inAlmostEmpty = io.tcarray_in(1).almost_empty | io.tcarray_in(2).almost_empty
 
       val chanStart = Bool()
       val chanSel = Bool()
@@ -323,12 +302,10 @@ class tensor_core_array_wrapper(array_col: Int, array_row: Int, chain_len: Int,
       data2TcarrayCol.foreach(_.payload.setDefault())
 
       val sIdle: State = new State with EntryPoint {
-        onEntry {
+        whenIsActive {
           rdWordCounter.clear()
           startAssertCounter.clear()
-        }
-        whenIsActive {
-          when(calStart.rise() && Vec(io.hbm_ready.slice(1, 5)).andR) {
+          when(calStart.rise() && Vec(io.hbm_ready.slice(1, io.tcarray_in.size)).andR) {
             goto(sWait)
           }
         }
@@ -336,12 +313,12 @@ class tensor_core_array_wrapper(array_col: Int, array_row: Int, chain_len: Int,
 
       val sWait: State = new State {
         whenIsActive {
-          chanStart := startAssertCounter < 5
-          startAssertCounter.increment()
-
           when(ports_err_reduce) {
             goto(sIdle)
-          }.elsewhen(startAssertCounter.willOverflow && ~inAlmostEmpty) {
+          }.elsewhen(~startAssertCounter.willOverflowIfInc) {
+            startAssertCounter.increment()
+            chanStart := True
+          }.elsewhen(~inAlmostEmpty) {
             goto(sSend)
           }
         }

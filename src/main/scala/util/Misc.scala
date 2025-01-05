@@ -131,9 +131,7 @@ object BlockDelay {
    require(cycleCount >= 0,"Negative cycleCount is not allowed in Delay")
 
    val res: T = cloneOf(that)
-   val preDelayCs: Int = 3
-   val bDelayCycleCount: Int = if (cycleCount > preDelayCs) cycleCount-preDelayCs else cycleCount
-   val delayCore = new blk_delay_core(that.getBitsWidth, bDelayCycleCount, mem_type = mem_type)
+   val delayCore = new blk_delay_core(that.getBitsWidth, cycleCount, mem_type = mem_type)
 
    if (delay_en != null){
      delayCore.io.ena := delay_en
@@ -141,13 +139,7 @@ object BlockDelay {
      delayCore.io.ena := True
    }
 
-   if (cycleCount > preDelayCs) {
-     val preDelayDat = Delay(that.asBits, cycleCount-preDelayCs, when = delay_en)
-     delayCore.io.dat_in := preDelayDat
-   } else {
-     delayCore.io.dat_in := that.asBits
-   }
-
+   delayCore.io.dat_in := that.asBits
    res.assignFromBits(delayCore.io.dat_out)
    res
  }

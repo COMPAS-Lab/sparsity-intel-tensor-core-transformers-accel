@@ -441,10 +441,12 @@ def mat_b_gen(size: tuple, chain_len: int, bfp_type: BFP, n_blocks_split: int = 
     # pad mat b to align with chain_len x BFP size
     align_size = chain_len * bfp_type.blk_size()
     required_padding_size = int(align_size - size[0] % align_size)
+    col_size = math.ceil(size[1] / n_blocks_split) * n_blocks_split
+    required_vec_padding_size = int(col_size - size[1])
     if required_padding_size > 0:
         padded_matB = np.pad(
             matB, 
-            pad_width=((0, required_padding_size), (0, 0)), 
+            pad_width=((0, required_padding_size), (0, required_vec_padding_size)), 
             mode="constant", 
             constant_values=0.0)
     else:
@@ -453,8 +455,10 @@ def mat_b_gen(size: tuple, chain_len: int, bfp_type: BFP, n_blocks_split: int = 
     print(f"padded mat b size: {padded_matB.shape}")
     matb_blk_size = math.ceil(size[1] / n_blocks_split)
     for matb_blk_idx in range(n_blocks_split):
-        # fetch a block
-        vec_ids = [vec*n_blocks_split + matb_blk_idx for vec in range(matb_blk_size) if vec*n_blocks_split + matb_blk_idx < size[1]]
+        # split mat b into chunks of interleaved cols
+        # chunk 0: 0, 22, 44, 66...
+        # chunk 1: 1, 23, 45, 67...
+        vec_ids = [vec*n_blocks_split + matb_blk_idx for vec in range(matb_blk_size)]
         # blk_size_range_h = matb_blk_idx * matb_blk_size
         # blk_size_range_t = min(blk_size_range_h + matb_blk_size, size[1])
         matb_blk = padded_matB[:, vec_ids]
@@ -463,12 +467,17 @@ def mat_b_gen(size: tuple, chain_len: int, bfp_type: BFP, n_blocks_split: int = 
         # bfp conversion
         bfp_res, _ = bfp_type.to_bfp(list(chunkedBTrans))
 
-        fname = DAT_PATH + "/" + f"MAT_B_{bfp_type.format_name()}_b{matb_blk_idx}.bin"
-        with open(fname, "w+", encoding='utf-8') as f:
-            for i in bfp_res:
-                f.write(i + "\n")
-            print("{} lines written to B.".format(len(bfp_res)))
-            print(f"mat B total size: {len(bfp_res) * len(bfp_res[0]) / 1024. / 1024. / 8 :.2f} MB")
+        fname = DAT_PATH + "/" + f"MAT_B_{bfp_type.format_name()}_all.bin"
+        if matb_blk_idx == 0:
+            f = open(fname, "w+", encoding='utf-8')
+        else:
+            f = open(fname, "a", encoding='utf-8')
+
+        for i in bfp_res:
+            f.write(i + "\n")
+        print("{} lines written to B.".format(len(bfp_res)))
+        print(f"mat B total size: {len(bfp_res) * len(bfp_res[0]) / 1024. / 1024. / 8 :.2f} MB")
+        f.close()
 
     return matB
 
@@ -553,13 +562,15 @@ def prepare_onchip_input_files(input_path: str, n_shared_chans: int, n_hbm_chans
                     mat_data[mapped_cid][rid], 
                     n_hbm_bwidth * n_hbms//n_chans_in_hbm_grp) + partial_dat
 
-            hbm_dat.append(bin_to_hex(partial_dat, n_hbms * n_hbm_bwidth) + "\n")
+            hbm_dat.append(bin_to_hex(partial_dat, n_hbms * n_hbm_bwidth))
 
     print(f"total len: {total_len}")
     update_or_create_json(input_path + f"onchip/onchip_sizes.json", {"mat a size": len(hbm_dat)})
 
-    with open(input_path + f"onchip/onchip_mat_a_hbm.mem", "w", encoding="utf-8") as f:
-        f.writelines(hbm_dat)
+    for i_hbm in range(n_hbms):
+        with open(input_path + f"onchip/onchip_mat_a_hbm_{n_hbms-1-i_hbm}.mem", "w", encoding="utf-8") as f:
+            for l in hbm_dat:
+                f.write(l[i_hbm * (n_hbm_bwidth//4) : (i_hbm+1) * (n_hbm_bwidth//4)] + "\n")
 
 def prepare_onchip_idx_file(
         input_path: str, n_shared_chans: int, cidx_width: tuple, head_idx: int, align_to=256):
@@ -606,15 +617,13 @@ def prepare_onchip_matb_file(input_path: str, n_matb_blks: int, align_to=256):
         input_path += "/"
 
     # import mat b file
-    mat_b_blks = [[] for i in range(n_matb_blks)]
-    for i in range(n_matb_blks):
-        with open(input_path + f"MAT_B_BFP12_b{i}.bin", "r", encoding="utf-8") as f:
-            lines = [line.rstrip() for line in f]
-            for l in lines:
-                mat_b_blks[i].append(bin_to_hex(l, align_to) + "\n")
+    lines = []
+    with open(input_path + f"MAT_B_BFP12_all.bin", "r", encoding="utf-8") as f:
+        lines = [line.rstrip() for line in f]
 
-        with open(input_path + f"onchip/onchip_mat_b_hbm{i}.mem", "w", encoding="utf-8") as f:
-            f.writelines(mat_b_blks[i])
+    with open(input_path + f"onchip/onchip_mat_b_hbm.mem", "w", encoding="utf-8") as f:
+        for l in lines:
+            f.writelines(bin_to_hex(l, align_to) + "\n")
 
 def main(args: dict):
     hw_row = 6
@@ -650,7 +659,7 @@ def main(args: dict):
         path = str(args['create-binary'])
         prepare_onchip_input_files(path, hw_col, 5, 12, 581)
         prepare_onchip_idx_file(path, hw_col, 10, 581)
-        prepare_onchip_matb_file(path, 6)
+        prepare_onchip_matb_file(path, 256)
     
     if args['test']:
         bfp_format = BFP(BfpType.BFP_12)

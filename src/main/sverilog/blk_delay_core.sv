@@ -84,15 +84,19 @@ generate
     assign dat_out[WIDTH-1:0] = data[WIDTH-1:0];
 
   end else begin
-    if( (TYPE == "MLAB" || TYPE == "M20K") && LENGTH>=3 ) begin
+    if( (TYPE == "MLAB" || TYPE == "M20K") && LENGTH>4 ) begin
 
       logic [WIDTH-1:0] fifo_out;
       logic full;
       logic [CNTR_W-1:0] usedw;
 
+      logic [WIDTH-1:0] reg_in_d1t = '0;
+      logic [WIDTH-1:0] reg_in_d2t = '0;
+      logic [WIDTH-1:0] reg_out = '0;
+
       logic fifo_out_ena;
       if( REGISTER_OUTPUTS=="TRUE" ) begin
-        assign fifo_out_ena = (usedw[CNTR_W-1:0] == LENGTH-1);
+        assign fifo_out_ena = (usedw[CNTR_W-1:0] == LENGTH-3);
       end else begin
         assign fifo_out_ena = full;
       end
@@ -113,7 +117,7 @@ generate
         .aclr( 1'b0 ),
         .sclr( ~nrst ),
 
-        .data( dat_in[WIDTH-1:0] ),
+        .data( reg_in_d2t[WIDTH-1:0] ),
         .wrreq( ena ),
         .rdreq( ena && fifo_out_ena ),
 
@@ -126,12 +130,17 @@ generate
         .eccstatus(  )
       );
 
-      logic [WIDTH-1:0] reg_out = '0;
       always_ff @(posedge clk) begin
         if( ~nrst ) begin
+          reg_in_d1t[WIDTH-1:0] <= '0;
+          reg_in_d2t[WIDTH-1:0] <= '0;
           reg_out[WIDTH-1:0] <= '0;
-        end else if( ena && fifo_out_ena ) begin
-          reg_out[WIDTH-1:0] <= fifo_out[WIDTH-1:0];
+        end else if( ena ) begin
+          reg_in_d1t[WIDTH-1:0] <= dat_in[WIDTH-1:0];
+          reg_in_d2t[WIDTH-1:0] <= reg_in_d1t[WIDTH-1:0];
+          if( fifo_out_ena ) begin
+            reg_out[WIDTH-1:0] <= fifo_out[WIDTH-1:0];
+          end
         end
       end
 

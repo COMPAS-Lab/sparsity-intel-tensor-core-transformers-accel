@@ -58,24 +58,9 @@ logic          io_matALoad_11_valid;
 logic          io_matALoad_11_ready;
 logic [87:0]   io_matALoad_11_payload_blkData;
 logic [RIDX_BITWIDTH-1:0]    io_matALoad_11_payload_rIdx;
-logic          io_matBLoad_0_valid;
-logic          io_matBLoad_0_ready;
-logic [87:0]   io_matBLoad_0_payload;
-logic          io_matBLoad_1_valid;
-logic          io_matBLoad_1_ready;
-logic [87:0]   io_matBLoad_1_payload;
-logic          io_matBLoad_2_valid;
-logic          io_matBLoad_2_ready;
-logic [87:0]   io_matBLoad_2_payload;
-logic          io_matBLoad_3_valid;
-logic          io_matBLoad_3_ready;
-logic [87:0]   io_matBLoad_3_payload;
-logic          io_matBLoad_4_valid;
-logic          io_matBLoad_4_ready;
-logic [87:0]   io_matBLoad_4_payload;
-logic          io_matBLoad_5_valid;
-logic          io_matBLoad_5_ready;
-logic [87:0]   io_matBLoad_5_payload;
+logic          io_matBLoad_valid;
+logic          io_matBLoad_ready;
+logic [87:0]   io_matBLoad_payload;
 logic          io_sortedColIdxSlow_valid;
 logic          io_sortedColIdxSlow_ready;
 logic [CIDX_BITWIDTH-1:0]    io_sortedColIdxSlow_payload_idxData;
@@ -103,7 +88,7 @@ logic          clk=0;
 // Mat A: 9x90, each ceil 8 bitsx10 elems + 1 shared exp 
 logic [88+RIDX_BITWIDTH-1:0] mat_a_stimu [TC_COL_SIZE-1:0][$];
 // Mat B: 90x18, each ceil 3x (8bits x 10 elems + 1 shared exp)
-logic [88-1:0] mat_b_stimu [TC_ROW_SIZE-1:0][$];
+logic [88-1:0] mat_b_stimu [$];
 // unique(indices)
 logic [CIDX_BITWIDTH+TC_COL_SIZE-1:0] index_stimu [$];
 // res: each goes to a HBM channel
@@ -168,31 +153,6 @@ assign io_matALoad_ready = {io_matALoad_11_ready,
                               io_matALoad_1_ready,
                               io_matALoad_0_ready};
 
-logic [88-1:0] io_matBLoad_payload [TC_ROW_SIZE-1:0];
-logic [TC_ROW_SIZE-1:0] io_matBLoad_valid;
-logic [TC_ROW_SIZE-1:0] io_matBLoad_ready;
-
-assign io_matBLoad_5_payload = io_matBLoad_payload[5];
-assign io_matBLoad_4_payload = io_matBLoad_payload[4];
-assign io_matBLoad_3_payload = io_matBLoad_payload[3];
-assign io_matBLoad_2_payload = io_matBLoad_payload[2];
-assign io_matBLoad_1_payload = io_matBLoad_payload[1];
-assign io_matBLoad_0_payload = io_matBLoad_payload[0];
-
-assign {io_matBLoad_5_valid,
-        io_matBLoad_4_valid,
-        io_matBLoad_3_valid,
-        io_matBLoad_2_valid,
-        io_matBLoad_1_valid,
-        io_matBLoad_0_valid} = io_matBLoad_valid;
-
-assign io_matBLoad_ready = {io_matBLoad_5_ready,
-                            io_matBLoad_4_ready,
-                            io_matBLoad_3_ready,
-                            io_matBLoad_2_ready,
-                            io_matBLoad_1_ready,
-                            io_matBLoad_0_ready};
-
 integer tc_col_idx, tc_row_idx;
 string stimu_path, out_path;
 //matrix a and b buffer load
@@ -202,10 +162,8 @@ initial begin
     $readmemb(stimu_path, mat_a_stimu[tc_col_idx]);
   end
 
-  for (tc_row_idx = 0; tc_row_idx < TC_ROW_SIZE; tc_row_idx++) begin
-    stimu_path = $sformatf("./tb/sparse_matmul_data/MAT_B_BFP12_b%0d.bin", tc_row_idx);
-    $readmemb(stimu_path, mat_b_stimu[tc_row_idx]);
-  end 
+  stimu_path = "./tb/sparse_matmul_data/MAT_B_BFP12_all.bin";
+  $readmemb(stimu_path, mat_b_stimu);
 
   stimu_path = "./tb/sparse_matmul_data/IDX_GEN_h581.bin";
   $readmemb(stimu_path, index_stimu);
@@ -256,40 +214,34 @@ generate
 endgenerate
 
 // mat b load ctrl
-genvar row_buffer_port_ptr;
-integer mat_b_load_ptr[TC_ROW_SIZE-1 : 0];
+integer mat_b_load_ptr;
 
-generate
-  for (row_buffer_port_ptr = 0; row_buffer_port_ptr < TC_ROW_SIZE; row_buffer_port_ptr++) begin
-    always @( posedge clk ) begin
-      if (io_matBLoad_valid[row_buffer_port_ptr] && io_matBLoad_ready[row_buffer_port_ptr]) begin
-        mat_b_load_ptr[row_buffer_port_ptr] = mat_b_load_ptr[row_buffer_port_ptr] + 1;
-      end
-    end
-
-    initial begin
-      io_matBLoad_payload[row_buffer_port_ptr] = '0;
-      io_matBLoad_valid[row_buffer_port_ptr] = 0;
-
-      mat_b_load_ptr[row_buffer_port_ptr] = 0;
-
-      wait(softClrnArea_newReset == 1);
-      repeat(3) begin @(posedge clk); end
-      while (! $isunknown(mat_b_stimu[row_buffer_port_ptr][mat_b_load_ptr[row_buffer_port_ptr]])) begin
-        #1
-        io_matBLoad_payload[row_buffer_port_ptr] = 
-          mat_b_stimu[row_buffer_port_ptr][mat_b_load_ptr[row_buffer_port_ptr]];
-        io_matBLoad_valid[row_buffer_port_ptr] = 1'b1;
-
-        @(posedge clk);
-      end
-
-      #1
-      io_matBLoad_payload[row_buffer_port_ptr] = '0;
-      io_matBLoad_valid[row_buffer_port_ptr] = 0;
-    end
+always @( posedge clk ) begin
+  if (io_matBLoad_valid && io_matBLoad_ready) begin
+    mat_b_load_ptr = mat_b_load_ptr + 1;
   end
-endgenerate
+end
+
+initial begin
+  io_matBLoad_payload = '0;
+  io_matBLoad_valid = 0;
+
+  mat_b_load_ptr = 0;
+
+  wait(softClrnArea_newReset == 1);
+  repeat(3) begin @(posedge clk); end
+  while (! $isunknown(mat_b_stimu[mat_b_load_ptr])) begin
+    #1
+    io_matBLoad_payload = mat_b_stimu[mat_b_load_ptr];
+    io_matBLoad_valid = 1'b1;
+
+    @(posedge clk);
+  end
+
+  #1
+  io_matBLoad_payload = '0;
+  io_matBLoad_valid = 0;
+end
 
 // index loading
 
@@ -376,11 +328,11 @@ initial begin
   io_res_ready = 1'b0;
   // rowBuffWrBound is the length of each mat b vector
   // e.g., seq len = 4355, rowBuffWrBound = 4480/20 = 224
-  io_configRowBuffWrBound = 8'd228;
+  io_configRowBuffWrBound = 8'd224;
 
-  wait(softClrnArea_newReset & io_matBLoad_0_valid & io_matBLoad_0_ready);
+  wait(softClrnArea_newReset & io_matBLoad_valid & io_matBLoad_ready);
   repeat (10) begin @(posedge clk); end
-  wait(io_matBLoad_0_valid == 0);
+  wait(io_matBLoad_valid == 0);
   repeat (4) begin @(posedge clk); end
   #1
   io_calEn = 1'b1;

@@ -8,6 +8,29 @@ quietly virtual function -install /TensorCoreArrayTb/dut -env /TensorCoreArrayTb
 quietly WaveActivateNextPane {} 0
 add wave -noupdate -divider {idx fifo}
 add wave -noupdate /TensorCoreArrayTb/dut/bufferArea_preArowPop3Fac_0_value
+add wave -noupdate /TensorCoreArrayTb/dut/bufferArea_rowBuffWrRsel_0_value
+add wave -noupdate /TensorCoreArrayTb/dut/io_matBLoad_valid
+add wave -noupdate /TensorCoreArrayTb/dut/io_matBLoad_ready
+add wave -noupdate /TensorCoreArrayTb/dut/io_matBLoad_payload
+add wave -noupdate /TensorCoreArrayTb/dut/io_matBLoad_fire
+add wave -noupdate /TensorCoreArrayTb/dut/bufferArea_rowMem_0_0/io_wren
+add wave -noupdate /TensorCoreArrayTb/dut/bufferArea_rowMem_0_1/io_wren
+add wave -noupdate /TensorCoreArrayTb/dut/bufferArea_rowMem_0_2/io_wren
+add wave -noupdate /TensorCoreArrayTb/dut/bufferArea_rowMem_1_0/io_wren
+add wave -noupdate /TensorCoreArrayTb/dut/bufferArea_rowMem_1_1/io_wren
+add wave -noupdate /TensorCoreArrayTb/dut/bufferArea_rowMem_1_2/io_wren
+add wave -noupdate /TensorCoreArrayTb/dut/bufferArea_rowMem_2_0/io_wren
+add wave -noupdate /TensorCoreArrayTb/dut/bufferArea_rowMem_2_1/io_wren
+add wave -noupdate /TensorCoreArrayTb/dut/bufferArea_rowMem_2_2/io_wren
+add wave -noupdate /TensorCoreArrayTb/dut/bufferArea_rowMem_3_0/io_wren
+add wave -noupdate /TensorCoreArrayTb/dut/bufferArea_rowMem_3_1/io_wren
+add wave -noupdate /TensorCoreArrayTb/dut/bufferArea_rowMem_3_2/io_wren
+add wave -noupdate /TensorCoreArrayTb/dut/bufferArea_rowMem_4_0/io_wren
+add wave -noupdate /TensorCoreArrayTb/dut/bufferArea_rowMem_4_1/io_wren
+add wave -noupdate /TensorCoreArrayTb/dut/bufferArea_rowMem_4_2/io_wren
+add wave -noupdate /TensorCoreArrayTb/dut/bufferArea_rowMem_5_0/io_wren
+add wave -noupdate /TensorCoreArrayTb/dut/bufferArea_rowMem_5_1/io_wren
+add wave -noupdate /TensorCoreArrayTb/dut/bufferArea_rowMem_5_2/io_wren
 add wave -noupdate -divider compute
 add wave -noupdate /TensorCoreArrayTb/dut/bufferArea_rowMem_0_0/clk
 add wave -noupdate /TensorCoreArrayTb/dut/io_sortedColIdxFast_valid
@@ -132,7 +155,6 @@ add wave -noupdate /TensorCoreArrayTb/dut/u_tc_core_r_0_c_0/io_doubleBufferLoadS
 add wave -noupdate -divider TCC00
 add wave -noupdate /TensorCoreArrayTb/dut/u_tc_core_r_0_c_0/io_doubleBufferCompSel
 add wave -noupdate /TensorCoreArrayTb/dut/u_tc_core_r_0_c_0/loadBufCompSel
-add wave -noupdate -radix unsigned /TensorCoreArrayTb/dut/debug_incounter_value
 add wave -noupdate /TensorCoreArrayTb/dut/u_tc_core_r_0_c_0/io_dataIn_payload_0
 add wave -noupdate /TensorCoreArrayTb/dut/u_tc_core_r_0_c_0/io_dataIn_payload_1
 add wave -noupdate /TensorCoreArrayTb/dut/u_tc_core_r_0_c_0/io_dataIn_payload_2
@@ -150,7 +172,6 @@ add wave -noupdate -radix unsigned /TensorCoreArrayTb/dut/u_tc_core_r_0_c_0/io_e
 add wave -noupdate -radix unsigned /TensorCoreArrayTb/dut/u_tc_core_r_0_c_0/io_expIn_6
 add wave -noupdate -radix unsigned /TensorCoreArrayTb/dut/u_tc_core_r_0_c_0/io_expIn_7
 add wave -noupdate /TensorCoreArrayTb/dut/u_tc_core_r_0_c_0/io_doubleBufferLoadSel
-add wave -noupdate -radix unsigned /TensorCoreArrayTb/dut/debug_loadcounter_value
 add wave -noupdate /TensorCoreArrayTb/dut/u_tc_core_r_0_c_0/io_loadCascadeIn_valid
 add wave -noupdate /TensorCoreArrayTb/dut/u_tc_core_r_0_c_0/io_loadCascadeIn_payload_blkData
 add wave -noupdate /TensorCoreArrayTb/dut/u_tc_core_r_0_c_0/io_loadCascadeIn_payload_rIdx
@@ -215,8 +236,6 @@ add wave -noupdate /TensorCoreArrayTb/dut/outBfpConv_0_0_io_dataOut_payload
 add wave -noupdate /TensorCoreArrayTb/dut/outBfpConv_0_1_io_dataOut_payload
 add wave -noupdate /TensorCoreArrayTb/dut/outBfpConv_0_2_io_dataOut_payload
 add wave -noupdate -divider {idx read check}
-add wave -noupdate -radix unsigned /TensorCoreArrayTb/dut/debug_idx_fast_counter_value
-add wave -noupdate -radix unsigned /TensorCoreArrayTb/dut/debug_idx_slow_counter_value
 add wave -noupdate -divider {output fetc}
 add wave -noupdate /TensorCoreArrayTb/dut/outBuffer_0/io_push_valid
 add wave -noupdate /TensorCoreArrayTb/dut/outBuffer_0/io_push_payload
@@ -226,7 +245,7 @@ add wave -noupdate /TensorCoreArrayTb/dut/outBuffer_0/io_pop_valid
 add wave -noupdate /TensorCoreArrayTb/dut/outBuffer_0/io_pop_ready
 add wave -noupdate /TensorCoreArrayTb/dut/outBuffer_0/io_pop_payload
 TreeUpdate [SetDefaultTree]
-WaveRestoreCursors {{Cursor 1} {169379494 ps} 0} {{Cursor 3} {50975918 ps} 0}
+WaveRestoreCursors {{Cursor 1} {169379494 ps} 0} {{Cursor 3} {54207560 ps} 0}
 quietly wave cursor active 2
 configure wave -namecolwidth 397
 configure wave -valuecolwidth 227
@@ -242,4 +261,4 @@ configure wave -griddelta 40
 configure wave -timeline 0
 configure wave -timelineunits ns
 update
-WaveRestoreZoom {50647930 ps} {51810572 ps}
+WaveRestoreZoom {0 ps} {57750 ns}

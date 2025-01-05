@@ -137,7 +137,7 @@ class TensorCoreChainArray(array_col: Int, array_row: Int, chain_len: Int, idx_w
                            debug_en: Boolean = false) extends Component {
   val io = new Bundle {
     val matALoad = Vec(slave Stream (BfpBlockWithIdx(88, idx_width.r, 0, 0)), array_col)
-    val matBLoad = Vec(slave Stream(UInt(88 bits)), array_row)
+    val matBLoad = slave Stream(UInt(88 bits))
     val sortedColIdxSlow, sortedColIdxFast = slave Stream(IndexData(idx_width.c, array_col))
     // colIdxFifoNotEmpty is asserted when colIdxFifo has at least
     // half of the loading
@@ -156,7 +156,7 @@ class TensorCoreChainArray(array_col: Int, array_row: Int, chain_len: Int, idx_w
   // keeping MATB_EN_DELAY and TRANS2TCC_DELAY the same
   val MATB_EN_DELAY = 2
   val TRANSRAM_RD_II = log2Up(NUM_MATB_VEC_PER_ROW/TRANSRAM_FOLDING_FACTOR)
-  val TRANS2TCC_DELAY = 2
+  val TRANS2TCC_DELAY = 4
   val ROWMEM2TCC_TOTAL_DELAY = MATB_EN_DELAY + TRANSRAM_RD_II + TRANS2TCC_DELAY
   val COL_BB_INSERT2TCC_DELAY = 2
   val COLBUF2TCC_TOTAL_DELAY = 1 + COL_BB_INSERT2TCC_DELAY
@@ -189,7 +189,7 @@ class TensorCoreChainArray(array_col: Int, array_row: Int, chain_len: Int, idx_w
   // used to halt mat b broadcast when waiting for the mat a load
   val matBLoadPipelineEn, matBEn4BubbleIns = Reg(Bool(), init=False)
   val matBLoadPipelineEnDelayed = Delay(matBLoadPipelineEn, MATB_EN_DELAY, init=False)
-  val matBEn4BubbleInsDelayed = BlockDelay(matBEn4BubbleIns, ROWMEM2TCC_TOTAL_DELAY + 1, "MLAB")
+  val matBEn4BubbleInsDelayed = Delay(matBEn4BubbleIns, ROWMEM2TCC_TOTAL_DELAY + 1)
   //input buffers
   val bufferArea = new Area {
     // buffer and ctrl signal def
@@ -201,6 +201,7 @@ class TensorCoreChainArray(array_col: Int, array_row: Int, chain_len: Int, idx_w
 
     // row buffer write and read
     val rowBuffWrAddr = Array.fill(array_row)(Counter(row_buffer_depth))
+    val rowBuffWrRsel = Array.fill(array_row)(Counter(array_row))
     val rowBufferBlkOut = Flow(Vec(Vec(BfpBlockWithIdx(88, 0, 0, 0), chain_len), array_row))
 
     // col buffer bubble insertion
@@ -413,7 +414,7 @@ class TensorCoreChainArray(array_col: Int, array_row: Int, chain_len: Int, idx_w
       }
 
       // global write buffer signal
-      when(io.matBLoad(r).fire) {
+      when(io.matBLoad.fire) {
         when(rowBuffWrAddr(r).value + 1 === io.configRowBuffWrBound) {
           rowBuffWrAddr(r).clear()
           rowBuffWrVecSel.vecId.increment()
@@ -421,12 +422,14 @@ class TensorCoreChainArray(array_col: Int, array_row: Int, chain_len: Int, idx_w
           rowBuffWrAddr(r).increment()
         }
         when(rowBuffWrVecSel.vecId.willOverflow) {rowBuffWrVecSel.foldBufSel.increment()}
+        when(rowBuffWrVecSel.foldBufSel.willOverflow) {rowBuffWrRsel(r).increment()}
       }
       for (vecId <- 0 until NUM_MATB_VEC_PER_ROW / TRANSRAM_FOLDING_FACTOR) {
         // row buffer write logic
         rowMem(r)(vecId).io.wraddress := rowBuffWrVecSel.foldBufSel.value @@ rowBuffWrAddr(r).value
-        rowMem(r)(vecId).io.wren := io.matBLoad(r).valid & rowBuffWrVecSel.vecId.value === vecId
-        rowMem(r)(vecId).io.data := io.matBLoad(r).payload
+        rowMem(r)(vecId).io.wren :=
+          io.matBLoad.valid & rowBuffWrVecSel.vecId.value === vecId & rowBuffWrRsel(r) === r
+        rowMem(r)(vecId).io.data := io.matBLoad.payload
 
         // row buffer read logic
         rowMem(r)(vecId).io.rdaddress := rowMemRdAddr
@@ -573,7 +576,7 @@ class TensorCoreChainArray(array_col: Int, array_row: Int, chain_len: Int, idx_w
     val isCurrSubvecMatmulFin = Reg(Bool(), init=False)
     val isFakeComputeIter = Reg(Bool(), init=False)
     // default
-    io.matBLoad.foreach(_.ready := False)
+    io.matBLoad.ready := False
     matBLoadPipelineEn := False
     matBEn4BubbleIns := False
 
@@ -581,7 +584,7 @@ class TensorCoreChainArray(array_col: Int, array_row: Int, chain_len: Int, idx_w
       whenIsActive {
         matBDataFeedCounter.clear()
         isCurrSubvecMatmulFin := False
-        io.matBLoad.foreach(_.ready := True)
+        io.matBLoad.ready := True
         when(bufferArea.isCurrSubgrpALoaded) {goto(sCompute)}
       }
     }
