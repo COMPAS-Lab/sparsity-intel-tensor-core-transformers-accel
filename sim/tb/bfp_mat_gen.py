@@ -9,6 +9,7 @@ import torch
 from random import sample
 import json
 import os
+import shutil
 
 def float_to_hex(f: float):
 	# Courtesy of https://stackoverflow.com/a/23624284
@@ -327,15 +328,16 @@ class BFP():
 
         return res
 
-DAT_PATH = "./sparse_matmul_data"
+IN_DAT_PATH = "/compas-old/projects/sparse-attention"
+OUT_DAT_PATH = "/compas-old/projects/sparse-attention/onchip"
 
 def mat_a_gen(mat_src_name: str, bfp_type: BFP, n_blocks_split: int = 1, ridx_size = 9, cidx_size=9, bfp_friendly_dat = False):
     '''
     assuming mat A is a 3xthree_vec_len mat block:
     '''
-    mat_a_src = np.load(DAT_PATH + f"/{mat_src_name}_val.npy")
-    mat_a_src_ridx = np.load(DAT_PATH + f"/{mat_src_name}_ridx.npy")    
-    mat_a_src_cidx = np.load(DAT_PATH + f"/{mat_src_name}_cidx.npy")
+    mat_a_src = np.load(IN_DAT_PATH + f"/{mat_src_name}_val.npy")
+    mat_a_src_ridx = np.load(IN_DAT_PATH + f"/{mat_src_name}_ridx.npy")    
+    mat_a_src_cidx = np.load(IN_DAT_PATH + f"/{mat_src_name}_cidx.npy")
 
     assert mat_a_src.shape[-1] == bfp_type.blk_size(), "block size mismatch"
 
@@ -360,9 +362,8 @@ def mat_a_gen(mat_src_name: str, bfp_type: BFP, n_blocks_split: int = 1, ridx_si
     # selecting 5 head from each layer
     n_layers = len(headgrp_ridx) // 32
     hidices = []
-    for l in range(n_layers):
-        hidices += list(sample(range(l*32, (l+1)*32), 5))
-    hidices = [581]
+    for l in np.arange(0, n_layers, 4):
+        hidices += list(sample(range(l*32, (l+4)*32), 3))
 
     print(f"get {len(headgrp_ridx)} heads in total, selecting head {hidices}")
 
@@ -381,10 +382,14 @@ def mat_a_gen(mat_src_name: str, bfp_type: BFP, n_blocks_split: int = 1, ridx_si
                                             insert_vec_tail = True, ridx_size=ridx_size, cidx_size=cidx_size,
                                             enable_row_subgrps = True)
         idx_after_redremove = bfp_type.idx_redremove_gen((src_ridx, src_cidx), n_blocks_split, ridx_size=ridx_size, cidx_size=cidx_size)
+        
+        out_path = OUT_DAT_PATH + f"/{mat_src_name}"
+        if not os.path.isdir(out_path):
+            os.makedirs(out_path)
 
-        fnames = [DAT_PATH + "/" + f"MAT_A_{bfp_type.format_name()}_b{b_size}_h{hidx}.bin" for b_size in range(n_blocks_split)]
+        fnames = [out_path + "/" + f"MAT_A_{bfp_type.format_name()}_b{b_size}_h{hidx}.bin" for b_size in range(n_blocks_split)]
         fps = [open(fname, "w+", encoding='utf-8') for fname in fnames]
-        idx_fname = DAT_PATH + "/" + f"IDX_GEN_h{hidx}.bin"
+        idx_fname = out_path + "/" + f"IDX_GEN_h{hidx}.bin"
         idx_fp = open(idx_fname, "w+", encoding='utf-8')
 
         f_idx = 0
@@ -408,6 +413,9 @@ def mat_a_gen(mat_src_name: str, bfp_type: BFP, n_blocks_split: int = 1, ridx_si
         for f in fps:
             f.close()
 
+        shutil.copyfile(IN_DAT_PATH + f"/{mat_src_name}.json", 
+                        out_path + "/" + "inst_profile.json")
+        
         print("generate reduced index...")
         for idx_pair in idx_after_redremove:
             idx_fp.write(idx_pair[0] + idx_pair[1] + "\n")
@@ -432,17 +440,22 @@ def mat_a_gen(mat_src_name: str, bfp_type: BFP, n_blocks_split: int = 1, ridx_si
     
     return mat
 
-def mat_b_gen(size: tuple, chain_len: int, bfp_type: BFP, n_blocks_split: int = 1):
+def mat_b_gen(mat_src_name: str, chain_len: int, bfp_type: BFP, n_blocks_split: int = 1):
     # matB = np.random.uniform(low=0., high=1.0, size=size).astype('f')
     # matB = np.random.randint(low=0, high=2, size=size)
-    matB = bfp_type.gen_bfp_friendly_data(size)
-    print(matB.shape)
+    matB_size = None
+    with open(OUT_DAT_PATH + f"/{mat_src_name}/inst_profile.json", "r") as mat_src_f:
+        mat_prof = json.load(mat_src_f)
+        matB_size = (mat_prof["seq_len"], 128)
+
+    matB = bfp_type.gen_bfp_friendly_data(matB_size)
+    print("mat b original size: ", matB.shape)
     
     # pad mat b to align with chain_len x BFP size
     align_size = chain_len * bfp_type.blk_size()
-    required_padding_size = int(align_size - size[0] % align_size)
-    col_size = math.ceil(size[1] / n_blocks_split) * n_blocks_split
-    required_vec_padding_size = int(col_size - size[1])
+    required_padding_size = int(align_size - matB_size[0] % align_size)
+    col_size = math.ceil(matB_size[1] / n_blocks_split) * n_blocks_split
+    required_vec_padding_size = int(col_size - matB_size[1])
     if required_padding_size > 0:
         padded_matB = np.pad(
             matB, 
@@ -453,7 +466,8 @@ def mat_b_gen(size: tuple, chain_len: int, bfp_type: BFP, n_blocks_split: int = 
         padded_matB = matB
 
     print(f"padded mat b size: {padded_matB.shape}")
-    matb_blk_size = math.ceil(size[1] / n_blocks_split)
+    mat_b_vec_load_size = int(padded_matB.shape[0] / bfp_type.blk_size())
+    matb_blk_size = math.ceil(matB_size[1] / n_blocks_split)
     for matb_blk_idx in range(n_blocks_split):
         # split mat b into chunks of interleaved cols
         # chunk 0: 0, 22, 44, 66...
@@ -467,7 +481,7 @@ def mat_b_gen(size: tuple, chain_len: int, bfp_type: BFP, n_blocks_split: int = 
         # bfp conversion
         bfp_res, _ = bfp_type.to_bfp(list(chunkedBTrans))
 
-        fname = DAT_PATH + "/" + f"MAT_B_{bfp_type.format_name()}_all.bin"
+        fname = OUT_DAT_PATH + f"/{mat_src_name}" + f"/MAT_B_{bfp_type.format_name()}_all.bin"
         if matb_blk_idx == 0:
             f = open(fname, "w+", encoding='utf-8')
         else:
@@ -479,6 +493,7 @@ def mat_b_gen(size: tuple, chain_len: int, bfp_type: BFP, n_blocks_split: int = 
         print(f"mat B total size: {len(bfp_res) * len(bfp_res[0]) / 1024. / 1024. / 8 :.2f} MB")
         f.close()
 
+    update_or_create_json(OUT_DAT_PATH + f"/{mat_src_name}/inst_profile.json", {"mat b vec size": mat_b_vec_load_size})
     return matB
 
 def check_outputs(sim_out_fname: str, ori_fname, num_tc_rows: int, num_tc_cols: int):
@@ -524,7 +539,7 @@ def check_outputs(sim_out_fname: str, ori_fname, num_tc_rows: int, num_tc_cols: 
     print("min err: ", np.min(err))
     print("average err: ", np.mean(err))
 
-def prepare_onchip_input_files(input_path: str, n_shared_chans: int, n_hbm_chans: int, ridx_width: tuple, head_idx: int):
+def prepare_onchip_input_files(input_path: str, n_shared_chans: int, head_idx: int):
     if input_path[-1] != "/":
         input_path += "/"
     mat_a_files = \
@@ -565,10 +580,10 @@ def prepare_onchip_input_files(input_path: str, n_shared_chans: int, n_hbm_chans
             hbm_dat.append(bin_to_hex(partial_dat, n_hbms * n_hbm_bwidth))
 
     print(f"total len: {total_len}")
-    update_or_create_json(input_path + f"onchip/onchip_sizes.json", {"mat a size": len(hbm_dat)})
+    update_or_create_json(input_path + f"hwconfig_h{head_idx}.json", {"mat a size": len(hbm_dat)})
 
     for i_hbm in range(n_hbms):
-        with open(input_path + f"onchip/onchip_mat_a_hbm_{n_hbms-1-i_hbm}.mem", "w", encoding="utf-8") as f:
+        with open(input_path + f"onchip_mat_a_hbm{n_hbms-1-i_hbm}_h{head_idx}.mem", "w", encoding="utf-8") as f:
             for l in hbm_dat:
                 f.write(l[i_hbm * (n_hbm_bwidth//4) : (i_hbm+1) * (n_hbm_bwidth//4)] + "\n")
 
@@ -606,13 +621,13 @@ def prepare_onchip_idx_file(
                     interm_iter_res[chan_id].append(idx[i])
     
 
-    with open(input_path + f"onchip/onchip_idx_hbm.mem", "w", encoding="utf-8") as f:
+    with open(input_path + f"onchip_idx_hbm_h{head_idx}.mem", "w", encoding="utf-8") as f:
         f.writelines(final_res)
 
     print(f"idx file len: {len(final_res)}")
-    update_or_create_json(input_path + f"onchip/onchip_sizes.json", {"idx size": len(final_res)})
+    update_or_create_json(input_path + f"hwconfig_h{head_idx}.json", {"idx_len": len(final_res)})
 
-def prepare_onchip_matb_file(input_path: str, n_matb_blks: int, align_to=256):
+def prepare_onchip_matb_file(input_path: str, align_to=256, head_idx=0):
     if input_path[-1] != "/":
         input_path += "/"
 
@@ -621,9 +636,15 @@ def prepare_onchip_matb_file(input_path: str, n_matb_blks: int, align_to=256):
     with open(input_path + f"MAT_B_BFP12_all.bin", "r", encoding="utf-8") as f:
         lines = [line.rstrip() for line in f]
 
-    with open(input_path + f"onchip/onchip_mat_b_hbm.mem", "w", encoding="utf-8") as f:
-        for l in lines:
-            f.writelines(bin_to_hex(l, align_to) + "\n")
+    if not os.path.exists(input_path + f"onchip_mat_b_hbm.mem"):
+        with open(input_path + f"onchip_mat_b_hbm.mem", "w", encoding="utf-8") as f:
+            for l in lines:
+                f.writelines(bin_to_hex(l, align_to) + "\n")
+    
+    update_or_create_json(input_path + f"hwconfig_h{head_idx}.json", {"mat b size": len(lines)})
+    with open(input_path + "/inst_profile.json", "r") as inst_pf:
+        inst_infos = json.load(inst_pf)
+        update_or_create_json(input_path + f"hwconfig_h{head_idx}.json", {"mat b vec size": inst_infos["mat b vec size"]})
 
 def main(args: dict):
     hw_row = 6
@@ -637,13 +658,12 @@ def main(args: dict):
         else:
             matA = mat_a_gen("midsize", BFP(BfpType.BFP_12), hw_col, ridx_size=12, cidx_size=10, bfp_friendly_dat=True)
 
-        matB = mat_b_gen((matA.shape[1], 128), 
-                            chain_len, BFP(BfpType.BFP_12), hw_row)
-        res = np.matmul(matA, matB)
-        print(f"mat a shape: {matA.shape}, mat b shape: {matB.shape}, res shape: {res.shape}")
-        np.save("sparse_matmul_data/mult_a_b_fp32_mata.npy", matA)
-        np.save("sparse_matmul_data/mult_a_b_fp32_matb.npy", matB)
-        np.save("sparse_matmul_data/mult_a_b_fp32_res.npy", res)
+        matB = mat_b_gen(args["data_path"], chain_len, BFP(BfpType.BFP_12), hw_row)
+        # res = np.matmul(matA, matB)
+        # print(f"mat a shape: {matA.shape}, mat b shape: {matB.shape}, res shape: {res.shape}")
+        # np.save("sparse_matmul_data/mult_a_b_fp32_mata.npy", matA)
+        # np.save("sparse_matmul_data/mult_a_b_fp32_matb.npy", matB)
+        # np.save("sparse_matmul_data/mult_a_b_fp32_res.npy", res)
 
     if args['outputs-check']:
         fname = str(args['outputs-check'])
@@ -657,9 +677,16 @@ def main(args: dict):
 
     if args['create-binary']:
         path = str(args['create-binary'])
-        prepare_onchip_input_files(path, hw_col, 5, 12, 581)
-        prepare_onchip_idx_file(path, hw_col, 10, 581)
-        prepare_onchip_matb_file(path, 256)
+        head_list = []
+        inst_list = [f.split(".")[0] \
+                for f in os.listdir(path) \
+                if os.path.isfile(path + f) and f.endswith(".bin") and "IDX_GEN" in f]
+        head_list = [int(i.split("_")[-1][1:]) for i in inst_list]
+        print(f"heads: {head_list}")
+        for h in head_list:
+            prepare_onchip_input_files(path, hw_col, head_idx=h)
+            prepare_onchip_idx_file(path, hw_col, 10, head_idx=h)
+            prepare_onchip_matb_file(path, 256, head_idx=h)
     
     if args['test']:
         bfp_format = BFP(BfpType.BFP_12)

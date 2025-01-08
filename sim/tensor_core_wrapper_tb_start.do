@@ -25,6 +25,8 @@ view wave
 log TensorCoreWrapperTb/dut/*
 log TensorCoreWrapperTb/dut/softClrnArea_tcArray/*
 log TensorCoreWrapperTb/dut/softClrnArea_tcArray/u_tc_core_r_0_c_0/*
+log TensorCoreWrapperTb/dut/softClrnArea_tcArray/bufferArea_casLoadBubbleInsert_1/*
+log TensorCoreWrapperTb/dut/softClrnArea_tcArray/bufferArea_casLoadBubbleInsert_2/*
 log TensorCoreWrapperTb/dut/softClrnArea_tcArray/outBuffer_0/*
 log TensorCoreWrapperTb/dut/softClrnArea_tcArray/outBuffer_1/*
 

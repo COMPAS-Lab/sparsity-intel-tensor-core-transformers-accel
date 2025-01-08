@@ -5,15 +5,16 @@ module TensorCoreWrapperTb;
 // localparam NUM_COL_HBMS = 5;
 localparam NUM_ROW_HBMS = 6;
 
-localparam MAT_A_RD_BOUND = 10200;
-localparam MAT_B_RD_BOUND = 29568;
-localparam IDX_RD_BOUND = 2391;
+localparam MAT_A_RD_BOUND = 14373;
+localparam MAT_B_RD_BOUND = 36960;
+localparam IDX_RD_BOUND = 3065;
+localparam MAT_B_VEC_SIZE = 280;
 
 logic         clrn=0;                                            // 0: global reset 
 logic         clk=0;                                             // Clock
 
 logic [7:0]   tc_ctrl;                                             
-logic [7:0]   mbvec_size;                                              
+logic [15:0]   mbvec_size;                                              
 logic [31:0]  mbidx_rd_bound;                                           
 logic [31:0]  ma_rd_bound;                                           
 logic [31:0]  buf_ld_sel;                                        
@@ -78,15 +79,15 @@ string stimu_path_a, stimu_path_b, out_path;
 
 //matrix a and b buffer load
 initial begin
-  stimu_path_a = "./tb/sparse_matmul_data/onchip/onchip_mat_a_hbm_0.mem";
+  stimu_path_a = "/compas-old/projects/sparse-attention/onchip/chatglm2-6b-32k-attn-bfp20-lcc/i88euYy5x/onchip_mat_a_hbm0_h845.mem";
   $readmemh(stimu_path_a, col_hbm_ins[0]);
-  stimu_path_a = "./tb/sparse_matmul_data/onchip/onchip_mat_a_hbm_1.mem";
+  stimu_path_a = "/compas-old/projects/sparse-attention/onchip/chatglm2-6b-32k-attn-bfp20-lcc/i88euYy5x/onchip_mat_a_hbm1_h845.mem";
   $readmemh(stimu_path_a, col_hbm_ins[1]);
 
-  stimu_path_b = "./tb/sparse_matmul_data/onchip/onchip_mat_b_hbm.mem";
+  stimu_path_b = "/compas-old/projects/sparse-attention/onchip/chatglm2-6b-32k-attn-bfp20-lcc/i88euYy5x/onchip_mat_b_hbm.mem";
   $readmemh(stimu_path_b, row_hbm_ins);
 
-  $readmemh("./tb/sparse_matmul_data/onchip/onchip_idx_hbm.mem", idx_hbm_ins);
+  $readmemh("/compas-old/projects/sparse-attention/onchip/chatglm2-6b-32k-attn-bfp20-lcc/i88euYy5x/onchip_idx_hbm_h845.mem", idx_hbm_ins);
 
   #61 clrn = 1'b1;
 
@@ -97,7 +98,7 @@ initial begin
   tc_ctrl = '0;
   // rowBuffWrBound is the length of each mat b vector
   // e.g., seq len = 4355, rowBuffWrBound = 4480/20 = 224
-  mbvec_size = 8'd224;
+  mbvec_size = MAT_B_VEC_SIZE;
 
   mbidx_rd_bound = 'd0; 
   ma_rd_bound = 'd0;
@@ -116,6 +117,7 @@ initial begin
   // load mat b
   //rd_addr is the stopping addr of col reading
   //this should be the same as n_rows in onchip_mat_b_hbm.mem
+  /*
   mbidx_rd_bound = MAT_B_RD_BOUND;
   buf_ld_sel = 1;
 
@@ -141,6 +143,7 @@ initial begin
     wait(select_tcarray_in_0);
     @(posedge clk);
   end 
+  */
 
   repeat (20) begin @(posedge clk); end
 

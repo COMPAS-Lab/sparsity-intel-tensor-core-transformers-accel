@@ -42,7 +42,8 @@ case class MultiPortStream(dWidth: Int, addrWidth: Int, hasAlmostFull: Boolean, 
 class tensor_core_array_wrapper(array_col: Int, array_row: Int, chain_len: Int,
                                 idx_width: IdxWidth, num_hbms: Int) extends Component {
   val io = new Bundle {
-    val tc_ctrl, mbvec_size = in UInt (8 bits)
+    val tc_ctrl = in UInt (8 bits)
+    val mbvec_size = in UInt (16 bits)
     val lat_counter = out UInt (16 bits)
     val mbidx_rd_bound, ma_rd_bound = in UInt (32 bits)
     val buf_ld_sel = in UInt (32 bits)
@@ -192,7 +193,7 @@ class tensor_core_array_wrapper(array_col: Int, array_row: Int, chain_len: Int,
       inout_pipe_delay = 5,
       n_out_chans = 2,
       n_words_outchan = 2,
-      debug_en = false,
+      debug_en = true,
     )
 
     tcArray.io.matALoad <> data2TcarrayCol

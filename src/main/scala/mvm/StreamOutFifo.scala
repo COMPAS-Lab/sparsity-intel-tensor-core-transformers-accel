@@ -13,7 +13,7 @@ class StreamOutFifo(output_width: Int,
     val almostFull = out Bool()
   }
 
-  val core = new scfifo(output_width, depth, ram_type, afull_thres = (depth / 2).toInt)
+  val core = new scfifo(output_width, depth, ram_type, afull_thres = (depth / 5 * 4).toInt)
 
   core.setName("FifoCore")
   core.io.data := io.push.payload
