@@ -1,14 +1,21 @@
 `timescale 1ns/100ps
 
+// `ifndef TB_DEBUG
+// `define TB_DEBUG
+// `endif
+
 module TensorCoreWrapperTb;
 
 // localparam NUM_COL_HBMS = 5;
 localparam NUM_ROW_HBMS = 6;
 
-localparam MAT_A_RD_BOUND = 14373;
-localparam MAT_B_RD_BOUND = 36960;
-localparam IDX_RD_BOUND = 3065;
-localparam MAT_B_VEC_SIZE = 280;
+integer MAT_A_RD_BOUND = 2028;
+integer MAT_B_RD_BOUND = 36960;
+integer IDX_RD_BOUND = 303;
+integer MAT_B_VEC_SIZE = 280;
+integer HEAD = 0;
+integer LBLK = 0;
+string DATA_DIR = "";
 
 logic         clrn=0;                                            // 0: global reset 
 logic         clk=0;                                             // Clock
@@ -75,19 +82,32 @@ logic [255:0] idx_hbm_ins [$];
 logic [255:0] row_hbm_ins [$];
 
 integer hbm_col_idx, hbm_row_idx;
-string stimu_path_a, stimu_path_b, out_path;
+string stimu_path_a, stimu_path_b, stimu_path_idx, out_path;
+
+initial begin
+    $value$plusargs("ardbound=%d", MAT_A_RD_BOUND);
+    $value$plusargs("brdbound=%d", MAT_B_RD_BOUND);
+    $value$plusargs("bvecsize=%d", MAT_B_VEC_SIZE);
+    $value$plusargs("idxrdbound=%d", IDX_RD_BOUND);
+    $value$plusargs("head=%d", HEAD);
+    $value$plusargs("lblk=%d", LBLK);
+    $value$plusargs("data_dir=%s", DATA_DIR);
+    $display("simulating data dir: %s, h%0d lb%0d,", DATA_DIR, HEAD, LBLK);
+    $display("a bound: %0d, idx bound: %0d", MAT_A_RD_BOUND, IDX_RD_BOUND);
+end
 
 //matrix a and b buffer load
 initial begin
-  stimu_path_a = "/compas-old/projects/sparse-attention/onchip/chatglm2-6b-32k-attn-bfp20-lcc/i88euYy5x/onchip_mat_a_hbm0_h845.mem";
+  stimu_path_a = $sformatf("%s/onchip_mat_a_hbm0_h%0d_lb%0d.mem", DATA_DIR, HEAD, LBLK);
   $readmemh(stimu_path_a, col_hbm_ins[0]);
-  stimu_path_a = "/compas-old/projects/sparse-attention/onchip/chatglm2-6b-32k-attn-bfp20-lcc/i88euYy5x/onchip_mat_a_hbm1_h845.mem";
+  stimu_path_a = $sformatf("%s/onchip_mat_a_hbm1_h%0d_lb%0d.mem", DATA_DIR, HEAD, LBLK);
   $readmemh(stimu_path_a, col_hbm_ins[1]);
 
   stimu_path_b = "/compas-old/projects/sparse-attention/onchip/chatglm2-6b-32k-attn-bfp20-lcc/i88euYy5x/onchip_mat_b_hbm.mem";
   $readmemh(stimu_path_b, row_hbm_ins);
 
-  $readmemh("/compas-old/projects/sparse-attention/onchip/chatglm2-6b-32k-attn-bfp20-lcc/i88euYy5x/onchip_idx_hbm_h845.mem", idx_hbm_ins);
+  stimu_path_idx = $sformatf("%s/onchip_idx_hbm_h%0d_lb%0d.mem", DATA_DIR, HEAD, LBLK);
+  $readmemh(stimu_path_idx, idx_hbm_ins);
 
   #61 clrn = 1'b1;
 
@@ -149,7 +169,7 @@ initial begin
 
   // start idx removal
   buf_ld_sel = 0;
-  mbidx_rd_bound = IDX_RD_BOUND;
+  mbidx_rd_bound = unsigned'(IDX_RD_BOUND);
 
   repeat (10) begin @(posedge clk); end
   
@@ -197,7 +217,7 @@ end
 
 // load mat A
 initial begin
-  ma_rd_bound = MAT_A_RD_BOUND;
+  ma_rd_bound = unsigned'(MAT_A_RD_BOUND);
   data_tcarray_in_1 = '0;
   data_tcarray_in_2 = '0;
   almost_empty_tcarray_in_1 = 0;
@@ -265,8 +285,11 @@ initial begin
         dut.softClrnArea_tcArray.rowCtrlFsm_stateReg == 'd1);
 
   repeat (100) begin @(posedge clk); end
-
   running_lat = int'(lat_counter);
+  $display("latency: %0d", running_lat);
+
+`ifdef TB_DEBUG
+
   mata_in_sum = real'(dut.softClrnArea_tcArray.debug_sp_incounter_c0_value + 
                       dut.softClrnArea_tcArray.debug_sp_incounter_c1_value + 
                       dut.softClrnArea_tcArray.debug_sp_incounter_c2_value + 
@@ -286,6 +309,12 @@ initial begin
   matb_out_sum = real'(dut.softClrnArea_tcArray.debug_out_counter_value) * 12 * 3 * (80 + 12) / 8;
   matb_out_req_bd = calculate_bandwidth(running_lat, 300.0, matb_out_sum);
   $display("Output bandwidth: %0.2f GB/s", matb_out_req_bd);
+
+`endif
+
+  tc_ctrl[1] = 1;
+  repeat (10) begin @(posedge clk); end
+  tc_ctrl[1] = 0;
 
   $finish();
 end

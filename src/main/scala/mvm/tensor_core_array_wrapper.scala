@@ -45,6 +45,7 @@ class tensor_core_array_wrapper(array_col: Int, array_row: Int, chain_len: Int,
     val tc_ctrl = in UInt (8 bits)
     val mbvec_size = in UInt (16 bits)
     val lat_counter = out UInt (16 bits)
+//    val errors = out UInt(8 bits)
     val mbidx_rd_bound, ma_rd_bound = in UInt (32 bits)
     val buf_ld_sel = in UInt (32 bits)
     val hbm_ready = Array.fill(num_hbms)(in Bool())
@@ -68,6 +69,10 @@ class tensor_core_array_wrapper(array_col: Int, array_row: Int, chain_len: Int,
 
   //mbidx_rd_bound: stop ptr for idx and row
   //ma_rd_bound: stop ptr for col
+
+  // errors:
+  // errors(0): compute error
+  // errors(1): idx gen error
 
   val CTRL_REG_DELAY = 5
 
@@ -180,6 +185,11 @@ class tensor_core_array_wrapper(array_col: Int, array_row: Int, chain_len: Int,
     val combDataFromHbm =
       Vec(for (ihbm <- HBM_MATA_CHAN_GRP) yield io.tcarray_in(ihbm).data)
         .asBits.subdivideIn(MATA_CHAN_PER_GRP slices)
+
+    // FIXME: dangerous! starting calc only when it receives all mat a
+    // to walk around shared mat a input problem.
+    // must make sure the col buffer is large enough to use this.
+    val matAFullyLoaded = Reg(Bool(), init=False)
     val tcArray = new TensorCoreChainArray(
       array_col = array_col,
       array_row = array_row,
@@ -193,14 +203,15 @@ class tensor_core_array_wrapper(array_col: Int, array_row: Int, chain_len: Int,
       inout_pipe_delay = 5,
       n_out_chans = 2,
       n_words_outchan = 2,
-      debug_en = true,
+      debug_en = false,
     )
 
     tcArray.io.matALoad <> data2TcarrayCol
     tcArray.io.matBLoad <> data2TcarrayRow
     tcArray.io.sortedColIdxSlow << idxGenFifoSlow.io.pop
     tcArray.io.sortedColIdxFast << idxGenFifoFast.io.pop
-    tcArray.io.colIdxFifoNotEmpty := idxGenFifoSlow.io.occupancy > 32
+//    tcArray.io.colIdxFifoNotEmpty := idxGenFifoSlow.io.occupancy > 32
+    tcArray.io.colIdxFifoNotEmpty := idxGenFifoSlow.io.occupancy > 32 && matAFullyLoaded
     tcArray.io.calEn := Delay(calStart.rise(), CTRL_REG_DELAY)
     tcArray.io.configRowBuffWrBound := Delay(io.mbvec_size, CTRL_REG_DELAY).resized
     io.lat_counter := Delay(tcArray.io.latCounter, CTRL_REG_DELAY)
@@ -307,6 +318,7 @@ class tensor_core_array_wrapper(array_col: Int, array_row: Int, chain_len: Int,
           rdWordCounter.clear()
           startAssertCounter.clear()
           when(calStart.rise() && Vec(io.hbm_ready.slice(1, io.tcarray_in.size)).andR) {
+            matAFullyLoaded := False
             goto(sWait)
           }
         }
@@ -355,6 +367,7 @@ class tensor_core_array_wrapper(array_col: Int, array_row: Int, chain_len: Int,
             tcColSel := tcColSel.rotateLeft(1)
           }
           when(rdWordCounter.willOverflow) {
+            matAFullyLoaded := True
             goto(sIdle)
           }
         }
@@ -374,7 +387,8 @@ class tensor_core_array_wrapper(array_col: Int, array_row: Int, chain_len: Int,
     //out logic
     for (g <- tcArray.io.res.indices) {
       val outHbmWrFsm = new StateMachine {
-        val wrInitCount = Counter(512 / 8 + 16)
+        val wrInitCount = Counter(4)
+        val port_err = io.tcarray_out(g).port_error
 
         io.tcarray_out(g).select := False
         io.tcarray_out(g).start := False
@@ -393,10 +407,13 @@ class tensor_core_array_wrapper(array_col: Int, array_row: Int, chain_len: Int,
 
         val sWait: State = new State {
           whenIsActive {
-            wrInitCount.increment()
-            io.tcarray_out(g).start := wrInitCount < 5
-            when(wrInitCount.willOverflow) {
-              when(tcArray.io.res(g).valid && ~io.tcarray_out(g).almost_full) {
+            when(port_err) {
+              goto(sIdle)
+            }.elsewhen(~wrInitCount.willOverflowIfInc) {
+              wrInitCount.increment()
+              io.tcarray_out(g).start := True
+            }.elsewhen(~io.tcarray_out(g).almost_full) {
+              when(tcArray.io.res(g).valid) {
                 goto(sSend)
               }.otherwise {
                 goto(sPause)
@@ -425,6 +442,19 @@ class tensor_core_array_wrapper(array_col: Int, array_row: Int, chain_len: Int,
         }
       }
     }
+
+    // TBD: error detection
+    //  idxgenerator error
+//    val idxGenReadys = Vec(for (i <- idxGenerator.io.seqIn) yield i.ready)
+//    val idxGenFifoOverflow = Delay(idxGenReadys.reduceBalancedTree((x, y) => x | y), 5)
+//    val idxGenFifoOverflowFlag = Reg(Bool(), False)
+//    idxGenFifoOverflowFlag := Mux(idxGenFifoOverflowFlag, True, idxGenFifoOverflow)
+//    // compute error
+//    val computeErrFlag = Reg(Bool(), False)
+//
+//
+//    io.errors(0) := Delay(computeErrFlag, CTRL_REG_DELAY)
+//    io.errors(1) := Delay(idxGenFifoOverflowFlag, CTRL_REG_DELAY)
   }
 
   // temporarily disable unused ports

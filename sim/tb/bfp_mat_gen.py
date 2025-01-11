@@ -261,7 +261,7 @@ class BFP():
             total_idx_count = len(list(itertools.chain(*curr_blk_list)))
             sorted_idx_res = list(np.unique(list(itertools.chain(*curr_blk_list))))
 
-            print(f"col idx remain rate: {len(sorted_idx_res) / total_idx_count:.4f}")
+            # print(f"col idx remain rate: {len(sorted_idx_res) / total_idx_count:.4f}")
             sorted_idx_res.sort(reverse=True)
             curr_sorted_res_bitmasks = ["0"] * n_shared_chans
             for unrep_elem in sorted_idx_res:
@@ -331,15 +331,31 @@ class BFP():
 IN_DAT_PATH = "/compas-old/projects/sparse-attention"
 OUT_DAT_PATH = "/compas-old/projects/sparse-attention/onchip"
 
-def mat_a_gen(mat_src_name: str, bfp_type: BFP, n_blocks_split: int = 1, ridx_size = 9, cidx_size=9, bfp_friendly_dat = False):
+def mat_a_gen(
+        mat_src_name: str, 
+        bfp_type: BFP, 
+        n_hw_cols: int = 1, 
+        ridx_size = 9, 
+        cidx_size=9, 
+        n_large_blocks = -1,
+        hidx_list = None,
+        bfp_friendly_dat = False):
     '''
     assuming mat A is a 3xthree_vec_len mat block:
+
+    mat_src_name: str, path of matrix source file in npy
+    bfp_type: BFP, BFP type
+    n_hw_cols: int = 1, number of columns of tensor blocks
+    ridx_size = 9, hardware row idx bitwidth
+    cidx_size = 9, hardware col idx bitwidth
+    n_large_blocks = 1, number of large blocks to split a matrix to avoid input blocking problem
+    bfp_friendly_dat = False, if to generate BFP-accurate data for easier debugging
     '''
     mat_a_src = np.load(IN_DAT_PATH + f"/{mat_src_name}_val.npy")
     mat_a_src_ridx = np.load(IN_DAT_PATH + f"/{mat_src_name}_ridx.npy")    
     mat_a_src_cidx = np.load(IN_DAT_PATH + f"/{mat_src_name}_cidx.npy")
 
-    assert mat_a_src.shape[-1] == bfp_type.blk_size(), "block size mismatch"
+    assert mat_a_src.shape[-1] == bfp_type.blk_size(), "BFP block size mismatch"
 
     # extract one head
     headgrp_vals, headgrp_ridx, headgrp_cidx = [], [], []
@@ -359,69 +375,109 @@ def mat_a_gen(mat_src_name: str, bfp_type: BFP, n_blocks_split: int = 1, ridx_si
             curr_head_cidx.append(cidx)
 
     # fetch a head
-    # selecting 5 head from each layer
-    n_layers = len(headgrp_ridx) // 32
     hidices = []
-    for l in np.arange(0, n_layers, 4):
-        hidices += list(sample(range(l*32, (l+4)*32), 3))
+    if hidx_list is None:
+        # selecting 3 head from each layer
+        n_layers = len(headgrp_ridx) // 32
+        for l in np.arange(0, n_layers, 4):
+            hidices += list(sample(range(l*32, (l+4)*32), 3))
+    else:
+        hidices = hidx_list
 
     print(f"get {len(headgrp_ridx)} heads in total, selecting head {hidices}")
 
     for hidx in hidices:
-        src_val, src_ridx, src_cidx = headgrp_vals[hidx], headgrp_ridx[hidx], headgrp_cidx[hidx] 
+        src_val_h, src_ridx_h, src_cidx_h = headgrp_vals[hidx], headgrp_ridx[hidx], headgrp_cidx[hidx] 
 
-        # prepare mat a
-        # pad rows to align with number of TC cols
-        curr_num_rows = len(np.unique(src_ridx))
-        nrows_to_pad = math.ceil(curr_num_rows / n_blocks_split) * n_blocks_split - curr_num_rows
-        src_val = src_val + [np.zeros((3, bfp_type.blk_size()))] * nrows_to_pad
-        src_ridx = src_ridx + [curr_num_rows + i for i in range(nrows_to_pad)]
-        src_cidx = src_cidx + [0] * nrows_to_pad
+        if n_large_blocks == -1:
+            n_large_blocks_actual = math.ceil(len(src_ridx_h) / 2048)
+        else:
+            n_large_blocks_actual = n_large_blocks
 
-        bfp_res, idx_width = bfp_type.to_bfp(src_val, (src_ridx, src_cidx), 
-                                            insert_vec_tail = True, ridx_size=ridx_size, cidx_size=cidx_size,
-                                            enable_row_subgrps = True)
-        idx_after_redremove = bfp_type.idx_redremove_gen((src_ridx, src_cidx), n_blocks_split, ridx_size=ridx_size, cidx_size=cidx_size)
-        
-        out_path = OUT_DAT_PATH + f"/{mat_src_name}"
-        if not os.path.isdir(out_path):
-            os.makedirs(out_path)
+        # split matrix into large blocks if needed
+        if n_large_blocks_actual > 1:
+            # Split src_ridx_h into uniformly distributed bins with integer edges
+            r_hist, r_binedges = np.histogram(src_ridx_h, bins=100)
+            print(f"rbin edges: {r_binedges}")
+            r_blk_tail_bar = 2048
+            r_blk_tails, curr_hist_sum = [], 0
+            for h, e in zip(r_hist, r_binedges[1:]):
+                curr_hist_sum += h
+                if curr_hist_sum >= r_blk_tail_bar:
+                    r_blk_tails.append(e)
+                    curr_hist_sum = 0
 
-        fnames = [out_path + "/" + f"MAT_A_{bfp_type.format_name()}_b{b_size}_h{hidx}.bin" for b_size in range(n_blocks_split)]
-        fps = [open(fname, "w+", encoding='utf-8') for fname in fnames]
-        idx_fname = out_path + "/" + f"IDX_GEN_h{hidx}.bin"
-        idx_fp = open(idx_fname, "w+", encoding='utf-8')
+            if r_blk_tails[-1] != r_binedges[-1]:
+                r_blk_tails[-1] = r_binedges[-1]
+            
+            split_spots = [-1] + [np.argmax(src_ridx_h > i)-1 for i in r_blk_tails]
+            if split_spots[-1] != len(src_ridx_h)-1:
+                split_spots[-1] = len(src_ridx_h)-1
+            src_val_lblks = [src_val_h[i+1:j+1] for i, j in zip(split_spots[:-1], split_spots[1:])]
+            src_ridx_lblks = [src_ridx_h[i+1:j+1] for i, j in zip(split_spots[:-1], split_spots[1:])]
+            src_cidx_lblks = [src_cidx_h[i+1:j+1] for i, j in zip(split_spots[:-1], split_spots[1:])]
+            # check if each sub-list's first element is different from previous sub-list's last element in the src_ridx_lblks
+            for i in range(len(src_ridx_lblks)-1):
+                assert(src_ridx_lblks[i][-1] != src_ridx_lblks[i+1][0])
+        else:
+            src_val_lblks = [src_val_h]
+            src_ridx_lblks = [src_ridx_h]
+            src_cidx_lblks = [src_cidx_h]
 
-        f_idx = 0
-        n_blks = 0
-        for big_row in bfp_res:
-            assert(len(big_row[0]) == len(big_row[1]) and len(big_row[1]) == len(big_row[2]))
-            n_blks += 3 * len(big_row[0])
-            for b_idx in range(len(big_row[0])-1):
-                fps[f_idx].write(big_row[0][b_idx] + "\n")
-                fps[f_idx].write(big_row[1][b_idx] + "\n")
-                fps[f_idx].write(big_row[2][b_idx] + "\n")
+        n_large_blocks_actual = len(src_ridx_lblks)
+        print(f"head {hidx} is split into {n_large_blocks_actual} large blocks")
 
-            if bfp_type.is_vec_tail(big_row[0][b_idx+1], idx_width):
-                fps[f_idx].write(big_row[0][b_idx+1] + "\n")
-                assert(len(big_row[0][b_idx+1]) == len(big_row[2][b_idx]))
-                f_idx = int((f_idx + 1) % n_blocks_split)
+        for large_blk_idx in range(n_large_blocks_actual):
+            # prepare mat a
+            # pad rows to align with number of TC cols
+            curr_num_rows = len(np.unique(src_ridx_lblks[large_blk_idx]))
+            nrows_to_pad = math.ceil(curr_num_rows / n_hw_cols) * n_hw_cols - curr_num_rows
+            src_val = src_val_lblks[large_blk_idx] + [np.zeros((3, bfp_type.blk_size()))] * nrows_to_pad
+            src_ridx = src_ridx_lblks[large_blk_idx] + [src_ridx_lblks[large_blk_idx][-1] + 1 + i for i in range(nrows_to_pad)]
+            src_cidx = src_cidx_lblks[large_blk_idx] + [0] * nrows_to_pad
 
-        print("{} big rows written to A.".format(len(bfp_res)))
-        print(f"mat A total size: {n_blks * 88 / 1024. / 1024. / 8:.2f} MB")
+            bfp_res, idx_width = bfp_type.to_bfp(src_val, (src_ridx, src_cidx), 
+                                                insert_vec_tail = True, ridx_size=ridx_size, cidx_size=cidx_size,
+                                                enable_row_subgrps = True)
+            idx_after_redremove = bfp_type.idx_redremove_gen((src_ridx, src_cidx), n_hw_cols, ridx_size=ridx_size, cidx_size=cidx_size)
+            
+            out_path = OUT_DAT_PATH + f"/{mat_src_name}"
+            if not os.path.isdir(out_path):
+                os.makedirs(out_path)
 
-        for f in fps:
-            f.close()
+            fnames = [out_path + "/" + f"MAT_A_{bfp_type.format_name()}_b{b_size}_h{hidx}_lb{large_blk_idx}.bin" for b_size in range(n_hw_cols)]
+            fps = [open(fname, "w+", encoding='utf-8') for fname in fnames]
+            idx_fname = out_path + "/" + f"IDX_GEN_h{hidx}_lb{large_blk_idx}.bin"
+            idx_fp = open(idx_fname, "w+", encoding='utf-8')
 
-        shutil.copyfile(IN_DAT_PATH + f"/{mat_src_name}.json", 
-                        out_path + "/" + "inst_profile.json")
-        
-        print("generate reduced index...")
-        for idx_pair in idx_after_redremove:
-            idx_fp.write(idx_pair[0] + idx_pair[1] + "\n")
-        idx_fp.close()
+            f_idx = 0
+            n_blks = 0
+            for big_row in bfp_res:
+                assert(len(big_row[0]) == len(big_row[1]) and len(big_row[1]) == len(big_row[2]))
+                n_blks += 3 * len(big_row[0])
+                for b_idx in range(len(big_row[0])-1):
+                    fps[f_idx].write(big_row[0][b_idx] + "\n")
+                    fps[f_idx].write(big_row[1][b_idx] + "\n")
+                    fps[f_idx].write(big_row[2][b_idx] + "\n")
+
+                if bfp_type.is_vec_tail(big_row[0][b_idx+1], idx_width):
+                    fps[f_idx].write(big_row[0][b_idx+1] + "\n")
+                    assert(len(big_row[0][b_idx+1]) == len(big_row[2][b_idx]))
+                    f_idx = int((f_idx + 1) % n_hw_cols)
+
+            print("{} big rows written to A large blk {}.".format(len(bfp_res), large_blk_idx))
+            print(f"mat A large blk total size: {n_blks * 88 / 1024. / 1024. / 8:.2f} MB")
+
+            for f in fps:
+                f.close()
+
+            print("generate reduced index...")
+            for idx_pair in idx_after_redremove:
+                idx_fp.write(idx_pair[0] + idx_pair[1] + "\n")
+            idx_fp.close()
 
         # construct dense mat from selected head to compute gold reference
+        # TODO: change COO parsing to generate result for multiple matrices
         coo_pairs = []
         for br, bc, bv in zip(src_ridx, src_cidx, src_val):
             curr_cids = [bc * bfp_type.blk_size() + i for i in range(bfp_type.blk_size())]
@@ -437,6 +493,9 @@ def mat_a_gen(mat_src_name: str, bfp_type: BFP, n_blocks_split: int = 1, ridx_si
         coo_vals = [p[2] for p in coo_pairs]
         mat_shape = max(coo_idx[0] + coo_idx[1])
         mat = torch.sparse_coo_tensor(coo_idx, coo_vals, size=(mat_shape, mat_shape)).to_dense().numpy()
+    
+    shutil.copyfile(IN_DAT_PATH + f"/{mat_src_name}.json", 
+        out_path + "/" + "inst_profile.json")
     
     return mat
 
@@ -539,93 +598,102 @@ def check_outputs(sim_out_fname: str, ori_fname, num_tc_rows: int, num_tc_cols: 
     print("min err: ", np.min(err))
     print("average err: ", np.mean(err))
 
-def prepare_onchip_input_files(input_path: str, n_shared_chans: int, head_idx: int):
+def prepare_onchip_input_files(input_path: str, n_shared_chans: int, head_idx: int, n_large_blocks: int):
     if input_path[-1] != "/":
         input_path += "/"
-    mat_a_files = \
-        [input_path + f"MAT_A_BFP12_b{i}_h{head_idx}.bin" for i in range(n_shared_chans)]
 
-    # import A file
-    mat_data = [[] for i in range(n_shared_chans)]
-    for fidx, fname in enumerate(mat_a_files):
-        with open(fname, "r", encoding="utf-8") as f:
-            lines = [line.rstrip() for line in f]
-            mat_data[fidx] += lines
+    hbm_a_len_list = []
+    for lb_idx in range(n_large_blocks):
+        mat_a_files = \
+            [input_path + f"MAT_A_BFP12_b{i}_h{head_idx}_lb{lb_idx}.bin" for i in range(n_shared_chans)]
 
-    padded = "1" + "0" * (len(mat_data[0][0]) - 1)
-    lens = [len(m) for m in mat_data]
-    print(f"all lens: {lens}")
-    total_len = max(lens)
-    for midx in range(n_shared_chans):
-        if lens[midx] < total_len:
-            mat_data[midx] += [padded] * (total_len - lens[midx])
+        # import A file
+        mat_data = [[] for i in range(n_shared_chans)]
+        for fidx, fname in enumerate(mat_a_files):
+            with open(fname, "r", encoding="utf-8") as f:
+                lines = [line.rstrip() for line in f]
+                mat_data[fidx] += lines
 
-    assert len(np.unique([len(m) for m in mat_data])) == 1, "mat a data not aligned"
+        padded = "1" + "0" * (len(mat_data[0][0]) - 1)
+        lens = [len(m) for m in mat_data]
+        print(f"all lens: {lens}")
+        total_len = max(lens)
+        for midx in range(n_shared_chans):
+            if lens[midx] < total_len:
+                mat_data[midx] += [padded] * (total_len - lens[midx])
 
-    # split into upper and lower mem files
-    n_chans_in_hbm_grp = 4
-    n_hbms = 2
-    n_hbm_bwidth = 256
+        assert len(np.unique([len(m) for m in mat_data])) == 1, "mat a data not aligned"
 
-    hbm_dat = []
-    for rid in range(total_len):
-        for cid in range(n_shared_chans // n_chans_in_hbm_grp):
-            partial_dat = ""
-            for hid in range(n_chans_in_hbm_grp):
-                mapped_cid = cid * n_chans_in_hbm_grp + hid
-                partial_dat = pad_str_dat_to_len(
-                    mat_data[mapped_cid][rid], 
-                    n_hbm_bwidth * n_hbms//n_chans_in_hbm_grp) + partial_dat
+        # split into upper and lower mem files
+        n_chans_in_hbm_grp = 4 
+        n_hbms = 2
+        n_hbm_bwidth = 256
 
-            hbm_dat.append(bin_to_hex(partial_dat, n_hbms * n_hbm_bwidth))
+        hbm_dat = []
+        for rid in range(total_len):
+            for cid in range(n_shared_chans // n_chans_in_hbm_grp):
+                partial_dat = ""
+                for hid in range(n_chans_in_hbm_grp):
+                    mapped_cid = cid * n_chans_in_hbm_grp + hid
+                    partial_dat = pad_str_dat_to_len(
+                        mat_data[mapped_cid][rid], 
+                        n_hbm_bwidth * n_hbms//n_chans_in_hbm_grp) + partial_dat
 
-    print(f"total len: {total_len}")
-    update_or_create_json(input_path + f"hwconfig_h{head_idx}.json", {"mat a size": len(hbm_dat)})
+                hbm_dat.append(bin_to_hex(partial_dat, n_hbms * n_hbm_bwidth))
 
-    for i_hbm in range(n_hbms):
-        with open(input_path + f"onchip_mat_a_hbm{n_hbms-1-i_hbm}_h{head_idx}.mem", "w", encoding="utf-8") as f:
-            for l in hbm_dat:
-                f.write(l[i_hbm * (n_hbm_bwidth//4) : (i_hbm+1) * (n_hbm_bwidth//4)] + "\n")
+        print(f"total len: {total_len}")
+        hbm_a_len_list.append(len(hbm_dat))
+
+        for i_hbm in range(n_hbms):
+            with open(input_path + f"onchip_mat_a_hbm{n_hbms-1-i_hbm}_h{head_idx}_lb{lb_idx}.mem", "w", encoding="utf-8") as f:
+                for l in hbm_dat:
+                    f.write(l[i_hbm * (n_hbm_bwidth//4) : (i_hbm+1) * (n_hbm_bwidth//4)] + "\n")
+
+    update_or_create_json(input_path + f"hwconfig_h{head_idx}.json", {"mat a size": hbm_a_len_list})
+    
 
 def prepare_onchip_idx_file(
-        input_path: str, n_shared_chans: int, cidx_width: tuple, head_idx: int, align_to=256):
+        input_path: str, n_shared_chans: int, cidx_width: tuple, head_idx: int, n_large_blocks: int, align_to=256):
     if input_path[-1] != "/":
         input_path += "/"
+
+    idx_len_list = []
+    for lb_idx in range(n_large_blocks):
+        # import index file
+        idx, bitmask = [], []
+        with open(input_path + f"IDX_GEN_h{head_idx}_lb{lb_idx}.bin", "r", encoding="utf-8") as f:
+            lines = [line.rstrip() for line in f]
+            for l in lines:
+                idx.append(l[:cidx_width])
+                bitmask.append(l[cidx_width:cidx_width+n_shared_chans])
+
+        print(f"idx len: {len(idx)}")
+        interm_iter_res, final_res = [[] for i in range(n_shared_chans)], []
+        for i in range(len(idx)):
+            if idx[i] == "1" * cidx_width and bitmask[i] == "0" * n_shared_chans:
+                max_vec_len = max([len(c) for c in interm_iter_res])
+                for c in range(n_shared_chans):
+                    if len(interm_iter_res[c]) < max_vec_len:
+                        interm_iter_res[c] += ["1"*cidx_width] * (max_vec_len - len(interm_iter_res[c]))
+
+                for l in range(max_vec_len):
+                    res_line = [interm_iter_res[c][l] for c in range(n_shared_chans)]
+                    final_res.append(bin_to_hex("".join(res_line), align_to) + "\n")
+
+                final_res.append(bin_to_hex(("1" * cidx_width) * n_shared_chans, align_to) + "\n")
+                interm_iter_res = [[] for i in range(n_shared_chans)]
+            else:
+                for chan_id in range(n_shared_chans):
+                    if(bitmask[i][chan_id] == "1"):
+                        interm_iter_res[chan_id].append(idx[i])
+        
+        with open(input_path + f"onchip_idx_hbm_h{head_idx}_lb{lb_idx}.mem", "w", encoding="utf-8") as f:
+            f.writelines(final_res)
+
+        print(f"idx file len: {len(final_res)}")
+        idx_len_list.append(len(final_res))
     
-    # import index file
-    idx, bitmask = [], []
-    with open(input_path + f"IDX_GEN_h{head_idx}.bin", "r", encoding="utf-8") as f:
-        lines = [line.rstrip() for line in f]
-        for l in lines:
-            idx.append(l[:cidx_width])
-            bitmask.append(l[cidx_width:cidx_width+n_shared_chans])
-
-    print(f"idx len: {len(idx)}")
-    interm_iter_res, final_res = [[] for i in range(n_shared_chans)], []
-    for i in range(len(idx)):
-        if idx[i] == "1" * cidx_width and bitmask[i] == "0" * n_shared_chans:
-            max_vec_len = max([len(c) for c in interm_iter_res])
-            for c in range(n_shared_chans):
-                if len(interm_iter_res[c]) < max_vec_len:
-                    interm_iter_res[c] += ["1"*cidx_width] * (max_vec_len - len(interm_iter_res[c]))
-
-            for l in range(max_vec_len):
-                res_line = [interm_iter_res[c][l] for c in range(n_shared_chans)]
-                final_res.append(bin_to_hex("".join(res_line), align_to) + "\n")
-
-            final_res.append(bin_to_hex(("1" * cidx_width) * n_shared_chans, align_to) + "\n")
-            interm_iter_res = [[] for i in range(n_shared_chans)]
-        else:
-            for chan_id in range(n_shared_chans):
-                if(bitmask[i][chan_id] == "1"):
-                    interm_iter_res[chan_id].append(idx[i])
-    
-
-    with open(input_path + f"onchip_idx_hbm_h{head_idx}.mem", "w", encoding="utf-8") as f:
-        f.writelines(final_res)
-
-    print(f"idx file len: {len(final_res)}")
-    update_or_create_json(input_path + f"hwconfig_h{head_idx}.json", {"idx_len": len(final_res)})
+    update_or_create_json(input_path + f"hwconfig_h{head_idx}.json", {"idx_len": idx_len_list})
 
 def prepare_onchip_matb_file(input_path: str, align_to=256, head_idx=0):
     if input_path[-1] != "/":
@@ -649,14 +717,35 @@ def prepare_onchip_matb_file(input_path: str, align_to=256, head_idx=0):
 def main(args: dict):
     hw_row = 6
     hw_col = 12
-    
+    n_large_blocks = int(args['large-blocks'])
     if args['inputs_gen']:
         chain_len = int(args['chain_len'])
 
         if args["data_path"]:
-            matA = mat_a_gen(args["data_path"], BFP(BfpType.BFP_12), hw_col, ridx_size=12, cidx_size=10, bfp_friendly_dat=False)
+            if args["head-indices"] is not None:
+                print(f"generating specific head indices: {args['head-indices']}")
+            matA = mat_a_gen(
+                    args["data_path"], 
+                    BFP(BfpType.BFP_12), 
+                    hw_col, 
+                    ridx_size=12, 
+                    cidx_size=10, 
+                    bfp_friendly_dat=False, 
+                    n_large_blocks=n_large_blocks, 
+                    hidx_list=args["head-indices"]
+                )
         else:
-            matA = mat_a_gen("midsize", BFP(BfpType.BFP_12), hw_col, ridx_size=12, cidx_size=10, bfp_friendly_dat=True)
+            if args["head-indices"] is not None:
+                print(f"generating specific head indices: {args['head-indices']}")
+            matA = mat_a_gen(
+                "midsize", 
+                    BFP(BfpType.BFP_12), 
+                    hw_col, ridx_size=12, 
+                    cidx_size=10, 
+                    bfp_friendly_dat=True, 
+                    n_large_blocks=n_large_blocks, 
+                    hidx_list=args["head-indices"]
+                )
 
         matB = mat_b_gen(args["data_path"], chain_len, BFP(BfpType.BFP_12), hw_row)
         # res = np.matmul(matA, matB)
@@ -681,11 +770,14 @@ def main(args: dict):
         inst_list = [f.split(".")[0] \
                 for f in os.listdir(path) \
                 if os.path.isfile(path + f) and f.endswith(".bin") and "IDX_GEN" in f]
-        head_list = [int(i.split("_")[-1][1:]) for i in inst_list]
+        head_list = np.unique([int(i.split("_")[-2][1:]) for i in inst_list])
         print(f"heads: {head_list}")
         for h in head_list:
-            prepare_onchip_input_files(path, hw_col, head_idx=h)
-            prepare_onchip_idx_file(path, hw_col, 10, head_idx=h)
+            lb_flist = [f for f in inst_list if f"IDX_GEN_h{h}_" in f]
+            lb_list = np.unique([int(f.split("_")[-1][2:]) for f in lb_flist])
+            print(f"head {h} large blocks: {lb_list}")
+            prepare_onchip_input_files(path, hw_col, head_idx=h, n_large_blocks=len(lb_list))
+            prepare_onchip_idx_file(path, hw_col, 10, head_idx=h, n_large_blocks=len(lb_list))
             prepare_onchip_matb_file(path, 256, head_idx=h)
     
     if args['test']:
@@ -719,6 +811,10 @@ if __name__ == "__main__":
                                 action="store_true", default=False)
     arg_parser.add_argument("-dp", "--data_path", help="data path of mat a", \
                                 action="store", default=None)
+    arg_parser.add_argument("-lb", "--large-blocks", help="number of large blocks", \
+                                action="store", dest="large-blocks", default=-1)
+    arg_parser.add_argument("-hidx", "--head-indices", help="head indices", \
+                                action="store", dest="head-indices", default=None)
     args = vars(arg_parser.parse_args())
 
     if args['inputs_gen'] and args['chain_len'] is None:

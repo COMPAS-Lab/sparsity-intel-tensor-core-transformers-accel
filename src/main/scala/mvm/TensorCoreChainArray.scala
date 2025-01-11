@@ -211,10 +211,11 @@ class TensorCoreChainArray(array_col: Int, array_row: Int, chain_len: Int, idx_w
     val isLastSubVecMultIter, isCurrLoadVecEmpty = Reg(Bits(array_col bits), init=B(0).resized)
     val isCurrCasBufLoaded = Bits(array_col bits)
     val isLastLoadVecEmpty = Reg(Bool(), init=False)
-    val colIdxFifoPopEn = Bool()
+    val colIdxFifoPopEn = Bits(array_col bits)
 
     //col cascade loading data and ctrl
-    io.sortedColIdxSlow.ready := colIdxFifoPopEn
+    isLastLoadVecEmpty := ~ (io.sortedColIdxSlow.payload.destId | isCurrLoadVecEmpty).orR
+    io.sortedColIdxSlow.ready := colIdxFifoPopEn.orR
     for (c <- 0 until array_col) {
       val preArowCasLoadCounter, postArowCasLoadCounter = Counter(chain_len)
       preArowCasLoadCounter.setName("preArowCasLoadCounter_" + c)
@@ -228,28 +229,27 @@ class TensorCoreChainArray(array_col: Int, array_row: Int, chain_len: Int, idx_w
       when(cascadeLoadEnLocal(c)) {
         preArowPop3Fac.increment()
         when(preArowPop3Fac.willOverflow) {preArowCasLoadCounter.increment()}
-
       }
 
-      // TODO: be careful of the routing length since ctrl_logic[0] is used here
-      if (c == 0) {
-        when(io.sortedColIdxSlow.payload.idxData.msb) {
-          colIdxFifoPopEn := preArowCasLoadCounter.willOverflow
+      when(io.sortedColIdxSlow.payload.idxData.msb) {
+        colIdxFifoPopEn(c) := preArowCasLoadCounter.willOverflow
+      }.otherwise {
+        colIdxFifoPopEn(c) := preArowPop3Fac.willOverflow
+      }
+      when(io.sortedColIdxSlow.fire) {
+        when(preArowCasLoadCounter.willOverflow) {
+          isCurrLoadVecEmpty(c).clearAll()
         }.otherwise {
-          colIdxFifoPopEn := preArowPop3Fac.willOverflow
+          isCurrLoadVecEmpty(c) := io.sortedColIdxSlow.payload.destId(c) | isCurrLoadVecEmpty(c)
         }
-        when(io.sortedColIdxSlow.fire) {
-          when(preArowCasLoadCounter.willOverflow) {
-            isCurrLoadVecEmpty.clearAll()
-          }.otherwise {
-            isCurrLoadVecEmpty := io.sortedColIdxSlow.payload.destId | isCurrLoadVecEmpty
-          }
-        }
-
-        isLastLoadVecEmpty := ~ (io.sortedColIdxSlow.payload.destId | isCurrLoadVecEmpty).orR
       }
+
       // this is the col buffer pop ctrl
-      isCurrCasBufLoaded(c) := preArowCasLoadCounter.willOverflow
+      // FIXME: dangerous! Regarding col buffer empty as a signal
+      // for cascade loading finished.
+      // must make sure starting calc only when it receives all mat A
+      // and the col buffer is large enough hold all mat A.
+      isCurrCasBufLoaded(c) := preArowCasLoadCounter.willOverflow | ~colBuffer(c).io.pop.valid
 
       when(cascadeLoadEnLocal(c)) {
         when(isCurrCasBufLoaded(c)) {
@@ -678,7 +678,7 @@ class TensorCoreChainArray(array_col: Int, array_row: Int, chain_len: Int, idx_w
         when(~isCalStartRecv) {
           isCalStartRecv := calEnDelay.rise()
         }
-        when(isCalStartRecv && colIdxFifoNotEmptyDelay && colBufferNotEmpty) {
+        when(isCalStartRecv && colIdxFifoNotEmptyDelay) {
           cascadeLoadStart := True
           goto(sWaitIdx)
         }
@@ -797,7 +797,9 @@ class TensorCoreChainArray(array_col: Int, array_row: Int, chain_len: Int, idx_w
   val perfCounter = Counter(16 bits)
   val perfCounterRun = Reg(Bool(), init=False)
   when(perfCounterRun) {
-    perfCounter.increment()
+    when(~perfCounter.willOverflowIfInc) {
+      perfCounter.increment()
+    }
     when(rowCtrlFsm.isActive(rowCtrlFsm.sCompFin)) {
       perfCounterRun := False
     }
