@@ -5,11 +5,13 @@ import argparse
 import math
 import itertools
 from enum import Enum
-import torch
+# import torch
 from random import sample
 import json
-import os
+import os, io
 import shutil
+from cProfile import Profile
+from pstats import Stats, SortKey
 
 def float_to_hex(f: float):
 	# Courtesy of https://stackoverflow.com/a/23624284
@@ -24,6 +26,9 @@ def hex_to_bin(x: str, n_bits: int):
 
 def bin_to_hex(x: str, n_bits: int):
     return hex(int(x, 2))[2:].zfill(n_bits//4)
+
+def int_idx_to_bin(index: int, width: int) -> str:
+    return "0" + bin(index)[2:].zfill(width-1)
 
 def twos_comp(x: str, sign: str):
     if sign == "0":
@@ -134,6 +139,34 @@ class BFP():
             res = True
 
         return res
+    
+    def vec_to_bfp_block(self, blk_r):
+        fp32_blk_elems = [f for f in blk_r]
+        blk_elems = [float_to_hex(f) for f in blk_r]
+        exps = [int(hex_to_bin(e, 32)[1:9], 2) for e in blk_elems]
+        mants = [hex_to_bin(e, 32)[9:9 + self.mant_bits()+1] for e in blk_elems]
+        signs = [hex_to_bin(e, 32)[0] for e in blk_elems]
+        
+        # TODO: be careful for the situation where part of the inputs are zero
+        blk_res = bin(max(max(exps)-2, 0))[2:].zfill(8)
+
+        possible_vals = [v*(2**(max(exps)-2-127)) for v in range(2**self.mant_bits())]
+        possible_mants = [bin(int(v))[2:].zfill(self.mant_bits()) for v in range(2**self.mant_bits())]
+        for i in range(len(blk_elems)):
+            ## nearest val rounding
+            if signs[i] == "1":
+                possible_vals = [0-v for v in possible_vals]
+            final_mant = possible_mants[find_nearest(possible_vals, fp32_blk_elems[i])]
+            final_mant = twos_comp(final_mant, signs[i])
+            ## truncation rounding:            
+            # mant_with_sign = "0" * (self.mant_bits() + 2) \
+            #     if blk_elems[i] == "00000000" else "1" + mants[i]
+            # shifted_mant = "0" * (self.mant_bits() + 2) \
+            #     if (max(exps) - exps[i]) > len(mant_with_sign) \
+            #     else mant_with_sign[0:len(mant_with_sign) - (max(exps) - exps[i]) + 1].zfill(len(mant_with_sign))
+            # final_mant = twos_comp(shifted_mant, signs[i])[0:self.mant_bits() + 1]
+            blk_res += final_mant
+        return blk_res
 
     def to_bfp(self, blk_list: list, idx: tuple = None, insert_vec_tail = True, ridx_size=0, cidx_size=0, enable_row_subgrps=False) -> tuple:
         '''
@@ -141,36 +174,6 @@ class BFP():
         return: (nblks, blks_str), int, int as list
         '''
         res = []
-        def int_idx_to_bin(index: int, width: int) -> str:
-            return "0" + bin(index)[2:].zfill(width-1)
-        
-        def vec_to_bfp_block(blk_r):
-            fp32_blk_elems = [f for f in blk_r]
-            blk_elems = [float_to_hex(f) for f in blk_r]
-            exps = [int(hex_to_bin(e, 32)[1:9], 2) for e in blk_elems]
-            mants = [hex_to_bin(e, 32)[9:9+self.mant_bits()+1] for e in blk_elems]
-            signs = [hex_to_bin(e, 32)[0] for e in blk_elems]
-            
-            # TODO: be careful for the situation where part of the inputs are zero
-            blk_res = bin(max(max(exps)-2, 0))[2:].zfill(8)
-
-            for i in range(len(blk_elems)):
-                mant_with_sign = "0" * (self.mant_bits() + 2) \
-                    if blk_elems[i] == "00000000" else "1" + mants[i]
-                ## nearest val rounding
-                possible_vals = [v*(2**(max(exps)-2-127)) for v in range(2**self.mant_bits())]
-                possible_mants = [bin(int(v))[2:].zfill(self.mant_bits()) for v in range(2**self.mant_bits())]
-                if signs[i] == "1":
-                    possible_vals = [0-v for v in possible_vals]
-                final_mant = possible_mants[find_nearest(possible_vals, fp32_blk_elems[i])]
-                final_mant = twos_comp(final_mant, signs[i])
-                ## truncation rounding:
-                # shifted_mant = "0" * (self.mant_bits() + 2) \
-                #     if (max(exps) - exps[i]) > len(mant_with_sign) \
-                #     else mant_with_sign[0:len(mant_with_sign) - (max(exps) - exps[i]) + 1].zfill(len(mant_with_sign))
-                # final_mant = twos_comp(shifted_mant, signs[i])[0:self.mant_bits() + 1]
-                blk_res += final_mant
-            return blk_res
 
         if idx:
             assert(len(idx[0]) == len(idx[1]))
@@ -206,7 +209,7 @@ class BFP():
 
                 # expand each 3-row group
                 for sub_r, blk_r in enumerate(blk):
-                    blk_res = vec_to_bfp_block(blk_r)
+                    blk_res = self.vec_to_bfp_block(blk_r)
                     if idx:
                         blk_res = int_idx_to_bin(idx[0][rec_idx], ridx_size) + blk_res
 
@@ -236,7 +239,7 @@ class BFP():
                         res.append("1" * (ridx_size + 1) + "1" * (cidx_size + 1) + "0" * self.blk_bits())
                         last_ridx = curr_ridx
                 
-                blk_res = vec_to_bfp_block(blk)
+                blk_res = self.vec_to_bfp_block(blk)
 
                 if idx:
                     blk_res = int_idx_to_bin(idx[0][rec_idx], ridx_size) + \
@@ -339,7 +342,9 @@ def mat_a_gen(
         cidx_size=9, 
         n_large_blocks = -1,
         hidx_list = None,
-        bfp_friendly_dat = False):
+        bfp_friendly_dat = False,
+        disable_file_writting = False,
+        ):
     '''
     assuming mat A is a 3xthree_vec_len mat block:
 
@@ -440,41 +445,42 @@ def mat_a_gen(
                                                 insert_vec_tail = True, ridx_size=ridx_size, cidx_size=cidx_size,
                                                 enable_row_subgrps = True)
             idx_after_redremove = bfp_type.idx_redremove_gen((src_ridx, src_cidx), n_hw_cols, ridx_size=ridx_size, cidx_size=cidx_size)
-            
-            out_path = OUT_DAT_PATH + f"/{mat_src_name}"
-            if not os.path.isdir(out_path):
-                os.makedirs(out_path)
 
-            fnames = [out_path + "/" + f"MAT_A_{bfp_type.format_name()}_b{b_size}_h{hidx}_lb{large_blk_idx}.bin" for b_size in range(n_hw_cols)]
-            fps = [open(fname, "w+", encoding='utf-8') for fname in fnames]
-            idx_fname = out_path + "/" + f"IDX_GEN_h{hidx}_lb{large_blk_idx}.bin"
-            idx_fp = open(idx_fname, "w+", encoding='utf-8')
+            if not disable_file_writting:
+                out_path = OUT_DAT_PATH + f"/{mat_src_name}"
+                if not os.path.isdir(out_path):
+                    os.makedirs(out_path)
 
-            f_idx = 0
-            n_blks = 0
-            for big_row in bfp_res:
-                assert(len(big_row[0]) == len(big_row[1]) and len(big_row[1]) == len(big_row[2]))
-                n_blks += 3 * len(big_row[0])
-                for b_idx in range(len(big_row[0])-1):
-                    fps[f_idx].write(big_row[0][b_idx] + "\n")
-                    fps[f_idx].write(big_row[1][b_idx] + "\n")
-                    fps[f_idx].write(big_row[2][b_idx] + "\n")
+                fnames = [out_path + "/" + f"MAT_A_{bfp_type.format_name()}_b{b_size}_h{hidx}_lb{large_blk_idx}.bin" for b_size in range(n_hw_cols)]
+                fps = [open(fname, "w+", encoding='utf-8') for fname in fnames]
+                idx_fname = out_path + "/" + f"IDX_GEN_h{hidx}_lb{large_blk_idx}.bin"
+                idx_fp = open(idx_fname, "w+", encoding='utf-8')
 
-                if bfp_type.is_vec_tail(big_row[0][b_idx+1], idx_width):
-                    fps[f_idx].write(big_row[0][b_idx+1] + "\n")
-                    assert(len(big_row[0][b_idx+1]) == len(big_row[2][b_idx]))
-                    f_idx = int((f_idx + 1) % n_hw_cols)
+                f_idx = 0
+                n_blks = 0
+                for big_row in bfp_res:
+                    assert(len(big_row[0]) == len(big_row[1]) and len(big_row[1]) == len(big_row[2]))
+                    n_blks += 3 * len(big_row[0])
+                    for b_idx in range(len(big_row[0])-1):
+                        fps[f_idx].write(big_row[0][b_idx] + "\n")
+                        fps[f_idx].write(big_row[1][b_idx] + "\n")
+                        fps[f_idx].write(big_row[2][b_idx] + "\n")
 
-            print("{} big rows written to A large blk {}.".format(len(bfp_res), large_blk_idx))
-            print(f"mat A large blk total size: {n_blks * 88 / 1024. / 1024. / 8:.2f} MB")
+                    if bfp_type.is_vec_tail(big_row[0][b_idx+1], idx_width):
+                        fps[f_idx].write(big_row[0][b_idx+1] + "\n")
+                        assert(len(big_row[0][b_idx+1]) == len(big_row[2][b_idx]))
+                        f_idx = int((f_idx + 1) % n_hw_cols)
 
-            for f in fps:
-                f.close()
+                print("{} big rows written to A large blk {}.".format(len(bfp_res), large_blk_idx))
+                print(f"mat A large blk total size: {n_blks * 88 / 1024. / 1024. / 8:.2f} MB")
 
-            print("generate reduced index...")
-            for idx_pair in idx_after_redremove:
-                idx_fp.write(idx_pair[0] + idx_pair[1] + "\n")
-            idx_fp.close()
+                for f in fps:
+                    f.close()
+
+                print("generate reduced index...")
+                for idx_pair in idx_after_redremove:
+                    idx_fp.write(idx_pair[0] + idx_pair[1] + "\n")
+                idx_fp.close()
 
         # construct dense mat from selected head to compute gold reference
         # TODO: change COO parsing to generate result for multiple matrices
@@ -492,12 +498,14 @@ def mat_a_gen(
         coo_idx = [[p[0] for p in coo_pairs], [p[1] for p in coo_pairs]]
         coo_vals = [p[2] for p in coo_pairs]
         mat_shape = max(coo_idx[0] + coo_idx[1])
-        mat = torch.sparse_coo_tensor(coo_idx, coo_vals, size=(mat_shape, mat_shape)).to_dense().numpy()
+        # mat = torch.sparse_coo_tensor(coo_idx, coo_vals, size=(mat_shape, mat_shape)).to_dense().numpy()
     
-    shutil.copyfile(IN_DAT_PATH + f"/{mat_src_name}.json", 
-        out_path + "/" + "inst_profile.json")
+    if not disable_file_writting:
+        # copy inst_profile.json
+        shutil.copyfile(IN_DAT_PATH + f"/{mat_src_name}.json", 
+            out_path + "/" + "inst_profile.json")
     
-    return mat
+    return None
 
 def mat_b_gen(mat_src_name: str, chain_len: int, bfp_type: BFP, n_blocks_split: int = 1):
     # matB = np.random.uniform(low=0., high=1.0, size=size).astype('f')
@@ -718,36 +726,58 @@ def main(args: dict):
     hw_row = 6
     hw_col = 12
     n_large_blocks = int(args['large-blocks'])
+    
+    if args["head-indices"] is not None:
+        print(f"generating specific head indices: {args['head-indices']}")
+        head_idx = [int(i) for i in args["head-indices"]]
+
     if args['inputs_gen']:
         chain_len = int(args['chain_len'])
 
-        if args["data_path"]:
-            if args["head-indices"] is not None:
-                print(f"generating specific head indices: {args['head-indices']}")
-            matA = mat_a_gen(
-                    args["data_path"], 
-                    BFP(BfpType.BFP_12), 
-                    hw_col, 
-                    ridx_size=12, 
-                    cidx_size=10, 
-                    bfp_friendly_dat=False, 
-                    n_large_blocks=n_large_blocks, 
-                    hidx_list=args["head-indices"]
+        if args["data-path"]:
+            if args["profile-runtime"]:
+                print("generating runtime profile")
+                with Profile() as pr:
+                    matA = mat_a_gen(
+                        args["data-path"], 
+                        BFP(BfpType.BFP_12), 
+                        hw_col, 
+                        ridx_size=12, 
+                        cidx_size=10, 
+                        bfp_friendly_dat=False, 
+                        n_large_blocks=n_large_blocks, 
+                        hidx_list=head_idx,
+                        disable_file_writting=True
+                    )
+                    s = io.StringIO()
+                    ps = Stats(pr, stream=s).strip_dirs().sort_stats(SortKey.CALLS)
+                    ps.print_stats()
+
+                    with open("runtime_profile.txt", "w") as f:
+                        f.write(s.getvalue())
+            else:
+                matA = mat_a_gen(
+                        args["data-path"], 
+                        BFP(BfpType.BFP_12), 
+                        hw_col, 
+                        ridx_size=12, 
+                        cidx_size=10, 
+                        bfp_friendly_dat=False, 
+                        n_large_blocks=n_large_blocks, 
+                        hidx_list=head_idx
                 )
         else:
-            if args["head-indices"] is not None:
-                print(f"generating specific head indices: {args['head-indices']}")
             matA = mat_a_gen(
-                "midsize", 
+                    "midsize", 
                     BFP(BfpType.BFP_12), 
                     hw_col, ridx_size=12, 
                     cidx_size=10, 
                     bfp_friendly_dat=True, 
                     n_large_blocks=n_large_blocks, 
-                    hidx_list=args["head-indices"]
+                    hidx_list=head_idx
                 )
 
-        matB = mat_b_gen(args["data_path"], chain_len, BFP(BfpType.BFP_12), hw_row)
+        # matB = mat_b_gen(args["data_path"], chain_len, BFP(BfpType.BFP_12), hw_row)
         # res = np.matmul(matA, matB)
         # print(f"mat a shape: {matA.shape}, mat b shape: {matB.shape}, res shape: {res.shape}")
         # np.save("sparse_matmul_data/mult_a_b_fp32_mata.npy", matA)
@@ -809,12 +839,15 @@ if __name__ == "__main__":
                                 action="store_true", default=False)
     arg_parser.add_argument("-th", "--throughput", help="temp compute throughput", \
                                 action="store_true", default=False)
-    arg_parser.add_argument("-dp", "--data_path", help="data path of mat a", \
-                                action="store", default=None)
+    arg_parser.add_argument("-dp", "--data-path", help="data path of mat a", \
+                                action="store", dest="data-path", default=None)
     arg_parser.add_argument("-lb", "--large-blocks", help="number of large blocks", \
                                 action="store", dest="large-blocks", default=-1)
-    arg_parser.add_argument("-hidx", "--head-indices", help="head indices", \
-                                action="store", dest="head-indices", default=None)
+    arg_parser.add_argument("-hidx", "--head-indices", help="list of head indices", \
+                                nargs='+', type=int, dest="head-indices", default=None)
+    arg_parser.add_argument("-pr", "--profile-runtime", help="profile runtime", \
+                                action="store_true", dest="profile-runtime", default=False)
+
     args = vars(arg_parser.parse_args())
 
     if args['inputs_gen'] and args['chain_len'] is None:
