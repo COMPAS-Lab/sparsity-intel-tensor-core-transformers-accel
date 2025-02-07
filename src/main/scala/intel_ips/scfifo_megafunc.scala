@@ -3,7 +3,7 @@ package intel_ips
 import spinal.core._
 import spinal.lib._
 
-class scfifo(output_width: Int, depth: Int, ram_type: String, afull_thres: Int = 0) extends BlackBox {
+class scfifo(output_width: Int, depth: Int, ram_type: String, afull_thres: Int = -1) extends BlackBox {
   addGenerics(
     "lpm_width" -> output_width,
     "lpm_numwords" -> depth,
@@ -27,8 +27,8 @@ class scfifo(output_width: Int, depth: Int, ram_type: String, afull_thres: Int =
     val clock = in Bool()
     val wrreq, rdreq = in Bool()
     val full, empty = out Bool()
-    val data = in UInt(output_width bits)
-    val q = out UInt(output_width bits)
+    val data = in Bits(output_width bits)
+    val q = out Bits(output_width bits)
     val aclr, sclr = in Bool()
     val almost_empty, almost_full = out Bool()
   }
@@ -37,5 +37,5 @@ class scfifo(output_width: Int, depth: Int, ram_type: String, afull_thres: Int =
   // disable the prefix
   noIoPrefix()
   // specify the tensor core main clock
-  mapClockDomain(clock = io.clock)
+  mapClockDomain(clock = io.clock, reset = io.sclr)
 }

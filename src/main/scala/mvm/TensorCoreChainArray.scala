@@ -169,7 +169,6 @@ class TensorCoreChainArray(array_col: Int, array_row: Int, chain_len: Int, idx_w
 
   val tensorArray = Array.ofDim[TensorCoreChainBf12](array_row, array_col)
   for (r <- 0 until array_row; c <- 0 until array_col) {
-    // out buf delay = number of B columns in each tensor core chain row - 3
     tensorArray(r)(c) = new TensorCoreChainBf12(
       chain_len,
       out_buf_delay = 4,
@@ -193,7 +192,8 @@ class TensorCoreChainArray(array_col: Int, array_row: Int, chain_len: Int, idx_w
   //input buffers
   val bufferArea = new Area {
     // buffer and ctrl signal def
-    val colBuffer = Array.fill(array_col)(new StreamOutFifo(88 + idx_width.r, col_buffer_depth, "M20K"))
+    val colBuffer = Array.fill(array_col)(
+      new StreamFifoIp(UInt(88 + idx_width.r bits), col_buffer_depth, "M20K"))
     val rowMem = Array.fill(array_row, NUM_MATB_VEC_PER_ROW / TRANSRAM_FOLDING_FACTOR)(
       new spram_megafunc(88, row_buffer_depth * TRANSRAM_FOLDING_FACTOR, "M20K"))
     val isCurrSubgrpALoaded = Bool()
@@ -284,8 +284,8 @@ class TensorCoreChainArray(array_col: Int, array_row: Int, chain_len: Int, idx_w
 
       casLoadBubbleInsert(c).io.casLoadBufIn <<
         colBuffer(c).io.pop.map(x => BfpBlockWithIdx(88, idx_width.r, 0, 0).fromUInt(x))
-      casLoadBubbleInsert(c).io.casLoadEn := Delay(cascadeLoadEnLocal(c), 1)
-      casLoadBubbleInsert(c).io.colSel := Delay(io.sortedColIdxSlow.payload.destId(c), 1)
+      casLoadBubbleInsert(c).io.casLoadEn := Delay(cascadeLoadEnLocal(c), 1, init=False)
+      casLoadBubbleInsert(c).io.colSel := Delay(io.sortedColIdxSlow.payload.destId(c), 1, init=False)
 
       colBuffer(c).io.push << io.matALoad(c).map(x => x.asUInt)
     }
@@ -662,7 +662,7 @@ class TensorCoreChainArray(array_col: Int, array_row: Int, chain_len: Int, idx_w
 
     val isCalStartRecv = Reg(Bool(), init=False)
     val delayedMatMulFin = Bool()
-    val colBufferNotEmpty = bufferArea.colBuffer.last.io.almostFull
+//    val colBufferNotEmpty = bufferArea.colBuffer.last.io.almostFull
 //    if (ROWMEM2TCC_TOTAL_DELAY > COLBUF2TCC_TOTAL_DELAY) {
 //      delayedMatMulFin :=
 //        Delay(rowCtrlFsm.isCurrSubvecMatmulFin, ROWMEM2TCC_TOTAL_DELAY - COLBUF2TCC_TOTAL_DELAY)
@@ -795,6 +795,7 @@ class TensorCoreChainArray(array_col: Int, array_row: Int, chain_len: Int, idx_w
 
   // perf and debug counters
   val perfCounter = Counter(16 bits)
+  perfCounter.init(0)
   val perfCounterRun = Reg(Bool(), init=False)
   when(perfCounterRun) {
     when(~perfCounter.willOverflowIfInc) {
@@ -810,6 +811,20 @@ class TensorCoreChainArray(array_col: Int, array_row: Int, chain_len: Int, idx_w
     }
   }
   io.latCounter := perfCounter.value
+
+  //temp perf counter for all col mem
+  val colMemRdCounters = Array.fill(array_col)(Counter(16 bits))
+  for (colIdx <- 0 until array_col) {
+    colMemRdCounters(colIdx)
+      .setName("debug_colMemRdCounter" + colIdx)
+      .dontSimplifyIt()
+      .addAttribute("preserve_for_debug")
+    when(~colMemRdCounters(colIdx).willOverflowIfInc) {
+      when(bufferArea.colBuffer(colIdx).io.push.fire) {
+        colMemRdCounters(colIdx).increment()
+      }
+    }
+  }
 
   if(debug_en) {
     val loadCounter = Counter(3 * chain_len, inc = tensorArray(0)(0).io.loadCascadeIn.valid)

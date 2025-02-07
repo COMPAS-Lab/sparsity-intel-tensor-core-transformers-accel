@@ -39,6 +39,7 @@ bin/
 *.vcd
 !tester/src/test/resources/*.vhd
 temp*
+etch*
 
 # Simulation
 simWorkspace/

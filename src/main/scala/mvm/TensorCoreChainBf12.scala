@@ -58,7 +58,7 @@ class TensorCoreChainBf12(chain_len: Int, out_buf_delay: Int,
   val tcCoreChainElems = new Array[tensor_core_bf12](chain_len-1)
   val tcAccu = new tensor_core_accu
   // small buffer for row index
-  val rIdxBuffer = Array.fill(2)(new StreamOutFifo(ridx_width, 2, "MLAB"))
+  val rIdxBuffer = Array.fill(2)(new StreamFifoIp(UInt(ridx_width bits), 2, "MLAB"))
 
   // loading requires 3 extra cycles, align the valid signal
   // with the first compute core here
@@ -177,7 +177,7 @@ class TensorCoreChainBf12(chain_len: Int, out_buf_delay: Int,
   val fbBufferLoadValid = Reg(Bool()) init False
   fbBufferLoadValid := delayedDataInValidForOut & ~delayedDataInLastForOut
 
-  val fbDelayFifo = new StreamOutFifo(output_width * 3, 32, "M20K")
+  val fbDelayFifo = new StreamFifoIp(UInt(output_width * 3 bits), 32, "M20K")
   fbDelayFifo.setName("AccuDelayInst")
   // when the final iter is ready, push the res into output fifo
   fbDelayFifo.io.push.valid := fbBufferLoadValid

@@ -113,7 +113,7 @@ class tensor_core_array_wrapper(array_col: Int, array_row: Int, chain_len: Int,
     val maRdBoundCC = Delay(io.ma_rd_bound, CTRL_REG_DELAY)
 
     val idxGenerator = new IndexGenerator(array_col, idx_width.c, BigInt("1" * idx_width.c, 2))
-    val idxGenFifoFast, idxGenFifoSlow = StreamFifo(IndexData(idx_width.c, array_col), 128)
+    val idxGenFifoFast, idxGenFifoSlow = new StreamFifoIp(IndexData(idx_width.c, array_col), 512, "M20K", 64)
     // index generator connection
     val isIdxGenWaitingOuts = Reg(Bits(array_col bits), init=B(0))
     val isLastPlaceholderRecved = Reg(Bits(3 bits), init=B(0))
@@ -211,7 +211,7 @@ class tensor_core_array_wrapper(array_col: Int, array_row: Int, chain_len: Int,
     tcArray.io.sortedColIdxSlow << idxGenFifoSlow.io.pop
     tcArray.io.sortedColIdxFast << idxGenFifoFast.io.pop
 //    tcArray.io.colIdxFifoNotEmpty := idxGenFifoSlow.io.occupancy > 32
-    tcArray.io.colIdxFifoNotEmpty := idxGenFifoSlow.io.occupancy > 32 && matAFullyLoaded
+    tcArray.io.colIdxFifoNotEmpty := matAFullyLoaded
     tcArray.io.calEn := Delay(calStart.rise(), CTRL_REG_DELAY)
     tcArray.io.configRowBuffWrBound := Delay(io.mbvec_size, CTRL_REG_DELAY).resized
     io.lat_counter := Delay(tcArray.io.latCounter, CTRL_REG_DELAY)
@@ -281,8 +281,8 @@ class tensor_core_array_wrapper(array_col: Int, array_row: Int, chain_len: Int,
             goto(sIdle)
           }.otherwise {
             when(~isIdxGenWaitingOuts.andR &
-              idxGenFifoSlow.io.occupancy < 64 &
-              idxGenFifoFast.io.occupancy < 64) {
+              ~idxGenFifoSlow.io.almostFull &
+              ~idxGenFifoFast.io.almostFull) {
               goto(sSend)
             }
           }
