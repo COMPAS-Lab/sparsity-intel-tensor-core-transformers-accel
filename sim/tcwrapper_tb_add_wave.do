@@ -217,8 +217,14 @@ add wave -noupdate /TensorCoreWrapperTb/dut/softClrnArea_tcArray/outBuffer_0/io_
 add wave -noupdate /TensorCoreWrapperTb/dut/softClrnArea_tcArray/outBuffer_0/io_pop_valid
 add wave -noupdate /TensorCoreWrapperTb/dut/softClrnArea_tcArray/outBuffer_0/io_pop_ready
 add wave -noupdate /TensorCoreWrapperTb/dut/softClrnArea_tcArray/outBuffer_0/io_pop_payload
+add wave -noupdate -divider {temp scope}
+add wave -noupdate /TensorCoreWrapperTb/dut/softClrnArea_tcArray/outBuffer_0/AsymFifoCore/fifo/scfifo_component/data
+add wave -noupdate /TensorCoreWrapperTb/dut/softClrnArea_tcArray/outBuffer_0/AsymFifoCore/fifo/scfifo_component/sclr
+add wave -noupdate /TensorCoreWrapperTb/dut/softClrnArea_tcArray/outBuffer_0/AsymFifoCore/fifo/scfifo_component/q
+add wave -noupdate /TensorCoreWrapperTb/dut/softClrnArea_tcArray/outBuffer_0/AsymFifoCore/fifo/scfifo_component/almost_full
+add wave -noupdate /TensorCoreWrapperTb/dut/softClrnArea_tcArray/outBuffer_0/AsymFifoCore/fifo/scfifo_component/almost_empty
 TreeUpdate [SetDefaultTree]
-WaveRestoreCursors {{Cursor 1} {42742947 ps} 0} {{Cursor 2} {49886914 ps} 0}
+WaveRestoreCursors {{Cursor 1} {42742947 ps} 0} {{Cursor 2} {52300522 ps} 0}
 quietly wave cursor active 2
 configure wave -namecolwidth 471
 configure wave -valuecolwidth 100
@@ -234,4 +240,4 @@ configure wave -griddelta 40
 configure wave -timeline 0
 configure wave -timelineunits ns
 update
-WaveRestoreZoom {49665989 ps} {49938717 ps}
+WaveRestoreZoom {51473715 ps} {52497750 ps}
