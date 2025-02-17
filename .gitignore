@@ -51,6 +51,7 @@ work
 wlf*
 *.ini
 sim/libraries/
+sim/sim_build/
 *.bin
 *.hex
 *.mem

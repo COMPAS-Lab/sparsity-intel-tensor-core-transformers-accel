@@ -66,6 +66,8 @@ class tensor_core_array_wrapper(array_col: Int, array_row: Int, chain_len: Int,
   // io.tc_ctrl(0): start load
   // io.tc_ctrl(1): soft reset
   // io.tc_ctrl(2): cal en start
+  // io.tc_ctrl(3): boundries push signal
+  // io.tc_ctrl(4): perf counters rd select
 
   //mbidx_rd_bound: stop ptr for idx and row
   //ma_rd_bound: stop ptr for col
@@ -106,11 +108,38 @@ class tensor_core_array_wrapper(array_col: Int, array_row: Int, chain_len: Int,
   val loadStart = Delay(io.tc_ctrl(0), CTRL_REG_DELAY)
   val softClrn = Delay(io.tc_ctrl(1), CTRL_REG_DELAY)
   val calStart = Delay(io.tc_ctrl(2), CTRL_REG_DELAY)
+  val loadRdBounds = Delay(io.tc_ctrl(3), CTRL_REG_DELAY)
+  val perfCounterSel = Delay(io.tc_ctrl(4), CTRL_REG_DELAY)
 
-  val softClrnArea = new ResetArea(softClrn, false) {
+  val softClrnArea = new ResetArea(softClrn, true) {
+    // ctrl registers
     val bufferSelCC = Delay(io.buf_ld_sel, CTRL_REG_DELAY)
-    val mbidxRdBoundCC = Delay(io.mbidx_rd_bound, CTRL_REG_DELAY)
-    val maRdBoundCC = Delay(io.ma_rd_bound, CTRL_REG_DELAY)
+    val mbidxRdBoundQue = new StreamFifoIp(UInt(io.mbidx_rd_bound.getWidth bits), 32, "MLAB")
+    val maRdBoundQue = new StreamFifoIp(UInt(io.ma_rd_bound.getWidth bits), 32, "MLAB")
+    val mbidxRdBoundIoDelayed = Delay(io.mbidx_rd_bound, CTRL_REG_DELAY)
+    val maRdBoundIoDelayed = Delay(io.ma_rd_bound, CTRL_REG_DELAY)
+
+    val mbidxRdBoundCC = Mux(bufferSelCC(0), mbidxRdBoundIoDelayed, mbidxRdBoundQue.io.pop.payload)
+    val maRdBoundCC = maRdBoundQue.io.pop.payload
+    val calTileStart = Bool()
+
+    // simple rd bounds pushing logic
+    mbidxRdBoundQue.io.push.payload := mbidxRdBoundIoDelayed
+    maRdBoundQue.io.push.payload := maRdBoundIoDelayed
+    when(loadRdBounds.rise()) {
+      mbidxRdBoundQue.io.push.valid := True
+      maRdBoundQue.io.push.valid := True
+    } .otherwise {
+      mbidxRdBoundQue.io.push.valid := False
+      maRdBoundQue.io.push.valid := False
+    }
+
+    // double buffer flags
+    val dBuffLdPtr, dBuffComputePtr = Reg(Bool()) init False
+    val matADbuffRdy = Vec(Reg(Bool()), 2)
+    matADbuffRdy.foreach(_.init(False))
+    val currLdRdy = Mux(dBuffLdPtr, matADbuffRdy(1), matADbuffRdy(0))
+    val currCompRdy = Mux(dBuffComputePtr, matADbuffRdy(1), matADbuffRdy(0))
 
     val idxGenerator = new IndexGenerator(array_col, idx_width.c, BigInt("1" * idx_width.c, 2))
     val idxGenFifoFast, idxGenFifoSlow = new StreamFifoIp(IndexData(idx_width.c, array_col), 512, "M20K", 64)
@@ -211,15 +240,20 @@ class tensor_core_array_wrapper(array_col: Int, array_row: Int, chain_len: Int,
     tcArray.io.sortedColIdxSlow << idxGenFifoSlow.io.pop
     tcArray.io.sortedColIdxFast << idxGenFifoFast.io.pop
 //    tcArray.io.colIdxFifoNotEmpty := idxGenFifoSlow.io.occupancy > 32
-    tcArray.io.colIdxFifoNotEmpty := matAFullyLoaded
-    tcArray.io.calEn := Delay(calStart.rise(), CTRL_REG_DELAY)
+    tcArray.io.colIdxFifoNotEmpty := currCompRdy
+    tcArray.io.calEn := calTileStart
     tcArray.io.configRowBuffWrBound := Delay(io.mbvec_size, CTRL_REG_DELAY).resized
-    io.lat_counter := Delay(tcArray.io.latCounter, CTRL_REG_DELAY)
+    tcArray.io.matADbuffWrPtr := dBuffLdPtr
+    tcArray.io.matADbuffRdPtr := dBuffComputePtr
+    tcArray.io.clrCounters := calStart
 
+    // index gen and mat b load ctrl
     val idxGenRowSharedRdFsm = new StateMachine {
       val rdWordCounter = DynaCounter(32, mbidxRdBoundCC)
       // wait for multiport fifo depth / 8 + 16 cycles according to Gidel Doc
       val startAssertCounter = Counter(4)
+      val bdPopDlyCounter = Counter(CTRL_REG_DELAY + 2)
+      val isNextBdPoped = Reg(Bool(), init=False)
 
       val ports_err_reduce = io.tcarray_in(0).port_error
 
@@ -229,6 +263,7 @@ class tensor_core_array_wrapper(array_col: Int, array_row: Int, chain_len: Int,
 
       selStart := False
       selSelect := False
+      mbidxRdBoundQue.io.pop.ready := False
 
       val sIdle: State = new State with EntryPoint {
         whenIsActive {
@@ -258,19 +293,23 @@ class tensor_core_array_wrapper(array_col: Int, array_row: Int, chain_len: Int,
           when(bufferSelCC(0)) {
             data2TcarrayRowValid := True
             selSelect := tcArray.io.matBLoad.ready
+            when(rdWordCounter.willOverflow) {
+              goto(sIdle)
+            }
           }.otherwise{
             tcArrayIn4IdxGenValid := True
             selSelect := True
-            when(Vec(for (i <- tcArrayIn4IdxGen) yield i.msb).andR) {
-              goto(sPause)
+            when(rdWordCounter.willOverflow) {
+              goto(sWaitComp)
+            }.otherwise {
+              when(Vec(for (i <- tcArrayIn4IdxGen) yield i.msb).andR) {
+                goto(sPause)
+              }
             }
           }
 
           when(selSelect) {
             rdWordCounter.increment()
-          }
-          when(rdWordCounter.willOverflow) {
-            goto(sIdle)
           }
         }
       }
@@ -286,6 +325,31 @@ class tensor_core_array_wrapper(array_col: Int, array_row: Int, chain_len: Int,
               goto(sSend)
             }
           }
+        }
+      }
+
+      val sWaitComp: State = new State {
+        whenIsActive {
+          when(mbidxRdBoundQue.io.pop.valid) {
+            when(~isNextBdPoped) {
+              mbidxRdBoundQue.io.pop.ready := True
+              isNextBdPoped := True
+            }.otherwise {
+              when(bdPopDlyCounter.willOverflowIfInc) {
+                when(~currCompRdy) {
+                  goto(sSend)
+                }
+              }.otherwise {
+                bdPopDlyCounter.increment()
+              }
+            }
+          }.otherwise {
+            goto(sIdle)
+          }
+        }
+        onExit {
+          isNextBdPoped := False
+          bdPopDlyCounter.clear()
         }
       }
     }
@@ -307,18 +371,23 @@ class tensor_core_array_wrapper(array_col: Int, array_row: Int, chain_len: Int,
       val chanSel = Bool()
       val tcColSel = Reg(Bits(array_col/MATA_CHAN_PER_GRP bits),
         init=B(array_col/MATA_CHAN_PER_GRP bits, 0 -> true, default -> false))
+      val isNextBdPoped = Reg(Bool()) init False
+      val bdPopDlyCounter = Counter(CTRL_REG_DELAY + 2)
 
       chanStart := False
       chanSel := False
       data2TcarrayCol.foreach(_.valid := False)
       data2TcarrayCol.foreach(_.payload.setDefault())
+      maRdBoundQue.io.pop.ready := False
 
       val sIdle: State = new State with EntryPoint {
         whenIsActive {
           rdWordCounter.clear()
           startAssertCounter.clear()
-          when(calStart.rise() && Vec(io.hbm_ready.slice(1, io.tcarray_in.size)).andR) {
-            matAFullyLoaded := False
+          matAFullyLoaded := False
+          when(calStart.rise() &&
+            maRdBoundQue.io.pop.valid &&
+            Vec(io.hbm_ready.slice(1, io.tcarray_in.size)).andR) {
             goto(sWait)
           }
         }
@@ -368,8 +437,34 @@ class tensor_core_array_wrapper(array_col: Int, array_row: Int, chain_len: Int,
           }
           when(rdWordCounter.willOverflow) {
             matAFullyLoaded := True
+            goto(sPause)
+          }
+        }
+      }
+
+      val sPause: State = new State {
+        whenIsActive {
+          matAFullyLoaded := False
+          when(maRdBoundQue.io.pop.valid) {
+            when(~isNextBdPoped) {
+              maRdBoundQue.io.pop.ready := True
+              isNextBdPoped := True
+            }.otherwise {
+              when(bdPopDlyCounter.willOverflowIfInc) {
+                when(~currLdRdy) {
+                  goto(sSend)
+                }
+              }.otherwise {
+                bdPopDlyCounter.increment()
+              }
+            }
+          }.otherwise {
             goto(sIdle)
           }
+        }
+        onExit {
+          isNextBdPoped := False
+          bdPopDlyCounter.clear()
         }
       }
     }
@@ -382,6 +477,66 @@ class tensor_core_array_wrapper(array_col: Int, array_row: Int, chain_len: Int,
       } else {
         io.tcarray_in(hbmChanId).disablePort()
       }
+    }
+
+    // start ctrl ctrl
+    //   when two ptrs meets either it's idle or one of
+    //   ld and comp finishes before the other, so only
+    //   one of them needs moving
+    when(dBuffLdPtr === dBuffComputePtr) {
+      // if ld not ready, wait for ld and move ld ptr
+      when(~currLdRdy) {
+        when(matAFullyLoaded) {
+          dBuffLdPtr := ~dBuffLdPtr
+          when(dBuffLdPtr) {
+            matADbuffRdy(1) := True
+          }.otherwise {
+            matADbuffRdy(0) := True
+          }
+        } // if ld ready, wait for comp and move comp ptr
+      }.otherwise {
+        when(tcArray.io.calFin) {
+          dBuffComputePtr := ~dBuffComputePtr
+          when(dBuffComputePtr) {
+            matADbuffRdy(1) := False
+          }.otherwise {
+            matADbuffRdy(0) := False
+          }
+        }
+      }
+    }.otherwise {
+      // when two ptrs are different, either of them
+      // need to move, or both
+      when(tcArray.io.calFin) {
+        dBuffComputePtr := ~dBuffComputePtr
+      }
+      when(matAFullyLoaded) {
+        dBuffLdPtr := ~dBuffLdPtr
+      }
+
+      when(dBuffLdPtr) {
+        when(matAFullyLoaded) {
+          matADbuffRdy(1) := True
+        }
+        when(tcArray.io.calFin) {
+          matADbuffRdy(0) := False
+        }
+      }.otherwise {
+        when(matAFullyLoaded) {
+          matADbuffRdy(0) := True
+        }
+        when(tcArray.io.calFin) {
+          matADbuffRdy(1) := False
+        }
+      }
+    }
+
+    // issue cal en when dbuff compute ptr points to a change
+    calTileStart := False
+    when(dBuffComputePtr.edge()) {
+      when(currCompRdy) {calTileStart := True}
+    }.otherwise {
+      when(currCompRdy.rise()) {calTileStart := True}
     }
 
     //out logic
@@ -443,6 +598,18 @@ class tensor_core_array_wrapper(array_col: Int, array_row: Int, chain_len: Int,
       }
     }
 
+    //perf counter
+    val totalLatCounter = PerfCounter(
+      16,
+      calStart,
+      tcArray.io.calFin & ~mbidxRdBoundQue.io.pop.valid & ~maRdBoundQue.io.pop.valid,
+      calStart
+    )
+    io.lat_counter := Delay(
+      Mux(perfCounterSel, tcArray.io.computeLatCounter, totalLatCounter.value),
+      CTRL_REG_DELAY
+    )
+
     // TBD: error detection
     //  idxgenerator error
 //    val idxGenReadys = Vec(for (i <- idxGenerator.io.seqIn) yield i.ready)
@@ -451,8 +618,7 @@ class tensor_core_array_wrapper(array_col: Int, array_row: Int, chain_len: Int,
 //    idxGenFifoOverflowFlag := Mux(idxGenFifoOverflowFlag, True, idxGenFifoOverflow)
 //    // compute error
 //    val computeErrFlag = Reg(Bool(), False)
-//
-//
+
 //    io.errors(0) := Delay(computeErrFlag, CTRL_REG_DELAY)
 //    io.errors(1) := Delay(idxGenFifoOverflowFlag, CTRL_REG_DELAY)
   }

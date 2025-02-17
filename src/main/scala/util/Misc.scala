@@ -73,6 +73,29 @@ object DynaCounter {
   }.dynaCounter
 }
 
+object PerfCounter {
+  def apply(num_bits: Int, start_sig: Bool, end_sig: Bool, clr: Bool): Counter = {
+    val perfCounterCore = Counter(num_bits bits)
+    val perfCounterRun = Reg(Bool(), init=False)
+
+    when(perfCounterRun) {
+      when(~perfCounterCore.willOverflowIfInc) {
+        perfCounterCore.increment()
+      }
+      when(end_sig) {
+        perfCounterRun := False
+      }
+    }.otherwise {
+      perfCounterRun := start_sig
+      when(clr) {
+        perfCounterCore.clear()
+      }
+    }
+
+    perfCounterCore
+  }
+}
+
 class DelayTree(num_bit: Int, n_outputs: Int) extends Component {
   val io = new Bundle {
     val dataIn = in UInt(num_bit bits)

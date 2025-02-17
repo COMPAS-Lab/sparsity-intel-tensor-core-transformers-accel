@@ -777,7 +777,7 @@ def main(args: dict):
                     hidx_list=head_idx
                 )
 
-        # matB = mat_b_gen(args["data_path"], chain_len, BFP(BfpType.BFP_12), hw_row)
+        matB = mat_b_gen(args["data-path"], chain_len, BFP(BfpType.BFP_12), hw_row)
         # res = np.matmul(matA, matB)
         # print(f"mat a shape: {matA.shape}, mat b shape: {matB.shape}, res shape: {res.shape}")
         # np.save("sparse_matmul_data/mult_a_b_fp32_mata.npy", matA)
@@ -795,7 +795,7 @@ def main(args: dict):
         print(res)
 
     if args['create-binary']:
-        path = str(args['create-binary'])
+        path = str(args['data-path'])
         head_list = []
         inst_list = [f.split(".")[0] \
                 for f in os.listdir(path) \
@@ -834,7 +834,7 @@ if __name__ == "__main__":
     arg_parser.add_argument("-cr", "--correct-res", help="path of the correct results", \
                                 action="store", dest="correct_res")
     arg_parser.add_argument("-cb", "--create-binary", help="create binary file for on-chip test", \
-                                action="store", dest="create-binary")
+                                action="store_true", dest="create-binary")
     arg_parser.add_argument("-tt", "--test", help="temp testing entry", \
                                 action="store_true", default=False)
     arg_parser.add_argument("-th", "--throughput", help="temp compute throughput", \

@@ -1,0 +1,35 @@
+# Makefile
+
+# defaults
+SIM ?= questa
+TOPLEVEL_LANG ?= verilog
+GUI = 1
+
+LIBRARIES = work work_lib altera_ver lpm_ver sgate_ver altera_mf_ver altera_lnsim_ver fourteennm_ver fourteennm_ct1_ver dsp_prime_10 tensor_core_accu tensor_core_entry_bf12 tensor_core_bf12 tensor_core_start_bf12
+SIM_ARGS += $(addprefix -L ,$(LIBRARIES))
+SCRIPT_FILE += $(PWD)/mentor/msim_setup.tcl
+
+ifeq ($(GUI),1)
+	PRE_CMD += $(PWD)/tensor_core_wrapper_tb_add_wave.do
+endif
+
+# use VHDL_SOURCES for VHDL files
+VERILOG_SOURCES += $(PWD)/tb/fourteennm_atoms.sv
+VERILOG_SOURCES += $(PWD)/../src/generated/*.v
+VERILOG_SOURCES += $(PWD)/../src/main/sverilog/blk_delay_core.sv
+VERILOG_SOURCES += $(PWD)/../src/main/sverilog/out_asym_fifo.sv
+
+
+# TOPLEVEL is the name of the toplevel module in your Verilog or VHDL file
+TOPLEVEL = tensor_core_array_wrapper
+
+# MODULE is the basename of the Python test file
+MODULE = tensor_core_wrapper_tb_coco
+
+# include cocotb's make rules to take care of the simulator setup
+include $(shell cocotb-config --makefiles)/Makefile.sim
+
+clean::
+	\rm -rf libraries
+	\rm -rf transcript
+	\rm -rf *.wlf

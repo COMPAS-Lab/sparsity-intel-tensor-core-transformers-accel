@@ -89,18 +89,14 @@
 
 # ----------------------------------------
 # Initialize variables
+set TOP_LEVEL_NAME "tensor_core_array_wrapper"
+set QSYS_SIMDIR "."
+set FORCE_MODELSIM_AE_SELECTION "true"
+
 if ![info exists SYSTEM_INSTANCE_NAME] { 
   set SYSTEM_INSTANCE_NAME ""
 } elseif { ![ string match "" $SYSTEM_INSTANCE_NAME ] } { 
   set SYSTEM_INSTANCE_NAME "/$SYSTEM_INSTANCE_NAME"
-}
-
-if ![info exists TOP_LEVEL_NAME] { 
-  set TOP_LEVEL_NAME "tensor_core.tensor_core"
-}
-
-if ![info exists QSYS_SIMDIR] { 
-  set QSYS_SIMDIR "./../"
 }
 
 if ![info exists SIMLIB_DIR] { 
@@ -364,4 +360,5 @@ alias h {
   echo "FORCE_MODELSIM_AE_SELECTION                       -- Set to true to force to select Modelsim AE always."
 }
 file_copy
-h
+
+com
