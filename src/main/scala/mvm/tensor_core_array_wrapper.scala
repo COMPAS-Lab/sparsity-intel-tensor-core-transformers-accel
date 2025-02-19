@@ -239,8 +239,8 @@ class tensor_core_array_wrapper(array_col: Int, array_row: Int, chain_len: Int,
     tcArray.io.matBLoad <> data2TcarrayRow
     tcArray.io.sortedColIdxSlow << idxGenFifoSlow.io.pop
     tcArray.io.sortedColIdxFast << idxGenFifoFast.io.pop
-//    tcArray.io.colIdxFifoNotEmpty := idxGenFifoSlow.io.occupancy > 32
-    tcArray.io.colIdxFifoNotEmpty := currCompRdy
+    tcArray.io.colIdxFifoNotEmpty :=
+      currCompRdy & idxGenFifoFast.io.almostFull & idxGenFifoFast.io.almostFull
     tcArray.io.calEn := calTileStart
     tcArray.io.configRowBuffWrBound := Delay(io.mbvec_size, CTRL_REG_DELAY).resized
     tcArray.io.matADbuffWrPtr := dBuffLdPtr
@@ -253,7 +253,7 @@ class tensor_core_array_wrapper(array_col: Int, array_row: Int, chain_len: Int,
       // wait for multiport fifo depth / 8 + 16 cycles according to Gidel Doc
       val startAssertCounter = Counter(4)
       val bdPopDlyCounter = Counter(CTRL_REG_DELAY + 2)
-      val isNextBdPoped = Reg(Bool(), init=False)
+      val isNextBdPoped, isCurrCompFinished = Reg(Bool(), init=False)
 
       val ports_err_reduce = io.tcarray_in(0).port_error
 
@@ -329,14 +329,17 @@ class tensor_core_array_wrapper(array_col: Int, array_row: Int, chain_len: Int,
       }
 
       val sWaitComp: State = new State {
+        // FIXME: bdPopDly should always be smaller than delay
+        // from tc_array_in_0 to tcarray
         whenIsActive {
+          isCurrCompFinished := Mux(isCurrCompFinished, True, dBuffComputePtr.edge())
           when(mbidxRdBoundQue.io.pop.valid) {
             when(~isNextBdPoped) {
               mbidxRdBoundQue.io.pop.ready := True
               isNextBdPoped := True
             }.otherwise {
               when(bdPopDlyCounter.willOverflowIfInc) {
-                when(~currCompRdy) {
+                when(isCurrCompFinished && currCompRdy) {
                   goto(sSend)
                 }
               }.otherwise {
@@ -349,6 +352,7 @@ class tensor_core_array_wrapper(array_col: Int, array_row: Int, chain_len: Int,
         }
         onExit {
           isNextBdPoped := False
+          isCurrCompFinished := False
           bdPopDlyCounter.clear()
         }
       }

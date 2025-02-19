@@ -256,8 +256,9 @@ class TensorCoreChainArray(array_col: Int, array_row: Int, chain_len: Int, idx_w
       // for cascade loading finished.
       // must make sure starting calc only when it receives all mat A
       // and the col buffer is large enough hold all mat A.
-      val currColRdCredit = Mux(io.matADbuffRdPtr, colBufferCredit(c)(1), colBufferCredit(c)(0))
-      isCurrCasBufLoaded(c) := preArowCasLoadCounter.willOverflow | (currColRdCredit === 0)
+      val currColRdCredit = io.matADbuffRdPtr ? colBufferCredit(c)(1) | colBufferCredit(c)(0)
+      //      isCurrCasBufLoaded(c) := preArowCasLoadCounter.willOverflow | (currColRdCredit === 0)
+      isCurrCasBufLoaded(c) := preArowCasLoadCounter.willOverflow
       isColBufferEmpty(c) := currColRdCredit === 0
 
       when(cascadeLoadEnLocal(c)) {
@@ -752,13 +753,13 @@ class TensorCoreChainArray(array_col: Int, array_row: Int, chain_len: Int, idx_w
 
     val sLoadAVec: State = new State {
       whenIsActive {
-        bufferArea.isCurrSubgrpALoaded := bufferArea.isCurrCasBufLoaded.andR
+        bufferArea.isCurrSubgrpALoaded := bufferArea.isCurrCasBufLoaded.orR
         // check if finishing one mat A subvector load
         when(bufferArea.isColBufferEmpty.andR) {
           isCalStartRecv := False
           goto(sIdle)
         }.otherwise {
-          when(bufferArea.isCurrCasBufLoaded.andR) {
+          when(bufferArea.isCurrCasBufLoaded.orR) {
             // check if need to wait computation
             when(delayedMatMulFin) {
               // check if need to send more mat a rows

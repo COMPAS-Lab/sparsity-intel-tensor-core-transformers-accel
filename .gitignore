@@ -57,6 +57,7 @@ sim/sim_build/
 *.mem
 *.mmr
 *.npy
+results.xml
 
 # python
 __pycache__/

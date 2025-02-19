@@ -213,8 +213,9 @@ class tensor_core_array_wrapper_dut:
 async def tensor_core_array_wrapper_test(dut):
     """Try accessing the design."""
 
-    base_path = "/compas-old/projects/sparse-attention/onchip/chatglm2-6b-32k-attn-bfp20-lcc/i5hWEFEnp"
-    hidx = 828
+    base_path = "/compas-old/projects/sparse-attention/onchip/mixtral-8x7b-attn-bfp20-multifieldqa_en/iC3VtSnSP"
+    
+    hidx = 381
     
     main_clk_period = 10
     main_clk = Clock(dut.clk, main_clk_period, units="ns")
@@ -246,6 +247,7 @@ async def tensor_core_array_wrapper_test(dut):
     # start calculation
     cocotb.start_soon(dut_tester.start_cal())
     await dut_tester.wait_compute_finish()
+    await Timer(1, "us")
 
 
 # def tensor_core_array_wrapper_test_runner():
