@@ -42,6 +42,7 @@ temp*
 etch*
 
 # Simulation
+.vscode/*
 simWorkspace/
 tmp/
 null

@@ -50,11 +50,13 @@ class tensor_core_array_wrapper_dut:
             self, 
             dut: SimHandleBase, 
             n_hbm_in_chan: int, 
-            n_hbm_out_chan:int):
+            n_hbm_out_chan:int,
+            debug=False):
         
         self.dut = dut
         self.hbm_in_chans = [hbm_chan(dut, i, hbm_chan.direction.HBM_IN) for i in range(n_hbm_in_chan)]
         self.hbm_out_chans = [hbm_chan(dut, i, hbm_chan.direction.HBM_OUT) for i in range(n_hbm_out_chan)]
+        self.debug = debug
 
     def init_test_stimulus(self, base_path: str, hidx: int):
         
@@ -65,8 +67,11 @@ class tensor_core_array_wrapper_dut:
         self.mat_a_bounds = list(hw_config["mat a size"])
         self.idx_bounds = list(hw_config["idx_len"])
         self.lb_idx_list = list(range(len(hw_config["idx_len"])))
+        self.mat_b_bound = int(hw_config["mat b size"])
+        self.mat_b_vec_size = int(hw_config["mat b vec size"])
 
         mat_a_data_hbm_0, mat_a_data_hbm_1, idx_data_hbm = [], [], []
+        mat_b_data_hbm = []
         for lb in self.lb_idx_list:
             mat_a_0_fpath = base_path + f"/onchip_mat_a_hbm0_h{hidx}_lb{lb}.mem"
             with open(mat_a_0_fpath, "r") as fp:
@@ -80,9 +85,14 @@ class tensor_core_array_wrapper_dut:
             with open(idx_fpath, "r") as fp:
                 idx_data_hbm += [l.strip() for l in fp.readlines()]
 
+        mat_b_fpath = base_path + f"/onchip_mat_b_hbm.mem"
+        with open(mat_b_fpath, "r") as fp:
+            mat_b_data_hbm += [l.strip() for l in fp.readlines()]
+
         self.mat_a_data_hbm_0 = mat_a_data_hbm_0
         self.mat_a_data_hbm_1 = mat_a_data_hbm_1
         self.idx_data_hbm = idx_data_hbm
+        self.mat_b_data_hbm = mat_b_data_hbm
 
         self.dut._log.info(f"Loaded stimulus file for {hw_config_path}, {len(self.lb_idx_list)} large blocks in total")
 
@@ -180,6 +190,39 @@ class tensor_core_array_wrapper_dut:
             await Equal([self.dut.select_tcarray_in_1, self.dut.select_tcarray_in_2], [1, 1])
             await clkCycles(self.dut.clk, 1)
 
+    async def load_mat_b_process(self):
+        self.dut._log.info("load mat b process started")
+
+        self.dut.mbidx_rd_bound.value = self.mat_b_bound
+        self.dut.mbvec_size.value = self.mat_b_vec_size
+
+        # switch to load mat b mode
+        self.dut.buf_ld_sel.value = 1
+        await clkCycles(self.dut.clk, 10)
+
+        # start mat b loading
+        self.dut.tc_ctrl[0].value = 1
+        await clkCycles(self.dut.clk, 1)
+        self.dut.tc_ctrl[0].value = 0
+
+        await RisingEdge(self.dut.start_tcarray_in_0)
+        await FallingEdge(self.dut.start_tcarray_in_0)
+        await Timer(1, "ns")
+        self.dut.almost_empty_tcarray_in_0.value = 1
+        await clkCycles(self.dut.clk, 150)
+        self.dut.almost_empty_tcarray_in_0.value = 0
+        await clkCycles(self.dut.clk, 1)
+
+        for rd_ptr in range(self.mat_b_bound):
+            await Timer(1, "ns")
+            self.dut.data_tcarray_in_0.value = \
+                BinaryValue(hex_to_bin(self.mat_b_data_hbm[rd_ptr], 256), n_bits=256)
+            await Equal([self.dut.select_tcarray_in_0], [1])
+            await clkCycles(self.dut.clk, 1)
+
+        await clkCycles(self.dut.clk, 20)
+        self.dut.buf_ld_sel.value = 0
+
     async def start_cal(self):
         self.dut._log.info("calc started")
         await Equal([self.dut.buf_ld_sel, self.dut.tc_ctrl[0]], [0, 1])
@@ -208,6 +251,33 @@ class tensor_core_array_wrapper_dut:
         self.dut._log.info(
             f"compute lat counter: {self.dut.softClrnArea_tcArray_io_computeLatCounter.value.integer}")
         
+    def calc_bdwidth(self, n_hw_cols: int):
+
+        def cycles_to_bd(n_cycles, data_transfer):
+            FREQ = 300.0
+
+            time_period = 1. / (FREQ * 1e6)
+            total_time = n_cycles * time_period
+            bandwidth = (data_transfer / total_time) / 1e9
+            return bandwidth
+        
+        if self.debug:
+            mata_in_sum = 0
+            for c in range(n_hw_cols):
+                exec(f"mata_in_sum += self.dut.softClrnArea_tcArray.debug_sp_incounter_c{c}_value.value.integer")
+            
+            # 88 is the output width and 12 is the ridx width
+            mata_in_sum *= (88 + 12) / 8
+            running_lat = self.dut.softClrnArea_tcArray_io_computeLatCounter.value.integer
+            mata_in_req_bd = cycles_to_bd(running_lat, mata_in_sum)
+
+            matb_out_sum = self.dut.softClrnArea_tcArray.debug_out_counter_value.value.integer
+            matb_out_req_bd = cycles_to_bd(running_lat, matb_out_sum)
+
+            self.dut._log(f"Mat A input bandwidth: {mata_in_req_bd:.2f} GB/s")
+            self.dut._log(f"Output bandwidth: {matb_out_req_bd:.2f} GB/s")
+
+        return
 
 @cocotb.test()
 async def tensor_core_array_wrapper_test(dut):
@@ -235,7 +305,7 @@ async def tensor_core_array_wrapper_test(dut):
     
     await clkCycles(dut.clk, 10)
     # start loading mat b
-    # TBD
+    await dut_tester.load_mat_b_process()
 
     # start issuing jobs
     await dut_tester.submit_jobs()
@@ -248,6 +318,8 @@ async def tensor_core_array_wrapper_test(dut):
     cocotb.start_soon(dut_tester.start_cal())
     await dut_tester.wait_compute_finish()
     await Timer(1, "us")
+
+    dut_tester.calc_bdwidth(12)
 
 
 # def tensor_core_array_wrapper_test_runner():
