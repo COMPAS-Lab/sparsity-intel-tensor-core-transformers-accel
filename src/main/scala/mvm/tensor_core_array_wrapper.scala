@@ -44,8 +44,8 @@ class tensor_core_array_wrapper(array_col: Int, array_row: Int, chain_len: Int,
   val io = new Bundle {
     val tc_ctrl = in UInt (8 bits)
     val mbvec_size = in UInt (16 bits)
-    val lat_counter = out UInt (16 bits)
-//    val errors = out UInt(8 bits)
+    val lat_counter = out UInt (32 bits)
+    val err_info = out UInt(32 bits)
     val mbidx_rd_bound, ma_rd_bound = in UInt (32 bits)
     val buf_ld_sel = in UInt (32 bits)
     val hbm_ready = Array.fill(num_hbms)(in Bool())
@@ -77,6 +77,7 @@ class tensor_core_array_wrapper(array_col: Int, array_row: Int, chain_len: Int,
   // errors(1): idx gen error
 
   val CTRL_REG_DELAY = 5
+  io.err_info.clearAll()
 
   noIoPrefix()
   val clrn = ClockDomain.current.readResetWire
@@ -111,11 +112,11 @@ class tensor_core_array_wrapper(array_col: Int, array_row: Int, chain_len: Int,
   val loadRdBounds = Delay(io.tc_ctrl(3), CTRL_REG_DELAY)
   val perfCounterSel = Delay(io.tc_ctrl(4), CTRL_REG_DELAY)
 
-  val softClrnArea = new ResetArea(softClrn, true) {
+  val softClrnArea = new ResetArea(softClrn, cumulative=false) {
     // ctrl registers
     val bufferSelCC = Delay(io.buf_ld_sel, CTRL_REG_DELAY)
-    val mbidxRdBoundQue = new StreamFifoIp(UInt(io.mbidx_rd_bound.getWidth bits), 32, "MLAB")
-    val maRdBoundQue = new StreamFifoIp(UInt(io.ma_rd_bound.getWidth bits), 32, "MLAB")
+    val mbidxRdBoundQue = new StreamFifoIp(UInt(io.mbidx_rd_bound.getWidth bits), 64, "MLAB")
+    val maRdBoundQue = new StreamFifoIp(UInt(io.ma_rd_bound.getWidth bits), 64, "MLAB")
     val mbidxRdBoundIoDelayed = Delay(io.mbidx_rd_bound, CTRL_REG_DELAY)
     val maRdBoundIoDelayed = Delay(io.ma_rd_bound, CTRL_REG_DELAY)
 
@@ -142,7 +143,7 @@ class tensor_core_array_wrapper(array_col: Int, array_row: Int, chain_len: Int,
     val currCompRdy = Mux(dBuffComputePtr, matADbuffRdy(1), matADbuffRdy(0))
 
     val idxGenerator = new IndexGenerator(array_col, idx_width.c, BigInt("1" * idx_width.c, 2))
-    val idxGenFifoFast, idxGenFifoSlow = new StreamFifoIp(IndexData(idx_width.c, array_col), 512, "M20K", 64)
+    val idxGenFifoFast, idxGenFifoSlow = new StreamFifoIp(IndexData(idx_width.c, array_col), 512, "M20K", 128)
     // index generator connection
     val isIdxGenWaitingOuts = Reg(Bits(array_col bits), init=B(0))
     val isLastPlaceholderRecved = Reg(Bits(3 bits), init=B(0))
@@ -219,6 +220,7 @@ class tensor_core_array_wrapper(array_col: Int, array_row: Int, chain_len: Int,
     // to walk around shared mat a input problem.
     // must make sure the col buffer is large enough to use this.
     val matAFullyLoaded = Reg(Bool(), init=False)
+    val idxFifoLoaded = Bool()
     val tcArray = new TensorCoreChainArray(
       array_col = array_col,
       array_row = array_row,
@@ -240,7 +242,7 @@ class tensor_core_array_wrapper(array_col: Int, array_row: Int, chain_len: Int,
     tcArray.io.sortedColIdxSlow << idxGenFifoSlow.io.pop
     tcArray.io.sortedColIdxFast << idxGenFifoFast.io.pop
     tcArray.io.colIdxFifoNotEmpty :=
-      currCompRdy & idxGenFifoFast.io.almostFull & idxGenFifoFast.io.almostFull
+      currCompRdy & ((idxGenFifoFast.io.almostFull & idxGenFifoFast.io.almostFull) | idxFifoLoaded)
     tcArray.io.calEn := calTileStart
     tcArray.io.configRowBuffWrBound := Delay(io.mbvec_size, CTRL_REG_DELAY).resized
     tcArray.io.matADbuffWrPtr := dBuffLdPtr
@@ -264,6 +266,7 @@ class tensor_core_array_wrapper(array_col: Int, array_row: Int, chain_len: Int,
       selStart := False
       selSelect := False
       mbidxRdBoundQue.io.pop.ready := False
+      idxFifoLoaded := False
 
       val sIdle: State = new State with EntryPoint {
         whenIsActive {
@@ -300,6 +303,7 @@ class tensor_core_array_wrapper(array_col: Int, array_row: Int, chain_len: Int,
             tcArrayIn4IdxGenValid := True
             selSelect := True
             when(rdWordCounter.willOverflow) {
+              idxFifoLoaded := True
               goto(sWaitComp)
             }.otherwise {
               when(Vec(for (i <- tcArrayIn4IdxGen) yield i.msb).andR) {
@@ -604,7 +608,7 @@ class tensor_core_array_wrapper(array_col: Int, array_row: Int, chain_len: Int,
 
     //perf counter
     val totalLatCounter = PerfCounter(
-      16,
+      32,
       calStart,
       tcArray.io.calFin & ~mbidxRdBoundQue.io.pop.valid & ~maRdBoundQue.io.pop.valid,
       calStart

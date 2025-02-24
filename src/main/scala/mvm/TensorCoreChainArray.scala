@@ -147,7 +147,7 @@ class TensorCoreChainArray(array_col: Int, array_row: Int, chain_len: Int, idx_w
     val calFin = out Bool()
     // config port
     val configRowBuffWrBound = in UInt(log2Up(row_buffer_depth) bits)
-    val computeLatCounter = out UInt(16 bits)
+    val computeLatCounter = out UInt(32 bits)
     val clrCounters = in Bool()
   }
   //parameters
@@ -841,7 +841,7 @@ class TensorCoreChainArray(array_col: Int, array_row: Int, chain_len: Int, idx_w
   }
 
   // perf and debug counters
-  val computeLatCounter = PerfCounter(16, colCtrlFsm.isActive(colCtrlFsm.sWaitIdx), io.calFin, io.clrCounters)
+  val computeLatCounter = PerfCounter(32, colCtrlFsm.isActive(colCtrlFsm.sWaitIdx), io.calFin, io.clrCounters)
   io.computeLatCounter := computeLatCounter.value
 
   //temp perf counter for all col mem

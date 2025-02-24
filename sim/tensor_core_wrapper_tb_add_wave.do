@@ -4,6 +4,8 @@ log /tensor_core_array_wrapper/softClrnArea_tcArray/u_tc_core_r_0_c_0/*
 log /tensor_core_array_wrapper/softClrnArea_tcArray/bufferArea_casLoadBubbleInsert_0/*
 log /tensor_core_array_wrapper/softClrnArea_tcArray/bufferArea_casLoadBubbleInsert_1/*
 log /tensor_core_array_wrapper/softClrnArea_tcArray/bufferArea_casLoadBubbleInsert_2/*
+log /tensor_core_array_wrapper/softClrnArea_tcArray/bufferArea_casLoadBubbleInsert_10/*
+log /tensor_core_array_wrapper/softClrnArea_tcArray/bufferArea_casLoadBubbleInsert_11/*
 log /tensor_core_array_wrapper/softClrnArea_tcArray/outBuffer_0/*
 log /tensor_core_array_wrapper/softClrnArea_tcArray/outBuffer_1/*
 
@@ -35,7 +37,6 @@ add wave -noupdate -radix unsigned /tensor_core_array_wrapper/softClrnArea_idxGe
 add wave -noupdate /tensor_core_array_wrapper/softClrnArea_colRdFsm_stateReg
 add wave -noupdate -radix unsigned /tensor_core_array_wrapper/colRdFsm_0_rdCounter_value
 add wave -noupdate /tensor_core_array_wrapper/softClrnArea_calTileStart
-
 add wave -noupdate -divider compute
 add wave -noupdate /tensor_core_array_wrapper/softClrnArea_tcArray/io_calFin
 add wave -noupdate /tensor_core_array_wrapper/data_tcarray_in_0
@@ -49,8 +50,6 @@ add wave -noupdate /tensor_core_array_wrapper/softClrnArea_tcArray/rowCtrlFsm_st
 add wave -noupdate /tensor_core_array_wrapper/softClrnArea_tcArray/colCtrlFsm_stateReg
 add wave -noupdate /tensor_core_array_wrapper/softClrnArea_tcArray/colCtrlFsm_isCalStartRecv
 add wave -noupdate /tensor_core_array_wrapper/softClrnArea_tcArray/io_colIdxFifoNotEmpty
-add wave -noupdate -radix binary /tensor_core_array_wrapper/softClrnArea_tcArray/bufferArea_isCurrCasBufLoaded
-add wave -noupdate /tensor_core_array_wrapper/softClrnArea_tcArray/bufferArea_isCurrSubgrpALoaded
 add wave -noupdate /tensor_core_array_wrapper/softClrnArea_tcArray/bufferArea_casLoadBubbleInsert_0/io_casLoadEn
 add wave -noupdate /tensor_core_array_wrapper/softClrnArea_tcArray/bufferArea_casLoadBubbleInsert_0/io_colSel
 add wave -noupdate /tensor_core_array_wrapper/softClrnArea_tcArray/bufferArea_colBuffer_0_io_pop_valid
@@ -67,7 +66,19 @@ add wave -noupdate /tensor_core_array_wrapper/softClrnArea_tcArray/bufferArea_co
 add wave -noupdate /tensor_core_array_wrapper/softClrnArea_tcArray/bufferArea_colBuffer_11_io_pop_valid
 add wave -noupdate /tensor_core_array_wrapper/start_tcarray_in_0
 add wave -noupdate -radix unsigned /tensor_core_array_wrapper/softClrnArea_tcArray/bufferArea_colBufferCredit_0_0
+add wave -noupdate -radix unsigned /tensor_core_array_wrapper/softClrnArea_tcArray/bufferArea_colBufferCredit_1_0
+add wave -noupdate -radix unsigned /tensor_core_array_wrapper/softClrnArea_tcArray/bufferArea_colBufferCredit_2_0
+add wave -noupdate -radix unsigned /tensor_core_array_wrapper/softClrnArea_tcArray/bufferArea_colBufferCredit_3_0
+add wave -noupdate -radix unsigned /tensor_core_array_wrapper/softClrnArea_tcArray/bufferArea_colBufferCredit_4_0
+add wave -noupdate -radix unsigned /tensor_core_array_wrapper/softClrnArea_tcArray/bufferArea_colBufferCredit_5_0
+add wave -noupdate -radix unsigned /tensor_core_array_wrapper/softClrnArea_tcArray/bufferArea_colBufferCredit_6_0
+add wave -noupdate -radix unsigned /tensor_core_array_wrapper/softClrnArea_tcArray/bufferArea_colBufferCredit_7_0
+add wave -noupdate -radix unsigned /tensor_core_array_wrapper/softClrnArea_tcArray/bufferArea_colBufferCredit_8_0
+add wave -noupdate -radix unsigned /tensor_core_array_wrapper/softClrnArea_tcArray/bufferArea_colBufferCredit_9_0
+add wave -noupdate -radix unsigned /tensor_core_array_wrapper/softClrnArea_tcArray/bufferArea_colBufferCredit_10_0
+add wave -noupdate -radix unsigned /tensor_core_array_wrapper/softClrnArea_tcArray/bufferArea_colBufferCredit_11_0
 add wave -noupdate -radix unsigned /tensor_core_array_wrapper/softClrnArea_tcArray/bufferArea_colBufferCredit_0_1
+add wave -noupdate -radix binary /tensor_core_array_wrapper/softClrnArea_tcArray/bufferArea_isCurrCasBufLoaded
 add wave -noupdate /tensor_core_array_wrapper/softClrnArea_tcArray/bufferArea_casLoadBubbleInsert_0_io_datWithBubble_valid
 add wave -noupdate /tensor_core_array_wrapper/softClrnArea_tcArray/bufferArea_casLoadBubbleInsert_0_io_datWithBubble_payload_blkData
 add wave -noupdate -radix unsigned /tensor_core_array_wrapper/softClrnArea_tcArray/bufferArea_casLoadBubbleInsert_0_io_datWithBubble_payload_rIdx
@@ -98,9 +109,16 @@ add wave -noupdate -radix unsigned /tensor_core_array_wrapper/softClrnArea_tcArr
 add wave -noupdate /tensor_core_array_wrapper/softClrnArea_tcArray/bufferArea_casLoadBubbleInsert_9_io_datWithBubble_valid
 add wave -noupdate /tensor_core_array_wrapper/softClrnArea_tcArray/bufferArea_casLoadBubbleInsert_9_io_datWithBubble_payload_blkData
 add wave -noupdate -radix unsigned /tensor_core_array_wrapper/softClrnArea_tcArray/bufferArea_casLoadBubbleInsert_9_io_datWithBubble_payload_rIdx
+add wave -noupdate /tensor_core_array_wrapper/softClrnArea_tcArray/bufferArea_casLoadBubbleInsert_10/io_casLoadEn
+add wave -noupdate /tensor_core_array_wrapper/softClrnArea_tcArray/bufferArea_casLoadBubbleInsert_10/io_colSel
 add wave -noupdate /tensor_core_array_wrapper/softClrnArea_tcArray/bufferArea_casLoadBubbleInsert_10_io_datWithBubble_valid
 add wave -noupdate /tensor_core_array_wrapper/softClrnArea_tcArray/bufferArea_casLoadBubbleInsert_10_io_datWithBubble_payload_blkData
 add wave -noupdate -radix unsigned /tensor_core_array_wrapper/softClrnArea_tcArray/bufferArea_casLoadBubbleInsert_10_io_datWithBubble_payload_rIdx
+add wave -noupdate /tensor_core_array_wrapper/softClrnArea_tcArray/bufferArea_isCurrSubgrpALoaded
+add wave -noupdate /tensor_core_array_wrapper/softClrnArea_tcArray/bufferArea_isCurrCasBufLoaded
+add wave -noupdate /tensor_core_array_wrapper/softClrnArea_tcArray/cascadeLoadEnLocal
+add wave -noupdate /tensor_core_array_wrapper/softClrnArea_tcArray/bufferArea_casLoadBubbleInsert_11/io_casLoadEn
+add wave -noupdate /tensor_core_array_wrapper/softClrnArea_tcArray/bufferArea_casLoadBubbleInsert_11/io_colSel
 add wave -noupdate /tensor_core_array_wrapper/softClrnArea_tcArray/bufferArea_casLoadBubbleInsert_11_io_datWithBubble_valid
 add wave -noupdate /tensor_core_array_wrapper/softClrnArea_tcArray/bufferArea_casLoadBubbleInsert_11_io_datWithBubble_payload_blkData
 add wave -noupdate -radix unsigned /tensor_core_array_wrapper/softClrnArea_tcArray/bufferArea_casLoadBubbleInsert_11_io_datWithBubble_payload_rIdx
@@ -174,16 +192,16 @@ add wave -noupdate /tensor_core_array_wrapper/port_error_tcarray_in_0
 add wave -noupdate /tensor_core_array_wrapper/softClrnArea_tcArray/softClrnArea_newReset
 add wave -noupdate /tensor_core_array_wrapper/softClrnArea_isIdxGenWaitingOuts
 add wave -noupdate /tensor_core_array_wrapper/softClrnArea_idxGenerator/io_seqIn_0_valid
-add wave -noupdate /tensor_core_array_wrapper/softClrnArea_idxGenerator/io_seqIn_0_payload_idxData
+add wave -noupdate -radix unsigned /tensor_core_array_wrapper/softClrnArea_idxGenerator/io_seqIn_0_payload_idxData
 add wave -noupdate /tensor_core_array_wrapper/softClrnArea_idxGenerator/io_seqIn_0_payload_destId
 add wave -noupdate /tensor_core_array_wrapper/softClrnArea_idxGenerator/io_seqIn_1_valid
-add wave -noupdate /tensor_core_array_wrapper/softClrnArea_idxGenerator/io_seqIn_1_payload_idxData
+add wave -noupdate -radix unsigned /tensor_core_array_wrapper/softClrnArea_idxGenerator/io_seqIn_1_payload_idxData
 add wave -noupdate /tensor_core_array_wrapper/softClrnArea_idxGenerator/io_seqIn_1_payload_destId
 add wave -noupdate /tensor_core_array_wrapper/softClrnArea_idxGenerator/io_seqIn_2_valid
-add wave -noupdate /tensor_core_array_wrapper/softClrnArea_idxGenerator/io_seqIn_2_payload_idxData
+add wave -noupdate -radix unsigned /tensor_core_array_wrapper/softClrnArea_idxGenerator/io_seqIn_2_payload_idxData
 add wave -noupdate /tensor_core_array_wrapper/softClrnArea_idxGenerator/io_seqIn_2_payload_destId
 add wave -noupdate /tensor_core_array_wrapper/softClrnArea_idxGenerator/io_seqIn_3_valid
-add wave -noupdate /tensor_core_array_wrapper/softClrnArea_idxGenerator/io_seqIn_3_payload_idxData
+add wave -noupdate -radix unsigned /tensor_core_array_wrapper/softClrnArea_idxGenerator/io_seqIn_3_payload_idxData
 add wave -noupdate /tensor_core_array_wrapper/softClrnArea_idxGenerator/io_seqIn_3_payload_destId
 add wave -noupdate /tensor_core_array_wrapper/softClrnArea_idxGenerator/io_seqIn_4_valid
 add wave -noupdate /tensor_core_array_wrapper/softClrnArea_idxGenerator/io_seqIn_4_payload_idxData
@@ -244,7 +262,7 @@ add wave -noupdate /tensor_core_array_wrapper/softClrnArea_tcArray/outBuffer_0/A
 add wave -noupdate /tensor_core_array_wrapper/softClrnArea_tcArray/outBuffer_0/AsymFifoCore/fifo/scfifo_component/almost_full
 add wave -noupdate /tensor_core_array_wrapper/softClrnArea_tcArray/outBuffer_0/AsymFifoCore/fifo/scfifo_component/almost_empty
 TreeUpdate [SetDefaultTree]
-WaveRestoreCursors {{Cursor 1} {4410881 ps} 0} {{Cursor 2} {23570000 ps} 0}
+WaveRestoreCursors {{Cursor 1} {36750000 ps} 0} {{Cursor 2} {36510000 ps} 0}
 quietly wave cursor active 2
 configure wave -namecolwidth 471
 configure wave -valuecolwidth 100
@@ -260,4 +278,4 @@ configure wave -griddelta 40
 configure wave -timeline 0
 configure wave -timelineunits ns
 update
-WaveRestoreZoom {7476761 ps} {55703599 ps}
+WaveRestoreZoom {35219530 ps} {37874450 ps}

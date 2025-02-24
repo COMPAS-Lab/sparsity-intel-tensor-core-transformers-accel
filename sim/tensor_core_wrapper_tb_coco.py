@@ -283,9 +283,9 @@ class tensor_core_array_wrapper_dut:
 async def tensor_core_array_wrapper_test(dut):
     """Try accessing the design."""
 
-    base_path = "/compas-old/projects/sparse-attention/onchip/mixtral-8x7b-attn-bfp20-multifieldqa_en/iC3VtSnSP"
+    base_path = "/compas-old/projects/sparse-attention/onchip/mixtral-8x7b-attn-bfp20-multifieldqa_en/i9uyWYAzL"
     
-    hidx = 381
+    hidx = 660
     
     main_clk_period = 10
     main_clk = Clock(dut.clk, main_clk_period, units="ns")
@@ -305,7 +305,7 @@ async def tensor_core_array_wrapper_test(dut):
     
     await clkCycles(dut.clk, 10)
     # start loading mat b
-    await dut_tester.load_mat_b_process()
+    # await dut_tester.load_mat_b_process()
 
     # start issuing jobs
     await dut_tester.submit_jobs()
