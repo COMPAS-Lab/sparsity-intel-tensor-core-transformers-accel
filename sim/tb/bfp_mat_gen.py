@@ -332,7 +332,7 @@ class BFP():
         return res
 
 IN_DAT_PATH = "/compas-old/projects/sparse-attention"
-OUT_DAT_PATH = "/compas-old/projects/sparse-attention/onchip"
+OUT_DAT_PATH = "/compas-old/projects/sparse-attention/onchip-maxhbm"
 
 def mat_a_gen(
         mat_src_name: str, 
@@ -625,6 +625,7 @@ def prepare_onchip_input_files(input_path: str, n_shared_chans: int, head_idx: i
         padded = "1" + "0" * (len(mat_data[0][0]) - 1)
         lens = [len(m) for m in mat_data]
         print(f"all lens: {lens}")
+        # align the data length of all shared channels
         total_len = max(lens)
         for midx in range(n_shared_chans):
             if lens[midx] < total_len:
@@ -634,28 +635,33 @@ def prepare_onchip_input_files(input_path: str, n_shared_chans: int, head_idx: i
 
         # split into upper and lower mem files
         n_chans_in_hbm_grp = 4 
-        n_hbms = 2
+        n_chans_in_hbm_grp_per_iter = 4
+        n_load_iters = n_chans_in_hbm_grp // n_chans_in_hbm_grp_per_iter
+        n_hbms_per_grp = 2
+        n_hbm_grps = n_shared_chans // n_chans_in_hbm_grp
         n_hbm_bwidth = 256
 
-        hbm_dat = []
-        for rid in range(total_len):
-            for cid in range(n_shared_chans // n_chans_in_hbm_grp):
-                partial_dat = ""
-                for hid in range(n_chans_in_hbm_grp):
-                    mapped_cid = cid * n_chans_in_hbm_grp + hid
-                    partial_dat = pad_str_dat_to_len(
-                        mat_data[mapped_cid][rid], 
-                        n_hbm_bwidth * n_hbms//n_chans_in_hbm_grp) + partial_dat
+        for i_g_hbm in range(n_hbm_grps):
+            hbm_dat = []
+            mat_data_hbm_grp = mat_data[n_chans_in_hbm_grp * i_g_hbm : n_chans_in_hbm_grp * (i_g_hbm + 1)]
+            for rid in range(total_len):
+                for i_iter in range(n_load_iters):
+                    partial_dat = ""
+                    # for each iter's group pad it to n_hbms_per_grp
+                    for cid in range(n_chans_in_hbm_grp_per_iter):
+                        partial_dat = pad_str_dat_to_len(
+                            mat_data_hbm_grp[cid + i_iter * n_chans_in_hbm_grp_per_iter][rid], 
+                            n_hbm_bwidth * n_hbms_per_grp) + partial_dat
 
-                hbm_dat.append(bin_to_hex(partial_dat, n_hbms * n_hbm_bwidth))
+                    hbm_dat.append(bin_to_hex(partial_dat, n_hbms_per_grp * n_hbm_bwidth))
 
-        print(f"total len: {total_len}")
-        hbm_a_len_list.append(len(hbm_dat))
+            print(f"total len: {total_len}")
+            hbm_a_len_list.append(len(hbm_dat))
 
-        for i_hbm in range(n_hbms):
-            with open(input_path + f"onchip_mat_a_hbm{n_hbms-1-i_hbm}_h{head_idx}_lb{lb_idx}.mem", "w", encoding="utf-8") as f:
-                for l in hbm_dat:
-                    f.write(l[i_hbm * (n_hbm_bwidth//4) : (i_hbm+1) * (n_hbm_bwidth//4)] + "\n")
+            for i_hbm in range(n_hbms_per_grp):
+                with open(input_path + f"onchip_mat_a_hbm{i_g_hbm * n_hbms_per_grp + i_hbm}_h{head_idx}_lb{lb_idx}.mem", "w", encoding="utf-8") as f:
+                    for l in hbm_dat:
+                        f.write(l[i_hbm * (n_hbm_bwidth//4) : (i_hbm+1) * (n_hbm_bwidth//4)] + "\n")
 
     update_or_create_json(input_path + f"hwconfig_h{head_idx}.json", {"mat a size": hbm_a_len_list})
     
