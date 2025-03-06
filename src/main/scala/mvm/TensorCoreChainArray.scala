@@ -149,6 +149,8 @@ class TensorCoreChainArray(array_col: Int, array_row: Int, chain_len: Int, idx_w
     val configRowBuffWrBound = in UInt(log2Up(row_buffer_depth) bits)
     val computeLatCounter = out UInt(32 bits)
     val clrCounters = in Bool()
+    // err info ports
+    val err_info = out Bits(2 bits)
   }
   //parameters
   val NUM_MATB_VEC_PER_ROW: Int = ceil(num_matb_cols.toFloat / array_row.toFloat).toInt
@@ -857,6 +859,10 @@ class TensorCoreChainArray(array_col: Int, array_row: Int, chain_len: Int, idx_w
 //      }
 //    }
 //  }
+
+  //err detection
+  io.err_info(0) := ~rowCtrlFsm.isActive(rowCtrlFsm.sIdle)
+  io.err_info(1) := ~colCtrlFsm.isActive(colCtrlFsm.sIdle)
 
   if(debug_en) {
     val loadCounter = Counter(3 * chain_len, inc = tensorArray(0)(0).io.loadCascadeIn.valid)

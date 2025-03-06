@@ -33,8 +33,8 @@ class hbm_chan:
         self.hbm_id = hbm_id
         self.hbm_dir = hbm_dir
     
-    async def init_hbm_chan(self):
-        exec(f"self.dut.hbm_{self.hbm_id}_ready.value = 1")
+    async def init_hbm_chan(self, hbm_id_offset):
+        exec(f"self.dut.hbm_{self.hbm_id + hbm_id_offset}_ready.value = 1")
 
         if self.hbm_dir == self.direction.HBM_IN:
             exec(f"self.dut.port_error_tcarray_in_{self.hbm_id}.value = 0")
@@ -70,7 +70,8 @@ class tensor_core_array_wrapper_dut:
         self.mat_b_bound = int(hw_config["mat b size"])
         self.mat_b_vec_size = int(hw_config["mat b vec size"])
 
-        mat_a_data_hbm_0, mat_a_data_hbm_1, idx_data_hbm = [], [], []
+        mat_a_data_hbm_0, mat_a_data_hbm_1, mat_a_data_hbm_2, mat_a_data_hbm_3, mat_a_data_hbm_4 = [], [], [], [], []
+        idx_data_hbm = []
         mat_b_data_hbm = []
         for lb in self.lb_idx_list:
             mat_a_0_fpath = base_path + f"/onchip_mat_a_hbm0_h{hidx}_lb{lb}.mem"
@@ -80,6 +81,18 @@ class tensor_core_array_wrapper_dut:
             mat_a_1_fpath = base_path + f"/onchip_mat_a_hbm1_h{hidx}_lb{lb}.mem"
             with open(mat_a_1_fpath, "r") as fp:
                 mat_a_data_hbm_1 += [l.strip() for l in fp.readlines()]
+
+            mat_a_2_fpath = base_path + f"/onchip_mat_a_hbm2_h{hidx}_lb{lb}.mem"
+            with open(mat_a_2_fpath, "r") as fp:
+                mat_a_data_hbm_2 += [l.strip() for l in fp.readlines()]
+
+            mat_a_3_fpath = base_path + f"/onchip_mat_a_hbm3_h{hidx}_lb{lb}.mem"
+            with open(mat_a_3_fpath, "r") as fp:
+                mat_a_data_hbm_3 += [l.strip() for l in fp.readlines()]
+
+            mat_a_4_fpath = base_path + f"/onchip_mat_a_hbm4_h{hidx}_lb{lb}.mem"
+            with open(mat_a_4_fpath, "r") as fp:
+                mat_a_data_hbm_4 += [l.strip() for l in fp.readlines()]
 
             idx_fpath = base_path + f"/onchip_idx_hbm_h{hidx}_lb{lb}.mem"
             with open(idx_fpath, "r") as fp:
@@ -91,6 +104,9 @@ class tensor_core_array_wrapper_dut:
 
         self.mat_a_data_hbm_0 = mat_a_data_hbm_0
         self.mat_a_data_hbm_1 = mat_a_data_hbm_1
+        self.mat_a_data_hbm_2 = mat_a_data_hbm_2
+        self.mat_a_data_hbm_3 = mat_a_data_hbm_3
+        self.mat_a_data_hbm_4 = mat_a_data_hbm_4
         self.idx_data_hbm = idx_data_hbm
         self.mat_b_data_hbm = mat_b_data_hbm
 
@@ -107,10 +123,10 @@ class tensor_core_array_wrapper_dut:
         self.dut.buf_ld_sel.value = 0
 
         for hins in self.hbm_in_chans:
-            await hins.init_hbm_chan()
+            await hins.init_hbm_chan(0)
 
         for houts in self.hbm_out_chans:
-            await houts.init_hbm_chan()
+            await houts.init_hbm_chan(len(self.hbm_in_chans))
 
     async def issue_soft_rst(self, hold_time: int):
         # soft reset
@@ -166,19 +182,31 @@ class tensor_core_array_wrapper_dut:
         self.dut._log.info("load mat a process started")
         await Combine(
             RisingEdge(self.dut.start_tcarray_in_1),
-            RisingEdge(self.dut.start_tcarray_in_2)
+            RisingEdge(self.dut.start_tcarray_in_2),
+            RisingEdge(self.dut.start_tcarray_in_3),
+            RisingEdge(self.dut.start_tcarray_in_4),
+            RisingEdge(self.dut.start_tcarray_in_5)
         )
         await Combine(
             FallingEdge(self.dut.start_tcarray_in_1),
-            FallingEdge(self.dut.start_tcarray_in_2)
+            FallingEdge(self.dut.start_tcarray_in_2),
+            FallingEdge(self.dut.start_tcarray_in_3),
+            FallingEdge(self.dut.start_tcarray_in_4),
+            FallingEdge(self.dut.start_tcarray_in_5)
         )
 
         await Timer(1, "ns")
         self.dut.almost_empty_tcarray_in_1.value = 1
         self.dut.almost_empty_tcarray_in_2.value = 1
+        self.dut.almost_empty_tcarray_in_3.value = 1
+        self.dut.almost_empty_tcarray_in_4.value = 1
+        self.dut.almost_empty_tcarray_in_5.value = 1
         await clkCycles(self.dut.clk, 120)
         self.dut.almost_empty_tcarray_in_1.value = 0
         self.dut.almost_empty_tcarray_in_2.value = 0
+        self.dut.almost_empty_tcarray_in_3.value = 0
+        self.dut.almost_empty_tcarray_in_4.value = 0
+        self.dut.almost_empty_tcarray_in_5.value = 0
 
         for col_ptr in range(sum(self.mat_a_bounds)):
             await Timer(1, "ns")
@@ -186,8 +214,23 @@ class tensor_core_array_wrapper_dut:
                 BinaryValue(hex_to_bin(self.mat_a_data_hbm_0[col_ptr], 256), n_bits=256)
             self.dut.data_tcarray_in_2.value = \
                 BinaryValue(hex_to_bin(self.mat_a_data_hbm_1[col_ptr], 256), n_bits=256)
+            self.dut.data_tcarray_in_3.value = \
+                BinaryValue(hex_to_bin(self.mat_a_data_hbm_2[col_ptr], 256), n_bits=256)
+            self.dut.data_tcarray_in_4.value = \
+                BinaryValue(hex_to_bin(self.mat_a_data_hbm_3[col_ptr], 256), n_bits=256)
+            self.dut.data_tcarray_in_5.value = \
+                BinaryValue(hex_to_bin(self.mat_a_data_hbm_4[col_ptr], 256), n_bits=256)
             
-            await Equal([self.dut.select_tcarray_in_1, self.dut.select_tcarray_in_2], [1, 1])
+            await Equal(
+                [
+                    self.dut.select_tcarray_in_1, 
+                    self.dut.select_tcarray_in_2,
+                    self.dut.select_tcarray_in_3,
+                    self.dut.select_tcarray_in_4,
+                    self.dut.select_tcarray_in_5,
+                ], 
+                [1, 1, 1, 1, 1]
+            )
             await clkCycles(self.dut.clk, 1)
 
     async def load_mat_b_process(self):
@@ -281,15 +324,13 @@ class tensor_core_array_wrapper_dut:
 
 @cocotb.test()
 async def tensor_core_array_wrapper_test(dut):
-    """Try accessing the design."""
 
-    base_path = "/compas-old/projects/sparse-attention/onchip/mixtral-8x7b-attn-bfp20-multifieldqa_en/i9uyWYAzL"
-    
-    hidx = 660
+    base_path = "/compas-old/projects/sparse-attention/onchip-5hbm/mixtral-8x7b-attn-bfp20-qasper/iiSeqInst0179"
+    hidx = 113
     
     main_clk_period = 10
     main_clk = Clock(dut.clk, main_clk_period, units="ns")
-    dut_tester = tensor_core_array_wrapper_dut(dut, 3, 2)
+    dut_tester = tensor_core_array_wrapper_dut(dut, 6, 2)
     dut_tester.init_test_stimulus(base_path, hidx)
     cocotb.start_soon(main_clk.start(start_high=True))
     await dut_tester.init_inputs()

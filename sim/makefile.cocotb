@@ -3,7 +3,7 @@
 # defaults
 SIM ?= questa
 TOPLEVEL_LANG ?= verilog
-GUI = 0
+GUI ?= 1
 
 LIBRARIES = work altera_ver lpm_ver sgate_ver altera_mf_ver altera_lnsim_ver fourteennm_ver fourteennm_ct1_ver dsp_prime_10 tensor_core_accu tensor_core_entry_bf12 tensor_core_bf12 tensor_core_start_bf12
 SIM_ARGS += $(addprefix -L ,$(LIBRARIES))

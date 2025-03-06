@@ -332,7 +332,7 @@ class BFP():
         return res
 
 IN_DAT_PATH = "/compas-old/projects/sparse-attention"
-OUT_DAT_PATH = "/compas-old/projects/sparse-attention/onchip-maxhbm"
+OUT_DAT_PATH = "/compas-old/projects/sparse-attention/onchip-5hbm"
 
 def mat_a_gen(
         mat_src_name: str, 
@@ -633,33 +633,41 @@ def prepare_onchip_input_files(input_path: str, n_shared_chans: int, head_idx: i
 
         assert len(np.unique([len(m) for m in mat_data])) == 1, "mat a data not aligned"
 
-        # split into upper and lower mem files
-        n_chans_in_hbm_grp = 4 
-        n_chans_in_hbm_grp_per_iter = 4
-        n_load_iters = n_chans_in_hbm_grp // n_chans_in_hbm_grp_per_iter
-        n_hbms_per_grp = 2
-        n_hbm_grps = n_shared_chans // n_chans_in_hbm_grp
+        # split into upper and lower mem files, supporting unevenly grouped 
+        # col channels into different hbms
+        n_chans_in_hbm_grp = [7, 5] 
+        n_chans_in_hbm_grp_per_iter = [7, 5]
+        n_load_iters = [i//j for i, j in zip(n_chans_in_hbm_grp, n_chans_in_hbm_grp_per_iter)]
+        n_hbms_per_grp = [3, 2]
+        n_hbm_grps = len(n_chans_in_hbm_grp)
         n_hbm_bwidth = 256
 
         for i_g_hbm in range(n_hbm_grps):
             hbm_dat = []
-            mat_data_hbm_grp = mat_data[n_chans_in_hbm_grp * i_g_hbm : n_chans_in_hbm_grp * (i_g_hbm + 1)]
+            n_chans_in_hbm_grp_cleft = [0] + n_chans_in_hbm_grp
+            # select the necessary cols from mat_data for each hbm group
+            mat_data_hbm_grp = mat_data[ \
+                    n_chans_in_hbm_grp_cleft[i_g_hbm] : \
+                    n_chans_in_hbm_grp_cleft[i_g_hbm] + n_chans_in_hbm_grp_cleft[i_g_hbm+1]]
             for rid in range(total_len):
-                for i_iter in range(n_load_iters):
+                for i_iter in range(n_load_iters[i_g_hbm]):
                     partial_dat = ""
                     # for each iter's group pad it to n_hbms_per_grp
-                    for cid in range(n_chans_in_hbm_grp_per_iter):
-                        partial_dat = pad_str_dat_to_len(
-                            mat_data_hbm_grp[cid + i_iter * n_chans_in_hbm_grp_per_iter][rid], 
-                            n_hbm_bwidth * n_hbms_per_grp) + partial_dat
+                    for cid in range(n_chans_in_hbm_grp_per_iter[i_g_hbm]):
+                        partial_dat = \
+                            mat_data_hbm_grp[cid + i_iter * n_chans_in_hbm_grp_per_iter[i_g_hbm]][rid] + partial_dat
 
-                    hbm_dat.append(bin_to_hex(partial_dat, n_hbms_per_grp * n_hbm_bwidth))
+                    partial_dat = pad_str_dat_to_len(partial_dat, n_hbm_bwidth * n_hbms_per_grp[i_g_hbm])
+                    hbm_dat.append(bin_to_hex(partial_dat, n_hbms_per_grp[i_g_hbm] * n_hbm_bwidth))
 
-            print(f"total len: {total_len}")
-            hbm_a_len_list.append(len(hbm_dat))
+            if i_g_hbm == 0:
+                print(f"total len: {total_len}")
+                hbm_a_len_list.append(len(hbm_dat))
 
-            for i_hbm in range(n_hbms_per_grp):
-                with open(input_path + f"onchip_mat_a_hbm{i_g_hbm * n_hbms_per_grp + i_hbm}_h{head_idx}_lb{lb_idx}.mem", "w", encoding="utf-8") as f:
+            n_hbms_per_grp_cleft = [0] + n_hbms_per_grp
+            for i_hbm in range(n_hbms_per_grp[i_g_hbm]):
+                out_fname = f"onchip_mat_a_hbm{n_hbms_per_grp_cleft[i_g_hbm] + n_hbms_per_grp[i_g_hbm] - i_hbm -1}_h{head_idx}_lb{lb_idx}.mem"
+                with open(input_path + out_fname, "w", encoding="utf-8") as f:
                     for l in hbm_dat:
                         f.write(l[i_hbm * (n_hbm_bwidth//4) : (i_hbm+1) * (n_hbm_bwidth//4)] + "\n")
 

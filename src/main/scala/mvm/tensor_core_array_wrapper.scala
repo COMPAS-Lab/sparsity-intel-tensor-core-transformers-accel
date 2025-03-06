@@ -45,18 +45,18 @@ class tensor_core_array_wrapper(array_col: Int, array_row: Int, chain_len: Int,
     val tc_ctrl = in UInt (8 bits)
     val mbvec_size = in UInt (16 bits)
     val lat_counter = out UInt (32 bits)
-    val err_info = out UInt(32 bits)
+    val err_info = out Bits(32 bits)
     val mbidx_rd_bound, ma_rd_bound = in UInt (32 bits)
     val buf_ld_sel = in UInt (32 bits)
     val hbm_ready = Array.fill(num_hbms)(in Bool())
     // TODO: temp ports for idx gen only, deprecated in the future
-    val tcarray_in = Vec(slave(MultiPortStream(256, 32, false, true)), 3)
+    val tcarray_in = Vec(slave(MultiPortStream(256, 32, false, true)), 6)
     val tcarray_out = Vec(master(MultiPortStream(256, 32, true, false)), 2)
   }
 
   // input list:
   // tcarray_in_0: col input, idx input
-  // tcarray_in_1/2: row input
+  // tcarray_in_1/2/3/4/5: row input
 
   // shared tcarray in channel address table
   // io.buf_ld_sel(n downto 0) === 1 -> tcArray.io.matBLoad
@@ -77,7 +77,6 @@ class tensor_core_array_wrapper(array_col: Int, array_row: Int, chain_len: Int,
   // errors(1): idx gen error
 
   val CTRL_REG_DELAY = 5
-  io.err_info.clearAll()
 
   noIoPrefix()
   val clrn = ClockDomain.current.readResetWire
@@ -210,11 +209,14 @@ class tensor_core_array_wrapper(array_col: Int, array_row: Int, chain_len: Int,
     data2TcarrayRow.valid := Delay(data2TcarrayRowValid & io.tcarray_in(0).select, 4)
 
     val data2TcarrayCol = Vec(Stream(BfpBlockWithIdx(88, idx_width.r, 0, 0)), array_col)
-    val MATA_CHAN_PER_GRP = 4
-    val HBM_MATA_CHAN_GRP = Array(1, 2)
-    val combDataFromHbm =
-      Vec(for (ihbm <- HBM_MATA_CHAN_GRP) yield io.tcarray_in(ihbm).data)
-        .asBits.subdivideIn(MATA_CHAN_PER_GRP slices)
+    val MATA_CHAN_PER_GRP = Array(7, 5)
+    val HBM_MATA_CHAN_GRP = Array(Array(1, 2, 3), Array(4, 5))
+    val combDataFromHbm: Array[Vec[Bits]] = Array.ofDim[Vec[Bits]](HBM_MATA_CHAN_GRP.length)
+    for (i <- HBM_MATA_CHAN_GRP.indices) {
+      combDataFromHbm(i) = Vec(
+        for (j <- HBM_MATA_CHAN_GRP(i)) yield io.tcarray_in(j).data
+      ).asBits(MATA_CHAN_PER_GRP(i) * (88 + idx_width.r) - 1 downto 0).subdivideIn(MATA_CHAN_PER_GRP(i) slices)
+    }
 
     // FIXME: dangerous! starting calc only when it receives all mat a
     // to walk around shared mat a input problem.
@@ -241,8 +243,11 @@ class tensor_core_array_wrapper(array_col: Int, array_row: Int, chain_len: Int,
     tcArray.io.matBLoad <> data2TcarrayRow
     tcArray.io.sortedColIdxSlow << idxGenFifoSlow.io.pop
     tcArray.io.sortedColIdxFast << idxGenFifoFast.io.pop
+    // start fulfillment signal of computation
+    // as long as one of the idx fifos is full enough,
+    // the computation can start
     tcArray.io.colIdxFifoNotEmpty :=
-      currCompRdy & ((idxGenFifoFast.io.almostFull & idxGenFifoFast.io.almostFull) | idxFifoLoaded)
+      currCompRdy & (idxGenFifoFast.io.almostFull | idxGenFifoSlow.io.almostFull | idxFifoLoaded)
     tcArray.io.calEn := calTileStart
     tcArray.io.configRowBuffWrBound := Delay(io.mbvec_size, CTRL_REG_DELAY).resized
     tcArray.io.matADbuffWrPtr := dBuffLdPtr
@@ -343,9 +348,10 @@ class tensor_core_array_wrapper(array_col: Int, array_row: Int, chain_len: Int,
               isNextBdPoped := True
             }.otherwise {
               when(bdPopDlyCounter.willOverflowIfInc) {
-                when(isCurrCompFinished && currCompRdy) {
-                  goto(sSend)
-                }
+//                when(isCurrCompFinished && currCompRdy) {
+//                  goto(sSend)
+//                }
+                goto(sPause)
               }.otherwise {
                 bdPopDlyCounter.increment()
               }
@@ -377,8 +383,6 @@ class tensor_core_array_wrapper(array_col: Int, array_row: Int, chain_len: Int,
 
       val chanStart = Bool()
       val chanSel = Bool()
-      val tcColSel = Reg(Bits(array_col/MATA_CHAN_PER_GRP bits),
-        init=B(array_col/MATA_CHAN_PER_GRP bits, 0 -> true, default -> false))
       val isNextBdPoped = Reg(Bool()) init False
       val bdPopDlyCounter = Counter(CTRL_REG_DELAY + 2)
 
@@ -416,32 +420,17 @@ class tensor_core_array_wrapper(array_col: Int, array_row: Int, chain_len: Int,
 
       val sSend: State = new State {
         whenIsActive {
-          for (c <- 0 until array_col/MATA_CHAN_PER_GRP) {
-            val colWidth = data2TcarrayCol(c).payload.getBitsWidth
-            for (gid <- 0 until MATA_CHAN_PER_GRP) {
-              val colPayload = combDataFromHbm(gid).resize(colWidth)
-              // don't push padded data into col buffer, those data are for hbm channel's intra col alignment
-              data2TcarrayCol(c * MATA_CHAN_PER_GRP + gid).valid :=
-                tcColSel(c) & ~(colPayload.resizeLeft(2) === B"2'b10")
-              when(tcColSel(c)) {
-                data2TcarrayCol(c * MATA_CHAN_PER_GRP + gid).payload.fromUInt(colPayload.asUInt)
-              }
+          for (iHbmGrp <- HBM_MATA_CHAN_GRP.indices) {
+            for (iCol <- 0 until MATA_CHAN_PER_GRP(iHbmGrp)) {
+              val iColOffset: Int = if (iHbmGrp == 0) 0 else MATA_CHAN_PER_GRP(iHbmGrp-1)
+              data2TcarrayCol(iColOffset + iCol).payload.fromUInt(combDataFromHbm(iHbmGrp)(iCol).asUInt)
+              data2TcarrayCol(iColOffset + iCol).valid := ~(combDataFromHbm(iHbmGrp)(iCol).resizeLeft(2) === B"2'b10")
             }
           }
-          //TODO: parameterize this
-          val colReadys = Bits(MATA_CHAN_PER_GRP * ceil(array_col/MATA_CHAN_PER_GRP).toInt bits)
-          for (cid <- colReadys.bitsRange) {
-            if (cid < data2TcarrayCol.length) {
-              colReadys(cid) := data2TcarrayCol(cid).ready
-            } else {
-              colReadys(cid) := True
-            }
-          }
-          val tcarrayColInRdyGrp = colReadys.subdivideIn(array_col/MATA_CHAN_PER_GRP slices)
-          chanSel := OhMux(tcColSel, Vec(for(i <- tcarrayColInRdyGrp) yield i.andR))
+
+          chanSel := Vec(for(i <- data2TcarrayCol) yield i.ready).andR
           when(chanSel) {
             rdWordCounter.increment()
-            tcColSel := tcColSel.rotateLeft(1)
           }
           when(rdWordCounter.willOverflow) {
             matAFullyLoaded := True
@@ -478,7 +467,7 @@ class tensor_core_array_wrapper(array_col: Int, array_row: Int, chain_len: Int,
     }
 
     for(hbmChanId <- 1 until io.tcarray_in.size) {
-      if (HBM_MATA_CHAN_GRP.contains(hbmChanId)) {
+      if (HBM_MATA_CHAN_GRP.reduce((a,b) => a ++ b).contains(hbmChanId)) {
         io.tcarray_in(hbmChanId).addr.clearAll()
         io.tcarray_in(hbmChanId).start := colRdFsm.chanStart
         io.tcarray_in(hbmChanId).select := colRdFsm.chanSel
@@ -487,7 +476,7 @@ class tensor_core_array_wrapper(array_col: Int, array_row: Int, chain_len: Int,
       }
     }
 
-    // start ctrl ctrl
+    // start ctrl
     //   when two ptrs meets either it's idle or one of
     //   ld and comp finishes before the other, so only
     //   one of them needs moving
@@ -618,17 +607,8 @@ class tensor_core_array_wrapper(array_col: Int, array_row: Int, chain_len: Int,
       CTRL_REG_DELAY
     )
 
-    // TBD: error detection
-    //  idxgenerator error
-//    val idxGenReadys = Vec(for (i <- idxGenerator.io.seqIn) yield i.ready)
-//    val idxGenFifoOverflow = Delay(idxGenReadys.reduceBalancedTree((x, y) => x | y), 5)
-//    val idxGenFifoOverflowFlag = Reg(Bool(), False)
-//    idxGenFifoOverflowFlag := Mux(idxGenFifoOverflowFlag, True, idxGenFifoOverflow)
-//    // compute error
-//    val computeErrFlag = Reg(Bool(), False)
-
-//    io.errors(0) := Delay(computeErrFlag, CTRL_REG_DELAY)
-//    io.errors(1) := Delay(idxGenFifoOverflowFlag, CTRL_REG_DELAY)
+    // error detection
+    io.err_info := Delay(tcArray.io.err_info, CTRL_REG_DELAY).resized
   }
 
   // temporarily disable unused ports
@@ -655,6 +635,6 @@ object tensor_core_array_wrapper_gen extends App {
     array_row = array_row,
     chain_len = chain_len,
     idx_width = IdxWidth(ridx_width, cidx_width),
-    num_hbms = 5
+    num_hbms = 8
   ))
 }
