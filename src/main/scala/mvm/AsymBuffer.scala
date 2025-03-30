@@ -9,7 +9,7 @@ case class AsymBufferN2One(bitwidth: Int,
                            num_in_words: Int,
                            wr_depth: Int,
                            folding_factor: Int,
-                           megfunc_type: String = "spram") extends Component {
+                           megfunc_type: String = "MLAB") extends Component {
   val io = new Bundle {
     val wrAddr = in UInt(log2Up(wr_depth) bits)
     val dataIn = in Vec(UInt(bitwidth bits), num_in_words)
@@ -17,7 +17,7 @@ case class AsymBufferN2One(bitwidth: Int,
     val wrEn, rdEn = in Bool()
   }
 
-  val asymBufferCore = Array.fill(num_in_words)(new spram_megafunc(bitwidth, wr_depth, "MLAB"))
+  val asymBufferCore = Array.fill(num_in_words)(new spram_megafunc(bitwidth, wr_depth, megfunc_type))
   val rdSel = Counter(num_in_words)
   val asymBufferRd = Counter(wr_depth)
 

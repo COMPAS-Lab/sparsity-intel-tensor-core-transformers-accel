@@ -8,6 +8,7 @@ from cocotb.binary import BinaryValue
 from cocotb.handle import SimHandleBase
 from cocotb.triggers import RisingEdge, FallingEdge, Timer, Combine, with_timeout
 from cocotb.clock import Clock
+from tb.bfp_mat_gen import update_or_create_json
 
 def hex_to_bin(x: str, n_bits: int):
     return bin(int(x, 16))[2:].zfill(n_bits)
@@ -50,17 +51,19 @@ class tensor_core_array_wrapper_dut:
             self, 
             dut: SimHandleBase, 
             n_hbm_in_chan: int, 
-            n_hbm_out_chan:int,
+            n_hbm_out_chan: int,
+            data_dir: str,
             debug=False):
         
         self.dut = dut
         self.hbm_in_chans = [hbm_chan(dut, i, hbm_chan.direction.HBM_IN) for i in range(n_hbm_in_chan)]
         self.hbm_out_chans = [hbm_chan(dut, i, hbm_chan.direction.HBM_OUT) for i in range(n_hbm_out_chan)]
         self.debug = debug
+        self.data_dir = data_dir
 
-    def init_test_stimulus(self, base_path: str, hidx: int):
+    def init_test_stimulus(self, hidx: int):
         
-        hw_config_path = base_path + f"/hwconfig_h{hidx}.json"
+        hw_config_path = self.data_dir + f"/hwconfig_h{hidx}.json"
         with open(hw_config_path, "r") as f:
             hw_config = json.load(f)
 
@@ -70,43 +73,24 @@ class tensor_core_array_wrapper_dut:
         self.mat_b_bound = int(hw_config["mat b size"])
         self.mat_b_vec_size = int(hw_config["mat b vec size"])
 
-        mat_a_data_hbm_0, mat_a_data_hbm_1, mat_a_data_hbm_2, mat_a_data_hbm_3, mat_a_data_hbm_4 = [], [], [], [], []
+        mat_a_data_hbm = [[] for _ in range(len(self.hbm_in_chans))]
         idx_data_hbm = []
         mat_b_data_hbm = []
         for lb in self.lb_idx_list:
-            mat_a_0_fpath = base_path + f"/onchip_mat_a_hbm0_h{hidx}_lb{lb}.mem"
-            with open(mat_a_0_fpath, "r") as fp:
-                mat_a_data_hbm_0 += [l.strip() for l in fp.readlines()]
+            for hbm_idx in range(len(self.hbm_in_chans)-1):
+                mat_a_fpath = self.data_dir + f"/onchip_mat_a_hbm{hbm_idx}_h{hidx}_lb{lb}.mem"
+                with open(mat_a_fpath, "r") as fp:
+                    mat_a_data_hbm[hbm_idx] += [l.strip() for l in fp.readlines()]
 
-            mat_a_1_fpath = base_path + f"/onchip_mat_a_hbm1_h{hidx}_lb{lb}.mem"
-            with open(mat_a_1_fpath, "r") as fp:
-                mat_a_data_hbm_1 += [l.strip() for l in fp.readlines()]
-
-            mat_a_2_fpath = base_path + f"/onchip_mat_a_hbm2_h{hidx}_lb{lb}.mem"
-            with open(mat_a_2_fpath, "r") as fp:
-                mat_a_data_hbm_2 += [l.strip() for l in fp.readlines()]
-
-            mat_a_3_fpath = base_path + f"/onchip_mat_a_hbm3_h{hidx}_lb{lb}.mem"
-            with open(mat_a_3_fpath, "r") as fp:
-                mat_a_data_hbm_3 += [l.strip() for l in fp.readlines()]
-
-            mat_a_4_fpath = base_path + f"/onchip_mat_a_hbm4_h{hidx}_lb{lb}.mem"
-            with open(mat_a_4_fpath, "r") as fp:
-                mat_a_data_hbm_4 += [l.strip() for l in fp.readlines()]
-
-            idx_fpath = base_path + f"/onchip_idx_hbm_h{hidx}_lb{lb}.mem"
+            idx_fpath = self.data_dir + f"/onchip_idx_hbm_h{hidx}_lb{lb}.mem"
             with open(idx_fpath, "r") as fp:
                 idx_data_hbm += [l.strip() for l in fp.readlines()]
 
-        mat_b_fpath = base_path + f"/onchip_mat_b_hbm.mem"
+        mat_b_fpath = self.data_dir + f"/onchip_mat_b_hbm.mem"
         with open(mat_b_fpath, "r") as fp:
             mat_b_data_hbm += [l.strip() for l in fp.readlines()]
 
-        self.mat_a_data_hbm_0 = mat_a_data_hbm_0
-        self.mat_a_data_hbm_1 = mat_a_data_hbm_1
-        self.mat_a_data_hbm_2 = mat_a_data_hbm_2
-        self.mat_a_data_hbm_3 = mat_a_data_hbm_3
-        self.mat_a_data_hbm_4 = mat_a_data_hbm_4
+        self.mat_a_data_hbm = mat_a_data_hbm
         self.idx_data_hbm = idx_data_hbm
         self.mat_b_data_hbm = mat_b_data_hbm
 
@@ -180,57 +164,31 @@ class tensor_core_array_wrapper_dut:
     
     async def load_mat_a_process(self):
         self.dut._log.info("load mat a process started")
-        await Combine(
-            RisingEdge(self.dut.start_tcarray_in_1),
-            RisingEdge(self.dut.start_tcarray_in_2),
-            RisingEdge(self.dut.start_tcarray_in_3),
-            RisingEdge(self.dut.start_tcarray_in_4),
-            RisingEdge(self.dut.start_tcarray_in_5)
-        )
-        await Combine(
-            FallingEdge(self.dut.start_tcarray_in_1),
-            FallingEdge(self.dut.start_tcarray_in_2),
-            FallingEdge(self.dut.start_tcarray_in_3),
-            FallingEdge(self.dut.start_tcarray_in_4),
-            FallingEdge(self.dut.start_tcarray_in_5)
-        )
+        start_tcarray_in, select_tcarray_in = [], []
+        for idx in range(len(self.hbm_in_chans)-1):
+            exec(f"start_tcarray_in += [self.dut.start_tcarray_in_{idx+1}]")
+            exec(f"select_tcarray_in += [self.dut.select_tcarray_in_{idx+1}]")
+
+        start_tcarray_in_rising_edge = [RisingEdge(i) for i in start_tcarray_in]
+        start_tcarray_in_falling_edge = [FallingEdge(i) for i in start_tcarray_in]
+        await Combine(*start_tcarray_in_rising_edge)
+        await Combine(*start_tcarray_in_falling_edge)
 
         await Timer(1, "ns")
-        self.dut.almost_empty_tcarray_in_1.value = 1
-        self.dut.almost_empty_tcarray_in_2.value = 1
-        self.dut.almost_empty_tcarray_in_3.value = 1
-        self.dut.almost_empty_tcarray_in_4.value = 1
-        self.dut.almost_empty_tcarray_in_5.value = 1
+        for idx in range(len(self.hbm_in_chans)-1):
+            exec(f"self.dut.almost_empty_tcarray_in_{idx+1}.value = 1")
+
         await clkCycles(self.dut.clk, 120)
-        self.dut.almost_empty_tcarray_in_1.value = 0
-        self.dut.almost_empty_tcarray_in_2.value = 0
-        self.dut.almost_empty_tcarray_in_3.value = 0
-        self.dut.almost_empty_tcarray_in_4.value = 0
-        self.dut.almost_empty_tcarray_in_5.value = 0
+        for idx in range(len(self.hbm_in_chans)-1):
+            exec(f"self.dut.almost_empty_tcarray_in_{idx+1}.value = 0")
 
         for col_ptr in range(sum(self.mat_a_bounds)):
             await Timer(1, "ns")
-            self.dut.data_tcarray_in_1.value = \
-                BinaryValue(hex_to_bin(self.mat_a_data_hbm_0[col_ptr], 256), n_bits=256)
-            self.dut.data_tcarray_in_2.value = \
-                BinaryValue(hex_to_bin(self.mat_a_data_hbm_1[col_ptr], 256), n_bits=256)
-            self.dut.data_tcarray_in_3.value = \
-                BinaryValue(hex_to_bin(self.mat_a_data_hbm_2[col_ptr], 256), n_bits=256)
-            self.dut.data_tcarray_in_4.value = \
-                BinaryValue(hex_to_bin(self.mat_a_data_hbm_3[col_ptr], 256), n_bits=256)
-            self.dut.data_tcarray_in_5.value = \
-                BinaryValue(hex_to_bin(self.mat_a_data_hbm_4[col_ptr], 256), n_bits=256)
+            for idx in range(len(self.hbm_in_chans)-1):
+                exec(f"self.dut.data_tcarray_in_{idx+1}.value = " + 
+                     f"BinaryValue(hex_to_bin(self.mat_a_data_hbm[{idx}][col_ptr], 256), n_bits=256)")
             
-            await Equal(
-                [
-                    self.dut.select_tcarray_in_1, 
-                    self.dut.select_tcarray_in_2,
-                    self.dut.select_tcarray_in_3,
-                    self.dut.select_tcarray_in_4,
-                    self.dut.select_tcarray_in_5,
-                ], 
-                [1, 1, 1, 1, 1]
-            )
+            await Equal(select_tcarray_in, [1] * (len(self.hbm_in_chans) - 1))
             await clkCycles(self.dut.clk, 1)
 
     async def load_mat_b_process(self):
@@ -279,7 +237,7 @@ class tensor_core_array_wrapper_dut:
         await Timer(1, "ns")
         self.dut.tc_ctrl[2].value = 0
 
-    async def wait_compute_finish(self):
+    async def wait_compute_finish(self, hidx: int):
         for f in range(len(self.lb_idx_list)):
             self.dut._log.info(f"waiting for {f} th tile to finish...")
             await with_timeout(
@@ -293,6 +251,14 @@ class tensor_core_array_wrapper_dut:
             f"total lat counter: {self.dut.softClrnArea_totalLatCounter_value.value.integer}")
         self.dut._log.info(
             f"compute lat counter: {self.dut.softClrnArea_tcArray_io_computeLatCounter.value.integer}")
+        self.dut._log.info(
+            f"mat b load counter: {self.dut.softClrnArea_matBLoadCounter_value.value.integer}")
+
+        hw_config_path = self.data_dir + f"/hwconfig_h{hidx}.json"
+        hw_config = {}
+        hw_config["total_lat_counter_res"] = self.dut.softClrnArea_totalLatCounter_value.value.integer
+        hw_config["compute_lat_counter_res"] = self.dut.softClrnArea_tcArray_io_computeLatCounter.value.integer
+        update_or_create_json(hw_config_path, hw_config)
         
     def calc_bdwidth(self, n_hw_cols: int):
 
@@ -325,13 +291,13 @@ class tensor_core_array_wrapper_dut:
 @cocotb.test()
 async def tensor_core_array_wrapper_test(dut):
 
-    base_path = "/compas-old/projects/sparse-attention/onchip-5hbm/mixtral-8x7b-attn-bfp20-qasper/iiSeqInst0179"
-    hidx = 113
+    base_path = "/compas-old/projects/sparse-attention/onchip-dualcore/chatglm2-6b-32k-attn-bfp20-lcc/iiSeqInst0477"
+    hidx = 343
     
     main_clk_period = 10
     main_clk = Clock(dut.clk, main_clk_period, units="ns")
-    dut_tester = tensor_core_array_wrapper_dut(dut, 6, 2)
-    dut_tester.init_test_stimulus(base_path, hidx)
+    dut_tester = tensor_core_array_wrapper_dut(dut, 8, 2, data_dir=base_path)
+    dut_tester.init_test_stimulus(hidx)
     cocotb.start_soon(main_clk.start(start_high=True))
     await dut_tester.init_inputs()
 
@@ -357,10 +323,10 @@ async def tensor_core_array_wrapper_test(dut):
 
     # start calculation
     cocotb.start_soon(dut_tester.start_cal())
-    await dut_tester.wait_compute_finish()
+    await dut_tester.wait_compute_finish(hidx)
     await Timer(1, "us")
 
-    dut_tester.calc_bdwidth(12)
+    dut_tester.calc_bdwidth(16)
 
 
 # def tensor_core_array_wrapper_test_runner():

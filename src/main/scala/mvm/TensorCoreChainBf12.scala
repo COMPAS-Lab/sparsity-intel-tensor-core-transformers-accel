@@ -140,9 +140,7 @@ class TensorCoreChainBf12(chain_len: Int, out_buf_delay: Int,
   for (i <- 0 until chain_len-1) {
     tcCoreChainElems(i) = new tensor_core_bf12
     // FIFO-based delay chain
-//    val delayedDataIn = BlockDelay(io.dataIn.payload(i+1), 2*(i+1), "M20K")
     connect_data_in(tcCoreChainElems(i).io, io.dataIn.payload(i+1))
-//    val delayedExpIn = BlockDelay(io.expIn(i+1), 2*(i+1), "M20K")
     tcCoreChainElems(i).io.shared_exponent_data <> io.expIn(i+1)
     val loadBufCompSelEnCounter = Counter(chain_len * 3, inc = delayedCasLoadValidForBufSel)
 

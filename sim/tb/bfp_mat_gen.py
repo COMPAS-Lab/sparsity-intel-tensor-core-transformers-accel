@@ -8,7 +8,7 @@ from enum import Enum
 # import torch
 from random import sample
 import json
-import os, io
+import os, io, glob
 import shutil
 from cProfile import Profile
 from pstats import Stats, SortKey
@@ -73,7 +73,7 @@ def update_or_create_json(file_path, a):
     else:
         existing_data = a
 
-    with open(file_path, 'w') as file:
+    with open(file_path, 'w+') as file:
         json.dump(existing_data, file, indent=4)
     
     print(f"File '{file_path}' updated with data: {existing_data}")
@@ -332,7 +332,6 @@ class BFP():
         return res
 
 IN_DAT_PATH = "/compas-old/projects/sparse-attention"
-OUT_DAT_PATH = "/compas-old/projects/sparse-attention/onchip-5hbm"
 
 def mat_a_gen(
         mat_src_name: str, 
@@ -344,6 +343,7 @@ def mat_a_gen(
         hidx_list = None,
         bfp_friendly_dat = False,
         disable_file_writting = False,
+        out_data_path = "/compas-old/projects/sparse-attention/onchip-5hbm",
         ):
     '''
     assuming mat A is a 3xthree_vec_len mat block:
@@ -398,7 +398,7 @@ def mat_a_gen(
             n_large_blocks_actual = math.ceil(len(src_ridx_h) / 2048)
         else:
             n_large_blocks_actual = n_large_blocks
-
+        
         # split matrix into large blocks if needed
         if n_large_blocks_actual > 1:
             # Split src_ridx_h into uniformly distributed bins with integer edges
@@ -431,6 +431,9 @@ def mat_a_gen(
 
         n_large_blocks_actual = len(src_ridx_lblks)
         print(f"head {hidx} is split into {n_large_blocks_actual} large blocks")
+        if not os.path.isdir(out_data_path):
+            os.makedirs(out_data_path)
+        update_or_create_json(out_data_path + "/" + f"hwconfig_h{hidx}.json", {"n_lbs": n_large_blocks_actual})
 
         for large_blk_idx in range(n_large_blocks_actual):
             # prepare mat a
@@ -447,13 +450,12 @@ def mat_a_gen(
             idx_after_redremove = bfp_type.idx_redremove_gen((src_ridx, src_cidx), n_hw_cols, ridx_size=ridx_size, cidx_size=cidx_size)
 
             if not disable_file_writting:
-                out_path = OUT_DAT_PATH + f"/{mat_src_name}"
-                if not os.path.isdir(out_path):
-                    os.makedirs(out_path)
+                if not os.path.isdir(out_data_path):
+                    os.makedirs(out_data_path)
 
-                fnames = [out_path + "/" + f"MAT_A_{bfp_type.format_name()}_b{b_size}_h{hidx}_lb{large_blk_idx}.bin" for b_size in range(n_hw_cols)]
+                fnames = [out_data_path + "/" + f"MAT_A_{bfp_type.format_name()}_b{b_size}_h{hidx}_lb{large_blk_idx}.bin" for b_size in range(n_hw_cols)]
                 fps = [open(fname, "w+", encoding='utf-8') for fname in fnames]
-                idx_fname = out_path + "/" + f"IDX_GEN_h{hidx}_lb{large_blk_idx}.bin"
+                idx_fname = out_data_path + "/" + f"IDX_GEN_h{hidx}_lb{large_blk_idx}.bin"
                 idx_fp = open(idx_fname, "w+", encoding='utf-8')
 
                 f_idx = 0
@@ -503,15 +505,20 @@ def mat_a_gen(
     if not disable_file_writting:
         # copy inst_profile.json
         shutil.copyfile(IN_DAT_PATH + f"/{mat_src_name}.json", 
-            out_path + "/" + "inst_profile.json")
-    
+            out_data_path + "/" + "inst_profile.json")
+            
     return None
 
-def mat_b_gen(mat_src_name: str, chain_len: int, bfp_type: BFP, n_blocks_split: int = 1):
+def mat_b_gen(
+        chain_len: int, 
+        bfp_type: BFP, 
+        n_blocks_split: int = 1, 
+        out_data_path = "/compas-old/projects/sparse-attention/onchip-5hbm"
+    ):
     # matB = np.random.uniform(low=0., high=1.0, size=size).astype('f')
     # matB = np.random.randint(low=0, high=2, size=size)
     matB_size = None
-    with open(OUT_DAT_PATH + f"/{mat_src_name}/inst_profile.json", "r") as mat_src_f:
+    with open(out_data_path + f"/inst_profile.json", "r") as mat_src_f:
         mat_prof = json.load(mat_src_f)
         matB_size = (mat_prof["seq_len"], 128)
 
@@ -548,7 +555,7 @@ def mat_b_gen(mat_src_name: str, chain_len: int, bfp_type: BFP, n_blocks_split: 
         # bfp conversion
         bfp_res, _ = bfp_type.to_bfp(list(chunkedBTrans))
 
-        fname = OUT_DAT_PATH + f"/{mat_src_name}" + f"/MAT_B_{bfp_type.format_name()}_all.bin"
+        fname = out_data_path + f"/MAT_B_{bfp_type.format_name()}_all.bin"
         if matb_blk_idx == 0:
             f = open(fname, "w+", encoding='utf-8')
         else:
@@ -560,7 +567,7 @@ def mat_b_gen(mat_src_name: str, chain_len: int, bfp_type: BFP, n_blocks_split: 
         print(f"mat B total size: {len(bfp_res) * len(bfp_res[0]) / 1024. / 1024. / 8 :.2f} MB")
         f.close()
 
-    update_or_create_json(OUT_DAT_PATH + f"/{mat_src_name}/inst_profile.json", {"mat b vec size": mat_b_vec_load_size})
+    update_or_create_json(out_data_path + f"/inst_profile.json", {"mat b vec size": mat_b_vec_load_size})
     return matB
 
 def check_outputs(sim_out_fname: str, ori_fname, num_tc_rows: int, num_tc_cols: int):
@@ -635,10 +642,18 @@ def prepare_onchip_input_files(input_path: str, n_shared_chans: int, head_idx: i
 
         # split into upper and lower mem files, supporting unevenly grouped 
         # col channels into different hbms
+
+        # FIXME: hardcoded config for single core
         n_chans_in_hbm_grp = [7, 5] 
         n_chans_in_hbm_grp_per_iter = [7, 5]
-        n_load_iters = [i//j for i, j in zip(n_chans_in_hbm_grp, n_chans_in_hbm_grp_per_iter)]
         n_hbms_per_grp = [3, 2]
+
+        # FIXME: hardcoded config for dual core
+        # n_hbms_per_grp = [7]
+        # n_chans_in_hbm_grp = [16] 
+        # n_chans_in_hbm_grp_per_iter = [16]
+
+        n_load_iters = [i//j for i, j in zip(n_chans_in_hbm_grp, n_chans_in_hbm_grp_per_iter)]
         n_hbm_grps = len(n_chans_in_hbm_grp)
         n_hbm_bwidth = 256
 
@@ -737,9 +752,10 @@ def prepare_onchip_matb_file(input_path: str, align_to=256, head_idx=0):
         update_or_create_json(input_path + f"hwconfig_h{head_idx}.json", {"mat b vec size": inst_infos["mat b vec size"]})
 
 def main(args: dict):
-    hw_row = 6
-    hw_col = 12
+    hw_row = int(args["hw_row"])
+    hw_col = int(args["hw_col"])
     n_large_blocks = int(args['large-blocks'])
+    head_idx = []
     
     if args["head-indices"] is not None:
         print(f"generating specific head indices: {args['head-indices']}")
@@ -753,7 +769,7 @@ def main(args: dict):
                 print("generating runtime profile")
                 with Profile() as pr:
                     matA = mat_a_gen(
-                        args["data-path"], 
+                        args["inputs_gen"], 
                         BFP(BfpType.BFP_12), 
                         hw_col, 
                         ridx_size=12, 
@@ -761,7 +777,8 @@ def main(args: dict):
                         bfp_friendly_dat=False, 
                         n_large_blocks=n_large_blocks, 
                         hidx_list=head_idx,
-                        disable_file_writting=True
+                        disable_file_writting=True,
+                        out_data_path=args["data-path"]
                     )
                     s = io.StringIO()
                     ps = Stats(pr, stream=s).strip_dirs().sort_stats(SortKey.CALLS)
@@ -771,14 +788,15 @@ def main(args: dict):
                         f.write(s.getvalue())
             else:
                 matA = mat_a_gen(
-                        args["data-path"], 
+                        args["inputs_gen"], 
                         BFP(BfpType.BFP_12), 
                         hw_col, 
                         ridx_size=12, 
                         cidx_size=10, 
                         bfp_friendly_dat=False, 
                         n_large_blocks=n_large_blocks, 
-                        hidx_list=head_idx
+                        hidx_list=head_idx,
+                        out_data_path=args["data-path"],
                 )
         else:
             matA = mat_a_gen(
@@ -791,7 +809,7 @@ def main(args: dict):
                     hidx_list=head_idx
                 )
 
-        matB = mat_b_gen(args["data-path"], chain_len, BFP(BfpType.BFP_12), hw_row)
+        matB = mat_b_gen(chain_len, BFP(BfpType.BFP_12), hw_row, args["data-path"])
         # res = np.matmul(matA, matB)
         # print(f"mat a shape: {matA.shape}, mat b shape: {matB.shape}, res shape: {res.shape}")
         # np.save("sparse_matmul_data/mult_a_b_fp32_mata.npy", matA)
@@ -810,15 +828,18 @@ def main(args: dict):
 
     if args['create-binary']:
         path = str(args['data-path'])
-        head_list = []
-        inst_list = [f.split(".")[0] \
-                for f in os.listdir(path) \
-                if os.path.isfile(path + f) and f.endswith(".bin") and "IDX_GEN" in f]
-        head_list = np.unique([int(i.split("_")[-2][1:]) for i in inst_list])
-        print(f"heads: {head_list}")
-        for h in head_list:
-            lb_flist = [f for f in inst_list if f"IDX_GEN_h{h}_" in f]
-            lb_list = np.unique([int(f.split("_")[-1][2:]) for f in lb_flist])
+        if not head_idx:
+            inst_list = [f.split(".")[0] \
+                    for f in os.listdir(path) \
+                    if os.path.isfile(path + f) and f.endswith(".bin") and "IDX_GEN" in f]
+            head_idx = np.unique([int(i.split("_")[-2][1:]) for i in inst_list])
+        print(f"heads: {head_idx}")
+        for h in head_idx:
+            lb_list = []
+            with open(path + f"/hwconfig_h{h}.json", "r") as jf:
+                head_cfg = json.load(jf)
+                lb_list = list(range(int(head_cfg["n_lbs"])))
+
             print(f"head {h} large blocks: {lb_list}")
             prepare_onchip_input_files(path, hw_col, head_idx=h, n_large_blocks=len(lb_list))
             prepare_onchip_idx_file(path, hw_col, 10, head_idx=h, n_large_blocks=len(lb_list))
@@ -835,8 +856,8 @@ def main(args: dict):
   
 if __name__ == "__main__":
     arg_parser = argparse.ArgumentParser()
-    arg_parser.add_argument("-ig", "--inputs-gen", help="generate mat a and b inputs for simulation", \
-                                action="store_true", dest="inputs_gen")
+    arg_parser.add_argument("-ig", "--inputs-gen", help="generate mat a and b inputs for simulation, provide input data path here", \
+                                action="store", dest="inputs_gen")
     arg_parser.add_argument("-cl", "--chain-len", help="chain length", \
                                 action="store", dest="chain_len")
     arg_parser.add_argument("-ci", "--compute-iter", help="compute iteration", \
@@ -861,6 +882,10 @@ if __name__ == "__main__":
                                 nargs='+', type=int, dest="head-indices", default=None)
     arg_parser.add_argument("-pr", "--profile-runtime", help="profile runtime", \
                                 action="store_true", dest="profile-runtime", default=False)
+    arg_parser.add_argument("-nr", "--number-hrows", help="number of hw rows", \
+                                action="store", dest="hw_row", default=6)
+    arg_parser.add_argument("-nc", "--number-hcols", help="number of hw cols", \
+                                action="store", dest="hw_col", default=12)
 
     args = vars(arg_parser.parse_args())
 

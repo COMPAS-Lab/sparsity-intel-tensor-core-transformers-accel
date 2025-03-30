@@ -15,7 +15,7 @@ endif
 
 # use VHDL_SOURCES for VHDL files
 VERILOG_SOURCES += $(PWD)/tb/fourteennm_atoms.sv
-VERILOG_SOURCES += $(PWD)/../src/generated/*.v
+VERILOG_SOURCES += $(PWD)/../src/generated_2core/*.v
 VERILOG_SOURCES += $(PWD)/../src/main/sverilog/blk_delay_core.sv
 VERILOG_SOURCES += $(PWD)/../src/main/sverilog/out_asym_fifo.sv
 

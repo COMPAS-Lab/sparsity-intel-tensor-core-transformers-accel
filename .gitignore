@@ -13,7 +13,7 @@ lib_managed/
 src_managed/
 project/boot/
 project/plugins/project/
-src/generated/
+src/generated*/
 # Scala-IDE specific
 .scala_dependencies
 .worksheet

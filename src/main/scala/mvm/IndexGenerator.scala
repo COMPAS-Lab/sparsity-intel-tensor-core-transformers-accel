@@ -211,7 +211,7 @@ class IndexGenerator(num_ports: Int, bitwidth: Int, placeholder: BigInt) extends
       val stgRes = Stream(IndexData(bitwidth, num_ports))
       val stgLastRes = Bool()
       if (i * 2 + 1 < datElem.length) {
-        val redRemover = new MergeSortRedundancyRemoverUnit(bitwidth, num_ports, placeholder, 256)
+        val redRemover = new MergeSortRedundancyRemoverUnit(bitwidth, num_ports, placeholder, 512)
         redRemover.io.idx_ins(0) << datElem(i * 2)
         redRemover.io.idx_ins(1) << datElem(i * 2 + 1)
         redRemover.io.lastGrpIns := lastElem(i * 2 + 1) ## lastElem(i * 2)

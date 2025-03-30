@@ -44,6 +44,7 @@ case class BfpBlockWithIdx(dwidth: Int,
 
   override def getZero: this.type = {
     val zeroData = new BfpBlockWithIdx(dwidth, ridx_width, cidx_width, dest_id_width)
+    zeroData.setName(this.getName() + "_ground")
     zeroData.blkData.clearAll()
     if(ridx_width > 0) {zeroData.rIdx.clearAll()}
     if(cidx_width > 0) {zeroData.cIdx.clearAll()}
@@ -53,6 +54,7 @@ case class BfpBlockWithIdx(dwidth: Int,
 
   def asUInt: UInt = {
     val res = UInt(this.getBitsWidth bits)
+    res.setName(this.getName() + "_toUInt")
     res(res.getBitsWidth-ridx_width-cidx_width-dest_id_width-1 downto 0) := this.blkData
     if (ridx_width > 0)
       res(res.getBitsWidth-1 downto res.getBitsWidth-ridx_width) := this.rIdx
@@ -259,6 +261,7 @@ class TensorCoreChainArray(array_col: Int, array_row: Int, chain_len: Int, idx_w
       // must make sure starting calc only when it receives all mat A
       // and the col buffer is large enough hold all mat A.
       val currColRdCredit = io.matADbuffRdPtr ? colBufferCredit(c)(1) | colBufferCredit(c)(0)
+      currColRdCredit.setName("currColRdCredit_" + c)
       //      isCurrCasBufLoaded(c) := preArowCasLoadCounter.willOverflow | (currColRdCredit === 0)
       isCurrCasBufLoaded(c) := preArowCasLoadCounter.willOverflow
       isColBufferEmpty(c) := currColRdCredit === 0
@@ -432,7 +435,7 @@ class TensorCoreChainArray(array_col: Int, array_row: Int, chain_len: Int, idx_w
         Vec(UInt(88 bits), NUM_MATB_VEC_PER_ROW / TRANSRAM_FOLDING_FACTOR).setName("rowBuffOut_" + r)
       val rowBuffWrVecSel = new Bundle {
         val vecId = Counter(NUM_MATB_VEC_PER_ROW / TRANSRAM_FOLDING_FACTOR)
-        val foldBufSel = Counter(TRANSRAM_FOLDING_FACTOR)
+        val foldBufSel = (TRANSRAM_FOLDING_FACTOR > 1) generate Counter(TRANSRAM_FOLDING_FACTOR)
       }
       val rowTransBuffWrCtrl =
         Reg(Bits(chain_len bits), init=B(chain_len bits, 0 -> true, default -> false))
@@ -451,7 +454,7 @@ class TensorCoreChainArray(array_col: Int, array_row: Int, chain_len: Int, idx_w
           num_in_words = NUM_MATB_VEC_PER_ROW / TRANSRAM_FOLDING_FACTOR,
           wr_depth = 2 * TRANSRAM_FOLDING_FACTOR,
           folding_factor = TRANSRAM_FOLDING_FACTOR,
-          megfunc_type = "spram"
+          megfunc_type = "M20K"
         )
       )
 
@@ -468,12 +471,26 @@ class TensorCoreChainArray(array_col: Int, array_row: Int, chain_len: Int, idx_w
         }.otherwise {
           rowBuffWrAddr(r).increment()
         }
-        when(rowBuffWrVecSel.vecId.willOverflow) {rowBuffWrVecSel.foldBufSel.increment()}
-        when(rowBuffWrVecSel.foldBufSel.willOverflow) {rowBuffWrRsel(r).increment()}
+        if (TRANSRAM_FOLDING_FACTOR > 1) {
+          when(rowBuffWrVecSel.vecId.willOverflow) {
+            rowBuffWrVecSel.foldBufSel.increment()
+          }
+          when(rowBuffWrVecSel.foldBufSel.willOverflow) {
+            rowBuffWrRsel(r).increment()
+          }
+        } else {
+          when(rowBuffWrVecSel.vecId.willOverflow) {
+            rowBuffWrRsel(r).increment()
+          }
+        }
       }
       for (vecId <- 0 until NUM_MATB_VEC_PER_ROW / TRANSRAM_FOLDING_FACTOR) {
         // row buffer write logic
-        rowMem(r)(vecId).io.wraddress := rowBuffWrVecSel.foldBufSel.value @@ rowBuffWrAddr(r).value
+        if (TRANSRAM_FOLDING_FACTOR > 1) {
+          rowMem(r)(vecId).io.wraddress := rowBuffWrVecSel.foldBufSel.value @@ rowBuffWrAddr(r).value
+        } else {
+          rowMem(r)(vecId).io.wraddress := rowBuffWrAddr(r).value
+        }
         rowMem(r)(vecId).io.wren :=
           io.matBLoad.valid & rowBuffWrVecSel.vecId.value === vecId & rowBuffWrRsel(r) === r
         rowMem(r)(vecId).io.data := io.matBLoad.payload
@@ -677,7 +694,7 @@ class TensorCoreChainArray(array_col: Int, array_row: Int, chain_len: Int, idx_w
     val sWaitALoad: State = new State {
       whenIsActive {
         matBLoadPipelineEn := False
-        when(bufferArea.isCurrSubgrpALoaded) {
+        when(bufferArea.isCurrCasBufLoaded.orR) {
           isCurrSubvecMatmulFin := False
           isFakeComputeIter := bufferArea.isLastLoadVecEmpty
           when(bufferArea.isColBufferEmpty.andR) {

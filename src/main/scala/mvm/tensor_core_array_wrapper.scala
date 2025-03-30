@@ -5,6 +5,7 @@ import spinal.lib._
 import spinal.lib.fsm._
 import config._
 import util._
+import intel_ips.hyperpipe
 import scala.math.{min, pow, ceil, floor}
 
 case class MultiPortStream(dWidth: Int, addrWidth: Int, hasAlmostFull: Boolean, hasAlmostEmpty: Boolean) extends Bundle with IMasterSlave {
@@ -50,13 +51,14 @@ class tensor_core_array_wrapper(array_col: Int, array_row: Int, chain_len: Int,
     val buf_ld_sel = in UInt (32 bits)
     val hbm_ready = Array.fill(num_hbms)(in Bool())
     // TODO: temp ports for idx gen only, deprecated in the future
-    val tcarray_in = Vec(slave(MultiPortStream(256, 32, false, true)), 6)
+    val tcarray_in = Vec(slave(MultiPortStream(256, 32, false, true)), 8)
     val tcarray_out = Vec(master(MultiPortStream(256, 32, true, false)), 2)
   }
 
   // input list:
-  // tcarray_in_0: col input, idx input
+  // tcarray_in_0: idx input
   // tcarray_in_1/2/3/4/5: row input
+  // tcarray_in_6/7: mat b input
 
   // shared tcarray in channel address table
   // io.buf_ld_sel(n downto 0) === 1 -> tcArray.io.matBLoad
@@ -109,7 +111,7 @@ class tensor_core_array_wrapper(array_col: Int, array_row: Int, chain_len: Int,
   val softClrn = Delay(io.tc_ctrl(1), CTRL_REG_DELAY)
   val calStart = Delay(io.tc_ctrl(2), CTRL_REG_DELAY)
   val loadRdBounds = Delay(io.tc_ctrl(3), CTRL_REG_DELAY)
-  val perfCounterSel = Delay(io.tc_ctrl(4), CTRL_REG_DELAY)
+  val perfCounterSel = Delay(io.tc_ctrl(5 downto 4), CTRL_REG_DELAY)
 
   val softClrnArea = new ResetArea(softClrn, cumulative=false) {
     // ctrl registers
@@ -142,7 +144,7 @@ class tensor_core_array_wrapper(array_col: Int, array_row: Int, chain_len: Int,
     val currCompRdy = Mux(dBuffComputePtr, matADbuffRdy(1), matADbuffRdy(0))
 
     val idxGenerator = new IndexGenerator(array_col, idx_width.c, BigInt("1" * idx_width.c, 2))
-    val idxGenFifoFast, idxGenFifoSlow = new StreamFifoIp(IndexData(idx_width.c, array_col), 512, "M20K", 128)
+    val idxGenFifoFast, idxGenFifoSlow = new StreamFifoIp(IndexData(idx_width.c, array_col), 512, "M20K", 256)
     // index generator connection
     val isIdxGenWaitingOuts = Reg(Bits(array_col bits), init=B(0))
     val isLastPlaceholderRecved = Reg(Bits(3 bits), init=B(0))
@@ -209,8 +211,10 @@ class tensor_core_array_wrapper(array_col: Int, array_row: Int, chain_len: Int,
     data2TcarrayRow.valid := Delay(data2TcarrayRowValid & io.tcarray_in(0).select, 4)
 
     val data2TcarrayCol = Vec(Stream(BfpBlockWithIdx(88, idx_width.r, 0, 0)), array_col)
-    val MATA_CHAN_PER_GRP = Array(7, 5)
-    val HBM_MATA_CHAN_GRP = Array(Array(1, 2, 3), Array(4, 5))
+    // val MATA_CHAN_PER_GRP = Array(7, 5)
+    // val HBM_MATA_CHAN_GRP = Array(Array(1, 2, 3), Array(4, 5))
+    val MATA_CHAN_PER_GRP = Array(16)
+    val HBM_MATA_CHAN_GRP = Array(Array(1, 2, 3, 4, 5, 6, 7))
     val combDataFromHbm: Array[Vec[Bits]] = Array.ofDim[Vec[Bits]](HBM_MATA_CHAN_GRP.length)
     for (i <- HBM_MATA_CHAN_GRP.indices) {
       combDataFromHbm(i) = Vec(
@@ -348,9 +352,6 @@ class tensor_core_array_wrapper(array_col: Int, array_row: Int, chain_len: Int,
               isNextBdPoped := True
             }.otherwise {
               when(bdPopDlyCounter.willOverflowIfInc) {
-//                when(isCurrCompFinished && currCompRdy) {
-//                  goto(sSend)
-//                }
                 goto(sPause)
               }.otherwise {
                 bdPopDlyCounter.increment()
@@ -602,8 +603,20 @@ class tensor_core_array_wrapper(array_col: Int, array_row: Int, chain_len: Int,
       tcArray.io.calFin & ~mbidxRdBoundQue.io.pop.valid & ~maRdBoundQue.io.pop.valid,
       calStart
     )
+    val matBLoadCounter = PerfCounter(
+      32,
+      bufferSelCC(0) && idxGenRowSharedRdFsm.isActive(idxGenRowSharedRdFsm.sSend),
+      bufferSelCC(0) && idxGenRowSharedRdFsm.isActive(idxGenRowSharedRdFsm.sIdle),
+      bufferSelCC(0).rise()
+    )
+
     io.lat_counter := Delay(
-      Mux(perfCounterSel, tcArray.io.computeLatCounter, totalLatCounter.value),
+      perfCounterSel.mux(
+        0 -> totalLatCounter.value,
+        1 -> tcArray.io.computeLatCounter,
+        2 -> matBLoadCounter.value,
+        3 -> U(0)
+      ),
       CTRL_REG_DELAY
     )
 
@@ -624,8 +637,8 @@ class tensor_core_array_wrapper(array_col: Int, array_row: Int, chain_len: Int,
 
 object tensor_core_array_wrapper_gen extends App {
   val gen = new DefaultConfig
-  val array_col = 12
-  val array_row = 6
+  val array_col = 16
+  val array_row = 8
   val chain_len = 8
   val ridx_width = 12
   val cidx_width = 10
@@ -635,6 +648,6 @@ object tensor_core_array_wrapper_gen extends App {
     array_row = array_row,
     chain_len = chain_len,
     idx_width = IdxWidth(ridx_width, cidx_width),
-    num_hbms = 8
+    num_hbms = 10
   ))
 }

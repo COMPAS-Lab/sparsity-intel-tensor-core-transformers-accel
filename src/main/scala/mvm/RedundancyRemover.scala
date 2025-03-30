@@ -101,7 +101,7 @@ class MergeSortRedundancyRemoverUnit(bitwidth: Int, dest_width: Int,
     val lastGrpOut = out Bool()
   }
 
-  val fifos = Array.fill(2)(new StreamFifoIp(IndexData(bitwidth, dest_width), fifo_depth, "MLAB"))
+  val fifos = Array.fill(2)(new StreamFifoIp(IndexData(bitwidth, dest_width), fifo_depth, "M20K"))
   val fifoPopEn = Bool()
 
   io.idx_outs.setOutputAsReg()
