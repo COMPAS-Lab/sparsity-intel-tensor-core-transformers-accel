@@ -1,4 +1,5 @@
 import numpy as np
+import matplotlib.pyplot as plt
 import struct
 import codecs
 import argparse
@@ -12,6 +13,24 @@ import os, io, glob
 import shutil
 from cProfile import Profile
 from pstats import Stats, SortKey
+
+def read_vec_files(name: str): 
+    data = np.loadtxt(name, usecols = (0,1,2)) # the first colum is the row number, the second is what element it is in the vector and the third is the val at that location. 
+    vector_index = data[:,0].astype(int)         # vector numbers are in column 1 
+    element_index = data[:,1].astype(int)        # element numbers are in col 2
+    float_data = data[:,2]                       # data associated with the above indices. 
+
+    max_vec_index = int(np.max(vector_index))
+    max_element_index = int(np.max(element_index))
+
+    matrix = np.zeros((max_vec_index + 1, max_element_index + 1))
+
+    for i in range(len(data)): 
+        vec_idx = int(vector_index[i])
+        ele_idx = int(element_index[i])
+        matrix[vec_idx,ele_idx] = float_data[i]
+
+    return matrix
 
 def float_to_hex(f: float):
 	# Courtesy of https://stackoverflow.com/a/23624284
@@ -86,21 +105,73 @@ def compute_thrpt(a_h, a_w, b_w, total_latency, freq):
     return flops
 
 class BfpType(Enum):
-    BFP_12 = 0
-    BFP_16 = 1
+    BFP_12 = 0                 # 8 + 3 BFPM + 1 sign. 
+    BFP_16 = 1                 # 8 + 7 BPFM + 1 sign. 
+    BFP_17 = 2
+    BFP_18 = 3
+    BFP_19 = 4
+    BFP_20 = 5
+    BFP_21 = 6 
+    BFP_22 = 7
+    BFP_23 = 8                 # 8 + 14 BFPM + 1 sign  
+    BFP_24 = 9                 # 8 + 15 BPFM + 1 sign
+    BFP_25 = 10                # 8 + 16 BFPM + 1 sign Need these three to look at the anomaly at seed 42 10000 tests.
+    BFP_26 = 11
+    BFP_27 = 12
+    BFP_28 = 13 
+    BFP_29 = 14 
+    BFP_30 = 15
+    BFP_31 = 16
+    BFP_32 = 17                # All the cases that have been tested on the hardware. 
 
 class BFP():
     bfp_struct = None
-    randgen_cand = [0.25, 0.3125, 0.375, 0.4375]
+    randgen_cand = [0.25, 0.3125, 0.375, 0.4375] #maybe to randomly generate floating point values. 
     def __init__(self, bfp_type: BfpType) -> None:
         if bfp_type == BfpType.BFP_12:
             self.bfp_struct = {"mant_bits": 3, "exp_bits":8, "sign_bits": 1, "blk_size": 20}
-        if bfp_type == BfpType.BFP_16:
-            self.bfp_struct = {"mant_bits": 7, "exp_bits":8, "sign_bits": 1, "blk_size": 10}
+        elif bfp_type == BfpType.BFP_16:
+            self.bfp_struct = {"mant_bits": 7, "exp_bits":8, "sign_bits": 1, "blk_size": 8} # The vectors have 8 elements. 
+        elif bfp_type == BfpType.BFP_17:
+            self.bfp_struct = {"mant_bits": 8, "exp_bits":8, "sign_bits": 1, "blk_size": 8}
+        elif bfp_type == BfpType.BFP_18:
+            self.bfp_struct = {"mant_bits": 9, "exp_bits":8, "sign_bits": 1, "blk_size": 8}
+        elif bfp_type == BfpType.BFP_19:
+            self.bfp_struct = {"mant_bits": 10, "exp_bits":8, "sign_bits": 1, "blk_size": 8}
+        elif bfp_type == BfpType.BFP_20:
+            self.bfp_struct = {"mant_bits": 11, "exp_bits":8, "sign_bits": 1, "blk_size": 8}
+        elif bfp_type == BfpType.BFP_21:
+            self.bfp_struct = {"mant_bits": 12, "exp_bits":8, "sign_bits": 1, "blk_size": 8}
+        elif bfp_type == BfpType.BFP_22:
+            self.bfp_struct = {"mant_bits": 13, "exp_bits":8, "sign_bits": 1, "blk_size": 8}
+        elif bfp_type == BfpType.BFP_23: 
+            self.bfp_struct = {"mant_bits" : 14, "exp_bits" : 8, "sign_bits" : 1 , "blk_size" : 8}   
+        elif bfp_type == BfpType.BFP_24: 
+            self.bfp_struct = {"mant_bits" : 15, "exp_bits" : 8, "sign_bits" : 1 , "blk_size" : 8}  
+        elif bfp_type == BfpType.BFP_25: 
+            self.bfp_struct = {"mant_bits" : 16, "exp_bits" : 8, "sign_bits" : 1 , "blk_size" : 8}  
+        elif bfp_type == BfpType.BFP_26: 
+            self.bfp_struct = {"mant_bits" : 17, "exp_bits" : 8, "sign_bits" : 1 , "blk_size" : 8}  
+        elif bfp_type == BfpType.BFP_27: 
+            self.bfp_struct = {"mant_bits" : 18, "exp_bits" : 8, "sign_bits" : 1 , "blk_size" : 8}  
+        elif bfp_type == BfpType.BFP_28: 
+            self.bfp_struct = {"mant_bits" : 19, "exp_bits" : 8, "sign_bits" : 1 , "blk_size" : 8}  
+        elif bfp_type == BfpType.BFP_29: 
+            self.bfp_struct = {"mant_bits" : 20, "exp_bits" : 8, "sign_bits" : 1 , "blk_size" : 8}  
+        elif bfp_type == BfpType.BFP_30: 
+            self.bfp_struct = {"mant_bits" : 21, "exp_bits" : 8, "sign_bits" : 1 , "blk_size" : 8}  
+        elif bfp_type == BfpType.BFP_31: 
+            self.bfp_struct = {"mant_bits" : 22, "exp_bits" : 8, "sign_bits" : 1 , "blk_size" : 8}  
+        elif bfp_type == BfpType.BFP_32: 
+            self.bfp_struct = {"mant_bits" : 23, "exp_bits" : 8, "sign_bits" : 1 , "blk_size" : 8} 
+        else : 
+            print(f"Invalid bfp_type: {bfp_type}") 
 
-    def format_name(self) -> str:
-        if self.bfp_struct["blk_size"] == 20:
+    def format_name(self) -> str:  # FIXME : I don't really use this in the model anywhere but if it needs to be uses then please change this. 
+        if self.bfp_struct["blk_size"] == 20: #FIXME make necessary changes for this one as well.. 
             return "BFP12"
+        elif self.bfp_struct["blk_size"] == 8: #change that I made. I don't know what's the purpose of this. 
+            return "BFP23 or BFP24 or BFP25"
         else:
             return "BFP16"
 
@@ -116,7 +187,7 @@ class BFP():
         else:
             return -1
         
-    def sign_bits(self): return 1
+    def sign_bits(self): return 1                           # No. of bits allocated to the sign. 
 
     def blk_size(self):
         if self.bfp_struct:
@@ -139,33 +210,112 @@ class BFP():
             res = True
 
         return res
-    
+
+    # blk_r is a bitstring that contains an 8 bit exponent and then all the other mantissa's along with the sign bit for all the numbers in the block 
+    # Therefore, we can get extract the exponent value, keep the sign and then get the mantissa. 
+    # Then get the fractional value of the each element of the block by incorporating the sign and multiplying the exponent. 
+    # make an np array and then call matmul on the two vectors to get the result. 
+    def bfp_to_real(self, blk_r) : 
+        real_vals = []
+        signs = [] 
+
+        shared_exp = int(blk_r[0:8],2) + 2                      # the exponent shared by all the blocks. When calculating shared exponent the VEC TO BFP code does max(exp)-2 but all the shifts are based on the difference. Therefore, here we need to add that 2. 
+
+        num_elements = 8                                     # Number of elements that share a block  
+        #print(f"blk_r length = {len(blk_r)}")
+        bits_per_element = int((len(blk_r) - 8 ) / num_elements)  # There are 8 elements per block and each element mantissa have the same number of bits. 
+        #print(f"Bits per element = {bits_per_element}")
+        first_mant = 8                                       # first bit where we see the mantissa. 
+        for i in range (num_elements) :                      # get the value of each of the elements in this for loop 
+            start_index = first_mant + i * bits_per_element
+            end_index = start_index + bits_per_element
+            element_bits = blk_r[start_index:end_index]
+            sign_bit = int(element_bits[0],2) 
+            mantissa_bits = element_bits[1:]
+
+            mant_real_val = 0.0
+
+            for j, bit in enumerate(mantissa_bits): 
+                if bit == '1': 
+                    mant_real_val += 1/(2**j) 
+
+            real_val = ((-1)**sign_bit) * (mant_real_val) * (2**(shared_exp - 127))
+            real_vals.append(real_val)
+
+        return np.array(real_vals)
+
+    def bfp_to_sign_and_mag(self, blk_r, elements) :  # elements is the numebr of elements that comprise a block. 
+        real_vals = []
+        signs = [] # we are not appending signs in this case before the multiplication, so we need to append it and send these back so that they can be used after multiplication. 
+        
+        shared_exp = int(blk_r[0:8],2) + 2                      # the exponent shared by all the blocks. When calculating shared exponent the VEC TO BFP code does max(exp)-2 but all the shifts are based on the difference. Therefore, here we need to add that 2. 
+
+        num_elements = elements                                     # Number of elements that share a block  
+        #print(f"blk_r length = {len(blk_r)}")
+        bits_per_element = int((len(blk_r) - 8 ) / num_elements)  # There are 8 elements per block and each element mantissa have the same number of bits. 
+        #print(f"Bits per element = {bits_per_element}")
+        first_mant = 8                                       # first bit where we see the mantissa. 
+        for i in range (num_elements) :                      # get the value of each of the elements in this for loop 
+            start_index = first_mant + i * bits_per_element
+            end_index = start_index + bits_per_element
+            element_bits = blk_r[start_index:end_index]
+            sign_bit = int(element_bits[0],2) 
+            mantissa_bits = element_bits[1:]
+
+            mant_real_val = 0.0
+
+            for j, bit in enumerate(mantissa_bits): 
+                if bit == '1': 
+                    mant_real_val += 1/(2**j) 
+            
+            real_val = (mant_real_val) * (2**(shared_exp - 127))
+            real_vals.append(real_val)
+            signs.append(sign_bit) # all the signs would be appended all the way at the end. So the magnitudes are from 0 to elements - 1 and then we have signs. 
+
+        sign_and_mag = list(zip(signs,real_vals))  # this should return a list of tuples. (sign, value)
+        return (sign_and_mag)
+        
+
     def vec_to_bfp_block(self, blk_r):
         fp32_blk_elems = [f for f in blk_r]
         blk_elems = [float_to_hex(f) for f in blk_r]
         exps = [int(hex_to_bin(e, 32)[1:9], 2) for e in blk_elems]
-        mants = [hex_to_bin(e, 32)[9:9 + self.mant_bits()+1] for e in blk_elems]
+        # print(f"mant_bits: {self.mant_bits()} (type: {type(self.mant_bits())})") # for debugging
+        # print("HI")
+        # print(self.mant_bits())
+        # print(f"number of mantissa bits in self = {self.mant_bits()}")
+        mants = [hex_to_bin(e, 32)[9:9 + self.mant_bits()] for e in blk_elems] # FIXME this initially had a +1 -> that gives us 1 extra bit. Idt that should be a problem but I'm gonna get rid of it. 
         signs = [hex_to_bin(e, 32)[0] for e in blk_elems]
         
         # TODO: be careful for the situation where part of the inputs are zero
-        blk_res = bin(max(max(exps)-2, 0))[2:].zfill(8)
-
+        # FIXME: why do we see a -2 for the max exponent. 
+        blk_res = bin(max(max(exps)-2, 0))[2:].zfill(8)     # WHY DO WE MAKE SURE THAT THE VALUE OF THE EXPONENT DOESN'T GO BELOW ZERO? 
         possible_vals = [v*(2**(max(exps)-2-127)) for v in range(2**self.mant_bits())]
         possible_mants = [bin(int(v))[2:].zfill(self.mant_bits()) for v in range(2**self.mant_bits())]
         for i in range(len(blk_elems)):
             ## nearest val rounding
-            if signs[i] == "1":
-                possible_vals = [0-v for v in possible_vals]
-            final_mant = possible_mants[find_nearest(possible_vals, fp32_blk_elems[i])]
-            final_mant = twos_comp(final_mant, signs[i])
-            ## truncation rounding:            
-            # mant_with_sign = "0" * (self.mant_bits() + 2) \
-            #     if blk_elems[i] == "00000000" else "1" + mants[i]
-            # shifted_mant = "0" * (self.mant_bits() + 2) \
-            #     if (max(exps) - exps[i]) > len(mant_with_sign) \
-            #     else mant_with_sign[0:len(mant_with_sign) - (max(exps) - exps[i]) + 1].zfill(len(mant_with_sign))
-            # final_mant = twos_comp(shifted_mant, signs[i])[0:self.mant_bits() + 1]
+            # if signs[i] == "1":
+            #     possible_vals = [0-v for v in possible_vals]
+            # final_mant = possible_mants[find_nearest(possible_vals, fp32_blk_elems[i])]
+            # final_mant = twos_comp(final_mant, signs[i])
+            ## truncation rounding:            Using this one because the hardware model truncates the mantissa instead of rounding it 
+            # the bit string self.mant_bits() + 2 long instead of + 1 because of the implicit 1: mant_bits + implicit 1 + sign. 
+
+            # the previous code with mant with sign was never actually assigning the sign bit so we were allocating it 1 extra bit that was involved with the shifting but never actually assigned that bit a value explicitly. 
+            # so now we only look at self.mant_bits() + 1 for the implicit 1 
+            mant_with_sign = "0" * (self.mant_bits() + 1) \
+                if blk_elems[i] == "00000000" else "1" + mants[i] 
+            # print(f"mantissa length = {len(mants[i])}")
+            # print("hi1")
+            # print(f"mant_with_sign length = {len(mant_with_sign)}")
+            shifted_mant = "0" * (self.mant_bits() + 2) \
+                if (max(exps) - exps[i]) > len(mant_with_sign) \
+                else mant_with_sign[0:len(mant_with_sign) - (max(exps) - exps[i]) ].zfill(len(mant_with_sign)) # + 1
+            # FIXME : To be in coherence with the hardware model don't take two's complement right now. Have this mantissa, keep the sign. Multiply and then do 2's complement. 
+            final_mant =  signs[i] + shifted_mant                   #twos_comp(shifted_mant, signs[i])[0:self.mant_bits() + 1]
             blk_res += final_mant
+
+        #print(f"blk_res = {blk_res}")
         return blk_res
 
     def to_bfp(self, blk_list: list, idx: tuple = None, insert_vec_tail = True, ridx_size=0, cidx_size=0, enable_row_subgrps=False) -> tuple:
@@ -751,148 +901,289 @@ def prepare_onchip_matb_file(input_path: str, align_to=256, head_idx=0):
         inst_infos = json.load(inst_pf)
         update_or_create_json(input_path + f"hwconfig_h{head_idx}.json", {"mat b vec size": inst_infos["mat b vec size"]})
 
-def main(args: dict):
-    hw_row = int(args["hw_row"])
-    hw_col = int(args["hw_col"])
-    n_large_blocks = int(args['large-blocks'])
-    head_idx = []
+# def main(args: dict):
+#     hw_row = int(args["hw_row"])
+#     hw_col = int(args["hw_col"])
+#     n_large_blocks = int(args['large-blocks'])
+#     head_idx = []
     
-    if args["head-indices"] is not None:
-        print(f"generating specific head indices: {args['head-indices']}")
-        head_idx = [int(i) for i in args["head-indices"]]
+#     if args["head-indices"] is not None:
+#         print(f"generating specific head indices: {args['head-indices']}")
+#         head_idx = [int(i) for i in args["head-indices"]]
 
-    if args['inputs_gen']:
-        chain_len = int(args['chain_len'])
+#     if args['inputs_gen']:
+#         chain_len = int(args['chain_len'])
 
-        if args["data-path"]:
-            if args["profile-runtime"]:
-                print("generating runtime profile")
-                with Profile() as pr:
-                    matA = mat_a_gen(
-                        args["inputs_gen"], 
-                        BFP(BfpType.BFP_12), 
-                        hw_col, 
-                        ridx_size=12, 
-                        cidx_size=10, 
-                        bfp_friendly_dat=False, 
-                        n_large_blocks=n_large_blocks, 
-                        hidx_list=head_idx,
-                        disable_file_writting=True,
-                        out_data_path=args["data-path"]
-                    )
-                    s = io.StringIO()
-                    ps = Stats(pr, stream=s).strip_dirs().sort_stats(SortKey.CALLS)
-                    ps.print_stats()
+#         if args["data-path"]:
+#             if args["profile-runtime"]:
+#                 print("generating runtime profile")
+#                 with Profile() as pr:
+#                     matA = mat_a_gen(
+#                         args["inputs_gen"], 
+#                         BFP(BfpType.BFP_12), 
+#                         hw_col, 
+#                         ridx_size=12, 
+#                         cidx_size=10, 
+#                         bfp_friendly_dat=False, 
+#                         n_large_blocks=n_large_blocks, 
+#                         hidx_list=head_idx,
+#                         disable_file_writting=True,
+#                         out_data_path=args["data-path"]
+#                     )
+#                     s = io.StringIO()
+#                     ps = Stats(pr, stream=s).strip_dirs().sort_stats(SortKey.CALLS)
+#                     ps.print_stats()
 
-                    with open("runtime_profile.txt", "w") as f:
-                        f.write(s.getvalue())
-            else:
-                matA = mat_a_gen(
-                        args["inputs_gen"], 
-                        BFP(BfpType.BFP_12), 
-                        hw_col, 
-                        ridx_size=12, 
-                        cidx_size=10, 
-                        bfp_friendly_dat=False, 
-                        n_large_blocks=n_large_blocks, 
-                        hidx_list=head_idx,
-                        out_data_path=args["data-path"],
-                )
-        else:
-            matA = mat_a_gen(
-                    "midsize", 
-                    BFP(BfpType.BFP_12), 
-                    hw_col, ridx_size=12, 
-                    cidx_size=10, 
-                    bfp_friendly_dat=True, 
-                    n_large_blocks=n_large_blocks, 
-                    hidx_list=head_idx
-                )
+#                     with open("runtime_profile.txt", "w") as f:
+#                         f.write(s.getvalue())
+#             else:
+#                 matA = mat_a_gen(
+#                         args["inputs_gen"], 
+#                         BFP(BfpType.BFP_12), 
+#                         hw_col, 
+#                         ridx_size=12, 
+#                         cidx_size=10, 
+#                         bfp_friendly_dat=False, 
+#                         n_large_blocks=n_large_blocks, 
+#                         hidx_list=head_idx,
+#                         out_data_path=args["data-path"],
+#                 )
+#         else:
+#             matA = mat_a_gen(
+#                     "midsize", 
+#                     BFP(BfpType.BFP_12), 
+#                     hw_col, ridx_size=12, 
+#                     cidx_size=10, 
+#                     bfp_friendly_dat=True, 
+#                     n_large_blocks=n_large_blocks, 
+#                     hidx_list=head_idx
+#                 )
 
-        matB = mat_b_gen(chain_len, BFP(BfpType.BFP_12), hw_row, args["data-path"])
-        # res = np.matmul(matA, matB)
-        # print(f"mat a shape: {matA.shape}, mat b shape: {matB.shape}, res shape: {res.shape}")
-        # np.save("sparse_matmul_data/mult_a_b_fp32_mata.npy", matA)
-        # np.save("sparse_matmul_data/mult_a_b_fp32_matb.npy", matB)
-        # np.save("sparse_matmul_data/mult_a_b_fp32_res.npy", res)
+#         matB = mat_b_gen(chain_len, BFP(BfpType.BFP_12), hw_row, args["data-path"])
 
-    if args['outputs-check']:
-        fname = str(args['outputs-check'])
-        correct_res_filename = str(args['correct_res'])
-        check_outputs(fname, correct_res_filename, 1, 1)
+#         #FIXME uncomment the matmul here for the hw sw model. 
+#         # res = np.matmul(matA, matB)
+#         # print(f"mat a shape: {matA.shape}, mat b shape: {matB.shape}, res shape: {res.shape}")
+#         # np.save("sparse_matmul_data/mult_a_b_fp32_mata.npy", matA)
+#         # np.save("sparse_matmul_data/mult_a_b_fp32_matb.npy", matB)
+#         # np.save("sparse_matmul_data/mult_a_b_fp32_res.npy", res)
 
-    if args['view-npy']:
-        fname = str(args['view-npy'])
-        res = np.load(fname)
-        print(res)
+#     if args['outputs-check']:
+#         fname = str(args['outputs-check'])
+#         correct_res_filename = str(args['correct_res'])
+#         check_outputs(fname, correct_res_filename, 1, 1)
 
-    if args['create-binary']:
-        path = str(args['data-path'])
-        if not head_idx:
-            inst_list = [f.split(".")[0] \
-                    for f in os.listdir(path) \
-                    if os.path.isfile(path + f) and f.endswith(".bin") and "IDX_GEN" in f]
-            head_idx = np.unique([int(i.split("_")[-2][1:]) for i in inst_list])
-        print(f"heads: {head_idx}")
-        for h in head_idx:
-            lb_list = []
-            with open(path + f"/hwconfig_h{h}.json", "r") as jf:
-                head_cfg = json.load(jf)
-                lb_list = list(range(int(head_cfg["n_lbs"])))
+#     if args['view-npy']:
+#         fname = str(args['view-npy'])
+#         res = np.load(fname)
+#         print(res)
 
-            print(f"head {h} large blocks: {lb_list}")
-            prepare_onchip_input_files(path, hw_col, head_idx=h, n_large_blocks=len(lb_list))
-            prepare_onchip_idx_file(path, hw_col, 10, head_idx=h, n_large_blocks=len(lb_list))
-            prepare_onchip_matb_file(path, 256, head_idx=h)
+#     if args['create-binary']:
+#         path = str(args['data-path'])
+#         if not head_idx:
+#             inst_list = [f.split(".")[0] \
+#                     for f in os.listdir(path) \
+#                     if os.path.isfile(path + f) and f.endswith(".bin") and "IDX_GEN" in f]
+#             head_idx = np.unique([int(i.split("_")[-2][1:]) for i in inst_list])
+#         print(f"heads: {head_idx}")
+#         for h in head_idx:
+#             lb_list = []
+#             with open(path + f"/hwconfig_h{h}.json", "r") as jf:
+#                 head_cfg = json.load(jf)
+#                 lb_list = list(range(int(head_cfg["n_lbs"])))
+
+#             print(f"head {h} large blocks: {lb_list}")
+#             prepare_onchip_input_files(path, hw_col, head_idx=h, n_large_blocks=len(lb_list))
+#             prepare_onchip_idx_file(path, hw_col, 10, head_idx=h, n_large_blocks=len(lb_list))
+#             prepare_onchip_matb_file(path, 256, head_idx=h)
     
-    if args['test']:
-        bfp_format = BFP(BfpType.BFP_12)
-        res = bfp_format.to_bfp([np.zeros((1, 20), dtype=float)])
-        print(res)
+#     if args['test']:
+#         bfp_format = BFP(BfpType.BFP_12)
+#         res = bfp_format.to_bfp([np.zeros((1, 20), dtype=float)])
+#         print(res)
 
-    if args['throughput']:
-        tp = compute_thrpt(4355, 4355, 128, 17901, 300)
-        print(f"thr:{tp:.4f}")
+#     if args['throughput']:
+#         tp = compute_thrpt(4355, 4355, 128, 17901, 300)
+#         print(f"thr:{tp:.4f}")
   
-if __name__ == "__main__":
-    arg_parser = argparse.ArgumentParser()
-    arg_parser.add_argument("-ig", "--inputs-gen", help="generate mat a and b inputs for simulation, provide input data path here", \
-                                action="store", dest="inputs_gen")
-    arg_parser.add_argument("-cl", "--chain-len", help="chain length", \
-                                action="store", dest="chain_len")
-    arg_parser.add_argument("-ci", "--compute-iter", help="compute iteration", \
-                                action="store", dest="compute_iter")
-    arg_parser.add_argument("-oc", "--outputs-check", help="check the correctness of the simulation output", \
-                                action="store", dest="outputs-check")
-    arg_parser.add_argument("-v", "--view-npy", help="view numpy file", \
-                                action="store", dest="view-npy")
-    arg_parser.add_argument("-cr", "--correct-res", help="path of the correct results", \
-                                action="store", dest="correct_res")
-    arg_parser.add_argument("-cb", "--create-binary", help="create binary file for on-chip test", \
-                                action="store_true", dest="create-binary")
-    arg_parser.add_argument("-tt", "--test", help="temp testing entry", \
-                                action="store_true", default=False)
-    arg_parser.add_argument("-th", "--throughput", help="temp compute throughput", \
-                                action="store_true", default=False)
-    arg_parser.add_argument("-dp", "--data-path", help="data path of mat a", \
-                                action="store", dest="data-path", default=None)
-    arg_parser.add_argument("-lb", "--large-blocks", help="number of large blocks", \
-                                action="store", dest="large-blocks", default=-1)
-    arg_parser.add_argument("-hidx", "--head-indices", help="list of head indices", \
-                                nargs='+', type=int, dest="head-indices", default=None)
-    arg_parser.add_argument("-pr", "--profile-runtime", help="profile runtime", \
-                                action="store_true", dest="profile-runtime", default=False)
-    arg_parser.add_argument("-nr", "--number-hrows", help="number of hw rows", \
-                                action="store", dest="hw_row", default=6)
-    arg_parser.add_argument("-nc", "--number-hcols", help="number of hw cols", \
-                                action="store", dest="hw_col", default=12)
+# if __name__ == "__main__":
+#     arg_parser = argparse.ArgumentParser()
+#     arg_parser.add_argument("-ig", "--inputs-gen", help="generate mat a and b inputs for simulation, provide input data path here", \
+#                                 action="store", dest="inputs_gen")
+#     arg_parser.add_argument("-cl", "--chain-len", help="chain length", \
+#                                 action="store", dest="chain_len")
+#     arg_parser.add_argument("-ci", "--compute-iter", help="compute iteration", \
+#                                 action="store", dest="compute_iter")
+#     arg_parser.add_argument("-oc", "--outputs-check", help="check the correctness of the simulation output", \
+#                                 action="store", dest="outputs-check")
+#     arg_parser.add_argument("-v", "--view-npy", help="view numpy file", \
+#                                 action="store", dest="view-npy")
+#     arg_parser.add_argument("-cr", "--correct-res", help="path of the correct results", \
+#                                 action="store", dest="correct_res")
+#     arg_parser.add_argument("-cb", "--create-binary", help="create binary file for on-chip test", \
+#                                 action="store_true", dest="create-binary")
+#     arg_parser.add_argument("-tt", "--test", help="temp testing entry", \
+#                                 action="store_true", default=False)
+#     arg_parser.add_argument("-th", "--throughput", help="temp compute throughput", \
+#                                 action="store_true", default=False)
+#     arg_parser.add_argument("-dp", "--data-path", help="data path of mat a", \
+#                                 action="store", dest="data-path", default=None)
+#     arg_parser.add_argument("-lb", "--large-blocks", help="number of large blocks", \
+#                                 action="store", dest="large-blocks", default=-1)
+#     arg_parser.add_argument("-hidx", "--head-indices", help="list of head indices", \
+#                                 nargs='+', type=int, dest="head-indices", default=None)
+#     arg_parser.add_argument("-pr", "--profile-runtime", help="profile runtime", \
+#                                 action="store_true", dest="profile-runtime", default=False)
+#     arg_parser.add_argument("-nr", "--number-hrows", help="number of hw rows", \
+#                                 action="store", dest="hw_row", default=6)
+#     arg_parser.add_argument("-nc", "--number-hcols", help="number of hw cols", \
+#                                 action="store", dest="hw_col", default=12)
 
-    args = vars(arg_parser.parse_args())
+#     args = vars(arg_parser.parse_args())
 
-    if args['inputs_gen'] and args['chain_len'] is None:
-        arg_parser.error("inputs generation requires a chain length AND a compute iteration!")
+#     if args['inputs_gen'] and args['chain_len'] is None:
+#         arg_parser.error("inputs generation requires a chain length AND a compute iteration!")
 
-    if args['outputs-check'] and args['correct_res'] is None:
-        arg_parser.error("must specify correct result to compare to.")
+#     if args['outputs-check'] and args['correct_res'] is None:
+#         arg_parser.error("must specify correct result to compare to.")
 
-    main(args)
+#     main(args)
+
+
+def parse_args():
+    parser = argparse.ArgumentParser(description="Compare BFP dot product methods")
+    parser.add_argument("-method", choices=["signedMult", "unsignedMult"], required=True,
+                        help="Multiplication method to use: signedMult or unsignedMult")
+    return parser.parse_args()
+
+def main() : 
+    # read the input files to get the matrices. Once we are done reading 
+    # creat the block float object and convert the vectors into block floats. 
+    # Once we have converted them, convert them back to real values after the
+    # trunctions and the common exponent and get numpy vectors that can be multiplied. 
+    # multiply these vectors. 
+    # print the results to an output file.
+    args = parse_args()
+    method = args.method
+
+    file1 = "/var/services/homes/kanadpanini.telang/Research/BlockFP_test1/BlockFP_test1.sim/sim_1/behav/xsim/vector1.txt"
+    file2 = "/var/services/homes/kanadpanini.telang/Research/BlockFP_test1/BlockFP_test1.sim/sim_1/behav/xsim/vector2.txt"
+
+    matrix1 = read_vec_files(file1) #[1.0,2.0,3.0,4.0,5.0,6.0,7.0,8.0]#
+    matrix2 = read_vec_files(file2) #[2.0,4.0,6.0,8.0,10.0,12.0,14.0,16.0]#
+
+    num_vectors = matrix1.shape[0] 
+    num_elements = matrix1.shape[1] # we need to send this as a parameter for the non sign value conversion. 
+    
+    # This would be the same for all changing BFP values. 
+    non_block_scalars = []
+    for i in range (num_vectors):
+        nonBfpScalar = np.dot(matrix1[i], matrix2[i])
+        non_block_scalars.append(nonBfpScalar)  # so that we can look into the errors. 
+
+    # print("Printing Matrix 1")
+    # print(matrix1)
+    max_error_list = []
+    avg_error_list = []
+    bfp_list = [BFP(BfpType.BFP_16), BFP(BfpType.BFP_17), BFP(BfpType.BFP_18), BFP(BfpType.BFP_19), BFP(BfpType.BFP_20), BFP(BfpType.BFP_21), BFP(BfpType.BFP_22), BFP(BfpType.BFP_23), 
+                BFP(BfpType.BFP_24), BFP(BfpType.BFP_25), BFP(BfpType.BFP_26), BFP(BfpType.BFP_27), BFP(BfpType.BFP_28), BFP(BfpType.BFP_29), BFP(BfpType.BFP_30), 
+                BFP(BfpType.BFP_31), BFP(BfpType.BFP_32)]
+    for bfp_format in bfp_list:
+        #bfp_format = BFP(BfpType.BFP_24) 
+        print(f"bfp format : {bfp_format}")
+        block_size = 8 
+
+        bfp_blocks_1 = []
+        for vec1 in matrix1: 
+            bfp_block = bfp_format.vec_to_bfp_block(vec1)
+            bfp_blocks_1.append(bfp_block)
+        #print(f"first block : {bfp_blocks_1[0]}")
+
+        bfp_blocks_2 = []
+        for vec2 in matrix2: 
+            bfp_block2 = bfp_format.vec_to_bfp_block(vec2)
+            bfp_blocks_2.append(bfp_block2)
+
+        # now once we have converted to block floats we can convert back to real values with the reduced accuracy of each element. 
+        #print(f"number of vectors in matrix 1 : {matrix1.shape[0]}")
+        #print(f"number of vectors in matrix 2 : {matrix2.shape[0]}")
+        scalars = []
+        
+        for i in range (num_vectors): 
+            result = 0.0
+
+            if (method == "signedMult"):
+                real_vec_1 = bfp_format.bfp_to_real(bfp_blocks_1[i])
+                # print(f"i = {i}")
+                # print(f"real vec 1: {real_vec_1}") 
+                real_vec_2 = bfp_format.bfp_to_real(bfp_blocks_2[i]) 
+                # print(f"real vec 2: {real_vec_2}") 
+                bfpscalars = np.dot(real_vec_1, real_vec_2)
+                scalars.append(bfpscalars)
+            
+            elif (method == "unsignedMult"):
+                vec1_sign_and_mag = bfp_format.bfp_to_sign_and_mag(bfp_blocks_1[i], num_elements)
+                vec2_sign_and_mag = bfp_format.bfp_to_sign_and_mag(bfp_blocks_2[i], num_elements)
+                for j in range(num_elements): 
+                    sign1, val1 = vec1_sign_and_mag[j] 
+                    sign2, val2 = vec2_sign_and_mag[j]
+
+                    product_mag = val1*val2 
+
+                    if(sign1 == sign2): # if both the numbers have the same sign. 
+                        result += product_mag
+                    else:
+                        result += (-1) * product_mag
+                scalars.append(result)
+            
+            else : 
+                print("Invalid Method")
+
+        # print("printing the two lists")
+        # print(scalars)
+        # print(non_block_scalars)
+        # find the absolute value of the error in each of the case.  
+        abs_error = [abs(a-b) for a,b in zip(scalars,non_block_scalars)] # itr_err in the bfpDPU test bench. 
+        max_error = max(abs_error)                                       # max_err
+        avg_error = sum(abs_error) / len(abs_error)                      # avg_err
+
+        
+        max_error_list.append(max_error)
+        avg_error_list.append(avg_error)
+
+        #print(f"Max Error: {max_error}")
+    # print("Max Error Lists") 
+    # print(max_error_list)
+    # print("Average Error List")
+    # print(avg_error_list)
+    print("finished getting errors")
+
+    # X-axis values from 7 to 23
+    x_vals = list(range(7, 24))
+
+    assert len(x_vals) == len(max_error_list), "Mismatch between x-axis and error list lengths"
+
+    plt.figure(figsize=(10, 6))
+
+    # Plot Max Error (log scale)
+    plt.plot(x_vals, max_error_list, marker='o', label='Max Error', color='red')
+
+    # Plot Avg Error (log scale)
+    plt.plot(x_vals, avg_error_list, marker='x', label='Average Error', color='blue')
+
+    plt.yscale('log')  # <<< Logarithmic y-axis
+
+    plt.title("Log Plot: Max and Average Error vs Mantissa Bits (BFP_16 to BFP_32)")
+    plt.xlabel("Number of Mantissa Bits (Effective Bits = BFP_N - 9)")
+    plt.ylabel("Error (log scale)")
+    plt.legend()
+    plt.grid(True, which="both", ls="--", linewidth=0.5)
+    plt.xticks(x_vals)
+    plt.tight_layout()
+    plt.savefig("bfp_errors_plot.png", dpi=300)
+    
+    #plt.show()  # does not work for me. 
+
+
+if __name__ == "__main__": 
+    main()                                                           #THIS JUST NEEDS TO BE TESTED NOW. I THINK IT SHOULD WORK. 
