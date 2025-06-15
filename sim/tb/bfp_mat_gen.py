@@ -5,7 +5,7 @@ import argparse
 import math
 import itertools
 from enum import Enum
-# import torch
+import torch
 from random import sample
 import json
 import os, io, glob
@@ -386,11 +386,29 @@ def mat_a_gen(
         n_layers = len(headgrp_ridx) // 32
         for l in np.arange(0, n_layers, 4):
             hidices += list(sample(range(l*32, (l+4)*32), 3))
+        # hard coded random hidx list for test
+        # hidices = [3, 6, 17, 18, 25, 28, 31, 32, 34, 35, 36, 46, 49, 66, 73, 74, 87, 89, 92, 94, 
+        #            95, 103, 104, 105, 111, 113, 114, 118, 119, 121, 132, 140, 144, 145, 147, 148, 
+        #            151, 160, 161, 163, 168, 173, 175, 188, 190, 191, 194, 198, 201, 207, 213, 217, 
+        #            219, 223, 229, 232, 234, 243, 245, 248, 253, 254, 266, 267, 273, 278, 279, 283, 
+        #            284, 297, 295, 299, 301, 307, 315, 320, 321, 334, 335, 336, 339, 340, 341, 342, 
+        #            343, 346, 347, 348, 351, 354, 355, 364, 374, 382, 394, 404, 408, 409, 415, 419, 
+        #            421, 425, 428, 429, 433, 445, 449, 455, 458, 459, 461, 464, 466, 468, 473, 476, 
+        #            482, 486, 488, 492, 498, 499, 502, 503, 505, 506, 507, 511, 515, 520, 522, 530, 
+        #            531, 535, 537, 540, 541, 553, 564, 575, 576, 578, 585, 589, 597, 599, 600, 602, 
+        #            606, 612, 613, 619, 621, 623, 629, 630, 635, 638, 644, 647, 654, 655, 661, 667, 
+        #            670, 671, 674, 683, 684, 690, 694, 701, 710, 716, 722, 729, 737, 739, 749, 750, 
+        #            754, 756, 762, 765, 769, 771, 772, 778, 782, 789, 793, 794, 796, 806, 809, 810, 
+        #            813, 822, 824, 828, 827, 830, 831, 841, 845, 847, 851, 855, 856, 867, 869, 871, 
+        #            874, 876, 880, 881, 884, 887, 893, 895]
+        hidices = [3, 6, 17, 18, 25, 28, 31, 32, 34, 35, 36, 46, 49, 66, 73, 74, 87, 89, 92, 94, 
+                   813, 822, 824, 828, 827, 830, 831, 841, 845, 847, 851, 855, 856, 867, 869, 871]
     else:
         hidices = hidx_list
 
     print(f"get {len(headgrp_ridx)} heads in total, selecting head {hidices}")
 
+    mat_a_np_list = {}
     for hidx in hidices:
         src_val_h, src_ridx_h, src_cidx_h = headgrp_vals[hidx], headgrp_ridx[hidx], headgrp_cidx[hidx] 
 
@@ -500,18 +518,20 @@ def mat_a_gen(
         coo_idx = [[p[0] for p in coo_pairs], [p[1] for p in coo_pairs]]
         coo_vals = [p[2] for p in coo_pairs]
         mat_shape = max(coo_idx[0] + coo_idx[1])
-        # mat = torch.sparse_coo_tensor(coo_idx, coo_vals, size=(mat_shape, mat_shape)).to_dense().numpy()
+        mat = torch.sparse_coo_tensor(coo_idx, coo_vals, size=(mat_shape, mat_shape)).to_dense().numpy()
+        mat_a_np_list[hidx] = mat
     
     if not disable_file_writting:
         # copy inst_profile.json
         shutil.copyfile(IN_DAT_PATH + f"/{mat_src_name}.json", 
             out_data_path + "/" + "inst_profile.json")
             
-    return None
+    return mat_a_np_list
 
 def mat_b_gen(
         chain_len: int, 
         bfp_type: BFP, 
+        hidx: int,
         n_blocks_split: int = 1, 
         out_data_path = "/compas-old/projects/sparse-attention/onchip-5hbm"
     ):
@@ -555,7 +575,7 @@ def mat_b_gen(
         # bfp conversion
         bfp_res, _ = bfp_type.to_bfp(list(chunkedBTrans))
 
-        fname = out_data_path + f"/MAT_B_{bfp_type.format_name()}_all.bin"
+        fname = out_data_path + f"/MAT_B_{bfp_type.format_name()}_h{hidx}.bin"
         if matb_blk_idx == 0:
             f = open(fname, "w+", encoding='utf-8')
         else:
@@ -568,7 +588,7 @@ def mat_b_gen(
         f.close()
 
     update_or_create_json(out_data_path + f"/inst_profile.json", {"mat b vec size": mat_b_vec_load_size})
-    return matB
+    return padded_matB
 
 def check_outputs(sim_out_fname: str, ori_fname, num_tc_rows: int, num_tc_cols: int):
     num_tcchaines = num_tc_rows * num_tc_cols
@@ -738,11 +758,11 @@ def prepare_onchip_matb_file(input_path: str, align_to=256, head_idx=0):
 
     # import mat b file
     lines = []
-    with open(input_path + f"MAT_B_BFP12_all.bin", "r", encoding="utf-8") as f:
+    with open(input_path + f"MAT_B_BFP12_h{head_idx}.bin", "r", encoding="utf-8") as f:
         lines = [line.rstrip() for line in f]
 
-    if not os.path.exists(input_path + f"onchip_mat_b_hbm.mem"):
-        with open(input_path + f"onchip_mat_b_hbm.mem", "w", encoding="utf-8") as f:
+    if not os.path.exists(input_path + f"onchip_mat_b_hbm_hidx{head_idx}.mem"):
+        with open(input_path + f"onchip_mat_b_hbm_h{head_idx}.mem", "w", encoding="utf-8") as f:
             for l in lines:
                 f.writelines(bin_to_hex(l, align_to) + "\n")
     
@@ -755,7 +775,7 @@ def main(args: dict):
     hw_row = int(args["hw_row"])
     hw_col = int(args["hw_col"])
     n_large_blocks = int(args['large-blocks'])
-    head_idx = []
+    head_idx = None
     
     if args["head-indices"] is not None:
         print(f"generating specific head indices: {args['head-indices']}")
@@ -808,13 +828,18 @@ def main(args: dict):
                     n_large_blocks=n_large_blocks, 
                     hidx_list=head_idx
                 )
-
-        matB = mat_b_gen(chain_len, BFP(BfpType.BFP_12), hw_row, args["data-path"])
-        # res = np.matmul(matA, matB)
-        # print(f"mat a shape: {matA.shape}, mat b shape: {matB.shape}, res shape: {res.shape}")
-        # np.save("sparse_matmul_data/mult_a_b_fp32_mata.npy", matA)
-        # np.save("sparse_matmul_data/mult_a_b_fp32_matb.npy", matB)
-        # np.save("sparse_matmul_data/mult_a_b_fp32_res.npy", res)
+            
+        #generate mat b test for each mat A
+        for hidx in matA.keys():
+            matB = mat_b_gen(chain_len, BFP(BfpType.BFP_12), hidx, hw_row, args["data-path"])
+            print(f"mat a shape: {matA[hidx].shape}, mat b shape: {matB.shape}")
+            if matA[hidx].shape[1] > matB.shape[0]:
+                res = np.matmul(matA[hidx][:,:matB.shape[0]], matB)
+            else:
+                res = np.matmul(matA[hidx], matB[:matA[hidx].shape[1],:])
+            # np.save("sparse_matmul_data/mult_a_b_fp32_mata.npy", matA)
+            # np.save("sparse_matmul_data/mult_a_b_fp32_matb.npy", matB)
+            np.save(f"{args['data-path']}/mult_a_b_fp32_res_h{hidx}.npy", res)
 
     if args['outputs-check']:
         fname = str(args['outputs-check'])
@@ -828,6 +853,8 @@ def main(args: dict):
 
     if args['create-binary']:
         path = str(args['data-path'])
+        if path[-1] != "/":
+            path += "/"
         if not head_idx:
             inst_list = [f.split(".")[0] \
                     for f in os.listdir(path) \
