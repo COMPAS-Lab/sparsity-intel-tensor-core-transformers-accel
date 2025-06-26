@@ -13,7 +13,7 @@ class DefaultConfig {
 
   var defaultSpinalConfig = SpinalConfig(
     mode = Verilog,
-    targetDirectory = "./src/generated_dense_core",
+    targetDirectory = "./src/generated_benes_core",
     oneFilePerComponent = true,
     defaultConfigForClockDomains = defaultClockConfig,
     removePruned = true

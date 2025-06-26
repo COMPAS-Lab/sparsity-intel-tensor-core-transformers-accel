@@ -8,18 +8,22 @@ case class BenesNetSwitch(bitwidth: Int) extends Component {
   val io = new Bundle{
     val datIn = Vec(slave Flow(BfpBlockWithIdx(bitwidth, 0, 0, 0)), 2)
     val datOut = Vec(master Flow(BfpBlockWithIdx(bitwidth, 0, 0, 0)), 2)
-    val switchCtrl, en = in Bool()
+    val switchCtrl0, switchCtrl1, en = in Bool()
   }
 
   val outReg = Vec(Reg(Flow(BfpBlockWithIdx(bitwidth, 0, 0, 0))), 2)
   outReg.foreach(_.setIdle())
 
   when(io.en) {
-    when(io.switchCtrl) {
+    when(io.switchCtrl0) {
       outReg(0) << io.datIn(1)
-      outReg(1) << io.datIn(0)
     }.otherwise {
       outReg(0) << io.datIn(0)
+    }
+
+    when(io.switchCtrl1) {
+      outReg(1) << io.datIn(0)
+    }.otherwise {
       outReg(1) << io.datIn(1)
     }
   }.otherwise {
@@ -29,7 +33,7 @@ case class BenesNetSwitch(bitwidth: Int) extends Component {
   io.datOut := outReg
 }
 
-case class BenesNet(num_ports: Int, bitwidth: Int, dest_width: Int, asso_tcc_id: Int) extends Component {
+case class BenesNet(num_ports: Int, bitwidth: Int, dest_width: Int) extends Component {
   val io = new Bundle {
     val inputSeq = in Vec(BfpBlockWithIdx(bitwidth, 0, 0, dest_width), num_ports)
     val outputSeq = Vec(master Flow(BfpBlockWithIdx(bitwidth, 0, 0, 0)), num_ports)
@@ -76,9 +80,9 @@ case class BenesNet(num_ports: Int, bitwidth: Int, dest_width: Int, asso_tcc_id:
   // input and output connection
   for (uidx <- 0 until nUnitsStg) {
     switches(0)(uidx).io.datIn(0).payload.blkData := io.inputSeq(uidx*2).blkData
-    switches(0)(uidx).io.datIn(0).valid := io.inputSeq(uidx*2).destId(asso_tcc_id)
+    switches(0)(uidx).io.datIn(0).valid := io.inputSeq(uidx*2).destId(uidx*2)
     switches(0)(uidx).io.datIn(1).payload.blkData := io.inputSeq(uidx*2+1).blkData
-    switches(0)(uidx).io.datIn(1).valid := io.inputSeq(uidx*2+1).destId(asso_tcc_id)
+    switches(0)(uidx).io.datIn(1).valid := io.inputSeq(uidx*2+1).destId(uidx*2+1)
 
     io.outputSeq(uidx*2) << switches.last(uidx).io.datOut(0)
     io.outputSeq(uidx*2+1) << switches.last(uidx).io.datOut(1)
@@ -89,7 +93,7 @@ case class BenesNet(num_ports: Int, bitwidth: Int, dest_width: Int, asso_tcc_id:
     for (uId <- 0 until nUnitsStg) {
       switches(stgIdx)(uId).io.en := io.en
       val validSigs = Vec(for (i <- switches(stgIdx)(uId).io.datIn) yield i.valid).asBits.asUInt
-      switches(stgIdx)(uId).io.switchCtrl := validSigs.muxListDc(
+      switches(stgIdx)(uId).io.switchCtrl0 := validSigs.muxListDc(
         for (i <- 0 until pow(2, validSigs.getWidth).toInt) yield (i, if (i == 1) True else False)
       )
     }

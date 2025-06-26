@@ -168,7 +168,7 @@ class TensorCoreChainArray(array_col: Int, array_row: Int, chain_len: Int, idx_w
   // keeping MATB_EN_DELAY and TRANS2TCC_DELAY the same
   val MATB_EN_DELAY = 2
   val TRANSRAM_RD_II = log2Up(NUM_MATB_VEC_PER_ROW/TRANSRAM_FOLDING_FACTOR)
-  val TRANS2TCC_DELAY = 4
+  val TRANS2TCC_DELAY = 0
   val ROWMEM2TCC_TOTAL_DELAY = MATB_EN_DELAY + TRANSRAM_RD_II + TRANS2TCC_DELAY
   val COL_BB_INSERT2TCC_DELAY = 2
   val COLBUF2TCC_TOTAL_DELAY = 1 + COL_BB_INSERT2TCC_DELAY
@@ -213,9 +213,10 @@ class TensorCoreChainArray(array_col: Int, array_row: Int, chain_len: Int, idx_w
     val isCurrSubgrpALoaded = Bool()
 
     // row buffer write and read
+    val chainTimeCorrectedRowData = Vec(Vec(UInt(88 bits), chain_len), array_row)
     val rowBuffWrAddr = Array.fill(array_row)(Counter(row_buffer_depth))
     val rowBuffWrRsel = Array.fill(array_row)(Counter(array_row))
-    val rowBufferBlkOut = Flow(Vec(Vec(BfpBlockWithIdx(88, 0, 0, 0), chain_len), array_row))
+    val rowBufferBlkOut = Vec(Flow(Vec(Vec(BfpBlockWithIdx(88, 0, 0, 0), chain_len), array_row)), array_col)
 
     // col buffer double buffer control and credits
     val colBufferCredit = Array.fill(array_col, 2)(Reg(UInt(log2Up(col_buffer_depth) bits), init=U(0)))
@@ -427,6 +428,7 @@ class TensorCoreChainArray(array_col: Int, array_row: Int, chain_len: Int, idx_w
     rowMemRdAddr := rowMemRdStateMachine.rowMemRdCounter
 
     for (r <- 0 until array_row) {
+      val benesNet = Array.fill(array_col)(BenesNet(num_ports=chain_len, bitwidth=88, dest_width=chain_len))
       val rowBuffParaRd = Vec(UInt(88 bits), chain_len).setName("rowBuffOut_" + r)
       val rowBuffWrVecSel = new Bundle {
         val vecId = Counter(chain_len)
@@ -436,7 +438,6 @@ class TensorCoreChainArray(array_col: Int, array_row: Int, chain_len: Int, idx_w
 
       if (r == 0) {
         transposeBufferValid := True
-        rowBufferBlkOut.valid := Delay(rowMemRdStateMachine.rowMemRdValid, 1)
       }
 
       // global write buffer signal
@@ -460,8 +461,9 @@ class TensorCoreChainArray(array_col: Int, array_row: Int, chain_len: Int, idx_w
           }
         }
       }
+
+      // row buffer write logic
       for (vecId <- 0 until chain_len) {
-        // row buffer write logic
         if (TRANSRAM_FOLDING_FACTOR > 1) {
           rowMem(r)(vecId).io.wraddress := rowBuffWrVecSel.foldBufSel.value @@ rowBuffWrAddr(r).value
         } else {
@@ -473,16 +475,29 @@ class TensorCoreChainArray(array_col: Int, array_row: Int, chain_len: Int, idx_w
 
         // row buffer read logic
         rowMem(r)(vecId).io.rdaddress := rowMemRdAddr
-        rowBuffParaRd(vecId) := rowMem(r)(vecId).io.q
+
+        // row connection logic
+        // pre-delay the row-input for cascade chain timing alignment
+        chainTimeCorrectedRowData(r)(vecId) := BlockDelay(rowMem(r)(vecId).io.q, 2 * vecId, "M20K")
+
+        for (c <- 0 until array_col) {
+          val rowConn = BfpBlockWithIdx(88, 0, 0, chain_len)
+          rowConn.blkData := chainTimeCorrectedRowData(r)(vecId)
+          rowConn.destId := Delay(io.sortedColIdxSlow.payload.destId, 5).resized
+          benesNet(c).io.inputSeq(vecId) := rowConn
+          rowBufferBlkOut(c).payload(r)(vecId).blkData := benesNet(c).io.outputSeq(vecId).payload.blkData
+        }
       }
+      benesNet.foreach(_.io.en := Delay(rowMemRdStateMachine.rowMemRdValid, 1))
+
       // TODO: magic number here. why 2 cycles delay?
       when(Delay(rowMemRdStateMachine.rowMemRdCounter.willOverflow, 2)) {
         tccInnerBuffSelComp(r) := ~tccInnerBuffSelComp(r)
       }
+    }
 
-      for (clenId <- 0 until chain_len) {
-        rowBufferBlkOut.payload(r)(clenId).blkData := rowBuffParaRd(clenId)
-      }
+    for (colId <- 0 until array_col) {
+      rowBufferBlkOut(colId).valid := Delay(rowMemRdStateMachine.rowMemRdValid, 4)
     }
   }
 
@@ -493,18 +508,6 @@ class TensorCoreChainArray(array_col: Int, array_row: Int, chain_len: Int, idx_w
 //      bufferArea.rowBufferBlkOut.payload(r)(tcId).blkData, array_col)
 //  }
   val CASIN_DATIN_DELAY_DELTA = ROWMEM2TCC_TOTAL_DELAY - COLBUF2TCC_TOTAL_DELAY - 1
-
-  // pre-delay the row-input for cascade chain timing alignment
-  val chainTimeCorrectedDataIn = Vec(Vec(UInt(80 bits), chain_len), array_row)
-  val chainTimeCorrectedExpIn = Vec(Vec(UInt(8 bits), chain_len), array_row)
-  for (r <- 0 until array_row) {
-    for (tcId <- 0 until chain_len) {
-      chainTimeCorrectedDataIn(r)(tcId) :=
-        BlockDelay(bufferArea.rowBufferBlkOut.payload(r)(tcId).blkData(79 downto 0), 2*tcId, "M20K")
-      chainTimeCorrectedExpIn(r)(tcId) :=
-        BlockDelay(bufferArea.rowBufferBlkOut.payload(r)(tcId).blkData(87 downto 80), 2*tcId, "M20K")
-    }
-  }
 
   for (c <- 0 until array_col) {
     val delayedLoadCascadeIn = Delay(bufferArea.casLoadBubbleInsert(c).io.datWithBubble.payload.blkData(79 downto 0),
@@ -518,11 +521,13 @@ class TensorCoreChainArray(array_col: Int, array_row: Int, chain_len: Int, idx_w
 
     for (r <- 0 until array_row) {
       tensorArray(r)(c).io.dataIn.valid :=
-        Delay(bufferArea.rowBufferBlkOut.valid, TRANS2TCC_DELAY, init=False) | matBEn4BubbleInsDelayed
+        Delay(bufferArea.rowBufferBlkOut(c).valid, TRANS2TCC_DELAY, init=False) | matBEn4BubbleInsDelayed
       // row-wise broadcasting
       for (tcId <- 0 until chain_len) {
-        tensorArray(r)(c).io.dataIn.payload(tcId) := Delay(chainTimeCorrectedDataIn(r)(tcId), TRANS2TCC_DELAY)
-        tensorArray(r)(c).io.expIn(tcId) := Delay(chainTimeCorrectedExpIn(r)(tcId), TRANS2TCC_DELAY)
+        tensorArray(r)(c).io.dataIn.payload(tcId) :=
+          Delay(bufferArea.rowBufferBlkOut(c).payload(r)(tcId).blkData(79 downto 0), TRANS2TCC_DELAY)
+        tensorArray(r)(c).io.expIn(tcId) :=
+          Delay(bufferArea.rowBufferBlkOut(c).payload(r)(tcId).blkData(87 downto 80), TRANS2TCC_DELAY)
       }
 
       // reconstruct load cascade input
