@@ -12,6 +12,7 @@ import os, io, glob
 import shutil
 from cProfile import Profile
 from pstats import Stats, SortKey
+from pathlib import Path
 
 def float_to_hex(f: float):
 	# Courtesy of https://stackoverflow.com/a/23624284
@@ -60,8 +61,11 @@ def update_or_create_json(file_path, a):
     - file_path (str): Path to the JSON file.
     - a (dict): Dictionary to append to the file's content or write if the file doesn't exist.
     """
-    if os.path.exists(file_path):
-        with open(file_path, 'r') as file:
+    if type(file_path) is str:
+        file_path = Path(file_path)
+
+    if file_path.exists():
+        with file_path.open('r') as file:
             try:
                 existing_data = json.load(file)
                 if not isinstance(existing_data, dict):
@@ -73,10 +77,10 @@ def update_or_create_json(file_path, a):
     else:
         existing_data = a
 
-    with open(file_path, 'w+') as file:
+    with file_path.open('w+') as file:
         json.dump(existing_data, file, indent=4)
     
-    print(f"File '{file_path}' updated with data: {existing_data}")
+    print(f"File '{str(file_path)}' updated with data: {existing_data}")
 
 def compute_thrpt(a_h, a_w, b_w, total_latency, freq):
     # compute throughput
@@ -343,7 +347,8 @@ def mat_a_gen(
         hidx_list = None,
         bfp_friendly_dat = False,
         disable_file_writting = False,
-        out_data_path = "/compas-old/projects/sparse-attention/onchip-5hbm",
+        in_data_path = Path("/compas-old/projects/sparse-attention"),
+        out_data_path = Path("/compas-old/projects/sparse-attention"),
         ):
     '''
     assuming mat A is a 3xthree_vec_len mat block:
@@ -356,9 +361,9 @@ def mat_a_gen(
     n_large_blocks = 1, number of large blocks to split a matrix to avoid input blocking problem
     bfp_friendly_dat = False, if to generate BFP-accurate data for easier debugging
     '''
-    mat_a_src = np.load(IN_DAT_PATH + f"/{mat_src_name}_val.npy")
-    mat_a_src_ridx = np.load(IN_DAT_PATH + f"/{mat_src_name}_ridx.npy")    
-    mat_a_src_cidx = np.load(IN_DAT_PATH + f"/{mat_src_name}_cidx.npy")
+    mat_a_src = np.load(str(in_data_path / f"{mat_src_name}_val.npy"))
+    mat_a_src_ridx = np.load(str(in_data_path / f"{mat_src_name}_ridx.npy"))    
+    mat_a_src_cidx = np.load(str(in_data_path / f"{mat_src_name}_cidx.npy"))
 
     assert mat_a_src.shape[-1] == bfp_type.blk_size(), "BFP block size mismatch"
 
@@ -408,6 +413,7 @@ def mat_a_gen(
 
     print(f"get {len(headgrp_ridx)} heads in total, selecting head {hidices}")
 
+    mat_a_list = {hidx: {} for hidx in hidices}
     mat_a_np_list = {}
     for hidx in hidices:
         src_val_h, src_ridx_h, src_cidx_h = headgrp_vals[hidx], headgrp_ridx[hidx], headgrp_cidx[hidx] 
@@ -449,10 +455,11 @@ def mat_a_gen(
 
         n_large_blocks_actual = len(src_ridx_lblks)
         print(f"head {hidx} is split into {n_large_blocks_actual} large blocks")
-        if not os.path.isdir(out_data_path):
-            os.makedirs(out_data_path)
-        update_or_create_json(out_data_path + "/" + f"hwconfig_h{hidx}.json", {"n_lbs": n_large_blocks_actual})
 
+        out_data_path.mkdir(parents=True, exist_ok=True)
+        update_or_create_json(str(out_data_path / f"hwconfig_h{hidx}.json"), {"n_lbs": n_large_blocks_actual})
+
+        mat_a_list[hidx] = {lblk_idx: {} for lblk_idx in range(n_large_blocks_actual)}
         for large_blk_idx in range(n_large_blocks_actual):
             # prepare mat a
             # pad rows to align with number of TC cols
@@ -468,9 +475,6 @@ def mat_a_gen(
             idx_after_redremove = bfp_type.idx_redremove_gen((src_ridx, src_cidx), n_hw_cols, ridx_size=ridx_size, cidx_size=cidx_size)
 
             if not disable_file_writting:
-                if not os.path.isdir(out_data_path):
-                    os.makedirs(out_data_path)
-
                 fnames = [out_data_path + "/" + f"MAT_A_{bfp_type.format_name()}_b{b_size}_h{hidx}_lb{large_blk_idx}.bin" for b_size in range(n_hw_cols)]
                 fps = [open(fname, "w+", encoding='utf-8') for fname in fnames]
                 idx_fname = out_data_path + "/" + f"IDX_GEN_h{hidx}_lb{large_blk_idx}.bin"
@@ -501,6 +505,30 @@ def mat_a_gen(
                 for idx_pair in idx_after_redremove:
                     idx_fp.write(idx_pair[0] + idx_pair[1] + "\n")
                 idx_fp.close()
+            else:
+                # save results as binary string list
+                mat_a_list[hidx][large_blk_idx] = {"idx": [], "data": [[] for b_size in range(n_hw_cols)]}
+                f_idx = 0
+                n_blks = 0
+                for big_row in bfp_res:
+                    assert(len(big_row[0]) == len(big_row[1]) and len(big_row[1]) == len(big_row[2]))
+                    n_blks += 3 * len(big_row[0])
+                    for b_idx in range(len(big_row[0])-1):
+                        mat_a_list[hidx][large_blk_idx]["data"][f_idx].append(big_row[0][b_idx])
+                        mat_a_list[hidx][large_blk_idx]["data"][f_idx].append(big_row[1][b_idx])
+                        mat_a_list[hidx][large_blk_idx]["data"][f_idx].append(big_row[2][b_idx])
+
+                    if bfp_type.is_vec_tail(big_row[0][b_idx+1], idx_width):
+                        mat_a_list[hidx][large_blk_idx]["data"][f_idx].append(big_row[0][b_idx+1])
+                        assert(len(big_row[0][b_idx+1]) == len(big_row[2][b_idx]))
+                        f_idx = int((f_idx + 1) % n_hw_cols)
+
+                print("{} big rows written to A large blk {}.".format(len(bfp_res), large_blk_idx))
+                print(f"mat A large blk total size: {n_blks * 88 / 1024. / 1024. / 8:.2f} MB")
+
+                print("generate reduced index...")
+                for idx_pair in idx_after_redremove:
+                    mat_a_list[hidx][large_blk_idx]["idx"].append(idx_pair[0] + idx_pair[1])
 
         # construct dense mat from selected head to compute gold reference
         # TODO: change COO parsing to generate result for multiple matrices
@@ -521,18 +549,19 @@ def mat_a_gen(
         mat = torch.sparse_coo_tensor(coo_idx, coo_vals, size=(mat_shape, mat_shape)).to_dense().numpy()
         mat_a_np_list[hidx] = mat
     
-    if not disable_file_writting:
-        # copy inst_profile.json
-        shutil.copyfile(IN_DAT_PATH + f"/{mat_src_name}.json", 
-            out_data_path + "/" + "inst_profile.json")
+    # copy inst_profile.json
+    if not (out_data_path / "inst_profile.json").exists():
+        shutil.copyfile(in_data_path / f"{mat_src_name}.json", 
+            out_data_path / "inst_profile.json")
             
-    return mat_a_np_list
+    return mat_a_np_list, mat_a_list
 
 def mat_b_gen(
         chain_len: int, 
         bfp_type: BFP, 
         hidx: int,
         n_blocks_split: int = 1, 
+        disable_file_writting = False,
         out_data_path = "/compas-old/projects/sparse-attention/onchip-5hbm"
     ):
     # matB = np.random.uniform(low=0., high=1.0, size=size).astype('f')
@@ -559,6 +588,7 @@ def mat_b_gen(
     else:
         padded_matB = matB
 
+    matb_list = []
     print(f"padded mat b size: {padded_matB.shape}")
     mat_b_vec_load_size = int(padded_matB.shape[0] / bfp_type.blk_size())
     matb_blk_size = math.ceil(matB_size[1] / n_blocks_split)
@@ -575,20 +605,25 @@ def mat_b_gen(
         # bfp conversion
         bfp_res, _ = bfp_type.to_bfp(list(chunkedBTrans))
 
-        fname = out_data_path + f"/MAT_B_{bfp_type.format_name()}_h{hidx}.bin"
-        if matb_blk_idx == 0:
-            f = open(fname, "w+", encoding='utf-8')
+        if disable_file_writting:
+            for i in bfp_res:
+                matb_list.append(i)
         else:
-            f = open(fname, "a", encoding='utf-8')
+            fname = out_data_path + f"/MAT_B_{bfp_type.format_name()}_h{hidx}.bin"
+            if matb_blk_idx == 0:
+                f = open(fname, "w+", encoding='utf-8')
+            else:
+                f = open(fname, "a", encoding='utf-8')
 
-        for i in bfp_res:
-            f.write(i + "\n")
+            for i in bfp_res:
+                f.write(i + "\n")
+            f.close()
+
         print("{} lines written to B.".format(len(bfp_res)))
         print(f"mat B total size: {len(bfp_res) * len(bfp_res[0]) / 1024. / 1024. / 8 :.2f} MB")
-        f.close()
 
     update_or_create_json(out_data_path + f"/inst_profile.json", {"mat b vec size": mat_b_vec_load_size})
-    return padded_matB
+    return padded_matB, matb_list
 
 def check_outputs(sim_out_fname: str, ori_fname, num_tc_rows: int, num_tc_cols: int):
     num_tcchaines = num_tc_rows * num_tc_cols
@@ -633,21 +668,30 @@ def check_outputs(sim_out_fname: str, ori_fname, num_tc_rows: int, num_tc_cols: 
     print("min err: ", np.min(err))
     print("average err: ", np.mean(err))
 
-def prepare_onchip_input_files(input_path: str, n_shared_chans: int, head_idx: int, n_large_blocks: int):
-    if input_path[-1] != "/":
-        input_path += "/"
+def prepare_onchip_input_files(
+        input_data_path: Path,
+        input_data: dict | None, 
+        n_shared_chans: int, 
+        head_idx: int, 
+        n_large_blocks: int,
+        disable_file_writting = False,
+        ):
 
     hbm_a_len_list = []
+    mem_res = {lb_idx: [] for lb_idx in range(n_large_blocks)}
     for lb_idx in range(n_large_blocks):
-        mat_a_files = \
-            [input_path + f"MAT_A_BFP12_b{i}_h{head_idx}_lb{lb_idx}.bin" for i in range(n_shared_chans)]
-
-        # import A file
-        mat_data = [[] for i in range(n_shared_chans)]
-        for fidx, fname in enumerate(mat_a_files):
-            with open(fname, "r", encoding="utf-8") as f:
-                lines = [line.rstrip() for line in f]
-                mat_data[fidx] += lines
+        if type(input_data) is None:
+            mat_a_files = \
+                [input_data_path / f"MAT_A_BFP12_b{i}_h{head_idx}_lb{lb_idx}.bin" for i in range(n_shared_chans)]
+            
+            # import A file
+            mat_data = [[] for i in range(n_shared_chans)]
+            for fidx, fname in enumerate(mat_a_files):
+                with fname.open("r", encoding="utf-8") as f:
+                    lines = [line.rstrip() for line in f]
+                    mat_data[fidx] += lines
+        else:
+            mat_data = input_data[head_idx][lb_idx]["data"]
 
         padded = "1" + "0" * (len(mat_data[0][0]) - 1)
         lens = [len(m) for m in mat_data]
@@ -677,6 +721,7 @@ def prepare_onchip_input_files(input_path: str, n_shared_chans: int, head_idx: i
         n_hbm_grps = len(n_chans_in_hbm_grp)
         n_hbm_bwidth = 256
 
+        mem_res[lb_idx] = [[] for _ in range(sum(n_hbms_per_grp))]
         for i_g_hbm in range(n_hbm_grps):
             hbm_dat = []
             n_chans_in_hbm_grp_cleft = [0] + n_chans_in_hbm_grp
@@ -701,26 +746,45 @@ def prepare_onchip_input_files(input_path: str, n_shared_chans: int, head_idx: i
 
             n_hbms_per_grp_cleft = [0] + n_hbms_per_grp
             for i_hbm in range(n_hbms_per_grp[i_g_hbm]):
-                out_fname = f"onchip_mat_a_hbm{n_hbms_per_grp_cleft[i_g_hbm] + n_hbms_per_grp[i_g_hbm] - i_hbm -1}_h{head_idx}_lb{lb_idx}.mem"
-                with open(input_path + out_fname, "w", encoding="utf-8") as f:
+                if disable_file_writting:
+                    hbm_idx = n_hbms_per_grp_cleft[i_g_hbm] + n_hbms_per_grp[i_g_hbm] - i_hbm -1
                     for l in hbm_dat:
-                        f.write(l[i_hbm * (n_hbm_bwidth//4) : (i_hbm+1) * (n_hbm_bwidth//4)] + "\n")
+                        mem_res[lb_idx][hbm_idx] = l[i_hbm * (n_hbm_bwidth//4) : (i_hbm+1) * (n_hbm_bwidth//4)]
+                else:
+                    out_fname = f"onchip_mat_a_hbm{n_hbms_per_grp_cleft[i_g_hbm] + n_hbms_per_grp[i_g_hbm] - i_hbm -1}" + \
+                                   "_h{head_idx}_lb{lb_idx}.mem"
+                    with open(input_data + out_fname, "w", encoding="utf-8") as f:
+                        for l in hbm_dat:
+                            f.write(l[i_hbm * (n_hbm_bwidth//4) : (i_hbm+1) * (n_hbm_bwidth//4)] + "\n")
 
-    update_or_create_json(input_path + f"hwconfig_h{head_idx}.json", {"mat a size": hbm_a_len_list})
+    update_or_create_json(input_data_path / f"hwconfig_h{head_idx}.json", {"mat a size": hbm_a_len_list})
+    return mem_res
     
 
 def prepare_onchip_idx_file(
-        input_path: str, n_shared_chans: int, cidx_width: tuple, head_idx: int, n_large_blocks: int, align_to=256):
-    if input_path[-1] != "/":
-        input_path += "/"
-
+        input_path: Path,
+        input_data: dict | None, 
+        n_shared_chans: int, 
+        cidx_width: tuple, 
+        head_idx: int, 
+        n_large_blocks: int, 
+        align_to=256,
+        disable_file_writting = False,
+        ):
+    
     idx_len_list = []
+    res_data = {lb_idx: None for lb_idx in range(n_large_blocks)}
     for lb_idx in range(n_large_blocks):
         # import index file
         idx, bitmask = [], []
-        with open(input_path + f"IDX_GEN_h{head_idx}_lb{lb_idx}.bin", "r", encoding="utf-8") as f:
-            lines = [line.rstrip() for line in f]
-            for l in lines:
+        if input_data is None:
+            with (input_path / f"IDX_GEN_h{head_idx}_lb{lb_idx}.bin").open("r", encoding="utf-8") as f:
+                lines = [line.rstrip() for line in f]
+                for l in lines:
+                    idx.append(l[:cidx_width])
+                    bitmask.append(l[cidx_width:cidx_width+n_shared_chans])
+        else:
+            for l in input_data[head_idx][lb_idx]["idx"]:
                 idx.append(l[:cidx_width])
                 bitmask.append(l[cidx_width:cidx_width+n_shared_chans])
 
@@ -744,32 +808,51 @@ def prepare_onchip_idx_file(
                     if(bitmask[i][chan_id] == "1"):
                         interm_iter_res[chan_id].append(idx[i])
         
-        with open(input_path + f"onchip_idx_hbm_h{head_idx}_lb{lb_idx}.mem", "w", encoding="utf-8") as f:
-            f.writelines(final_res)
+        if disable_file_writting:
+            res_data[lb_idx] = final_res
+        else:
+            with (input_path + f"onchip_idx_hbm_h{head_idx}_lb{lb_idx}.mem").open("w", encoding="utf-8") as f:
+                f.writelines(final_res)
 
         print(f"idx file len: {len(final_res)}")
         idx_len_list.append(len(final_res))
     
     update_or_create_json(input_path + f"hwconfig_h{head_idx}.json", {"idx_len": idx_len_list})
 
-def prepare_onchip_matb_file(input_path: str, align_to=256, head_idx=0):
-    if input_path[-1] != "/":
-        input_path += "/"
+    return res_data
+
+def prepare_onchip_matb_file(
+        input_path: Path,
+        input_data: list | None,
+        align_to=256, 
+        disable_file_writting = False,
+        head_idx=0
+    ):
 
     # import mat b file
     lines = []
-    with open(input_path + f"MAT_B_BFP12_h{head_idx}.bin", "r", encoding="utf-8") as f:
-        lines = [line.rstrip() for line in f]
 
-    if not os.path.exists(input_path + f"onchip_mat_b_hbm_hidx{head_idx}.mem"):
-        with open(input_path + f"onchip_mat_b_hbm_h{head_idx}.mem", "w", encoding="utf-8") as f:
-            for l in lines:
-                f.writelines(bin_to_hex(l, align_to) + "\n")
+    if input_data is None:
+        with (input_path / f"MAT_B_BFP12_h{head_idx}.bin").open("r", encoding="utf-8") as f:
+            lines = [line.rstrip() for line in f]
+    else:
+        lines = input_data
+
+    res_data = []
+    if disable_file_writting:
+        res_data = [bin_to_hex(l, align_to) for l in lines]
+    else:
+        if not (input_path / f"onchip_mat_b_hbm_hidx{head_idx}.mem").exists():
+            with (input_path / f"onchip_mat_b_hbm_h{head_idx}.mem").open("w", encoding="utf-8") as f:
+                for l in lines:
+                    f.writelines(bin_to_hex(l, align_to) + "\n")
     
     update_or_create_json(input_path + f"hwconfig_h{head_idx}.json", {"mat b size": len(lines)})
-    with open(input_path + "/inst_profile.json", "r") as inst_pf:
+    with (input_path / "inst_profile.json").open("r") as inst_pf:
         inst_infos = json.load(inst_pf)
         update_or_create_json(input_path + f"hwconfig_h{head_idx}.json", {"mat b vec size": inst_infos["mat b vec size"]})
+
+    return res_data
 
 def main(args: dict):
     hw_row = int(args["hw_row"])
@@ -788,7 +871,7 @@ def main(args: dict):
             if args["profile-runtime"]:
                 print("generating runtime profile")
                 with Profile() as pr:
-                    matA = mat_a_gen(
+                    matA, _ = mat_a_gen(
                         args["inputs_gen"], 
                         BFP(BfpType.BFP_12), 
                         hw_col, 
@@ -807,7 +890,7 @@ def main(args: dict):
                     with open("runtime_profile.txt", "w") as f:
                         f.write(s.getvalue())
             else:
-                matA = mat_a_gen(
+                matA, _ = mat_a_gen(
                         args["inputs_gen"], 
                         BFP(BfpType.BFP_12), 
                         hw_col, 
@@ -819,7 +902,7 @@ def main(args: dict):
                         out_data_path=args["data-path"],
                 )
         else:
-            matA = mat_a_gen(
+            matA, _ = mat_a_gen(
                     "midsize", 
                     BFP(BfpType.BFP_12), 
                     hw_col, ridx_size=12, 
@@ -831,7 +914,8 @@ def main(args: dict):
             
         #generate mat b test for each mat A
         for hidx in matA.keys():
-            matB = mat_b_gen(chain_len, BFP(BfpType.BFP_12), hidx, hw_row, args["data-path"])
+            matB, _ = mat_b_gen(chain_len, BFP(BfpType.BFP_12), hidx, hw_row, 
+                                disable_file_writting=False, out_data_path=args["data-path"])
             print(f"mat a shape: {matA[hidx].shape}, mat b shape: {matB.shape}")
             if matA[hidx].shape[1] > matB.shape[0]:
                 res = np.matmul(matA[hidx][:,:matB.shape[0]], matB)
