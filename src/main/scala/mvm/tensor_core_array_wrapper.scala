@@ -116,8 +116,8 @@ class tensor_core_array_wrapper(array_col: Int, array_row: Int, chain_len: Int,
   val softClrnArea = new ResetArea(softClrn, cumulative=false) {
     // ctrl registers
     val bufferSelCC = Delay(io.buf_ld_sel, CTRL_REG_DELAY)
-    val mbidxRdBoundQue = new StreamFifoIp(UInt(io.mbidx_rd_bound.getWidth bits), 64, "MLAB")
-    val maRdBoundQue = new StreamFifoIp(UInt(io.ma_rd_bound.getWidth bits), 64, "MLAB")
+    val mbidxRdBoundQue = new StreamFifoIp(UInt(io.mbidx_rd_bound.getWidth bits), 128, "MLAB")
+    val maRdBoundQue = new StreamFifoIp(UInt(io.ma_rd_bound.getWidth bits), 128, "MLAB")
     val mbidxRdBoundIoDelayed = Delay(io.mbidx_rd_bound, CTRL_REG_DELAY)
     val maRdBoundIoDelayed = Delay(io.ma_rd_bound, CTRL_REG_DELAY)
 
@@ -211,10 +211,10 @@ class tensor_core_array_wrapper(array_col: Int, array_row: Int, chain_len: Int,
     data2TcarrayRow.valid := Delay(data2TcarrayRowValid & io.tcarray_in(0).select, 4)
 
     val data2TcarrayCol = Vec(Stream(BfpBlockWithIdx(88, idx_width.r, 0, 0)), array_col)
-    // val MATA_CHAN_PER_GRP = Array(7, 5)
-    // val HBM_MATA_CHAN_GRP = Array(Array(1, 2, 3), Array(4, 5))
-    val MATA_CHAN_PER_GRP = Array(16)
-    val HBM_MATA_CHAN_GRP = Array(Array(1, 2, 3, 4, 5, 6, 7))
+    val MATA_CHAN_PER_GRP = Array(7, 5)
+    val HBM_MATA_CHAN_GRP = Array(Array(1, 2, 3), Array(4, 5))
+//    val MATA_CHAN_PER_GRP = Array(16)
+//    val HBM_MATA_CHAN_GRP = Array(Array(1, 2, 3, 4, 5, 6, 7))
     val combDataFromHbm: Array[Vec[Bits]] = Array.ofDim[Vec[Bits]](HBM_MATA_CHAN_GRP.length)
     for (i <- HBM_MATA_CHAN_GRP.indices) {
       combDataFromHbm(i) = Vec(
@@ -226,7 +226,7 @@ class tensor_core_array_wrapper(array_col: Int, array_row: Int, chain_len: Int,
     // to walk around shared mat a input problem.
     // must make sure the col buffer is large enough to use this.
     val matAFullyLoaded = Reg(Bool(), init=False)
-    val idxFifoLoaded = Bool()
+    val idxFifoLoaded = Reg(Bool(), init=False)
     val tcArray = new TensorCoreChainArray(
       array_col = array_col,
       array_row = array_row,
@@ -346,6 +346,7 @@ class tensor_core_array_wrapper(array_col: Int, array_row: Int, chain_len: Int,
         // from tc_array_in_0 to tcarray
         whenIsActive {
           isCurrCompFinished := Mux(isCurrCompFinished, True, dBuffComputePtr.edge())
+          idxFifoLoaded := True
           when(mbidxRdBoundQue.io.pop.valid) {
             when(~isNextBdPoped) {
               mbidxRdBoundQue.io.pop.ready := True
@@ -358,7 +359,9 @@ class tensor_core_array_wrapper(array_col: Int, array_row: Int, chain_len: Int,
               }
             }
           }.otherwise {
-            goto(sIdle)
+            when(isCurrCompFinished) {
+              goto(sIdle)
+            }
           }
         }
         onExit {
@@ -637,8 +640,8 @@ class tensor_core_array_wrapper(array_col: Int, array_row: Int, chain_len: Int,
 
 object tensor_core_array_wrapper_gen extends App {
   val gen = new DefaultConfig
-  val array_col = 16
-  val array_row = 8
+  val array_col = 12
+  val array_row = 6
   val chain_len = 8
   val ridx_width = 12
   val cidx_width = 10

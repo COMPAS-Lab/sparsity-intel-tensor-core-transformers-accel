@@ -86,7 +86,7 @@ class tensor_core_array_wrapper_dut:
             with open(idx_fpath, "r") as fp:
                 idx_data_hbm += [l.strip() for l in fp.readlines()]
 
-        mat_b_fpath = self.data_dir + f"/onchip_mat_b_hbm.mem"
+        mat_b_fpath = self.data_dir + f"/onchip_mat_b_hbm_h{hidx}.mem"
         with open(mat_b_fpath, "r") as fp:
             mat_b_data_hbm += [l.strip() for l in fp.readlines()]
 
@@ -291,12 +291,12 @@ class tensor_core_array_wrapper_dut:
 @cocotb.test()
 async def tensor_core_array_wrapper_test(dut):
 
-    base_path = "/compas-old/projects/sparse-attention/onchip-dualcore/chatglm2-6b-32k-attn-bfp20-lcc/iiSeqInst0477"
-    hidx = 343
+    base_path = "/compas-old/projects/sparse-attention/onchip-5hbm/chatglm2-6b-32k-attn-bfp20-lcc/iiSeqInst0477/qkT"
+    hidx = 0
     
     main_clk_period = 10
     main_clk = Clock(dut.clk, main_clk_period, units="ns")
-    dut_tester = tensor_core_array_wrapper_dut(dut, 8, 2, data_dir=base_path)
+    dut_tester = tensor_core_array_wrapper_dut(dut, 6, 2, data_dir=base_path)
     dut_tester.init_test_stimulus(hidx)
     cocotb.start_soon(main_clk.start(start_high=True))
     await dut_tester.init_inputs()

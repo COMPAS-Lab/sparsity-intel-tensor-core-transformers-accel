@@ -9,6 +9,7 @@ import torch
 from random import sample
 import json
 import os, io, glob
+from pathlib import Path
 import shutil
 from cProfile import Profile
 from pstats import Stats, SortKey
@@ -84,6 +85,37 @@ def compute_thrpt(a_h, a_w, b_w, total_latency, freq):
     time_latency = total_latency * 1./freq * 1e-6
     flops = total_ops / time_latency / 1e12
     return flops
+
+def to_bco_format(dat: torch.tensor, block_size = [3, 20]):
+    flatten_dat = dat.view(-1, dat.size()[-2], dat.size()[-1])
+    
+    brow_idx, bcol_idx = [], []
+    sparse_val = []
+    for head_dat in flatten_dat:
+        # padding
+        required_padding_size = \
+            (block_size[0] - head_dat.size()[0] % block_size[0], \
+             block_size[1] - head_dat.size()[1] % block_size[1],)
+        if sum(required_padding_size) > 0:
+            head_dat = torch.nn.functional.pad(
+                head_dat, 
+                pad=(0, required_padding_size[1], 0, required_padding_size[0]), 
+                mode="constant", 
+                value=0.0)
+        hdat_rblocks = torch.split(head_dat, block_size[0], dim=0)
+        for rbidx, rblock in enumerate(hdat_rblocks):
+            cblocks = torch.split(rblock, 20, dim=-1)
+            for cbidx, cblock in enumerate(cblocks):
+                if torch.sum(cblock).item() > 0:
+                    brow_idx.append(rbidx)
+                    bcol_idx.append(cbidx)
+                    sparse_val.append(cblock)
+
+        brow_idx.append(-1)
+        bcol_idx.append(-1)
+        sparse_val.append(torch.ones(block_size))
+
+    return (brow_idx, bcol_idx, sparse_val) 
 
 class BfpType(Enum):
     BFP_12 = 0
@@ -331,18 +363,94 @@ class BFP():
 
         return res
 
-IN_DAT_PATH = "/compas-old/projects/sparse-attention/micro25"
+def gen_fake_dense_mat(mat_shape: list[int], block_size: list[int], out_path: str, is_causal = False):
+    assert len(mat_shape) == 2, "synthesized dense mat only support 2D array"
+    res = torch.rand(mat_shape, requires_grad=False)
+    if is_causal:
+        res = res.tril()
+    ridx, cidx, val = to_bco_format(res, block_size=block_size)
+
+    val_fp = Path(out_path + "_val.npy")
+    brow_idx_fp = Path(out_path + "_ridx.npy")
+    bcol_idx_fp = Path(out_path + "_cidx.npy")
+
+    all_attn = torch.squeeze(torch.stack(val)).numpy()
+    np.save(arr=all_attn, file=val_fp)
+    all_ridx = torch.tensor(ridx).to(int).numpy()
+    np.save(arr=all_ridx, file=brow_idx_fp)
+    all_cidx = torch.tensor(cidx).to(int).numpy()
+    np.save(arr=all_cidx, file=bcol_idx_fp)
+
+    return 
+
+def gen_dense_gemm_attn(
+        block_size: list[int], 
+        hw_cols: int, hw_rows: int, hw_clen: int, 
+        in_path: str, out_path: str, 
+        n_heads=32, n_head_dim=128):
+    # get seq len
+    inst_prof_path = Path(in_path) / "inst_profile.json"
+    seq_len = 0
+    with inst_prof_path.open("r") as profile_fp:
+        inst_prof = json.load(profile_fp)
+        seq_len = int(inst_prof["seq_len"])
+
+    # set n_hidden_size
+    n_hidden_size = n_head_dim * n_heads
+
+    # qkv gen
+    def gen_gemm_data(a_size, b_size, lblk_size, postfix, is_causal=False):
+        gen_fake_dense_mat(list(a_size), block_size, str(Path(in_path) / postfix), is_causal)
+        mat_a_gen(
+                    BFP(BfpType.BFP_12), 
+                    hw_cols, 
+                    ridx_size=12, 
+                    cidx_size=10, 
+                    n_row_per_block=lblk_size,
+                    bfp_friendly_dat=False, 
+                    hidx_list=[0],
+                    in_data_path=str(Path(in_path) / postfix),
+                    out_data_path=str(Path(out_path) / postfix),
+        )
+
+        mat_b_gen(
+                    hw_clen, 
+                    BFP(BfpType.BFP_12), 
+                    0, 
+                    size=b_size,
+                    n_blocks_split=hw_rows, 
+                    out_data_path=str(Path(out_path) / postfix)
+        )
+
+        lb_list = []
+        with (Path(out_path) / postfix / "hwconfig_h0.json").open("r") as jf:
+            head_cfg = json.load(jf)
+            lb_list = list(range(int(head_cfg["n_lbs"])))
+
+        print(f"large blocks: {lb_list}")
+        prepare_onchip_input_files(str(Path(out_path) / postfix), hw_cols, head_idx=0, n_large_blocks=len(lb_list))
+        prepare_onchip_idx_file(str(Path(out_path) / postfix), hw_cols, 10, head_idx=0, n_large_blocks=len(lb_list))
+        prepare_onchip_matb_file(str(Path(out_path) / postfix), 256, head_idx=0)
+
+    #qkv
+    gen_gemm_data((seq_len, n_hidden_size), (n_hidden_size, n_hidden_size), 24, "qkv")
+    #qkT
+    gen_gemm_data((seq_len, n_head_dim), (n_head_dim, seq_len), 24*10, "qkT")
+    #aV
+    gen_gemm_data((seq_len, seq_len), (seq_len, n_head_dim), -1, "aV", is_causal=True)
+
+    return
 
 def mat_a_gen(
-        mat_src_name: str, 
         bfp_type: BFP, 
         n_hw_cols: int = 1, 
         ridx_size = 9, 
         cidx_size=9, 
-        n_large_blocks = -1,
+        n_row_per_block = -1,
         hidx_list = None,
         bfp_friendly_dat = False,
         disable_file_writting = False,
+        in_data_path = "/compas-old/projects/sparse-attention",
         out_data_path = "/compas-old/projects/sparse-attention/onchip-5hbm",
         ):
     '''
@@ -353,12 +461,12 @@ def mat_a_gen(
     n_hw_cols: int = 1, number of columns of tensor blocks
     ridx_size = 9, hardware row idx bitwidth
     cidx_size = 9, hardware col idx bitwidth
-    n_large_blocks = 1, number of large blocks to split a matrix to avoid input blocking problem
+    n_row_per_block, number of rows in a large block to split a matrix to avoid input blocking problem
     bfp_friendly_dat = False, if to generate BFP-accurate data for easier debugging
     '''
-    mat_a_src = np.load(IN_DAT_PATH + f"/{mat_src_name}_val.npy")
-    mat_a_src_ridx = np.load(IN_DAT_PATH + f"/{mat_src_name}_ridx.npy")    
-    mat_a_src_cidx = np.load(IN_DAT_PATH + f"/{mat_src_name}_cidx.npy")
+    mat_a_src = np.load(in_data_path + f"_val.npy")
+    mat_a_src_ridx = np.load(in_data_path + f"_ridx.npy")    
+    mat_a_src_cidx = np.load(in_data_path + f"_cidx.npy")
 
     assert mat_a_src.shape[-1] == bfp_type.blk_size(), "BFP block size mismatch"
 
@@ -412,13 +520,10 @@ def mat_a_gen(
     for hidx in hidices:
         src_val_h, src_ridx_h, src_cidx_h = headgrp_vals[hidx], headgrp_ridx[hidx], headgrp_cidx[hidx] 
 
-        if n_large_blocks == -1:
-            n_large_blocks_actual = math.ceil(len(src_ridx_h) / 2048)
-        else:
-            n_large_blocks_actual = n_large_blocks
-        
+        # n_row_per_block: if -1, automatically figure out block split by histogram
+        # if > 0, split it by the rows forcely        
         # split matrix into large blocks if needed
-        if n_large_blocks_actual > 1:
+        if n_row_per_block < 0:
             # Split src_ridx_h into uniformly distributed bins with integer edges
             r_hist, r_binedges = np.histogram(src_ridx_h, bins=100)
             print(f"rbin edges: {r_binedges}")
@@ -443,12 +548,41 @@ def mat_a_gen(
             for i in range(len(src_ridx_lblks)-1):
                 assert(src_ridx_lblks[i][-1] != src_ridx_lblks[i+1][0])
         else:
-            src_val_lblks = [src_val_h]
-            src_ridx_lblks = [src_ridx_h]
-            src_cidx_lblks = [src_cidx_h]
+            n_rows = list(np.unique(src_ridx_h))
+
+            chunks = []
+            num_full_chunks = len(n_rows) // n_row_per_block
+
+            # Create full chunks
+            for i in range(num_full_chunks):
+                start_index = i * n_row_per_block
+                end_index = (i + 1) * n_row_per_block
+                chunks.append(n_rows[start_index:end_index])
+
+            # Add the last chunk (if any remaining elements)
+            remaining_elements = len(n_rows) % n_row_per_block
+            if remaining_elements > 0:
+                chunks.append(n_rows[num_full_chunks * n_row_per_block:])
+
+            curr_rec_id = 0
+            src_ridx_lblks, src_cidx_lblks, src_val_lblks = [], [], []
+            curr_row_chunk, curr_col_chunk, curr_val_chunk = [], [], []
+            for curr_rowsid in chunks:
+                curr_rbound = curr_rowsid[-1]
+                while src_ridx_h[curr_rec_id] < curr_rbound:
+                    curr_row_chunk.append(src_ridx_h[curr_rec_id])
+                    curr_col_chunk.append(src_cidx_h[curr_rec_id])
+                    curr_val_chunk.append(src_val_h[curr_rec_id])
+                    curr_rec_id += 1
+
+                src_val_lblks.append(curr_val_chunk)
+                src_ridx_lblks.append(curr_row_chunk)
+                src_cidx_lblks.append(curr_col_chunk)
+                curr_row_chunk, curr_col_chunk, curr_val_chunk = [], [], []
 
         n_large_blocks_actual = len(src_ridx_lblks)
         print(f"head {hidx} is split into {n_large_blocks_actual} large blocks")
+
         if not os.path.isdir(out_data_path):
             os.makedirs(out_data_path)
         update_or_create_json(out_data_path + "/" + f"hwconfig_h{hidx}.json", {"n_lbs": n_large_blocks_actual})
@@ -521,9 +655,11 @@ def mat_a_gen(
         mat = torch.sparse_coo_tensor(coo_idx, coo_vals, size=(mat_shape, mat_shape)).to_dense().numpy()
         mat_a_np_list[hidx] = mat
     
-    if not disable_file_writting:
-        # copy inst_profile.json
-        shutil.copyfile(IN_DAT_PATH + f"/{mat_src_name}.json", 
+    # copy inst_profile.json
+    if not disable_file_writting and \
+        (Path(in_data_path) / ".json").exists() and \
+        not (Path(out_data_path) / "inst_profile.json").exists():
+        shutil.copyfile(in_data_path + f".json", 
             out_data_path + "/" + "inst_profile.json")
             
     return mat_a_np_list
@@ -532,22 +668,30 @@ def mat_b_gen(
         chain_len: int, 
         bfp_type: BFP, 
         hidx: int,
+        size: tuple = None,
         n_blocks_split: int = 1, 
-        out_data_path = "/compas-old/projects/sparse-attention/onchip-5hbm"
+        out_data_path = "/compas-old/projects/sparse-attention/onchip-5hbm",
     ):
     # matB = np.random.uniform(low=0., high=1.0, size=size).astype('f')
     # matB = np.random.randint(low=0, high=2, size=size)
+
     matB_size = None
-    with open(out_data_path + f"/inst_profile.json", "r") as mat_src_f:
-        mat_prof = json.load(mat_src_f)
-        matB_size = (mat_prof["seq_len"], 128)
+    n_matB_col_blks = 1
+    if size:
+        n_matB_col_blks = math.ceil(size[1] / 128.0)
+        matB_size = (size[0], 128)
+    else:
+        with open(out_data_path + f"/inst_profile.json", "r") as mat_src_f:
+            mat_prof = json.load(mat_src_f)
+            matB_size = (mat_prof["seq_len"], 128)
 
     matB = bfp_type.gen_bfp_friendly_data(matB_size)
     print("mat b original size: ", matB.shape)
     
-    # pad mat b to align with chain_len x BFP size
+    # pad mat b vecs to align with chain_len x BFP size
     align_size = chain_len * bfp_type.blk_size()
     required_padding_size = int(align_size - matB_size[0] % align_size)
+    # pad number of mat b cols to hw row size
     col_size = math.ceil(matB_size[1] / n_blocks_split) * n_blocks_split
     required_vec_padding_size = int(col_size - matB_size[1])
     if required_padding_size > 0:
@@ -559,7 +703,7 @@ def mat_b_gen(
     else:
         padded_matB = matB
 
-    print(f"padded mat b size: {padded_matB.shape}")
+    print(f"padded mat b size: {padded_matB.shape}, col blks: {n_matB_col_blks}")
     mat_b_vec_load_size = int(padded_matB.shape[0] / bfp_type.blk_size())
     matb_blk_size = math.ceil(matB_size[1] / n_blocks_split)
     for matb_blk_idx in range(n_blocks_split):
@@ -587,7 +731,10 @@ def mat_b_gen(
         print(f"mat B total size: {len(bfp_res) * len(bfp_res[0]) / 1024. / 1024. / 8 :.2f} MB")
         f.close()
 
-    update_or_create_json(out_data_path + f"/inst_profile.json", {"mat b vec size": mat_b_vec_load_size})
+    update_or_create_json(
+        out_data_path + f"/inst_profile.json", 
+        {"mat b vec size": mat_b_vec_load_size, "mat b col blks": n_matB_col_blks}
+    )
     return padded_matB
 
 def check_outputs(sim_out_fname: str, ori_fname, num_tc_rows: int, num_tc_cols: int):
@@ -769,12 +916,19 @@ def prepare_onchip_matb_file(input_path: str, align_to=256, head_idx=0):
     update_or_create_json(input_path + f"hwconfig_h{head_idx}.json", {"mat b size": len(lines)})
     with open(input_path + "/inst_profile.json", "r") as inst_pf:
         inst_infos = json.load(inst_pf)
-        update_or_create_json(input_path + f"hwconfig_h{head_idx}.json", {"mat b vec size": inst_infos["mat b vec size"]})
+        update_or_create_json(
+            input_path + f"hwconfig_h{head_idx}.json", 
+            {
+                "mat b vec size": inst_infos["mat b vec size"], 
+                "mat b col blks": inst_infos["mat b col blks"]
+            }
+        )
 
 def main(args: dict):
     hw_row = int(args["hw_row"])
     hw_col = int(args["hw_col"])
-    n_large_blocks = int(args['large-blocks'])
+    chain_len = int(args["chain_len"])
+    large_blk_size = int(args['large-block-size'])
     head_idx = None
     
     if args["head-indices"] is not None:
@@ -782,22 +936,20 @@ def main(args: dict):
         head_idx = [int(i) for i in args["head-indices"]]
 
     if args['inputs_gen']:
-        chain_len = int(args['chain_len'])
-
         if args["data-path"]:
             if args["profile-runtime"]:
                 print("generating runtime profile")
                 with Profile() as pr:
                     matA = mat_a_gen(
-                        args["inputs_gen"], 
                         BFP(BfpType.BFP_12), 
                         hw_col, 
                         ridx_size=12, 
                         cidx_size=10, 
                         bfp_friendly_dat=False, 
-                        n_large_blocks=n_large_blocks, 
+                        n_row_per_block=large_blk_size, 
                         hidx_list=head_idx,
                         disable_file_writting=True,
+                        in_data_path=args["inputs_gen"],
                         out_data_path=args["data-path"]
                     )
                     s = io.StringIO()
@@ -808,14 +960,14 @@ def main(args: dict):
                         f.write(s.getvalue())
             else:
                 matA = mat_a_gen(
-                        args["inputs_gen"], 
                         BFP(BfpType.BFP_12), 
                         hw_col, 
                         ridx_size=12, 
                         cidx_size=10, 
                         bfp_friendly_dat=False, 
-                        n_large_blocks=n_large_blocks, 
+                        n_row_per_block=large_blk_size, 
                         hidx_list=head_idx,
+                        in_data_path=args["inputs_gen"],
                         out_data_path=args["data-path"],
                 )
         else:
@@ -825,13 +977,19 @@ def main(args: dict):
                     hw_col, ridx_size=12, 
                     cidx_size=10, 
                     bfp_friendly_dat=True, 
-                    n_large_blocks=n_large_blocks, 
+                    n_row_per_block=large_blk_size, 
                     hidx_list=head_idx
                 )
             
         #generate mat b test for each mat A
         for hidx in matA.keys():
-            matB = mat_b_gen(chain_len, BFP(BfpType.BFP_12), hidx, hw_row, args["data-path"])
+            matB = mat_b_gen(
+                chain_len, 
+                BFP(BfpType.BFP_12), 
+                hidx=hidx, 
+                n_blocks_split=hw_row, 
+                out_data_path=args["data-path"]
+            )
             print(f"mat a shape: {matA[hidx].shape}, mat b shape: {matB.shape}")
             if matA[hidx].shape[1] > matB.shape[0]:
                 res = np.matmul(matA[hidx][:,:matB.shape[0]], matB)
@@ -871,6 +1029,18 @@ def main(args: dict):
             prepare_onchip_input_files(path, hw_col, head_idx=h, n_large_blocks=len(lb_list))
             prepare_onchip_idx_file(path, hw_col, 10, head_idx=h, n_large_blocks=len(lb_list))
             prepare_onchip_matb_file(path, 256, head_idx=h)
+
+    if args['dense-gen']:
+        gen_dense_gemm_attn(
+            block_size=[3, 20],
+            hw_cols=hw_col,
+            hw_rows=hw_row,
+            hw_clen=chain_len,
+            in_path=args['data-path'],
+            out_path=args['data-path'],
+            n_heads=32,
+            n_head_dim=128,
+        )
     
     if args['test']:
         bfp_format = BFP(BfpType.BFP_12)
@@ -903,8 +1073,8 @@ if __name__ == "__main__":
                                 action="store_true", default=False)
     arg_parser.add_argument("-dp", "--data-path", help="data path of mat a", \
                                 action="store", dest="data-path", default=None)
-    arg_parser.add_argument("-lb", "--large-blocks", help="number of large blocks", \
-                                action="store", dest="large-blocks", default=-1)
+    arg_parser.add_argument("-lb", "--large-block-size", help="#rows of large blocks", \
+                                action="store", dest="large-block-size", default=-1)
     arg_parser.add_argument("-hidx", "--head-indices", help="list of head indices", \
                                 nargs='+', type=int, dest="head-indices", default=None)
     arg_parser.add_argument("-pr", "--profile-runtime", help="profile runtime", \
@@ -913,6 +1083,8 @@ if __name__ == "__main__":
                                 action="store", dest="hw_row", default=6)
     arg_parser.add_argument("-nc", "--number-hcols", help="number of hw cols", \
                                 action="store", dest="hw_col", default=12)
+    arg_parser.add_argument("-dg", "--dense-gen", help="create synthesized dense GEMM data for qkt and qkT", \
+                                action="store_true", dest="dense-gen", default=False)
 
     args = vars(arg_parser.parse_args())
 
