@@ -40,7 +40,7 @@ case class MultiPortStream(dWidth: Int, addrWidth: Int, hasAlmostFull: Boolean, 
   }
 }
 
-class tensor_core_array_wrapper(array_col: Int, array_row: Int, chain_len: Int,
+class tensor_core_array_wrapper(array_col: Int, chain_len: Int,
                                 idx_width: IdxWidth, num_hbms: Int) extends Component {
   val io = new Bundle {
     val tc_ctrl = in UInt (8 bits)
@@ -51,7 +51,7 @@ class tensor_core_array_wrapper(array_col: Int, array_row: Int, chain_len: Int,
     val buf_ld_sel = in UInt (32 bits)
     val hbm_ready = Array.fill(num_hbms)(in Bool())
     // TODO: temp ports for idx gen only, deprecated in the future
-    val tcarray_in = Vec(slave(MultiPortStream(256, 32, false, true)), 6)
+    val tcarray_in = Vec(slave(MultiPortStream(256, 32, false, true)), 8)
     val tcarray_out = Vec(master(MultiPortStream(256, 32, true, false)), 2)
   }
 
@@ -143,10 +143,18 @@ class tensor_core_array_wrapper(array_col: Int, array_row: Int, chain_len: Int,
     val currLdRdy = Mux(dBuffLdPtr, matADbuffRdy(1), matADbuffRdy(0))
     val currCompRdy = Mux(dBuffComputePtr, matADbuffRdy(1), matADbuffRdy(0))
 
+    // static HBM assignment for mat a buffer banks, R,C,L=6,12,8
+    //    val MATA_CHAN_PER_GRP = Array(7, 5)
+    //    val HBM_MATA_CHAN_GRP = Array(Array(1, 2, 3), Array(4, 5))
+    // static HBM assignment for mat a buffer banks, R,C,L=8,16,8
+    val MATA_CHAN_PER_GRP = Array(8)
+    val HBM_MATA_CHAN_GRP = Array(Array(1, 2, 3, 4, 5, 6, 7))
+    val GRP_REUSE_FACTOR = 4
+
     // fake idx fifo
     val idxGenFifoSlow, idxGenFifoFast = new StreamFifoIp(IndexData(idx_width.c, array_col), 512, "M20K", 256)
     val tcArrayIn4IdxGen =
-      io.tcarray_in(0).data(idx_width.c * array_col - 1 downto 0).subdivideIn(idx_width.c bits)
+      io.tcarray_in(0).data(idx_width.c * array_col / GRP_REUSE_FACTOR - 1 downto 0).subdivideIn(idx_width.c bits)
     idxGenFifoSlow.io.push.payload <> IndexData(tcArrayIn4IdxGen(0), ~B(0, array_col bits))
     idxGenFifoSlow.io.push.valid := io.tcarray_in(0).select & ~bufferSelCC(0)
     idxGenFifoFast.io.push.payload <> IndexData(tcArrayIn4IdxGen(1), ~B(0, array_col bits))
@@ -159,12 +167,6 @@ class tensor_core_array_wrapper(array_col: Int, array_row: Int, chain_len: Int,
     data2TcarrayRow.valid := Delay(data2TcarrayRowValid & io.tcarray_in(0).select, 4)
 
     val data2TcarrayCol = Vec(Stream(BfpBlockWithIdx(88, idx_width.r, 0, 0)), array_col)
-    // static HBM assignment for mat a buffer banks, R,C,L=6,12,8
-    val MATA_CHAN_PER_GRP = Array(7, 5)
-    val HBM_MATA_CHAN_GRP = Array(Array(1, 2, 3), Array(4, 5))
-    // static HBM assignment for mat a buffer banks, R,C,L=8,16,8
-    //val MATA_CHAN_PER_GRP = Array(16)
-    //val HBM_MATA_CHAN_GRP = Array(Array(1, 2, 3, 4, 5, 6, 7))
     val combDataFromHbm: Array[Vec[Bits]] = Array.ofDim[Vec[Bits]](HBM_MATA_CHAN_GRP.length)
     for (i <- HBM_MATA_CHAN_GRP.indices) {
       combDataFromHbm(i) = Vec(
@@ -179,13 +181,12 @@ class tensor_core_array_wrapper(array_col: Int, array_row: Int, chain_len: Int,
     val idxFifoLoaded = Bool()
     val tcArray = new TensorCoreChainArray(
       array_col = array_col,
-      array_row = array_row,
       chain_len = chain_len,
       idx_width = idx_width,
-      col_buffer_depth = 2048,
-      row_buffer_depth = 512,
+      col_buffer_depth = 256,
+      row_buffer_depth = 128,
       out_buf_delay = 4,
-      output_fifo_depth = 128,
+      output_fifo_depth = 64,
       output_width = 24,
       inout_pipe_delay = 5,
       n_out_chans = 2,
@@ -327,6 +328,7 @@ class tensor_core_array_wrapper(array_col: Int, array_row: Int, chain_len: Int,
       val chanSel = Bool()
       val isNextBdPoped = Reg(Bool()) init False
       val bdPopDlyCounter = Counter(CTRL_REG_DELAY + 2)
+      val grpSel = Counter(GRP_REUSE_FACTOR)
 
       chanStart := False
       chanSel := False
@@ -364,9 +366,22 @@ class tensor_core_array_wrapper(array_col: Int, array_row: Int, chain_len: Int,
         whenIsActive {
           for (iHbmGrp <- HBM_MATA_CHAN_GRP.indices) {
             for (iCol <- 0 until MATA_CHAN_PER_GRP(iHbmGrp)) {
-              val iColOffset: Int = if (iHbmGrp == 0) 0 else MATA_CHAN_PER_GRP(iHbmGrp-1)
-              data2TcarrayCol(iColOffset + iCol).payload.fromUInt(combDataFromHbm(iHbmGrp)(iCol).asUInt)
-              data2TcarrayCol(iColOffset + iCol).valid := ~(combDataFromHbm(iHbmGrp)(iCol).resizeLeft(2) === B"2'b10")
+              val iColOffset: Int = if (iHbmGrp == 0) 0 else MATA_CHAN_PER_GRP(iHbmGrp - 1)
+              if (GRP_REUSE_FACTOR == 1) {
+                data2TcarrayCol(iColOffset + iCol).payload.fromUInt(combDataFromHbm(iHbmGrp)(iCol).asUInt)
+                data2TcarrayCol(iColOffset + iCol).valid := ~(combDataFromHbm(iHbmGrp)(iCol).resizeLeft(2) === B"2'b10")
+              } else if (GRP_REUSE_FACTOR > 1) {
+                switch(grpSel.value) {
+                  for (g <- 0 until GRP_REUSE_FACTOR) {
+                    is(g) {
+                      data2TcarrayCol(iColOffset + iCol + g * MATA_CHAN_PER_GRP(iHbmGrp)).payload
+                        .fromUInt(combDataFromHbm(iHbmGrp)(iCol).asUInt)
+                      data2TcarrayCol(iColOffset + iCol + g * MATA_CHAN_PER_GRP(iHbmGrp)).valid :=
+                        ~(combDataFromHbm(iHbmGrp)(iCol).resizeLeft(2) === B"2'b10")
+                    }
+                  }
+                }
+              }
             }
           }
 
@@ -404,6 +419,7 @@ class tensor_core_array_wrapper(array_col: Int, array_row: Int, chain_len: Int,
         onExit {
           isNextBdPoped := False
           bdPopDlyCounter.clear()
+          grpSel.increment()
         }
       }
     }
@@ -578,15 +594,13 @@ class tensor_core_array_wrapper(array_col: Int, array_row: Int, chain_len: Int,
 
 object tensor_core_array_wrapper_gen extends App {
   val gen = new DefaultConfig
-  val array_col = 12
-  val array_row = 6
-  val chain_len = 8
+  val array_col = 32
+  val chain_len = 16
   val ridx_width = 12
   val cidx_width = 10
 
   gen.defaultSpinalConfig.withoutEnumString().generate(new tensor_core_array_wrapper(
     array_col = array_col,
-    array_row = array_row,
     chain_len = chain_len,
     idx_width = IdxWidth(ridx_width, cidx_width),
     num_hbms = 10

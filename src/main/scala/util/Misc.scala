@@ -197,6 +197,43 @@ object StreamWidthConv{
   }.res
 }
 
+case class SrlDataMover[T <: Data](dataType: HardType[T], num_in_ports: Int) extends Component {
+  val io = new Bundle {
+    val inFlow = Vec(slave Flow(dataType), num_in_ports)
+    val outFlow = master Flow(dataType)
+    val enable = in Bool()
+  }
+
+  val isShifting = Reg(Bool()) init False
+  val shiftCounter = Counter(num_in_ports, inc=isShifting)
+  val outPipe = Vec(Reg(dataType), num_in_ports)
+
+  io.outFlow.payload := outPipe.last
+
+  for (i <- 0 until num_in_ports) {
+    when(shiftCounter.willIncrement) {
+      if (i > 0) {
+        outPipe(i) := outPipe(i - 1)
+      }
+    }.otherwise {
+      when(io.inFlow(i).valid) {outPipe(i) := io.inFlow(i).payload} .otherwise(outPipe(i).clearAll())
+    }
+  }
+
+  // ctrl
+  when(isShifting) {
+    io.outFlow.valid := True
+    when(shiftCounter.willOverflow) {
+      isShifting := False
+    }
+  }.otherwise {
+    io.outFlow.valid := False
+    when(io.enable) {
+      isShifting := True
+    }
+  }
+}
+
 class StreamDelay[T <: Data](dataType: HardType[T]) extends Component {
   val io = new Bundle {
     val inputStream = slave Stream(dataType)

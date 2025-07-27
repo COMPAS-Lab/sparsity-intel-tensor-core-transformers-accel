@@ -99,7 +99,7 @@ class FixedBfp16Converter extends Component {
 
 class FixedBfp12Converter(grpSize: Int) extends Component {
   val io = new Bundle {
-    //input: flatten 20 32-bit floating
+    //input: flatten 20 24-bit floating
     val dataIn = slave Flow(Vec(UInt(24 bits), grpSize))
     //output: 20 mantissa and one exp
     val dataOut = master Flow(UInt(grpSize * 4 + 8 bits))

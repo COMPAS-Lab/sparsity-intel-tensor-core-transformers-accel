@@ -2,100 +2,69 @@ package mvm
 
 import spinal.core._
 import spinal.lib._
-import scala.math.{min, pow, ceil}
-
-case class BenesNetSwitch(bitwidth: Int) extends Component {
-  val io = new Bundle{
-    val datIn = Vec(slave Flow(BfpBlockWithIdx(bitwidth, 0, 0, 0)), 2)
-    val datOut = Vec(master Flow(BfpBlockWithIdx(bitwidth, 0, 0, 0)), 2)
-    val switchCtrl0, switchCtrl1, en = in Bool()
-  }
-
-  val outReg = Vec(Reg(Flow(BfpBlockWithIdx(bitwidth, 0, 0, 0))), 2)
-  outReg.foreach(_.setIdle())
-
-  when(io.en) {
-    when(io.switchCtrl0) {
-      outReg(0) << io.datIn(1)
-    }.otherwise {
-      outReg(0) << io.datIn(0)
-    }
-
-    when(io.switchCtrl1) {
-      outReg(1) << io.datIn(0)
-    }.otherwise {
-      outReg(1) << io.datIn(1)
-    }
-  }.otherwise {
-    outReg := outReg
-  }
-
-  io.datOut := outReg
-}
+import scala.math.{ceil, min, pow}
 
 case class BenesNet(num_ports: Int, bitwidth: Int, dest_width: Int) extends Component {
+  // Benes Net for input data distribution
+  // reference: https://github.com/georgia-tech-synergy-lab/SIGMA
   val io = new Bundle {
     val inputSeq = in Vec(BfpBlockWithIdx(bitwidth, 0, 0, dest_width), num_ports)
     val outputSeq = Vec(master Flow(BfpBlockWithIdx(bitwidth, 0, 0, 0)), num_ports)
-    val en = in Bool()
   }
 
-  val nConnStgs: Int = (log2Up(num_ports) - 1) * 2
+  def switcher(a: BfpBlockWithIdx,
+               b: BfpBlockWithIdx,
+               stgId: Int,
+               portIdOffset: Int): BfpBlockWithIdx = {
+    val outReg = Reg(BfpBlockWithIdx(bitwidth, 0, 0, dest_width))
+
+    outReg.setName("stg_" + stgId.toString + "_muxff_" + (portIdOffset).toString)
+    outReg := Mux(a.destId(stgId), b, a)
+    outReg
+  }
+
+  assert(isPow2(num_ports), "number of inputs for Benes net should be power of 2")
+
+  val nConnStgs: Int = log2Up(num_ports) * 2
   val nUnitsStg: Int = (num_ports / 2)
 
-  val switches = Array.fill(nConnStgs + 1, nUnitsStg)(BenesNetSwitch(bitwidth))
-
   // intermediate stages connection
-  var nSubGrps = 0
-  for (stgIdx <- 0 until nConnStgs) {
-    val nSubGrpPorts: Int = num_ports / pow(2, nSubGrps).toInt
-    for (subGrpIdx <- 0 until pow(2, nSubGrps).toInt) {
-      val portIdOffset: Int = nSubGrpPorts * subGrpIdx
-      for (portId <- 0 until nSubGrpPorts) {
-        var destPort, srcPort: Int = 0
-        if (stgIdx < nConnStgs / 2) {
-          destPort = portId
-          srcPort = if (destPort < nSubGrpPorts / 2) destPort * 2
-                          else (destPort - nSubGrpPorts / 2) * 2 + 1
-        } else {
-          srcPort = portId
-          destPort = if (srcPort < nSubGrpPorts / 2) srcPort * 2
-                          else (srcPort - nSubGrpPorts / 2) * 2 + 1
-        }
-        srcPort += portIdOffset
-        destPort += portIdOffset
+  var preStgPorts: Vec[BfpBlockWithIdx] = io.inputSeq
 
-        switches(stgIdx + 1)(destPort/2).io.datIn(destPort % 2) <<
-          switches(stgIdx)(srcPort/2).io.datOut(srcPort % 2)
+  var nSubGrps = num_ports / 2
+  var currPortSkipOffset = 1
+  for (stgIdx <- 0 until nConnStgs) {
+    val curr_stg_ports = Vec(BfpBlockWithIdx(bitwidth, 0, 0, dest_width), num_ports)
+//    println("benes gen at stg ", stgIdx)
+    val nSubGrpPorts: Int = num_ports / nSubGrps
+    for (subGrpIdx <- 0 until nSubGrps) {
+      for(pId <- 0 until nSubGrpPorts) {
+        val currAbsPid = pId + subGrpIdx * nSubGrpPorts
+        val srcA = pId + subGrpIdx * nSubGrpPorts
+        val srcB = (pId + subGrpIdx * nSubGrpPorts + currPortSkipOffset) % nSubGrpPorts + subGrpIdx * nSubGrpPorts
+        curr_stg_ports(currAbsPid) := switcher(
+          a=preStgPorts(srcA),
+          b=preStgPorts(srcB),
+          stgId=stgIdx,
+          portIdOffset=currAbsPid
+        )
+//        println("- connecting p" + srcA.toString + " and p" + srcB.toString + " to p" + currAbsPid.toString)
       }
     }
 
     if (stgIdx < (nConnStgs / 2 - 1)) {
-      nSubGrps += 1
-    } else if (stgIdx > (nConnStgs/2 - 1)) {
-      nSubGrps -= 1
+      nSubGrps /= 2
+      currPortSkipOffset *= 2
+    } else if (stgIdx >= (nConnStgs/2)) {
+      nSubGrps *= 2
+      currPortSkipOffset /= 2
     }
+    preStgPorts = curr_stg_ports
   }
 
-  // input and output connection
-  for (uidx <- 0 until nUnitsStg) {
-    switches(0)(uidx).io.datIn(0).payload.blkData := io.inputSeq(uidx*2).blkData
-    switches(0)(uidx).io.datIn(0).valid := io.inputSeq(uidx*2).destId(uidx*2)
-    switches(0)(uidx).io.datIn(1).payload.blkData := io.inputSeq(uidx*2+1).blkData
-    switches(0)(uidx).io.datIn(1).valid := io.inputSeq(uidx*2+1).destId(uidx*2+1)
-
-    io.outputSeq(uidx*2) << switches.last(uidx).io.datOut(0)
-    io.outputSeq(uidx*2+1) << switches.last(uidx).io.datOut(1)
-  }
-
-  // control path
-  for (stgIdx <- 0 until nConnStgs+1) {
-    for (uId <- 0 until nUnitsStg) {
-      switches(stgIdx)(uId).io.en := io.en
-      val validSigs = Vec(for (i <- switches(stgIdx)(uId).io.datIn) yield i.valid).asBits.asUInt
-      switches(stgIdx)(uId).io.switchCtrl0 := validSigs.muxListDc(
-        for (i <- 0 until pow(2, validSigs.getWidth).toInt) yield (i, if (i == 1) True else False)
-      )
-    }
+  // output connection
+  for (pidx <- 0 until num_ports) {
+    io.outputSeq(pidx).payload.blkData := preStgPorts(pidx).blkData
+    io.outputSeq(pidx).valid := (preStgPorts(pidx).destId.asUInt === pidx)
   }
 }

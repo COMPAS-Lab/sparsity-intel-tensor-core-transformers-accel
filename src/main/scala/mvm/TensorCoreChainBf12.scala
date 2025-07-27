@@ -9,6 +9,11 @@ import util._
 
 class TensorCoreChainBf12(chain_len: Int, out_buf_delay: Int,
                           output_width: Int, ridx_width: Int) extends Component {
+  // This tensor core chain design generates all output, mimicing the
+  // flexible reduction tree architecture similar to SIGMA implementation
+  // the reduction tree is implemented by acc_zero (for accu breaking) and
+  // accumulation chain
+  // reference: https://github.com/georgia-tech-synergy-lab/SIGMA
   val io = new Bundle {
     // TODO: how to efficiently use the valid signal?
     val dataIn = slave Flow(Vec(UInt(80 bits), chain_len))
@@ -18,7 +23,8 @@ class TensorCoreChainBf12(chain_len: Int, out_buf_delay: Int,
     //data valid and data in should be 1 clock earlier than
     //the first loading because of data load reg and load_buf_sel reg
     val dataIterReady = out Bool()
-    val res = master Flow(Vec(BfpBlockWithIdx(output_width, ridx_width, 0, 0), 3))
+    // assuming the entire chain's max output is 3xchain_len
+    val res = master Flow(Vec(BfpBlockWithIdx(output_width, ridx_width, 0, 0), 3 * chain_len))
     // ctrl signal that switches the selected buffer
     val doubleBufferCompSel = in Bool()
     val doubleBufferLoadSel = in Bits(2 bits)
@@ -83,6 +89,7 @@ class TensorCoreChainBf12(chain_len: Int, out_buf_delay: Int,
 
   //ridx buffer logic: triggered by io.loadCascadeIn.valid
   val rIdxPushStart = Reg(Bool(), init=False)
+  val rIdxHistoryPipe = History(io.loadCascadeIn.rIdx, chain_len, when = loadCounter.willOverflow)
 
   rIdxBuffer(0).io.push.valid := rIdxPushStart & io.doubleBufferLoadSel(0)
   rIdxBuffer(0).io.push.payload := Delay(io.loadCascadeIn.payload.rIdx, 1)
@@ -157,7 +164,11 @@ class TensorCoreChainBf12(chain_len: Int, out_buf_delay: Int,
       tcCoreChainElems(i).io.cascade_weight_in <> tcCoreChainElems(i-1).io.cascade_weight_out
       loadBufSelDelayed(i) := Delay(loadBufSelDelayed(i-1), 2)
     }
-    tcCoreChainElems(i).io.zero_en <> False
+    if (i == 0) {
+      tcCoreChainElems(i).io.zero_en <> False
+    } else {
+      tcCoreChainElems(i).io.zero_en <> (rIdxHistoryPipe(i) === rIdxHistoryPipe(i - 1))
+    }
     tcCoreChainElems(i).io.acc_en <> False
     tcCoreChainElems(i).io.load_buf_sel <> loadBufSelDelayed(i)
     tcCoreChainElems(i).io.load_bb_one := loadBufCtrl(0) & (loadBufCompSelEnCounter > ((i+1)*3-1))
@@ -251,7 +262,21 @@ class TensorCoreChainBf12(chain_len: Int, out_buf_delay: Int,
       Mux(delayedBufCompSel, rIdxBuffer(1).io.pop.payload, rIdxBuffer(0).io.pop.payload), 1, init = U(0))
   }
 
-  io.res.payload := resWithIdx
+  for (i_out <- 0 until chain_len){
+    if (i_out == chain_len-1) {
+      for (i_tc_col <- 0 until 3) {
+        io.res.payload(i_out * 3 + i_tc_col) := resWithIdx(i_tc_col)
+      }
+    } else {
+      io.res.payload(i_out * 3 + 0).blkData := tcCoreChainElems(i_out).io.bf24_col_1
+      io.res.payload(i_out * 3 + 0).rIdx := rIdxHistoryPipe(i_out)
+      io.res.payload(i_out * 3 + 1).blkData := tcCoreChainElems(i_out).io.bf24_col_2
+      io.res.payload(i_out * 3 + 1).rIdx := rIdxHistoryPipe(i_out)
+      io.res.payload(i_out * 3 + 2).blkData := tcCoreChainElems(i_out).io.bf24_col_3
+      io.res.payload(i_out * 3 + 2).rIdx := rIdxHistoryPipe(i_out)
+    }
+  }
+
   io.res.valid := Delay(delayedDataInValidForOut, 1)
   io.dataOutLast := ~fbBufferLoadValid & io.res.valid
 }
