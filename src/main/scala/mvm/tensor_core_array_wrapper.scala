@@ -147,14 +147,22 @@ class tensor_core_array_wrapper(array_col: Int, chain_len: Int,
     //    val MATA_CHAN_PER_GRP = Array(7, 5)
     //    val HBM_MATA_CHAN_GRP = Array(Array(1, 2, 3), Array(4, 5))
     // static HBM assignment for mat a buffer banks, R,C,L=8,16,8
-    val MATA_CHAN_PER_GRP = Array(8)
+    val MATA_CHAN_PER_GRP = Array(15)
     val HBM_MATA_CHAN_GRP = Array(Array(1, 2, 3, 4, 5, 6, 7))
     val GRP_REUSE_FACTOR = 4
+
+    // check if hbm width is enough
+    assert(idx_width.c * 2 < 256, "hbm for idx is not wide enough")
+    for (i <- HBM_MATA_CHAN_GRP.indices) {
+      val hbm_width = HBM_MATA_CHAN_GRP(i).length * 256
+      val col_width = MATA_CHAN_PER_GRP(i) * (idx_width.r + 88)
+      assert((col_width / GRP_REUSE_FACTOR) < hbm_width, "hbms for cols are not wide enough")
+    }
 
     // fake idx fifo
     val idxGenFifoSlow, idxGenFifoFast = new StreamFifoIp(IndexData(idx_width.c, array_col), 512, "M20K", 256)
     val tcArrayIn4IdxGen =
-      io.tcarray_in(0).data(idx_width.c * array_col / GRP_REUSE_FACTOR - 1 downto 0).subdivideIn(idx_width.c bits)
+      io.tcarray_in(0).data(idx_width.c * 2 - 1 downto 0).subdivideIn(idx_width.c bits)
     idxGenFifoSlow.io.push.payload <> IndexData(tcArrayIn4IdxGen(0), ~B(0, array_col bits))
     idxGenFifoSlow.io.push.valid := io.tcarray_in(0).select & ~bufferSelCC(0)
     idxGenFifoFast.io.push.payload <> IndexData(tcArrayIn4IdxGen(1), ~B(0, array_col bits))
@@ -183,8 +191,8 @@ class tensor_core_array_wrapper(array_col: Int, chain_len: Int,
       array_col = array_col,
       chain_len = chain_len,
       idx_width = idx_width,
-      col_buffer_depth = 256,
-      row_buffer_depth = 128,
+      col_buffer_depth = 1024,
+      row_buffer_depth = 1024,
       out_buf_delay = 4,
       output_fifo_depth = 64,
       output_width = 24,
@@ -594,12 +602,14 @@ class tensor_core_array_wrapper(array_col: Int, chain_len: Int,
 
 object tensor_core_array_wrapper_gen extends App {
   val gen = new DefaultConfig
-  val array_col = 32
+  val array_col = 60
   val chain_len = 16
   val ridx_width = 12
   val cidx_width = 10
 
-  gen.defaultSpinalConfig.withoutEnumString().generate(new tensor_core_array_wrapper(
+  gen.getConfigForSpecificPath(s"./src/generated_benes_core_${chain_len}x${array_col}")
+    .withoutEnumString()
+    .generate(new tensor_core_array_wrapper(
     array_col = array_col,
     chain_len = chain_len,
     idx_width = IdxWidth(ridx_width, cidx_width),

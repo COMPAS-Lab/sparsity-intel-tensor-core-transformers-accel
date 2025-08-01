@@ -208,14 +208,14 @@ class TensorCoreChainArray(array_col: Int, chain_len: Int, idx_width: IdxWidth,
     // col buffer has the depth x 2 for double buffering
     val colBuffer = Array.fill(array_col)(
       new StreamFifoIp(UInt(88 + idx_width.r bits), col_buffer_depth * 2, "M20K"))
-    val rowMem = Array.fill(array_col, chain_len)(
+    val rowMem = Array.fill(chain_len)(
       new spram_megafunc(88, row_buffer_depth, "M20K"))
     val isCurrSubgrpALoaded = Bool()
 
     // row buffer write and read
-    val chainTimeCorrectedRowData = Vec(Vec(UInt(88 bits), chain_len), array_col)
-    val rowBuffWrAddr = Array.fill(array_col)(Counter(row_buffer_depth))
-    val rowBuffWrRsel = Array.fill(array_col)(Counter(array_col))
+    val chainTimeCorrectedRowData = Vec(UInt(88 bits), chain_len)
+    val rowBuffWrAddr = Counter(row_buffer_depth)
+    val rowBuffWrRsel = Counter(array_col)
     val rowBufferBlkOut = Vec(Flow(Vec(BfpBlockWithIdx(88, 0, 0, 0), chain_len)), array_col)
 
     // col buffer double buffer control and credits
@@ -428,64 +428,64 @@ class TensorCoreChainArray(array_col: Int, chain_len: Int, idx_width: IdxWidth,
     rowMemRdAddr := rowMemRdStateMachine.rowMemRdCounter
 
     // copy row mem array_col times, each serving as a bank for one DPE (tensor core chain)
+    val benesNet = Array.fill(array_col)(BenesNet(num_ports=chain_len, bitwidth=88, dest_width=chain_len))
+
+    val rowBuffParaRd = Vec(UInt(88 bits), chain_len).setName("rowBuffOut")
+    val rowBuffWrVecSel = new Bundle {
+      val vecId = Counter(chain_len)
+      val foldBufSel = (TRANSRAM_FOLDING_FACTOR > 1) generate Counter(TRANSRAM_FOLDING_FACTOR)
+    }
+    val isTransRamRdValid = Reg(Bool(), init=False).setName("isTransRamRdValid")
+
+    transposeBufferValid := True
+
+    // global write buffer signal
+    when(io.matBLoad.fire) {
+      when(rowBuffWrAddr.value + 1 === io.configRowBuffWrBound) {
+        rowBuffWrAddr.clear()
+        rowBuffWrVecSel.vecId.increment()
+      }.otherwise {
+        rowBuffWrAddr.increment()
+      }
+      if (TRANSRAM_FOLDING_FACTOR > 1) {
+        when(rowBuffWrVecSel.vecId.willOverflow) {
+          rowBuffWrVecSel.foldBufSel.increment()
+        }
+        when(rowBuffWrVecSel.foldBufSel.willOverflow) {
+          rowBuffWrRsel.increment()
+        }
+      } else {
+        when(rowBuffWrVecSel.vecId.willOverflow) {
+          rowBuffWrRsel.increment()
+        }
+      }
+    }
+
+    // row buffer write and read logic
+    for (vecId <- 0 until chain_len) {
+      if (TRANSRAM_FOLDING_FACTOR > 1) {
+        rowMem(vecId).io.wraddress := rowBuffWrVecSel.foldBufSel.value @@ rowBuffWrAddr.value
+      } else {
+        rowMem(vecId).io.wraddress := rowBuffWrAddr.value
+      }
+      rowMem(vecId).io.wren :=
+        io.matBLoad.valid & rowBuffWrVecSel.vecId.value === vecId
+      rowMem(vecId).io.data := io.matBLoad.payload
+
+      // row buffer read logic
+      rowMem(vecId).io.rdaddress := rowMemRdAddr
+
+      // row connection logic
+      // pre-delay the row-input for cascade chain timing alignment
+      chainTimeCorrectedRowData(vecId) := BlockDelay(rowMem(vecId).io.q, 2 * vecId, "MLAB")
+    }
+
+    // mat b broadcasting from rowMem to all array cols
     for (c <- 0 until array_col) {
-      val benesNet = BenesNet(num_ports=chain_len, bitwidth=88, dest_width=chain_len)
-      val rowBuffParaRd = Vec(UInt(88 bits), chain_len).setName("rowBuffOut_cp" + c)
-      val rowBuffWrVecSel = new Bundle {
-        val vecId = Counter(chain_len)
-        val foldBufSel = (TRANSRAM_FOLDING_FACTOR > 1) generate Counter(TRANSRAM_FOLDING_FACTOR)
-      }
-      val isTransRamRdValid = Reg(Bool(), init=False).setName("isTransRamRdValid_cp" + c)
-
-      if (c == 0) {
-        transposeBufferValid := True
-      }
-
-      // global write buffer signal
-      when(io.matBLoad.fire) {
-        when(rowBuffWrAddr(c).value + 1 === io.configRowBuffWrBound) {
-          rowBuffWrAddr(c).clear()
-          rowBuffWrVecSel.vecId.increment()
-        }.otherwise {
-          rowBuffWrAddr(c).increment()
-        }
-        if (TRANSRAM_FOLDING_FACTOR > 1) {
-          when(rowBuffWrVecSel.vecId.willOverflow) {
-            rowBuffWrVecSel.foldBufSel.increment()
-          }
-          when(rowBuffWrVecSel.foldBufSel.willOverflow) {
-            rowBuffWrRsel(c).increment()
-          }
-        } else {
-          when(rowBuffWrVecSel.vecId.willOverflow) {
-            rowBuffWrRsel(c).increment()
-          }
-        }
-      }
-
-      // row buffer write logic
       for (vecId <- 0 until chain_len) {
-        if (TRANSRAM_FOLDING_FACTOR > 1) {
-          rowMem(c)(vecId).io.wraddress := rowBuffWrVecSel.foldBufSel.value @@ rowBuffWrAddr(c).value
-        } else {
-          rowMem(c)(vecId).io.wraddress := rowBuffWrAddr(c).value
-        }
-        rowMem(c)(vecId).io.wren :=
-          io.matBLoad.valid & rowBuffWrVecSel.vecId.value === vecId & rowBuffWrRsel(c) === c
-        rowMem(c)(vecId).io.data := io.matBLoad.payload
-
-        // row buffer read logic
-        rowMem(c)(vecId).io.rdaddress := rowMemRdAddr
-
-        // row connection logic
-        // pre-delay the row-input for cascade chain timing alignment
-        chainTimeCorrectedRowData(c)(vecId) := BlockDelay(rowMem(c)(vecId).io.q, 2 * vecId, "MLAB")
-
-        val rowConn = BfpBlockWithIdx(88, 0, 0, chain_len)
-        rowConn.blkData := chainTimeCorrectedRowData(c)(vecId)
-        rowConn.destId := Delay(io.sortedColIdxSlow.payload.destId, 5).resized
-        benesNet.io.inputSeq(vecId) := rowConn
-        rowBufferBlkOut(c).payload(vecId).blkData := benesNet.io.outputSeq(vecId).payload.blkData
+        benesNet(c).io.inputSeq(vecId).blkData := chainTimeCorrectedRowData(vecId)
+        benesNet(c).io.inputSeq(vecId).destId := Delay(io.sortedColIdxSlow.payload.destId, 5).resized
+        rowBufferBlkOut(c).payload(vecId).blkData := benesNet(c).io.outputSeq(vecId).payload.blkData
       }
       rowBufferBlkOut(c).valid := Delay(rowMemRdStateMachine.rowMemRdValid, 4)
 
@@ -741,7 +741,7 @@ class TensorCoreChainArray(array_col: Int, chain_len: Int, idx_width: IdxWidth,
   val outBuffer = Array.fill(n_out_chans)(
     new StreamOutAsymFifo(
       input_width = (output_width + idx_width.r) * 3 * array_col / n_out_chans,
-      output_width = (output_width + idx_width.r) * n_words_outchan,
+      output_width = (output_width + idx_width.r),
       depth=output_fifo_depth
     )
   )
