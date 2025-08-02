@@ -13,7 +13,7 @@ class DefaultConfig {
 
   var defaultSpinalConfig = SpinalConfig(
     mode = Verilog,
-    targetDirectory = "./src/generated_2core",
+    targetDirectory = "./src/generated_core",
     oneFilePerComponent = true,
     defaultConfigForClockDomains = defaultClockConfig,
     removePruned = true
@@ -23,4 +23,16 @@ class DefaultConfig {
     defaultConfigForClockDomains = ClockDomainConfig(
       resetActiveLevel = LOW)
   )).addSimulatorFlag("--x-assign 0 --x-initial 0").withWave(5)
+
+  def getConfigForSpecificPath(path: String): SpinalConfig = {
+    var spinalConfig = SpinalConfig(
+      mode = Verilog,
+      targetDirectory = path,
+      oneFilePerComponent = true,
+      defaultConfigForClockDomains = defaultClockConfig,
+      removePruned = true
+    )
+
+    spinalConfig
+  }
 }

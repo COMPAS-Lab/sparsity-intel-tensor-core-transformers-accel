@@ -131,7 +131,7 @@ class tensor_core_array_wrapper(array_col: Int, array_row: Int, chain_len: Int,
     when(loadRdBounds.rise()) {
       mbidxRdBoundQue.io.push.valid := True
       maRdBoundQue.io.push.valid := True
-    } .otherwise {
+    }.otherwise {
       mbidxRdBoundQue.io.push.valid := False
       maRdBoundQue.io.push.valid := False
     }
@@ -146,16 +146,20 @@ class tensor_core_array_wrapper(array_col: Int, array_row: Int, chain_len: Int,
     val idxGenerator = new IndexGenerator(array_col, idx_width.c, BigInt("1" * idx_width.c, 2))
     val idxGenFifoFast, idxGenFifoSlow = new StreamFifoIp(IndexData(idx_width.c, array_col), 512, "M20K", 256)
     // index generator connection
-    val isIdxGenWaitingOuts = Reg(Bits(array_col bits), init=B(0))
-    val isLastPlaceholderRecved = Reg(Bits(3 bits), init=B(0))
+    val isIdxGenWaitingOuts = Reg(Bits(array_col bits), init = B(0))
+    val isLastPlaceholderRecved = Reg(Bits(3 bits), init = B(0))
     val tcArrayIn4IdxGenValid = Bool()
+
+    if (idx_width.c * array_col > io.tcarray_in(0).data.getBitsWidth) {
+      throw new Exception("hbm channel 0 not wide enough to hold indices")
+    }
 
     val tcArrayIn4IdxGen =
       io.tcarray_in(0).data(idx_width.c * array_col - 1 downto 0).subdivideIn(idx_width.c bits)
 
     for (i <- 0 until array_col) {
       val idxGenInValid, idxGenInLast = Bool()
-      val lastGrpRaised = Reg(Bool(), init=False)
+      val lastGrpRaised = Reg(Bool(), init = False)
 
       when(isIdxGenWaitingOuts(i)) {
         idxGenInValid := False
@@ -215,6 +219,15 @@ class tensor_core_array_wrapper(array_col: Int, array_row: Int, chain_len: Int,
     // val HBM_MATA_CHAN_GRP = Array(Array(1, 2, 3), Array(4, 5))
     val MATA_CHAN_PER_GRP = Array(16)
     val HBM_MATA_CHAN_GRP = Array(Array(1, 2, 3, 4, 5, 6, 7))
+
+    for (i <- HBM_MATA_CHAN_GRP.indices) {
+      val hbm_width = HBM_MATA_CHAN_GRP(i).length * 256
+      val col_width = MATA_CHAN_PER_GRP(i) * (idx_width.r + 88)
+      if (col_width < hbm_width) {
+        throw new Exception("hbms for cols are not wide enough")
+      }
+    }
+
     val combDataFromHbm: Array[Vec[Bits]] = Array.ofDim[Vec[Bits]](HBM_MATA_CHAN_GRP.length)
     for (i <- HBM_MATA_CHAN_GRP.indices) {
       combDataFromHbm(i) = Vec(
@@ -643,11 +656,13 @@ object tensor_core_array_wrapper_gen extends App {
   val ridx_width = 12
   val cidx_width = 10
 
-  gen.defaultSpinalConfig.withoutEnumString().generate(new tensor_core_array_wrapper(
-    array_col = array_col,
-    array_row = array_row,
-    chain_len = chain_len,
-    idx_width = IdxWidth(ridx_width, cidx_width),
-    num_hbms = 10
-  ))
+  gen.getConfigForSpecificPath(s"./src/generated_spmm_core_${array_row}x${array_col}x${chain_len}")
+    .withoutEnumString()
+    .generate(new tensor_core_array_wrapper(
+      array_col = array_col,
+      array_row = array_row,
+      chain_len = chain_len,
+      idx_width = IdxWidth(ridx_width, cidx_width),
+      num_hbms = 10
+    ))
 }
