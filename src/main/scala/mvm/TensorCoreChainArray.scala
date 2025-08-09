@@ -442,7 +442,7 @@ class TensorCoreChainArray(array_col: Int, array_row: Int, chain_len: Int, idx_w
           .setName("bufferArea_rowBuffWrCtrl_" + r)
       val rowTransBuffRdAddr = Counter(NUM_MATB_VEC_PER_ROW).setName("bufferArea_transposeBufRdAddr_" + r)
       val rowTransBuffFakeRdCtr = Counter(NUM_MATB_VEC_PER_ROW).setName("bufferArea_rowTransBuffFakeRdCtr_" + r)
-      val transposeBufferOccu = Reg(UInt(2 bits), init=U(0))
+      val transposeBufferOccu = Reg(UInt(3 bits), init=U(0))
       transposeBufferOccu.setName("bufferArea_transposeBufOccu_" + r)
       val transposeBufferWrDbufSel = Reg(UInt(1 bits), init=U(0))
       val transposeBufferWrAddr =
@@ -840,10 +840,11 @@ class TensorCoreChainArray(array_col: Int, array_row: Int, chain_len: Int, idx_w
     }
   }
   // TODO: fix 88 bit width conversion
+  // FIXME: temporarlily disable max outchan utilization for simpler output grouping
   val outBuffer = Array.fill(n_out_chans)(
     new StreamOutAsymFifo(
       input_width = (outBfpConv(0)(0).io.dataOut.payload.getBitsWidth + idx_width.r) * 3 * array_col / n_out_chans,
-      output_width = (outBfpConv(0)(0).io.dataOut.payload.getBitsWidth + idx_width.r) * n_words_outchan,
+      output_width = (outBfpConv(0)(0).io.dataOut.payload.getBitsWidth + idx_width.r),
       depth=output_fifo_depth
     )
   )

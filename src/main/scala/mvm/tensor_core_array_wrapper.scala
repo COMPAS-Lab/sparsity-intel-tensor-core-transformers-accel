@@ -149,14 +149,32 @@ class tensor_core_array_wrapper(array_col: Int, array_row: Int, chain_len: Int,
     val isIdxGenWaitingOuts = Reg(Bits(array_col bits), init = B(0))
     val isLastPlaceholderRecved = Reg(Bits(3 bits), init = B(0))
     val tcArrayIn4IdxGenValid = Bool()
+    val IDX_IN_GRP_REUSE_FACTOR = 2
 
-    if (idx_width.c * array_col > io.tcarray_in(0).data.getBitsWidth) {
+    if (idx_width.c * array_col / IDX_IN_GRP_REUSE_FACTOR > io.tcarray_in(0).data.getBitsWidth) {
       throw new Exception("hbm channel 0 not wide enough to hold indices")
     }
 
-    val tcArrayIn4IdxGen =
-      io.tcarray_in(0).data(idx_width.c * array_col - 1 downto 0).subdivideIn(idx_width.c bits)
+    // index input reuse logic
+    val grped_index_data_in =
+      Vec(Reg(UInt(idx_width.c * array_col / IDX_IN_GRP_REUSE_FACTOR bits)), IDX_IN_GRP_REUSE_FACTOR)
+    if (IDX_IN_GRP_REUSE_FACTOR > 1) {
+      val idx_in_mux_counter = Counter(IDX_IN_GRP_REUSE_FACTOR)
+      when(io.tcarray_in(0).select) {
+        idx_in_mux_counter.increment()
+      }
+      for (i <- grped_index_data_in.indices) {
+        grped_index_data_in(i).init(0)
+        when(idx_in_mux_counter.value === i) {
+          grped_index_data_in(i) :=
+            io.tcarray_in(0).data(idx_width.c * array_col / IDX_IN_GRP_REUSE_FACTOR - 1 downto 0)
+        }
+      }
+    } else {
+      grped_index_data_in(0) := io.tcarray_in(0).data(idx_width.c * array_col - 1 downto 0)
+    }
 
+    val tcArrayIn4IdxGen = grped_index_data_in.asBits.asUInt.subdivideIn(idx_width.c bits)
     for (i <- 0 until array_col) {
       val idxGenInValid, idxGenInLast = Bool()
       val lastGrpRaised = Reg(Bool(), init = False)
@@ -217,13 +235,14 @@ class tensor_core_array_wrapper(array_col: Int, array_row: Int, chain_len: Int,
     val data2TcarrayCol = Vec(Stream(BfpBlockWithIdx(88, idx_width.r, 0, 0)), array_col)
     // val MATA_CHAN_PER_GRP = Array(7, 5)
     // val HBM_MATA_CHAN_GRP = Array(Array(1, 2, 3), Array(4, 5))
-    val MATA_CHAN_PER_GRP = Array(16)
+    val MATA_CHAN_PER_GRP = Array(9)
     val HBM_MATA_CHAN_GRP = Array(Array(1, 2, 3, 4, 5, 6, 7))
+    val COL_IN_GRP_REUSE_FACTOR = 4
 
     for (i <- HBM_MATA_CHAN_GRP.indices) {
       val hbm_width = HBM_MATA_CHAN_GRP(i).length * 256
-      val col_width = MATA_CHAN_PER_GRP(i) * (idx_width.r + 88)
-      if (col_width < hbm_width) {
+      val col_width = MATA_CHAN_PER_GRP(i) * (idx_width.r + 88) / COL_IN_GRP_REUSE_FACTOR
+      if (col_width > hbm_width) {
         throw new Exception("hbms for cols are not wide enough")
       }
     }
@@ -399,6 +418,7 @@ class tensor_core_array_wrapper(array_col: Int, array_row: Int, chain_len: Int,
       val chanSel = Bool()
       val isNextBdPoped = Reg(Bool()) init False
       val bdPopDlyCounter = Counter(CTRL_REG_DELAY + 2)
+      val hbmGrpSel = Counter(COL_IN_GRP_REUSE_FACTOR)
 
       chanStart := False
       chanSel := False
@@ -437,8 +457,22 @@ class tensor_core_array_wrapper(array_col: Int, array_row: Int, chain_len: Int,
           for (iHbmGrp <- HBM_MATA_CHAN_GRP.indices) {
             for (iCol <- 0 until MATA_CHAN_PER_GRP(iHbmGrp)) {
               val iColOffset: Int = if (iHbmGrp == 0) 0 else MATA_CHAN_PER_GRP(iHbmGrp-1)
-              data2TcarrayCol(iColOffset + iCol).payload.fromUInt(combDataFromHbm(iHbmGrp)(iCol).asUInt)
-              data2TcarrayCol(iColOffset + iCol).valid := ~(combDataFromHbm(iHbmGrp)(iCol).resizeLeft(2) === B"2'b10")
+
+              if (COL_IN_GRP_REUSE_FACTOR == 1) {
+                data2TcarrayCol(iColOffset + iCol).payload.fromUInt(combDataFromHbm(iHbmGrp)(iCol).asUInt)
+                data2TcarrayCol(iColOffset + iCol).valid := ~(combDataFromHbm(iHbmGrp)(iCol).resizeLeft(2) === B"2'b10")
+              } else if (COL_IN_GRP_REUSE_FACTOR > 1) {
+                switch(hbmGrpSel.value) {
+                  for (g <- 0 until COL_IN_GRP_REUSE_FACTOR) {
+                    is(g) {
+                      data2TcarrayCol(iColOffset + iCol + g * MATA_CHAN_PER_GRP(iHbmGrp)).payload
+                        .fromUInt(combDataFromHbm(iHbmGrp)(iCol).asUInt)
+                      data2TcarrayCol(iColOffset + iCol + g * MATA_CHAN_PER_GRP(iHbmGrp)).valid :=
+                        ~(combDataFromHbm(iHbmGrp)(iCol).resizeLeft(2) === B"2'b10")
+                    }
+                  }
+                }
+              }
             }
           }
 
@@ -650,13 +684,13 @@ class tensor_core_array_wrapper(array_col: Int, array_row: Int, chain_len: Int,
 
 object tensor_core_array_wrapper_gen extends App {
   val gen = new DefaultConfig
-  val array_col = 16
+  val array_col = 36
   val array_row = 8
   val chain_len = 8
   val ridx_width = 12
   val cidx_width = 10
 
-  gen.getConfigForSpecificPath(s"./src/generated_spmm_core_${array_row}x${array_col}x${chain_len}")
+  gen.getConfigForSpecificPath(s"./src/generated_spmm_core_r${array_row}c${array_col}cl${chain_len}")
     .withoutEnumString()
     .generate(new tensor_core_array_wrapper(
       array_col = array_col,
