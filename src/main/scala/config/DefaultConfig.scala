@@ -30,7 +30,8 @@ class DefaultConfig {
       targetDirectory = path,
       oneFilePerComponent = true,
       defaultConfigForClockDomains = defaultClockConfig,
-      removePruned = true
+      removePruned = true,
+      bitVectorWidthMax = 5120,
     )
 
     spinalConfig

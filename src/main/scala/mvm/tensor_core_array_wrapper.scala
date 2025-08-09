@@ -147,7 +147,7 @@ class tensor_core_array_wrapper(array_col: Int, chain_len: Int,
     //    val MATA_CHAN_PER_GRP = Array(7, 5)
     //    val HBM_MATA_CHAN_GRP = Array(Array(1, 2, 3), Array(4, 5))
     // static HBM assignment for mat a buffer banks, R,C,L=8,16,8
-    val MATA_CHAN_PER_GRP = Array(15)
+    val MATA_CHAN_PER_GRP = Array(9)
     val HBM_MATA_CHAN_GRP = Array(Array(1, 2, 3, 4, 5, 6, 7))
     val GRP_REUSE_FACTOR = 4
 
@@ -602,7 +602,7 @@ class tensor_core_array_wrapper(array_col: Int, chain_len: Int,
 
 object tensor_core_array_wrapper_gen extends App {
   val gen = new DefaultConfig
-  val array_col = 60
+  val array_col = 36
   val chain_len = 16
   val ridx_width = 12
   val cidx_width = 10
