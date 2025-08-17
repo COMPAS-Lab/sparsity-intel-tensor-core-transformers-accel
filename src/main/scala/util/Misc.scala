@@ -2,7 +2,10 @@ package util
 
 import spinal.core._
 import spinal.lib._
+
 import scala.math.pow
+import scala.math.ceil
+import scala.reflect.{ClassTag, classTag}
 
 object LeadingZeros {
 
@@ -170,29 +173,62 @@ object BlockDelay {
 
 object StreamWidthConv{
   def apply[T <: Data](that: Stream[Vec[T]], out_width: Int): Stream[Vec[T]] = new Composite(that) {
-    require(that.payload.length < out_width, "stream width conversion only supports narrow to wide conversion")
-
     val resPayload = Vec(Reg(cloneOf(that.payload.last), init=cloneOf(that.payload.last).getZero), out_width)
-    val inCounter = Counter(out_width / that.payload.length) init 0
     val res = Stream(Vec(cloneOf(that.payload.last), out_width))
 
+    if (that.payload.length < out_width) {
+      res.payload := resPayload
 
-    that.ready := res.ready
-    when(that.fire || (that.ready && inCounter.willOverflowIfInc)) {
-      inCounter.increment()
-    }
-    when(inCounter.willOverflow) {
-      resPayload.foreach(_.clearAll())
-    }
-    res.valid := inCounter.willOverflowIfInc
-    res.payload := resPayload
-
-    for (gIdx <- 0 until out_width / that.payload.length) {
-      when(that.fire && (inCounter === gIdx)) {
-        for (el <- that.payload.indices) {
-          resPayload(gIdx * that.payload.length + el) := that.payload(el)
+      val inCounter = Counter(out_width / that.payload.length) init 0
+      that.ready := res.ready
+      when(that.fire || (that.ready && inCounter.willOverflowIfInc)) {
+        inCounter.increment()
+      }
+      when(inCounter.willOverflow) {
+        resPayload.foreach(_.clearAll())
+      }
+      res.valid := inCounter.willOverflowIfInc
+      for (gIdx <- 0 until out_width / that.payload.length) {
+        when(that.fire && (inCounter === gIdx)) {
+          for (el <- that.payload.indices) {
+            resPayload(gIdx * that.payload.length + el) := that.payload(el)
+          }
         }
       }
+    } else if(that.payload.length > out_width) {
+      res.payload := resPayload
+
+      val nInSubGrps = ceil(that.payload.length.toFloat / out_width.toFloat).toInt
+      val outCounter = Counter(nInSubGrps) init 0
+      val isOccupied = Reg(Bool()) init False
+      val widthConvBuffer =
+        Vec(
+          Vec(Reg(cloneOf(that.payload.last), init=cloneOf(that.payload.last).getZero), out_width),
+          nInSubGrps
+        )
+
+      that.ready := ~isOccupied
+      res.valid := isOccupied
+
+      when(isOccupied) {
+        isOccupied := outCounter.willOverflow
+        when(res.ready) {outCounter.increment()}
+        resPayload := outCounter.value.muxListDc(
+          for (inSubGrpId <- 0 until nInSubGrps) yield (inSubGrpId, widthConvBuffer(inSubGrpId))
+        )
+      }.otherwise {
+        for (inSubGrpId <- 0 until nInSubGrps; elem <- 0 until out_width) {
+          val currInIdx = inSubGrpId * out_width + elem
+          if (currInIdx < that.payload.length) {
+            widthConvBuffer(inSubGrpId)(elem) := that.payload(currInIdx)
+          } else {
+            widthConvBuffer(inSubGrpId)(elem) := widthConvBuffer(inSubGrpId)(elem).getZero
+          }
+        }
+        isOccupied := that.fire
+      }
+    } else {
+      res << that
     }
   }.res
 }

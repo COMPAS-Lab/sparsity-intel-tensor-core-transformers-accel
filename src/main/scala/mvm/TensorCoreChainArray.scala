@@ -156,7 +156,7 @@ class TensorCoreChainArray(array_col: Int, array_row: Int, chain_len: Int, idx_w
   }
   //parameters
   val NUM_MATB_VEC_PER_ROW: Int = ceil(num_matb_cols.toFloat / array_row.toFloat).toInt
-  val TRANSRAM_FOLDING_FACTOR: Int = 2
+  val TRANSRAM_FOLDING_FACTOR: Int = 1
   // TODO: fix parameters here
   val COLIDX2ROWMEM_DELAY = 2
   val ROWMEM2TRANSRAM_DELAY = 2

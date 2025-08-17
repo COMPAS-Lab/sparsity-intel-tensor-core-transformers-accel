@@ -143,13 +143,10 @@ class tensor_core_array_wrapper(array_col: Int, array_row: Int, chain_len: Int,
     val currLdRdy = Mux(dBuffLdPtr, matADbuffRdy(1), matADbuffRdy(0))
     val currCompRdy = Mux(dBuffComputePtr, matADbuffRdy(1), matADbuffRdy(0))
 
-    val idxGenerator = new IndexGenerator(array_col, idx_width.c, BigInt("1" * idx_width.c, 2))
     val idxGenFifoFast, idxGenFifoSlow = new StreamFifoIp(IndexData(idx_width.c, array_col), 512, "M20K", 256)
     // index generator connection
-    val isIdxGenWaitingOuts = Reg(Bits(array_col bits), init = B(0))
-    val isLastPlaceholderRecved = Reg(Bits(3 bits), init = B(0))
     val tcArrayIn4IdxGenValid = Bool()
-    val IDX_IN_GRP_REUSE_FACTOR = 2
+    val IDX_IN_GRP_REUSE_FACTOR = 1
 
     if (idx_width.c * array_col / IDX_IN_GRP_REUSE_FACTOR > io.tcarray_in(0).data.getBitsWidth) {
       throw new Exception("hbm channel 0 not wide enough to hold indices")
@@ -175,56 +172,12 @@ class tensor_core_array_wrapper(array_col: Int, array_row: Int, chain_len: Int,
     }
 
     val tcArrayIn4IdxGen = grped_index_data_in.asBits.asUInt.subdivideIn(idx_width.c bits)
-    for (i <- 0 until array_col) {
-      val idxGenInValid, idxGenInLast = Bool()
-      val lastGrpRaised = Reg(Bool(), init = False)
 
-      when(isIdxGenWaitingOuts(i)) {
-        idxGenInValid := False
-        idxGenInLast := False
-        when(lastGrpRaised) {
-          isIdxGenWaitingOuts(i) := isLastPlaceholderRecved.orR
-        }.otherwise {
-          lastGrpRaised := idxGenerator.io.lastGrpOut
-          isIdxGenWaitingOuts(i) :=
-            ~(idxGenFifoSlow.io.push.ready & idxGenFifoFast.io.push.ready & idxGenerator.io.lastGrpOut)
-        }
-      }.otherwise {
-        idxGenInValid := (~tcArrayIn4IdxGen(i).msb) & tcArrayIn4IdxGenValid
-        idxGenInLast := tcArrayIn4IdxGen(i).msb & tcArrayIn4IdxGenValid
-        isIdxGenWaitingOuts(i) := tcArrayIn4IdxGen(i).msb & tcArrayIn4IdxGenValid
-        lastGrpRaised.clear()
-      }
-
-      idxGenerator.io.seqIn(i).payload := IndexData(tcArrayIn4IdxGen(i), B(1, array_col bits) |<< i)
-      idxGenerator.io.seqIn(i).valid := idxGenInValid & idxGenFifoFast.io.push.ready & idxGenFifoSlow.io.push.ready
-      idxGenerator.io.lastGrpIns(i) := idxGenInLast
-    }
-
-    // make sure both slow and fast fifo get the last placeholder
-    when(isLastPlaceholderRecved(0)) {
-      isLastPlaceholderRecved(1) := idxGenFifoSlow.io.push.ready
-      isLastPlaceholderRecved(2) := idxGenFifoFast.io.push.ready
-      when(isLastPlaceholderRecved.andR) {
-        isLastPlaceholderRecved.clearAll()
-      }
-    }.otherwise {
-      when(idxGenFifoSlow.io.push.ready & idxGenFifoFast.io.push.ready & idxGenerator.io.lastGrpOut) {
-        isLastPlaceholderRecved.clearAll()
-      }.otherwise {
-        isLastPlaceholderRecved(0) := idxGenerator.io.lastGrpOut
-        isLastPlaceholderRecved(1) := idxGenFifoSlow.io.push.ready
-        isLastPlaceholderRecved(2) := idxGenFifoFast.io.push.ready
-      }
-    }
-
-    idxGenFifoSlow.io.push.payload <> idxGenerator.io.seqOut.payload
-    idxGenFifoSlow.io.push.valid :=
-      (idxGenerator.io.seqOut.valid | idxGenerator.io.lastGrpOut | isLastPlaceholderRecved(0)) & idxGenFifoFast.io.push.ready
-    idxGenFifoFast.io.push.payload <> idxGenerator.io.seqOut.payload
-    idxGenFifoFast.io.push.valid :=
-      idxGenerator.io.seqOut.valid | idxGenerator.io.lastGrpOut | isLastPlaceholderRecved(0) & idxGenFifoSlow.io.push.ready
-    idxGenerator.io.seqOut.ready := idxGenFifoSlow.io.push.ready & idxGenFifoFast.io.push.ready
+    // fake idx fifo
+    idxGenFifoSlow.io.push.payload <> IndexData(tcArrayIn4IdxGen(0), ~B(0, array_col bits))
+    idxGenFifoSlow.io.push.valid := io.tcarray_in(0).select & ~bufferSelCC(0)
+    idxGenFifoFast.io.push.payload <> IndexData(tcArrayIn4IdxGen(1), ~B(0, array_col bits))
+    idxGenFifoFast.io.push.valid := io.tcarray_in(0).select & ~bufferSelCC(0)
 
     // TC Array data path from HBM to TC Array
     val data2TcarrayRow = Stream(UInt(88 bits))
@@ -235,9 +188,9 @@ class tensor_core_array_wrapper(array_col: Int, array_row: Int, chain_len: Int,
     val data2TcarrayCol = Vec(Stream(BfpBlockWithIdx(88, idx_width.r, 0, 0)), array_col)
     // val MATA_CHAN_PER_GRP = Array(7, 5)
     // val HBM_MATA_CHAN_GRP = Array(Array(1, 2, 3), Array(4, 5))
-    val MATA_CHAN_PER_GRP = Array(9)
+    val MATA_CHAN_PER_GRP = Array(4)
     val HBM_MATA_CHAN_GRP = Array(Array(1, 2, 3, 4, 5, 6, 7))
-    val COL_IN_GRP_REUSE_FACTOR = 4
+    val COL_IN_GRP_REUSE_FACTOR = 1
 
     for (i <- HBM_MATA_CHAN_GRP.indices) {
       val hbm_width = HBM_MATA_CHAN_GRP(i).length * 256
@@ -364,8 +317,7 @@ class tensor_core_array_wrapper(array_col: Int, array_row: Int, chain_len: Int,
           when(rdWordCounter.willOverflow) {
             goto(sIdle)
           }.otherwise {
-            when(~isIdxGenWaitingOuts.andR &
-              ~idxGenFifoSlow.io.almostFull &
+            when(~idxGenFifoSlow.io.almostFull &
               ~idxGenFifoFast.io.almostFull) {
               goto(sSend)
             }
@@ -684,13 +636,13 @@ class tensor_core_array_wrapper(array_col: Int, array_row: Int, chain_len: Int,
 
 object tensor_core_array_wrapper_gen extends App {
   val gen = new DefaultConfig
-  val array_col = 36
-  val array_row = 8
+  val array_row = 36
+  val array_col = 8
   val chain_len = 8
   val ridx_width = 12
   val cidx_width = 10
 
-  gen.getConfigForSpecificPath(s"./src/generated_spmm_core_r${array_row}c${array_col}cl${chain_len}")
+  gen.getConfigForSpecificPath(s"./src/generated_naive_core_r${array_row}c${array_col}cl${chain_len}")
     .withoutEnumString()
     .generate(new tensor_core_array_wrapper(
       array_col = array_col,
