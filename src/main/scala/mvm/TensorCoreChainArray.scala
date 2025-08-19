@@ -72,7 +72,7 @@ case class BfpBlockWithIdx(dwidth: Int,
   }
 }
 
-class CasLoadBubbleInsert(ridx_width: Int, chain_len: Int) extends Component {
+class CasLoadBubbleInsert(ridx_width: Int, chain_len: Int, bypass: Boolean = false) extends Component {
   val io = new Bundle {
     val casLoadBufIn = slave Stream(BfpBlockWithIdx(88, ridx_width, 0, 0))
     val datWithBubble = master Flow(BfpBlockWithIdx(88, ridx_width, 0, 0))
@@ -80,54 +80,59 @@ class CasLoadBubbleInsert(ridx_width: Int, chain_len: Int) extends Component {
     val isVecTail = out Bool()
   }
 
-  io.isVecTail.setAsReg()
+  if (bypass) {
+    io.datWithBubble := io.casLoadBufIn.toFlow
+    io.isVecTail := io.casLoadBufIn.payload.rIdx.msb
+  } else {
+    io.isVecTail.setAsReg()
 
-  val outReg = Reg(BfpBlockWithIdx(88, ridx_width, 0, 0))
-  outReg.blkData.init(0)
-  outReg.rIdx.init(U(BigInt("1" * ridx_width, 2)))
+    val outReg = Reg(BfpBlockWithIdx(88, ridx_width, 0, 0))
+    outReg.blkData.init(0)
+    outReg.rIdx.init(U(BigInt("1" * ridx_width, 2)))
 
-  val cachedRidx = Reg(UInt(ridx_width bits), init=U(0))
-  val isTailPadding = Reg(Bool(), False)
-  val casLoadTailPaddingCtr = Counter(chain_len)
-  val casLoad3FactorCtr = Counter(3)
+    val cachedRidx = Reg(UInt(ridx_width bits), init = U(0))
+    val isTailPadding = Reg(Bool(), False)
+    val casLoadTailPaddingCtr = Counter(chain_len)
+    val casLoad3FactorCtr = Counter(3)
 
-  io.casLoadBufIn.ready := False
-  io.datWithBubble.valid := Delay(io.casLoadEn, 1, init=False)
+    io.casLoadBufIn.ready := False
+    io.datWithBubble.valid := Delay(io.casLoadEn, 1, init = False)
 
-  when(casLoad3FactorCtr.willOverflow) {
-    casLoadTailPaddingCtr.increment()
-  }
+    when(casLoad3FactorCtr.willOverflow) {
+      casLoadTailPaddingCtr.increment()
+    }
 
-  when(io.casLoadEn) {
-    casLoad3FactorCtr.increment()
-    when(io.colSel) {
-      io.casLoadBufIn.ready := True
-      outReg := io.casLoadBufIn.payload
-      cachedRidx := io.casLoadBufIn.payload.rIdx
-    }.otherwise {
-      when(io.casLoadBufIn.payload.rIdx.msb | isTailPadding) {
-        outReg.fromUInt(cachedRidx @@ U(0, outReg.blkData.getWidth bits))
-      }.otherwise {
-        outReg.fromUInt(io.casLoadBufIn.payload.rIdx @@ U(0, outReg.blkData.getWidth bits))
+    when(io.casLoadEn) {
+      casLoad3FactorCtr.increment()
+      when(io.colSel) {
+        io.casLoadBufIn.ready := True
+        outReg := io.casLoadBufIn.payload
         cachedRidx := io.casLoadBufIn.payload.rIdx
-      }
-
-      when(isTailPadding) {
-        io.casLoadBufIn.ready := False
-        when(casLoadTailPaddingCtr.willOverflow) {
-          isTailPadding := False
-        }
       }.otherwise {
-        when(io.casLoadBufIn.valid && io.casLoadBufIn.payload.rIdx.msb) {
-          isTailPadding := True
-          io.casLoadBufIn.ready := True
+        when(io.casLoadBufIn.payload.rIdx.msb | isTailPadding) {
+          outReg.fromUInt(cachedRidx @@ U(0, outReg.blkData.getWidth bits))
+        }.otherwise {
+          outReg.fromUInt(io.casLoadBufIn.payload.rIdx @@ U(0, outReg.blkData.getWidth bits))
+          cachedRidx := io.casLoadBufIn.payload.rIdx
+        }
+
+        when(isTailPadding) {
+          io.casLoadBufIn.ready := False
+          when(casLoadTailPaddingCtr.willOverflow) {
+            isTailPadding := False
+          }
+        }.otherwise {
+          when(io.casLoadBufIn.valid && io.casLoadBufIn.payload.rIdx.msb) {
+            isTailPadding := True
+            io.casLoadBufIn.ready := True
+          }
         }
       }
     }
-  }
 
-  io.datWithBubble.payload := outReg
-  io.isVecTail := io.casLoadBufIn.payload.rIdx.msb | isTailPadding
+    io.datWithBubble.payload := outReg
+    io.isVecTail := io.casLoadBufIn.payload.rIdx.msb | isTailPadding
+  }
 }
 
 class TensorCoreChainArray(array_col: Int, array_row: Int, chain_len: Int, idx_width: IdxWidth,
@@ -203,8 +208,7 @@ class TensorCoreChainArray(array_col: Int, array_row: Int, chain_len: Int, idx_w
     // col buffer has the depth x 2 for double buffering
     val colBuffer = Array.fill(array_col)(
       new StreamFifoIp(UInt(88 + idx_width.r bits), col_buffer_depth * 2, "M20K"))
-    val rowMem = Array.fill(array_row, NUM_MATB_VEC_PER_ROW / TRANSRAM_FOLDING_FACTOR)(
-      new spram_megafunc(88, row_buffer_depth * TRANSRAM_FOLDING_FACTOR, "M20K"))
+    val rowMem = Array.fill(array_row, chain_len)(new spram_megafunc(88, row_buffer_depth, "M20K"))
     val isCurrSubgrpALoaded = Bool()
 
     // row buffer write and read
@@ -216,7 +220,7 @@ class TensorCoreChainArray(array_col: Int, array_row: Int, chain_len: Int, idx_w
     val colBufferCredit = Array.fill(array_col, 2)(Reg(UInt(log2Up(col_buffer_depth) bits), init=U(0)))
 
     // col buffer bubble insertion
-    val casLoadBubbleInsert = Array.fill(array_col)(new CasLoadBubbleInsert(idx_width.r, chain_len))
+    val casLoadBubbleInsert = Array.fill(array_col)(new CasLoadBubbleInsert(idx_width.r, chain_len, true))
 
     val isVecALast = Vec(for(c <- casLoadBubbleInsert) yield c.io.isVecTail).asBits
     val isLastSubVecMultIter, isCurrLoadVecEmpty = Reg(Bits(array_col bits), init=B(0).resized)
@@ -300,7 +304,7 @@ class TensorCoreChainArray(array_col: Int, array_row: Int, chain_len: Int, idx_w
       casLoadBubbleInsert(c).io.casLoadBufIn <<
         colBuffer(c).io.pop.map(x => BfpBlockWithIdx(88, idx_width.r, 0, 0).fromUInt(x))
       casLoadBubbleInsert(c).io.casLoadEn := Delay(cascadeLoadEnLocal(c), 1, init=False)
-      casLoadBubbleInsert(c).io.colSel := Delay(io.sortedColIdxSlow.payload.destId(c), 1, init=False)
+      casLoadBubbleInsert(c).io.colSel := True
 
       colBuffer(c).io.push << io.matALoad(c).map(x => x.asUInt)
 
@@ -347,7 +351,7 @@ class TensorCoreChainArray(array_col: Int, array_row: Int, chain_len: Int, idx_w
     // row mem reading ctrl
     val transposeBufferValid = Bool()
     val rowPrefetchEnStart = Reg(Bool())
-    val rowMemRdAddr = UInt(log2Up(row_buffer_depth * TRANSRAM_FOLDING_FACTOR) bits)
+    val rowMemRdAddr = UInt(log2Up(row_buffer_depth) bits)
     val isRowMemRdAddrTail = Delay(io.sortedColIdxFast.payload.idxData.msb, COLIDX2ROWMEM_DELAY + 2)
 
     val rowMemRdStateMachine = new StateMachine {
@@ -355,7 +359,7 @@ class TensorCoreChainArray(array_col: Int, array_row: Int, chain_len: Int, idx_w
       val rdPropaCounter = Counter(COLIDX2ROWMEM_DELAY + 2 + 1)
       val rowBufferFetchFifoPopCounter =
         (TRANSRAM_FOLDING_FACTOR > 1) generate Counter(TRANSRAM_FOLDING_FACTOR)
-      val rowMemRdCounter = Counter(chain_len)
+      val rowMemRdCounter = DynaCounter(log2Up(row_buffer_depth), io.configRowBuffWrBound)
       val isCheckingOccu = Reg(Bool(), init=False)
       val rowMemRdValid = Bool()
 
@@ -386,8 +390,8 @@ class TensorCoreChainArray(array_col: Int, array_row: Int, chain_len: Int, idx_w
           } else {
             rowMemRdCounter.increment()
             io.sortedColIdxFast.ready := True
-            rowMemRdValid := ~io.sortedColIdxFast.payload.idxData.msb
-            when(rowMemRdCounter.willOverflow || io.sortedColIdxFast.payload.idxData.msb) {
+            rowMemRdValid := True
+            when(rowMemRdCounter.willOverflow) {
               rowMemRdValid := False
               goto(sConfirm)
             }
@@ -418,49 +422,19 @@ class TensorCoreChainArray(array_col: Int, array_row: Int, chain_len: Int, idx_w
         }
       }
     }
-
-    if (TRANSRAM_FOLDING_FACTOR > 1) {
-      rowMemRdAddr := Delay(
-        rowMemRdStateMachine.rowBufferFetchFifoPopCounter.value @@
-          io.sortedColIdxFast.payload.idxData(idx_width.c-2 downto 0).resize(log2Up(row_buffer_depth)),
-        COLIDX2ROWMEM_DELAY)
-    } else {
-      rowMemRdAddr := Delay(
-        io.sortedColIdxFast.payload.idxData(idx_width.c-2 downto 0).resize(log2Up(row_buffer_depth)),
-        COLIDX2ROWMEM_DELAY)
-    }
+    rowMemRdAddr :=  rowMemRdStateMachine.rowMemRdCounter
 
     for (r <- 0 until array_row) {
-      val rowBuffParaRd =
-        Vec(UInt(88 bits), NUM_MATB_VEC_PER_ROW / TRANSRAM_FOLDING_FACTOR).setName("rowBuffOut_" + r)
+      val rowBuffParaRd = Vec(UInt(88 bits), chain_len).setName("rowBuffOut_" + r)
       val rowBuffWrVecSel = new Bundle {
-        val vecId = Counter(NUM_MATB_VEC_PER_ROW / TRANSRAM_FOLDING_FACTOR)
+        val vecId = Counter(chain_len)
         val foldBufSel = (TRANSRAM_FOLDING_FACTOR > 1) generate Counter(TRANSRAM_FOLDING_FACTOR)
       }
-      val rowTransBuffWrCtrl =
-        Reg(Bits(chain_len bits), init=B(chain_len bits, 0 -> true, default -> false))
-          .setName("bufferArea_rowBuffWrCtrl_" + r)
-      val rowTransBuffRdAddr = Counter(NUM_MATB_VEC_PER_ROW).setName("bufferArea_transposeBufRdAddr_" + r)
-      val rowTransBuffFakeRdCtr = Counter(NUM_MATB_VEC_PER_ROW).setName("bufferArea_rowTransBuffFakeRdCtr_" + r)
-      val transposeBufferOccu = Reg(UInt(3 bits), init=U(0))
-      transposeBufferOccu.setName("bufferArea_transposeBufOccu_" + r)
-      val transposeBufferWrDbufSel = Reg(UInt(1 bits), init=U(0))
-      val transposeBufferWrAddr =
-        UInt(1 + log2Up(TRANSRAM_FOLDING_FACTOR) bits).setName("bufferArea_transposeBufWrAddr_" + r)
       val isTransRamRdValid = Reg(Bool(), init=False).setName("isTransRamRdValid_" + r)
-      val transposeBuffer = Array.fill(chain_len)(
-        AsymBufferN2One(
-          bitwidth = 88,
-          num_in_words = NUM_MATB_VEC_PER_ROW / TRANSRAM_FOLDING_FACTOR,
-          wr_depth = 2 * TRANSRAM_FOLDING_FACTOR,
-          folding_factor = TRANSRAM_FOLDING_FACTOR,
-          megfunc_type = "M20K"
-        )
-      )
 
       if (r == 0) {
-        transposeBufferValid := transposeBufferOccu < TRANSRAM_FOLDING_FACTOR
-        rowBufferBlkOut.valid := Delay(isTransRamRdValid, TRANSRAM_RD_II)
+        transposeBufferValid := True
+        rowBufferBlkOut.valid := Delay(rowMemRdStateMachine.rowMemRdValid, 1)
       }
 
       // global write buffer signal
@@ -484,7 +458,7 @@ class TensorCoreChainArray(array_col: Int, array_row: Int, chain_len: Int, idx_w
           }
         }
       }
-      for (vecId <- 0 until NUM_MATB_VEC_PER_ROW / TRANSRAM_FOLDING_FACTOR) {
+      for (vecId <- 0 until chain_len) {
         // row buffer write logic
         if (TRANSRAM_FOLDING_FACTOR > 1) {
           rowMem(r)(vecId).io.wraddress := rowBuffWrVecSel.foldBufSel.value @@ rowBuffWrAddr(r).value
@@ -500,80 +474,13 @@ class TensorCoreChainArray(array_col: Int, array_row: Int, chain_len: Int, idx_w
         rowBuffParaRd(vecId) := rowMem(r)(vecId).io.q
       }
 
-      val transposeBufferOccuCtrl = rowTransBuffRdAddr.willOverflow ## transposeBufferWrDbufSel(0).edge()
-      transposeBufferOccuCtrl.setName("bufferArea_transposeBufferOccuCtrl_" + r)
-      val rowMemRdValidDelayed4TrBufWr = Delay(rowMemRdStateMachine.rowMemRdValid, COLIDX2ROWMEM_DELAY + 2)
-      if (TRANSRAM_FOLDING_FACTOR > 1) {
-        val transposeBufferWrFbufSel = Counter(TRANSRAM_FOLDING_FACTOR).setName("transposeBufWrFbufSel_" + r)
-        transposeBufferWrAddr := transposeBufferWrDbufSel @@ transposeBufferWrFbufSel.value
-        when(rowMemRdValidDelayed4TrBufWr) {
-          transposeBufferWrFbufSel.increment()
-          when(transposeBufferWrFbufSel.willOverflow) {
-            rowTransBuffWrCtrl := rowTransBuffWrCtrl.rotateLeft(1)
-            when(rowTransBuffWrCtrl.msb) {
-              transposeBufferWrDbufSel := ~transposeBufferWrDbufSel
-            }
-          }
-        }.elsewhen(isRowMemRdAddrTail) {
-          transposeBufferWrFbufSel.clear()
-          rowTransBuffWrCtrl := B(chain_len bits, 0 -> true, default -> false)
-          // only flip WrDbufSel once, check both valid delayed and wr ctrl
-          // to make sure only flip WrDbufSel once when the last Wr runs chain_len times and
-          // meets a RowMemRdAddrTail in fancy
-          when(rowMemRdValidDelayed4TrBufWr.fall() && ~rowTransBuffWrCtrl.lsb) {
-            transposeBufferWrDbufSel := ~transposeBufferWrDbufSel
-          }
-        }
-      } else {
-        transposeBufferWrAddr := transposeBufferWrDbufSel
-        when(rowMemRdValidDelayed4TrBufWr) {
-          rowTransBuffWrCtrl := rowTransBuffWrCtrl.rotateLeft(1)
-          when(rowTransBuffWrCtrl.msb) {
-            transposeBufferWrDbufSel := ~transposeBufferWrDbufSel
-          }
-        }.elsewhen(isRowMemRdAddrTail) {
-          when(rowMemRdValidDelayed4TrBufWr.fall()) {
-            transposeBufferWrDbufSel := ~transposeBufferWrDbufSel
-          }
-          rowTransBuffWrCtrl := B(chain_len bits, 0 -> true, default -> false)
-        }
-      }
-
-      switch(transposeBufferOccuCtrl) {
-        is (B"2'b10") {
-          when(transposeBufferOccu > 0) {transposeBufferOccu := transposeBufferOccu - 1}
-        }
-        is (B"2'b01") {
-          when(transposeBufferOccu < 2){transposeBufferOccu := transposeBufferOccu + 1}
-        }
-      }
-
-      // transpose buffer read: once fired run a full iteration
-      when(isTransRamRdValid) {
-        when(rowTransBuffRdAddr.willOverflow) {
-          isTransRamRdValid := matBLoadPipelineEnDelayed & Delay(transposeBufferOccu > 0, 1)
-        }
-      }.otherwise {
-        isTransRamRdValid := matBLoadPipelineEnDelayed & Delay(transposeBufferOccu > 0, 1)
-      }
-      when(isTransRamRdValid) {
-        rowTransBuffRdAddr.increment()
-      }
-      when(Delay(matBEn4BubbleIns, MATB_EN_DELAY + 1, init=False)) {
-        rowTransBuffFakeRdCtr.increment()
-      }
       // TODO: magic number here. why 2 cycles delay?
-      when(Delay(rowTransBuffRdAddr.willOverflow | rowTransBuffFakeRdCtr.willOverflow, 2)) {
+      when(Delay(rowMemRdStateMachine.rowMemRdCounter.willOverflow, 2)) {
         tccInnerBuffSelComp(r) := ~tccInnerBuffSelComp(r)
       }
 
       for (clenId <- 0 until chain_len) {
-        transposeBuffer(clenId).io.dataIn := Delay(rowBuffParaRd, ROWMEM2TRANSRAM_DELAY)
-        transposeBuffer(clenId).io.wrEn := Delay(rowTransBuffWrCtrl(clenId), ROWMEM2TRANSRAM_DELAY) &
-            Delay(rowMemRdValidDelayed4TrBufWr, ROWMEM2TRANSRAM_DELAY)
-        transposeBuffer(clenId).io.wrAddr := Delay(transposeBufferWrAddr, ROWMEM2TRANSRAM_DELAY)
-        transposeBuffer(clenId).io.rdEn := isTransRamRdValid
-        rowBufferBlkOut.payload(r)(clenId).blkData := transposeBuffer(chain_len-1 - clenId).io.dataOut
+        rowBufferBlkOut.payload(r)(clenId).blkData := rowBuffParaRd(clenId)
       }
     }
   }
@@ -856,7 +763,7 @@ class TensorCoreChainArray(array_col: Int, array_row: Int, chain_len: Int, idx_w
         j <- 0 until 3
       } yield outputRidx(i) @@ outBfpConv(i)(j).io.dataOut.payload
     ).asBits.asUInt
-    
+
     io.res(regIdx) << outBuffer(regIdx).io.pop.translateWith(outBuffer(regIdx).io.pop.payload.resize(256 bits))
   }
 

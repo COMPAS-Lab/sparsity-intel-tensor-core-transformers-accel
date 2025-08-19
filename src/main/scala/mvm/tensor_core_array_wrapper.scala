@@ -636,13 +636,13 @@ class tensor_core_array_wrapper(array_col: Int, array_row: Int, chain_len: Int,
 
 object tensor_core_array_wrapper_gen extends App {
   val gen = new DefaultConfig
-  val array_row = 36
-  val array_col = 8
-  val chain_len = 8
+  val array_row = 1
+  val array_col = 4
+  val chain_len = 15
   val ridx_width = 12
   val cidx_width = 10
 
-  gen.getConfigForSpecificPath(s"./src/generated_naive_core_r${array_row}c${array_col}cl${chain_len}")
+  gen.getConfigForSpecificPath(s"./src/generated_dense_core_r${array_row}c${array_col}cl${chain_len}")
     .withoutEnumString()
     .generate(new tensor_core_array_wrapper(
       array_col = array_col,
