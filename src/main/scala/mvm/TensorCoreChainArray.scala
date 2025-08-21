@@ -747,11 +747,10 @@ class TensorCoreChainArray(array_col: Int, array_row: Int, chain_len: Int, idx_w
     }
   }
   // TODO: fix 88 bit width conversion
-  // FIXME: temporarlily disable max outchan utilization for simpler output grouping
   val outBuffer = Array.fill(n_out_chans)(
     new StreamOutAsymFifo(
       input_width = (outBfpConv(0)(0).io.dataOut.payload.getBitsWidth + idx_width.r) * 3 * array_col / n_out_chans,
-      output_width = (outBfpConv(0)(0).io.dataOut.payload.getBitsWidth + idx_width.r),
+      output_width = (outBfpConv(0)(0).io.dataOut.payload.getBitsWidth + idx_width.r) * n_words_outchan,
       depth=output_fifo_depth
     )
   )

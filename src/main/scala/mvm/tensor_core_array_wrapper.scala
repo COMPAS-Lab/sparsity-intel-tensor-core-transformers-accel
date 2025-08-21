@@ -146,7 +146,7 @@ class tensor_core_array_wrapper(array_col: Int, array_row: Int, chain_len: Int,
     val idxGenFifoFast, idxGenFifoSlow = new StreamFifoIp(IndexData(idx_width.c, array_col), 512, "M20K", 256)
     // index generator connection
     val tcArrayIn4IdxGenValid = Bool()
-    val IDX_IN_GRP_REUSE_FACTOR = 1
+    val IDX_IN_GRP_REUSE_FACTOR = 2
 
     if (idx_width.c * array_col / IDX_IN_GRP_REUSE_FACTOR > io.tcarray_in(0).data.getBitsWidth) {
       throw new Exception("hbm channel 0 not wide enough to hold indices")
@@ -188,9 +188,9 @@ class tensor_core_array_wrapper(array_col: Int, array_row: Int, chain_len: Int,
     val data2TcarrayCol = Vec(Stream(BfpBlockWithIdx(88, idx_width.r, 0, 0)), array_col)
     // val MATA_CHAN_PER_GRP = Array(7, 5)
     // val HBM_MATA_CHAN_GRP = Array(Array(1, 2, 3), Array(4, 5))
-    val MATA_CHAN_PER_GRP = Array(4)
+    val MATA_CHAN_PER_GRP = Array(12)
     val HBM_MATA_CHAN_GRP = Array(Array(1, 2, 3, 4, 5, 6, 7))
-    val COL_IN_GRP_REUSE_FACTOR = 1
+    val COL_IN_GRP_REUSE_FACTOR = 3
 
     for (i <- HBM_MATA_CHAN_GRP.indices) {
       val hbm_width = HBM_MATA_CHAN_GRP(i).length * 256
@@ -636,9 +636,9 @@ class tensor_core_array_wrapper(array_col: Int, array_row: Int, chain_len: Int,
 
 object tensor_core_array_wrapper_gen extends App {
   val gen = new DefaultConfig
-  val array_row = 1
-  val array_col = 4
-  val chain_len = 15
+  val array_row = 7
+  val array_col = 36
+  val chain_len = 8
   val ridx_width = 12
   val cidx_width = 10
 
