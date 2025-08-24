@@ -161,7 +161,7 @@ class TensorCoreChainArray(array_col: Int, chain_len: Int, idx_width: IdxWidth,
   }
   //parameters
   val NUM_MATB_VEC_PER_ROW: Int = num_matb_cols
-  val TRANSRAM_FOLDING_FACTOR: Int = 1
+  val TRANSRAM_FOLDING_FACTOR: Int = 4
   // TODO: fix parameters here
   val COLIDX2ROWMEM_DELAY = 2
   val ROWMEM2TRANSRAM_DELAY = 2
@@ -208,14 +208,13 @@ class TensorCoreChainArray(array_col: Int, chain_len: Int, idx_width: IdxWidth,
     // col buffer has the depth x 2 for double buffering
     val colBuffer = Array.fill(array_col)(
       new StreamFifoIp(UInt(88 + idx_width.r bits), col_buffer_depth * 2, "M20K"))
-    val rowMem = Array.fill(chain_len)(
-      new spram_megafunc(88, row_buffer_depth, "M20K"))
+    val rowMem = Array.fill(NUM_MATB_VEC_PER_ROW / TRANSRAM_FOLDING_FACTOR)(
+      new spram_megafunc(88, row_buffer_depth * TRANSRAM_FOLDING_FACTOR, "M20K"))
     val isCurrSubgrpALoaded = Bool()
 
     // row buffer write and read
     val chainTimeCorrectedRowData = Vec(UInt(88 bits), chain_len)
     val rowBuffWrAddr = Counter(row_buffer_depth)
-    val rowBuffWrRsel = Counter(array_col)
     val rowBufferBlkOut = Vec(Flow(Vec(BfpBlockWithIdx(88, 0, 0, 0), chain_len)), array_col)
 
     // col buffer double buffer control and credits
@@ -353,7 +352,7 @@ class TensorCoreChainArray(array_col: Int, chain_len: Int, idx_width: IdxWidth,
     // row mem reading ctrl
     val transposeBufferValid = Bool()
     val rowPrefetchEnStart = Reg(Bool())
-    val rowMemRdAddr = UInt(log2Up(row_buffer_depth) bits)
+    val rowMemRdAddr = UInt(log2Up(row_buffer_depth * TRANSRAM_FOLDING_FACTOR) bits)
     val isRowMemRdAddrTail = Delay(io.sortedColIdxFast.payload.idxData.msb, COLIDX2ROWMEM_DELAY + 2)
 
     val rowMemRdStateMachine = new StateMachine {
@@ -425,19 +424,48 @@ class TensorCoreChainArray(array_col: Int, chain_len: Int, idx_width: IdxWidth,
       }
     }
 
-    rowMemRdAddr := rowMemRdStateMachine.rowMemRdCounter
+    if (TRANSRAM_FOLDING_FACTOR > 1) {
+      rowMemRdAddr := Delay(
+        rowMemRdStateMachine.rowBufferFetchFifoPopCounter.value @@
+          io.sortedColIdxFast.payload.idxData(idx_width.c-2 downto 0).resize(log2Up(row_buffer_depth)),
+        COLIDX2ROWMEM_DELAY)
+    } else {
+      rowMemRdAddr := Delay(
+        io.sortedColIdxFast.payload.idxData(idx_width.c-2 downto 0).resize(log2Up(row_buffer_depth)),
+        COLIDX2ROWMEM_DELAY)
+    }
 
-    // copy row mem array_col times, each serving as a bank for one DPE (tensor core chain)
+    // copy benes net array_col times, each serving as a bank for one DPE (tensor core chain)
     val benesNet = Array.fill(array_col)(BenesNet(num_ports=chain_len, bitwidth=88, dest_width=chain_len))
 
-    val rowBuffParaRd = Vec(UInt(88 bits), chain_len).setName("rowBuffOut")
+    val rowBuffParaRd = Vec(UInt(88 bits), NUM_MATB_VEC_PER_ROW / TRANSRAM_FOLDING_FACTOR).setName("rowBuffOut")
     val rowBuffWrVecSel = new Bundle {
-      val vecId = Counter(chain_len)
+      val vecId = Counter(NUM_MATB_VEC_PER_ROW / TRANSRAM_FOLDING_FACTOR)
       val foldBufSel = (TRANSRAM_FOLDING_FACTOR > 1) generate Counter(TRANSRAM_FOLDING_FACTOR)
     }
+    val rowTransBuffWrCtrl =
+      Reg(Bits(chain_len bits), init=B(chain_len bits, 0 -> true, default -> false))
+        .setName("bufferArea_rowBuffWrCtrl")
+    val rowTransBuffRdAddr = Counter(NUM_MATB_VEC_PER_ROW).setName("bufferArea_transposeBufRdAddr")
+    val rowTransBuffFakeRdCtr = Counter(NUM_MATB_VEC_PER_ROW).setName("bufferArea_rowTransBuffFakeRdCtr")
+    val transposeBufferOccu = Reg(UInt(log2Up(TRANSRAM_FOLDING_FACTOR) + 1 bits), init=U(0))
+    transposeBufferOccu.setName("bufferArea_transposeBufOccu")
+    val transposeBufferWrDbufSel = Reg(UInt(1 bits), init=U(0))
+    val transposeBufferWrAddr =
+      UInt(1 + log2Up(TRANSRAM_FOLDING_FACTOR) bits).setName("bufferArea_transposeBufWrAddr")
     val isTransRamRdValid = Reg(Bool(), init=False).setName("isTransRamRdValid")
+    val transposeBuffer = Array.fill(chain_len)(
+      AsymBufferN2One(
+        bitwidth = 88,
+        num_in_words = NUM_MATB_VEC_PER_ROW / TRANSRAM_FOLDING_FACTOR,
+        wr_depth = 2 * TRANSRAM_FOLDING_FACTOR,
+        folding_factor = TRANSRAM_FOLDING_FACTOR,
+        megfunc_type = "M20K"
+      )
+    )
+    transposeBufferValid := transposeBufferOccu < TRANSRAM_FOLDING_FACTOR
 
-    transposeBufferValid := True
+    rowBufferBlkOut.foreach(_.valid := Delay(isTransRamRdValid, TRANSRAM_RD_II))
 
     // global write buffer signal
     when(io.matBLoad.fire) {
@@ -451,33 +479,101 @@ class TensorCoreChainArray(array_col: Int, chain_len: Int, idx_width: IdxWidth,
         when(rowBuffWrVecSel.vecId.willOverflow) {
           rowBuffWrVecSel.foldBufSel.increment()
         }
-        when(rowBuffWrVecSel.foldBufSel.willOverflow) {
-          rowBuffWrRsel.increment()
-        }
-      } else {
-        when(rowBuffWrVecSel.vecId.willOverflow) {
-          rowBuffWrRsel.increment()
-        }
       }
     }
 
     // row buffer write and read logic
-    for (vecId <- 0 until chain_len) {
+    for (vecId <- 0 until NUM_MATB_VEC_PER_ROW / TRANSRAM_FOLDING_FACTOR) {
+      // row buffer write logic
       if (TRANSRAM_FOLDING_FACTOR > 1) {
         rowMem(vecId).io.wraddress := rowBuffWrVecSel.foldBufSel.value @@ rowBuffWrAddr.value
       } else {
         rowMem(vecId).io.wraddress := rowBuffWrAddr.value
       }
-      rowMem(vecId).io.wren :=
-        io.matBLoad.valid & rowBuffWrVecSel.vecId.value === vecId
+      rowMem(vecId).io.wren := io.matBLoad.valid & rowBuffWrVecSel.vecId.value === vecId
       rowMem(vecId).io.data := io.matBLoad.payload
 
       // row buffer read logic
       rowMem(vecId).io.rdaddress := rowMemRdAddr
+      rowBuffParaRd(vecId) := rowMem(vecId).io.q
+    }
 
-      // row connection logic
-      // pre-delay the row-input for cascade chain timing alignment
-      chainTimeCorrectedRowData(vecId) := BlockDelay(rowMem(vecId).io.q, 2 * vecId, "MLAB")
+    val transposeBufferOccuCtrl = rowTransBuffRdAddr.willOverflow ## transposeBufferWrDbufSel(0).edge()
+    transposeBufferOccuCtrl.setName("bufferArea_transposeBufferOccuCtrl")
+    val rowMemRdValidDelayed4TrBufWr = Delay(rowMemRdStateMachine.rowMemRdValid, COLIDX2ROWMEM_DELAY + 2)
+    if (TRANSRAM_FOLDING_FACTOR > 1) {
+      val transposeBufferWrFbufSel = Counter(TRANSRAM_FOLDING_FACTOR).setName("transposeBufWrFbufSel")
+      transposeBufferWrAddr := transposeBufferWrDbufSel @@ transposeBufferWrFbufSel.value
+      when(rowMemRdValidDelayed4TrBufWr) {
+        transposeBufferWrFbufSel.increment()
+        when(transposeBufferWrFbufSel.willOverflow) {
+          rowTransBuffWrCtrl := rowTransBuffWrCtrl.rotateLeft(1)
+          when(rowTransBuffWrCtrl.msb) {
+            transposeBufferWrDbufSel := ~transposeBufferWrDbufSel
+          }
+        }
+      }.elsewhen(isRowMemRdAddrTail) {
+        transposeBufferWrFbufSel.clear()
+        rowTransBuffWrCtrl := B(chain_len bits, 0 -> true, default -> false)
+        // only flip WrDbufSel once, check both valid delayed and wr ctrl
+        // to make sure only flip WrDbufSel once when the last Wr runs chain_len times and
+        // meets a RowMemRdAddrTail in fancy
+        when(rowMemRdValidDelayed4TrBufWr.fall() && ~rowTransBuffWrCtrl.lsb) {
+          transposeBufferWrDbufSel := ~transposeBufferWrDbufSel
+        }
+      }
+    } else {
+      transposeBufferWrAddr := transposeBufferWrDbufSel
+      when(rowMemRdValidDelayed4TrBufWr) {
+        rowTransBuffWrCtrl := rowTransBuffWrCtrl.rotateLeft(1)
+        when(rowTransBuffWrCtrl.msb) {
+          transposeBufferWrDbufSel := ~transposeBufferWrDbufSel
+        }
+      }.elsewhen(isRowMemRdAddrTail) {
+        when(rowMemRdValidDelayed4TrBufWr.fall()) {
+          transposeBufferWrDbufSel := ~transposeBufferWrDbufSel
+        }
+        rowTransBuffWrCtrl := B(chain_len bits, 0 -> true, default -> false)
+      }
+    }
+
+    switch(transposeBufferOccuCtrl) {
+      is (B"2'b10") {
+        when(transposeBufferOccu > 0) {transposeBufferOccu := transposeBufferOccu - 1}
+      }
+      is (B"2'b01") {
+        when(transposeBufferOccu < 2){transposeBufferOccu := transposeBufferOccu + 1}
+      }
+    }
+
+    // transpose buffer read: once fired run a full iteration
+    when(isTransRamRdValid) {
+      when(rowTransBuffRdAddr.willOverflow) {
+        isTransRamRdValid := matBLoadPipelineEnDelayed & Delay(transposeBufferOccu > 0, 1)
+      }
+    }.otherwise {
+      isTransRamRdValid := matBLoadPipelineEnDelayed & Delay(transposeBufferOccu > 0, 1)
+    }
+    when(isTransRamRdValid) {
+      rowTransBuffRdAddr.increment()
+    }
+    when(Delay(matBEn4BubbleIns, MATB_EN_DELAY + 1, init=False)) {
+      rowTransBuffFakeRdCtr.increment()
+    }
+    // TODO: magic number here. why 2 cycles delay?
+    when(Delay(rowTransBuffRdAddr.willOverflow | rowTransBuffFakeRdCtr.willOverflow, 2)) {
+      tccInnerBuffSelComp := ~tccInnerBuffSelComp
+    }
+
+    // pre-delay the row-input for cascade chain timing alignment
+    for (clenId <- 0 until chain_len) {
+      transposeBuffer(clenId).io.dataIn := Delay(rowBuffParaRd, ROWMEM2TRANSRAM_DELAY)
+      transposeBuffer(clenId).io.wrEn := Delay(rowTransBuffWrCtrl(clenId), ROWMEM2TRANSRAM_DELAY) &
+        Delay(rowMemRdValidDelayed4TrBufWr, ROWMEM2TRANSRAM_DELAY)
+      transposeBuffer(clenId).io.wrAddr := Delay(transposeBufferWrAddr, ROWMEM2TRANSRAM_DELAY)
+      transposeBuffer(clenId).io.rdEn := isTransRamRdValid
+      chainTimeCorrectedRowData(clenId) :=
+        BlockDelay(transposeBuffer(chain_len - 1 - clenId).io.dataOut, 2*clenId, "M20K")
     }
 
     // mat b broadcasting from rowMem to all array cols
@@ -487,7 +583,6 @@ class TensorCoreChainArray(array_col: Int, chain_len: Int, idx_width: IdxWidth,
         benesNet(c).io.inputSeq(vecId).destId := Delay(io.sortedColIdxSlow.payload.destId, 5).resized
         rowBufferBlkOut(c).payload(vecId).blkData := benesNet(c).io.outputSeq(vecId).payload.blkData
       }
-      rowBufferBlkOut(c).valid := Delay(rowMemRdStateMachine.rowMemRdValid, 4)
 
       // TODO: magic number here. why 2 cycles delay?
       when(Delay(rowMemRdStateMachine.rowMemRdCounter.willOverflow, 2)) {
