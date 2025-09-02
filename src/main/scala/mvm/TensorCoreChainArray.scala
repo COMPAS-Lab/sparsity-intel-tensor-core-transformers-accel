@@ -190,6 +190,13 @@ class TensorCoreChainArray(array_col: Int, chain_len: Int, idx_width: IdxWidth,
     tensorArray(c).setName("u_tc_core_c_" + c)
   }
 
+  // helper function to create a modularized delay
+  def createModularizedDelay[T <: Data](data: T, delay_len: Int, dataType: HardType[T]): T = {
+    val wrappedDelayCore = WrappedDelay(dataType, delay_len)
+    wrappedDelayCore.io.datToDelayed := data
+    wrappedDelayCore.io.delayedDat
+  }
+
   //signals between datapath and ctrl logic
   // start signal for mat a loading
   val cascadeLoadStart = Bool()
@@ -600,23 +607,29 @@ class TensorCoreChainArray(array_col: Int, chain_len: Int, idx_width: IdxWidth,
   val CASIN_DATIN_DELAY_DELTA = ROWMEM2TCC_TOTAL_DELAY - COLBUF2TCC_TOTAL_DELAY - 1
 
   for (c <- 0 until array_col) {
-    val delayedLoadCascadeIn = Delay(bufferArea.casLoadBubbleInsert(c).io.datWithBubble.payload.blkData(79 downto 0),
-      COL_BB_INSERT2TCC_DELAY + CASIN_DATIN_DELAY_DELTA)
-    val delayedExpCascadeIn = Delay(bufferArea.casLoadBubbleInsert(c).io.datWithBubble.payload.blkData(87 downto 80),
-      COL_BB_INSERT2TCC_DELAY + CASIN_DATIN_DELAY_DELTA)
-    val delayedRowIdx = Delay(bufferArea.casLoadBubbleInsert(c).io.datWithBubble.payload.rIdx,
-      COL_BB_INSERT2TCC_DELAY + CASIN_DATIN_DELAY_DELTA)
-    val delayedCasInValid = Delay(bufferArea.casLoadBubbleInsert(c).io.datWithBubble.valid,
-      COL_BB_INSERT2TCC_DELAY + CASIN_DATIN_DELAY_DELTA, init=False)
+    val delayedLoadCascadeIn = createModularizedDelay(
+      bufferArea.casLoadBubbleInsert(c).io.datWithBubble.payload.blkData(79 downto 0),
+      COL_BB_INSERT2TCC_DELAY + CASIN_DATIN_DELAY_DELTA, UInt(80 bits))
+    val delayedExpCascadeIn = createModularizedDelay(
+      bufferArea.casLoadBubbleInsert(c).io.datWithBubble.payload.blkData(87 downto 80),
+      COL_BB_INSERT2TCC_DELAY + CASIN_DATIN_DELAY_DELTA, UInt(8 bits))
+    val delayedRowIdx = createModularizedDelay(
+      bufferArea.casLoadBubbleInsert(c).io.datWithBubble.payload.rIdx,
+      COL_BB_INSERT2TCC_DELAY + CASIN_DATIN_DELAY_DELTA, UInt(idx_width.r bits))
+    val delayedCasInValid = createModularizedDelay(
+      bufferArea.casLoadBubbleInsert(c).io.datWithBubble.valid,
+      COL_BB_INSERT2TCC_DELAY + CASIN_DATIN_DELAY_DELTA, Bool())
 
     tensorArray(c).io.dataIn.valid :=
       Delay(bufferArea.rowBufferBlkOut(c).valid, TRANS2TCC_DELAY, init=False) | matBEn4BubbleInsDelayed
     // row-wise broadcasting
     for (tcId <- 0 until chain_len) {
-      tensorArray(c).io.dataIn.payload(tcId) :=
-        Delay(bufferArea.rowBufferBlkOut(c).payload(tcId).blkData(79 downto 0), TRANS2TCC_DELAY)
-      tensorArray(c).io.expIn(tcId) :=
-        Delay(bufferArea.rowBufferBlkOut(c).payload(tcId).blkData(87 downto 80), TRANS2TCC_DELAY)
+      tensorArray(c).io.dataIn.payload(tcId) := createModularizedDelay(
+        bufferArea.rowBufferBlkOut(c).payload(tcId).blkData(79 downto 0),
+        TRANS2TCC_DELAY, UInt(80 bits))
+      tensorArray(c).io.expIn(tcId) := createModularizedDelay(
+        bufferArea.rowBufferBlkOut(c).payload(tcId).blkData(87 downto 80),
+        TRANS2TCC_DELAY, UInt(8 bits))
     }
 
     // reconstruct load cascade input

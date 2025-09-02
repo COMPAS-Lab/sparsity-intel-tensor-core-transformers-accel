@@ -168,6 +168,16 @@ object BlockDelay {
  }
 }
 
+case class WrappedDelay[T <: Data](dataType: HardType[T], delay_len: Int) extends Component {
+  // delay unit that provides a wrapper as a module for easier identification after p&r
+  val io = new Bundle {
+    val datToDelayed = in (dataType())
+    val delayedDat = out (dataType())
+  }
+
+  io.delayedDat := Delay(io.datToDelayed, delay_len)
+}
+
 object StreamWidthConv{
   def apply[T <: Data](that: Stream[Vec[T]], out_width: Int): Stream[Vec[T]] = new Composite(that) {
     require(that.payload.length < out_width, "stream width conversion only supports narrow to wide conversion")

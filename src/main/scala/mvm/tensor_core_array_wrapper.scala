@@ -147,9 +147,9 @@ class tensor_core_array_wrapper(array_col: Int, chain_len: Int,
     //    val MATA_CHAN_PER_GRP = Array(7, 5)
     //    val HBM_MATA_CHAN_GRP = Array(Array(1, 2, 3), Array(4, 5))
     // static HBM assignment for mat a buffer banks, R,C,L=8,16,8
-    val MATA_CHAN_PER_GRP = Array(15)
+    val MATA_CHAN_PER_GRP = Array(2)
     val HBM_MATA_CHAN_GRP = Array(Array(1, 2, 3, 4, 5, 6, 7))
-    val GRP_REUSE_FACTOR = 4
+    val GRP_REUSE_FACTOR = 1
 
     // check if hbm width is enough
     assert(idx_width.c * 2 < 256, "hbm for idx is not wide enough")
@@ -602,12 +602,12 @@ class tensor_core_array_wrapper(array_col: Int, chain_len: Int,
 
 object tensor_core_array_wrapper_gen extends App {
   val gen = new DefaultConfig
-  val array_col = 60
-  val chain_len = 16
+  val array_col = 2
+  val chain_len = 32
   val ridx_width = 12
   val cidx_width = 10
 
-  gen.getConfigForSpecificPath(s"./src/generated_benes_core_f4_${chain_len}x${array_col}")
+  gen.getConfigForSpecificPath(s"./src/generated_benes_core_${chain_len}x${array_col}")
     .withoutEnumString()
     .generate(new tensor_core_array_wrapper(
     array_col = array_col,
