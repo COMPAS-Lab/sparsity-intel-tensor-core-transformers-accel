@@ -128,4 +128,4 @@ This will start QuestaSim and run the simulation. If you want to view the wavefo
 
 ## Generate bitstream
 
-Refer to [nx10-matmul-project](nx10-matmul-project/README.md) to build the hardware.
+Refer to [nx10-matmul-project](https://github.com/COMPAS-Lab/sparsity-nx10-matmul-gidel-proj) to build the hardware.
