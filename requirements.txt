@@ -1,0 +1,5 @@
+cronitor==4.7.1
+numpy==2.4.1
+sysv_ipc==1.1.0
+torch==2.6.0+cpu
+tqdm==4.67.1

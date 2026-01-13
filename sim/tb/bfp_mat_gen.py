@@ -543,7 +543,7 @@ def mat_b_gen(
         hidx: int,
         n_blocks_split: int = 1, 
         disable_file_writting = False,
-        out_data_path = "/compas-old/projects/sparse-attention/onchip-5hbm"
+        out_data_path = Path("/compas-old/projects/sparse-attention/onchip-5hbm")
     ):
     # matB = np.random.uniform(low=0., high=1.0, size=size).astype('f')
     # matB = np.random.randint(low=0, high=2, size=size)
@@ -862,7 +862,7 @@ def main(args: dict):
                         n_large_blocks=n_large_blocks, 
                         hidx_list=head_idx,
                         disable_file_writting=True,
-                        out_data_path=args["data-path"]
+                        out_data_path=Path(args["data-path"])
                     )
                     s = io.StringIO()
                     ps = Stats(pr, stream=s).strip_dirs().sort_stats(SortKey.CALLS)
@@ -880,7 +880,7 @@ def main(args: dict):
                         bfp_friendly_dat=False, 
                         n_large_blocks=n_large_blocks, 
                         hidx_list=head_idx,
-                        out_data_path=args["data-path"],
+                        out_data_path=Path(args["data-path"]),
                 )
         else:
             matA, _ = mat_a_gen(
@@ -896,7 +896,7 @@ def main(args: dict):
         #generate mat b test for each mat A
         for hidx in matA.keys():
             matB, _ = mat_b_gen(chain_len, BFP(BfpType.BFP_12), hidx, hw_row, 
-                                disable_file_writting=False, out_data_path=args["data-path"])
+                                disable_file_writting=False, out_data_path=Path(args["data-path"]))
             print(f"mat a shape: {matA[hidx].shape}, mat b shape: {matB.shape}")
             if matA[hidx].shape[1] > matB.shape[0]:
                 res = np.matmul(matA[hidx][:,:matB.shape[0]], matB)

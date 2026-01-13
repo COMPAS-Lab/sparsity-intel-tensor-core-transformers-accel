@@ -14,16 +14,16 @@ ifeq ($(GUI),1)
 endif
 
 # use VHDL_SOURCES for VHDL files
+# intel ip and util design
 VERILOG_SOURCES += $(PWD)/tb/fourteennm_atoms.sv
-VERILOG_SOURCES += $(PWD)/../src/generated_2core/*.v
 VERILOG_SOURCES += $(PWD)/../src/main/sverilog/blk_delay_core.sv
 VERILOG_SOURCES += $(PWD)/../src/main/sverilog/out_asym_fifo.sv
+# specify spmm core src path here
+VERILOG_SOURCES += $(PWD)/../src/generated_spmm_core_6x12x8/*.v
 
 
-# TOPLEVEL is the name of the toplevel module in your Verilog or VHDL file
+# specify top design and test module
 TOPLEVEL = tensor_core_array_wrapper
-
-# MODULE is the basename of the Python test file
 MODULE = tensor_core_wrapper_tb_coco
 
 # include cocotb's make rules to take care of the simulator setup

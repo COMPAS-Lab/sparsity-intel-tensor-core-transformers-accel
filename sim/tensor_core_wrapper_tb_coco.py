@@ -2,13 +2,24 @@
 import json, os
 from pathlib import Path
 from enum import Enum
+import itertools
+
 import cocotb
 # from cocotb.runner import get_runner
 from cocotb.binary import BinaryValue
 from cocotb.handle import SimHandleBase
 from cocotb.triggers import RisingEdge, FallingEdge, Timer, Combine, with_timeout
 from cocotb.clock import Clock
-from tb.bfp_mat_gen import update_or_create_json
+from tb.bfp_mat_gen import (
+    BfpType,
+    BFP,
+    mat_a_gen, 
+    mat_b_gen,  
+    prepare_onchip_input_files,
+    prepare_onchip_idx_file,
+    prepare_onchip_matb_file,
+    update_or_create_json
+)
 
 def hex_to_bin(x: str, n_bits: int):
     return bin(int(x, 16))[2:].zfill(n_bits)
@@ -47,6 +58,14 @@ class hbm_chan:
             exec(f"self.dut.almost_full_tcarray_out_{self.hbm_id}.value = 0")
 
 class tensor_core_array_wrapper_dut:
+    # NOTE: make sure the following hw config is the same as what is defined in 
+    # src/main/scala/mvm/tensor_core_array_wrapper.scala
+    _hw_row = 6
+    _hw_col = 12
+    _hw_chainlen = 8
+    _hw_ridx_size = 12
+    _hw_cidx_size = 10
+
     def __init__(
             self, 
             dut: SimHandleBase, 
@@ -93,6 +112,78 @@ class tensor_core_array_wrapper_dut:
         self.mat_a_data_hbm = mat_a_data_hbm
         self.idx_data_hbm = idx_data_hbm
         self.mat_b_data_hbm = mat_b_data_hbm
+
+        self.dut._log.info(f"Loaded stimulus file for {hw_config_path}, {len(self.lb_idx_list)} large blocks in total")
+
+    def init_test_stimulus_wo_intermed_data(self, hidx: int, 
+                                            inst_id: str, attn_data_path: str, 
+                                            inter_config_path: str):
+
+        _, mat_a_data_list = mat_a_gen(
+                            inst_id,
+                            BFP(BfpType.BFP_12), 
+                            self._hw_col, 
+                            ridx_size=self._hw_ridx_size, 
+                            cidx_size=self._hw_cidx_size, 
+                            bfp_friendly_dat=False,
+                            hidx_list=[hidx],
+                            disable_file_writting = True,
+                            in_data_path=Path(attn_data_path),
+                            out_data_path=Path(inter_config_path))
+    
+        _, mat_b_data_list = mat_b_gen(
+                            self._hw_chainlen, 
+                            BFP(BfpType.BFP_12), 0, self._hw_row, 
+                            disable_file_writting=True, 
+                            out_data_path=Path(inter_config_path))
+
+        # get data from generated list of mat a and b
+        n_lbs = len(mat_a_data_list[hidx].keys())
+        self.dut._log.info(f"number of large blocks: {n_lbs}")
+
+        input_data = prepare_onchip_input_files(
+            Path(inter_config_path),
+            mat_a_data_list,
+            self._hw_col,
+            hidx,
+            n_lbs,
+            disable_file_writting=True
+        )
+        idx_data = prepare_onchip_idx_file(
+            Path(inter_config_path),
+            mat_a_data_list,
+            self._hw_col,
+            self._hw_cidx_size,
+            hidx,
+            n_lbs,
+            disable_file_writting=True,
+        )
+        matb_data = prepare_onchip_matb_file(
+            Path(inter_config_path),
+            mat_b_data_list,
+            disable_file_writting=True,
+            head_idx=hidx
+        )
+        
+        hw_config_path = self.data_dir + f"/hwconfig_h{hidx}.json"
+        with open(hw_config_path, "r") as f:
+            hw_config = json.load(f)
+
+        self.mat_a_bounds = list(hw_config["mat a size"])
+        self.idx_bounds = list(hw_config["idx_len"])
+        self.lb_idx_list = list(range(len(hw_config["idx_len"])))
+        self.mat_b_bound = int(hw_config["mat b size"])
+        self.mat_b_vec_size = int(hw_config["mat b vec size"])
+
+        # flatten idx and mat a data
+        self.mat_a_data_hbm = [[] for _ in range(len(input_data[0]))]
+        self.idx_data_hbm = []
+        for lb in self.lb_idx_list:
+            self.idx_data_hbm += idx_data[lb]
+            for hbm_idx in range(len(input_data[0])):
+                self.mat_a_data_hbm[hbm_idx] += input_data[lb][hbm_idx]
+
+        self.mat_b_data_hbm = matb_data
 
         self.dut._log.info(f"Loaded stimulus file for {hw_config_path}, {len(self.lb_idx_list)} large blocks in total")
 
@@ -165,7 +256,8 @@ class tensor_core_array_wrapper_dut:
     async def load_mat_a_process(self):
         self.dut._log.info("load mat a process started")
         start_tcarray_in, select_tcarray_in = [], []
-        for idx in range(len(self.hbm_in_chans)-1):
+        n_mat_a_hbm_chans = len(self.mat_a_data_hbm)
+        for idx in range(n_mat_a_hbm_chans):
             exec(f"start_tcarray_in += [self.dut.start_tcarray_in_{idx+1}]")
             exec(f"select_tcarray_in += [self.dut.select_tcarray_in_{idx+1}]")
 
@@ -175,20 +267,20 @@ class tensor_core_array_wrapper_dut:
         await Combine(*start_tcarray_in_falling_edge)
 
         await Timer(1, "ns")
-        for idx in range(len(self.hbm_in_chans)-1):
+        for idx in range(n_mat_a_hbm_chans):
             exec(f"self.dut.almost_empty_tcarray_in_{idx+1}.value = 1")
 
         await clkCycles(self.dut.clk, 120)
-        for idx in range(len(self.hbm_in_chans)-1):
+        for idx in range(n_mat_a_hbm_chans):
             exec(f"self.dut.almost_empty_tcarray_in_{idx+1}.value = 0")
 
         for col_ptr in range(sum(self.mat_a_bounds)):
             await Timer(1, "ns")
-            for idx in range(len(self.hbm_in_chans)-1):
+            for idx in range(n_mat_a_hbm_chans):
                 exec(f"self.dut.data_tcarray_in_{idx+1}.value = " + 
                      f"BinaryValue(hex_to_bin(self.mat_a_data_hbm[{idx}][col_ptr], 256), n_bits=256)")
             
-            await Equal(select_tcarray_in, [1] * (len(self.hbm_in_chans) - 1))
+            await Equal(select_tcarray_in, [1] * n_mat_a_hbm_chans)
             await clkCycles(self.dut.clk, 1)
 
     async def load_mat_b_process(self):
@@ -291,13 +383,22 @@ class tensor_core_array_wrapper_dut:
 @cocotb.test()
 async def tensor_core_array_wrapper_test(dut):
 
-    base_path = "/compas-old/projects/sparse-attention/onchip-dualcore/chatglm2-6b-32k-attn-bfp20-lcc/iiSeqInst0477"
-    hidx = 343
+    # specify sequece id and head index here
+    inst_id = "iiSeqInst0139"
+    hidx = 846
+    # provide attention data extracted from huggingface models here
+    attn_data_path = "/compas-old/projects/sparse-attention/llama2-7b-chat-4k-attn-bfp20-samsum/"
+    inter_config_path = f"/compas-old/projects/sparse-attention/sim_test/llama2-7b-chat-4k-attn-bfp20-samsum/{inst_id}"
     
     main_clk_period = 10
     main_clk = Clock(dut.clk, main_clk_period, units="ns")
-    dut_tester = tensor_core_array_wrapper_dut(dut, 8, 2, data_dir=base_path)
-    dut_tester.init_test_stimulus(hidx)
+    dut_tester = tensor_core_array_wrapper_dut(
+        dut, 8, 2, 
+        data_dir = inter_config_path,
+    )
+    dut_tester.init_test_stimulus_wo_intermed_data(
+        hidx, inst_id, attn_data_path, inter_config_path)
+    
     cocotb.start_soon(main_clk.start(start_high=True))
     await dut_tester.init_inputs()
 
@@ -312,7 +413,7 @@ async def tensor_core_array_wrapper_test(dut):
     
     await clkCycles(dut.clk, 10)
     # start loading mat b
-    # await dut_tester.load_mat_b_process()
+    await dut_tester.load_mat_b_process()
 
     # start issuing jobs
     await dut_tester.submit_jobs()

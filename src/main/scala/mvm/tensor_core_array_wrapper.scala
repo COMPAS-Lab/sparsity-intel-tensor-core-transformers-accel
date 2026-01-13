@@ -56,8 +56,10 @@ class tensor_core_array_wrapper(array_col: Int, array_row: Int, chain_len: Int,
   }
 
   // input list:
-  // tcarray_in_0: idx input
+  // tcarray_in_0: idx input/mat b input
   // tcarray_in_1/2/3/4/5: row input
+  // future-planned: isolate mat b input channel
+  // so that mat b can be double buffered
   // tcarray_in_6/7: mat b input
 
   // shared tcarray in channel address table
@@ -215,15 +217,15 @@ class tensor_core_array_wrapper(array_col: Int, array_row: Int, chain_len: Int,
     data2TcarrayRow.valid := Delay(data2TcarrayRowValid & io.tcarray_in(0).select, 4)
 
     val data2TcarrayCol = Vec(Stream(BfpBlockWithIdx(88, idx_width.r, 0, 0)), array_col)
-    // val MATA_CHAN_PER_GRP = Array(7, 5)
-    // val HBM_MATA_CHAN_GRP = Array(Array(1, 2, 3), Array(4, 5))
-    val MATA_CHAN_PER_GRP = Array(16)
-    val HBM_MATA_CHAN_GRP = Array(Array(1, 2, 3, 4, 5, 6, 7))
+    val MATA_CHAN_PER_GRP = Array(7, 5)
+    val HBM_MATA_CHAN_GRP = Array(Array(1, 2, 3), Array(4, 5))
+//    val MATA_CHAN_PER_GRP = Array(16)
+//    val HBM_MATA_CHAN_GRP = Array(Array(1, 2, 3, 4, 5, 6, 7))
 
     for (i <- HBM_MATA_CHAN_GRP.indices) {
       val hbm_width = HBM_MATA_CHAN_GRP(i).length * 256
       val col_width = MATA_CHAN_PER_GRP(i) * (idx_width.r + 88)
-      if (col_width < hbm_width) {
+      if (col_width > hbm_width) {
         throw new Exception("hbms for cols are not wide enough")
       }
     }
@@ -650,8 +652,8 @@ class tensor_core_array_wrapper(array_col: Int, array_row: Int, chain_len: Int,
 
 object tensor_core_array_wrapper_gen extends App {
   val gen = new DefaultConfig
-  val array_col = 16
-  val array_row = 8
+  val array_col = 12
+  val array_row = 6
   val chain_len = 8
   val ridx_width = 12
   val cidx_width = 10
