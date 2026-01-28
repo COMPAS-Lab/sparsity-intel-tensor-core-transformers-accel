@@ -1,7 +1,9 @@
 //------------------------------------------------------------------------------
-// delay.sv
-// published as part of https://github.com/pConst/basic_verilog
-// Konstantin Pavlov, pavlovconst@gmail.com
+// This file is part of SpMM core on Intel Stratix 10 NX FPGA 
+// by COMPAS Lab. This specific file is licensed under CC BY-SA 4_0 
+// as required by the creator of the original file.
+// Original creator: Konstantin Pavlov, pavlovconst@gmail.com
+// Original project: https://github.com/pConst/basic_verilog 
 //------------------------------------------------------------------------------
 
 // INFO -------------------------------------------------------------------------
