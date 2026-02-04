@@ -16,9 +16,11 @@ from pstats import Stats, SortKey
 
 def read_vec_files(name: str): 
     data = np.loadtxt(name, usecols = (0,1,2)) # the first colum is the row number, the second is what element it is in the vector and the third is the val at that location. 
+    float_data_ieee754 = np.loadtxt(name, usecols = (3,), dtype=str) # IEEE 754 FP data associated with the above indices. 
     vector_index = data[:,0].astype(int)         # vector numbers are in column 1 
-    element_index = data[:,1].astype(int)        # element numbers are in col 2
-    float_data = data[:,2]                       # data associated with the above indices. 
+    element_index = data[:,1].astype(int)        # element numbers are in col 2                  
+    float_data = [hex_to_float(bin_to_hex(b, 32)) for b in float_data_ieee754] # iterate through binary string in ieee 754 string
+                                                                           # convert to FP data
 
     max_vec_index = int(np.max(vector_index))
     max_element_index = int(np.max(element_index))
@@ -31,6 +33,24 @@ def read_vec_files(name: str):
         matrix[vec_idx,ele_idx] = float_data[i]
 
     return matrix
+
+def read_outFP_file(filepath: str):
+    data = []
+    data_fp = []
+    try:
+        with open(filepath, 'r') as file:
+            for line in file:
+                processed_line = line.strip()  # parse hex value
+                data.append(processed_line)
+                data_fp.append(hex_to_float(processed_line))
+
+        return data, data_fp
+    except FileNotFoundError:
+        print(f"Error: The file '{filepath}' was not found.")
+        return None, None
+    except Exception as e:
+        print(f"An error occurred: {e}")
+        return None, None
 
 def float_to_hex(f: float):
 	# Courtesy of https://stackoverflow.com/a/23624284
@@ -252,6 +272,8 @@ class BFP():
 
         num_elements = elements                                     # Number of elements that share a block  
         #print(f"blk_r length = {len(blk_r)}")
+        bpe = (len(blk_r) - 8) / num_elements
+        print(f"bits_per_elem: {bpe}")
         bits_per_element = int((len(blk_r) - 8 ) / num_elements)  # There are 8 elements per block and each element mantissa have the same number of bits. 
         #print(f"Bits per element = {bits_per_element}")
         first_mant = 8                                       # first bit where we see the mantissa. 
@@ -259,8 +281,12 @@ class BFP():
             start_index = first_mant + i * bits_per_element
             end_index = start_index + bits_per_element
             element_bits = blk_r[start_index:end_index]
+            print(f"element_bits = {element_bits}")
+            print(f"start_index:end_idx = {start_index}: {end_index}")
+            
             sign_bit = int(element_bits[0],2) 
             mantissa_bits = element_bits[1:]
+            print(f"sign_bit = {sign_bit}, mant = {mantissa_bits}")
 
             mant_real_val = 0.0
 
@@ -278,18 +304,24 @@ class BFP():
 
     def vec_to_bfp_block(self, blk_r):
         fp32_blk_elems = [f for f in blk_r]
-        blk_elems = [float_to_hex(f) for f in blk_r]
+        blk_elems = [float_to_hex(f) for f in blk_r] #data should already be in ieee floating point format
         exps = [int(hex_to_bin(e, 32)[1:9], 2) for e in blk_elems]
-        # print(f"mant_bits: {self.mant_bits()} (type: {type(self.mant_bits())})") # for debugging
+        
+        print(f"mant_bits: {self.mant_bits()} (type: {type(self.mant_bits())})") # for debugging
         # print("HI")
         # print(self.mant_bits())
-        # print(f"number of mantissa bits in self = {self.mant_bits()}")
+        print(f"number of mantissa bits in self = {self.mant_bits()}")
         mants = [hex_to_bin(e, 32)[9:9 + self.mant_bits()] for e in blk_elems] # FIXME this initially had a +1 -> that gives us 1 extra bit. Idt that should be a problem but I'm gonna get rid of it. 
         signs = [hex_to_bin(e, 32)[0] for e in blk_elems]
         
+        print(f"mants = {mants}")
+        
         # TODO: be careful for the situation where part of the inputs are zero
         # FIXME: why do we see a -2 for the max exponent. 
-        blk_res = bin(max(max(exps)-2, 0))[2:].zfill(8)     # WHY DO WE MAKE SURE THAT THE VALUE OF THE EXPONENT DOESN'T GO BELOW ZERO? 
+        blk_res = bin(max(max(exps)-2, 0))[2:].zfill(8)     # WHY DO WE MAKE SURE THATTHE VALUE OF THE EXPONENT DOESN'T GO BELOW ZERO? 
+        max_exp = bin(max(max(exps)-2,0))[2:]
+        print(f"max exponent: {max_exp}")
+        print(f"max exponent blk_res = {blk_res}")
         possible_vals = [v*(2**(max(exps)-2-127)) for v in range(2**self.mant_bits())]
         possible_mants = [bin(int(v))[2:].zfill(self.mant_bits()) for v in range(2**self.mant_bits())]
         for i in range(len(blk_elems)):
@@ -305,16 +337,19 @@ class BFP():
             # so now we only look at self.mant_bits() + 1 for the implicit 1 
             mant_with_sign = "0" * (self.mant_bits() + 1) \
                 if blk_elems[i] == "00000000" else "1" + mants[i] 
+            print(f"mant_with_sign = {mant_with_sign}")
             # print(f"mantissa length = {len(mants[i])}")
             # print("hi1")
             # print(f"mant_with_sign length = {len(mant_with_sign)}")
-            shifted_mant = "0" * (self.mant_bits() + 2) \
+            shifted_mant = "0" * (self.mant_bits()) \
                 if (max(exps) - exps[i]) > len(mant_with_sign) \
-                else mant_with_sign[0:len(mant_with_sign) - (max(exps) - exps[i]) ].zfill(len(mant_with_sign)) # + 1
+                else mant_with_sign[0:(len(mant_with_sign) + 1) - (max(exps) - exps[i]) ].zfill(len(mant_with_sign)) # + 1
             # FIXME : To be in coherence with the hardware model don't take two's complement right now. Have this mantissa, keep the sign. Multiply and then do 2's complement. 
             final_mant =  signs[i] + shifted_mant                   #twos_comp(shifted_mant, signs[i])[0:self.mant_bits() + 1]
+            print(f"shifted_mant = {shifted_mant}")
             blk_res += final_mant
-
+            print(f"final_mant = {final_mant}")
+            print(f"blk_res = {blk_res} #with type {type(blk_res)}")
         #print(f"blk_res = {blk_res}")
         return blk_res
 
@@ -1066,11 +1101,14 @@ def main() :
     args = parse_args()
     method = args.method
 
-    file1 = "/var/services/homes/kanadpanini.telang/Research/BlockFP_test1/BlockFP_test1.sim/sim_1/behav/xsim/vector1.txt"
-    file2 = "/var/services/homes/kanadpanini.telang/Research/BlockFP_test1/BlockFP_test1.sim/sim_1/behav/xsim/vector2.txt"
+    file1 = "/var/services/homes/mbove/bfp/bfp.sim/sim_1/behav/xsim/vector1.txt"
+    file2 = "/var/services/homes/mbove/bfp/bfp.sim/sim_1/behav/xsim/vector2.txt"
+    outFP_file = "/var/services/homes/mbove/bfp/bfp.sim/sim_1/behav/xsim/outFP.txt"
 
     matrix1 = read_vec_files(file1) #[1.0,2.0,3.0,4.0,5.0,6.0,7.0,8.0]#
     matrix2 = read_vec_files(file2) #[2.0,4.0,6.0,8.0,10.0,12.0,14.0,16.0]#
+
+    outFP_HDL, outFP_HDL_fp = read_outFP_file(outFP_file) #decimal format of outFP hex values
 
     num_vectors = matrix1.shape[0] 
     num_elements = matrix1.shape[1] # we need to send this as a parameter for the non sign value conversion. 
@@ -1085,29 +1123,44 @@ def main() :
     # print(matrix1)
     max_error_list = []
     avg_error_list = []
-    bfp_list = [BFP(BfpType.BFP_16), BFP(BfpType.BFP_17), BFP(BfpType.BFP_18), BFP(BfpType.BFP_19), BFP(BfpType.BFP_20), BFP(BfpType.BFP_21), BFP(BfpType.BFP_22), BFP(BfpType.BFP_23), 
-                BFP(BfpType.BFP_24), BFP(BfpType.BFP_25), BFP(BfpType.BFP_26), BFP(BfpType.BFP_27), BFP(BfpType.BFP_28), BFP(BfpType.BFP_29), BFP(BfpType.BFP_30), 
-                BFP(BfpType.BFP_31), BFP(BfpType.BFP_32)]
+    # bfp_list = [BFP(BfpType.BFP_16), BFP(BfpType.BFP_17), BFP(BfpType.BFP_18), BFP(BfpType.BFP_19), BFP(BfpType.BFP_20), BFP(BfpType.BFP_21), BFP(BfpType.BFP_22), BFP(BfpType.BFP_23), 
+    #             BFP(BfpType.BFP_24), BFP(BfpType.BFP_25), BFP(BfpType.BFP_26), BFP(BfpType.BFP_27), BFP(BfpType.BFP_28), BFP(BfpType.BFP_29), BFP(BfpType.BFP_30), 
+    #             BFP(BfpType.BFP_31), BFP(BfpType.BFP_32)]
+
+    bfp_list = [BFP(BfpType.BFP_16)]
     for bfp_format in bfp_list:
         #bfp_format = BFP(BfpType.BFP_24) 
         print(f"bfp format : {bfp_format}")
         block_size = 8 
 
         bfp_blocks_1 = []
+        count = 0
+        print("Calculating BFP1")
         for vec1 in matrix1: 
             bfp_block = bfp_format.vec_to_bfp_block(vec1)
             bfp_blocks_1.append(bfp_block)
+            # Convert binary string to an integer
+            decimal_value = int(bfp_block, 2)
+
+            # Convert integer to a hexadecimal string
+            hex_string = hex(decimal_value)
+            print(f"bfp_block1[{count}] = {decimal_value}\n")
+            count += 1
         #print(f"first block : {bfp_blocks_1[0]}")
 
         bfp_blocks_2 = []
+        count = 0
         for vec2 in matrix2: 
             bfp_block2 = bfp_format.vec_to_bfp_block(vec2)
             bfp_blocks_2.append(bfp_block2)
+            print(f"bfp_block2[{count}] = {bfp_block}\n")
+            count += 1
 
         # now once we have converted to block floats we can convert back to real values with the reduced accuracy of each element. 
         #print(f"number of vectors in matrix 1 : {matrix1.shape[0]}")
         #print(f"number of vectors in matrix 2 : {matrix2.shape[0]}")
         scalars = []
+        scalars_hex = []
         
         for i in range (num_vectors): 
             result = 0.0
@@ -1119,11 +1172,14 @@ def main() :
                 real_vec_2 = bfp_format.bfp_to_real(bfp_blocks_2[i]) 
                 # print(f"real vec 2: {real_vec_2}") 
                 bfpscalars = np.dot(real_vec_1, real_vec_2)
+
                 scalars.append(bfpscalars)
             
             elif (method == "unsignedMult"):
                 vec1_sign_and_mag = bfp_format.bfp_to_sign_and_mag(bfp_blocks_1[i], num_elements)
+                print(f"vec1_sign_and_mag = {vec1_sign_and_mag}")
                 vec2_sign_and_mag = bfp_format.bfp_to_sign_and_mag(bfp_blocks_2[i], num_elements)
+                print(f"vec2_sign_and_mag = {vec2_sign_and_mag}")
                 for j in range(num_elements): 
                     sign1, val1 = vec1_sign_and_mag[j] 
                     sign2, val2 = vec2_sign_and_mag[j]
@@ -1135,11 +1191,14 @@ def main() :
                     else:
                         result += (-1) * product_mag
                 scalars.append(result)
+                scalars_hex.append(float_to_hex(result))
+                print(f"result = {result}")
             
             else : 
                 print("Invalid Method")
 
         # print("printing the two lists")
+        # print("Scalars:")
         # print(scalars)
         # print(non_block_scalars)
         # find the absolute value of the error in each of the case.  
@@ -1147,16 +1206,29 @@ def main() :
         max_error = max(abs_error)                                       # max_err
         avg_error = sum(abs_error) / len(abs_error)                      # avg_err
 
+        outFP_error = [int(scalars_hex[i],16) - int(outFP_HDL[i], 16) for i in range(0,len(outFP_HDL))]
         
         max_error_list.append(max_error)
         avg_error_list.append(avg_error)
 
-        #print(f"Max Error: {max_error}")
+    
+    # print(f"Scalars: {scalars}")
+    for i in range(0, len(scalars_hex)):
+        print(f'{("Error: " if outFP_error[i] != 0 else "")} {i+1} (hex) Scalars = {scalars_hex[i]} HDL= {outFP_HDL[i]} \
+            (FP) Scalars = {scalars[i]} HDL = {outFP_HDL_fp[i]} Expected = {non_block_scalars[i]}')
+        
+    error_count = 0
+    for i in range(len(outFP_error)):
+        if(outFP_error[i] != 0):
+            error_count += 1
+    print(f"Error count: {error_count}")
+
+    # print(f"Max Error: {max_error}")
     # print("Max Error Lists") 
     # print(max_error_list)
     # print("Average Error List")
     # print(avg_error_list)
-    print("finished getting errors")
+    # print("finished getting errors")
 
     # X-axis values from 7 to 23
     x_vals = list(range(7, 24))
