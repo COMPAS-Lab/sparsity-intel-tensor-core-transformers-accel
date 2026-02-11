@@ -4,18 +4,22 @@ This repo contains the hardware design as well as a simple testbench for the SpM
 If you would like to cite this work, use
 
 ```bibtex
-@inproceedings{enabling-efficient-spmm-for-sparse-attention-on-gemm-optimized-hardware-with-block-aggregation,
-  author    = {Ji, Tianchu and Balasubramanian, Niranjan and Ferdman, Michael and Milder, Peter},
-  title     = {Enabling Efficient SpMM for Sparse Attention on GEMM-Optimized Hardware with Block Aggregation},
-  booktitle = {Proceedings of the 2026 ACM/SIGDA International Symposium on Field Programmable Gate Arrays (FPGA '26)},
-  year      = {2026},
-  isbn      = {9798400720796},
-  address   = {Monterey, CA, USA},
-  publisher = {Association for Computing Machinery},
-  numpages  = {12},
-  keywords  = {sparse-dense matrix multiplication, self-attention, sparse attention, Tensor Block},
-  doi       = {10.1145/3748173.3779187},
-  url       = {https://doi.org/10.1145/3748173.3779187},
+@inproceedings{
+    enabling-efficient-spmm-for-sparse-attention-on-gemm-optimized-hardware-with-block-aggregation,
+    author = {Ji, Tianchu and Balasubramanian, Niranjan and Ferdman, Michael and Milder, Peter},
+    title = {Enabling Efficient SpMM for Sparse Attention on GEMM-Optimized Hardware with Block Aggregation},
+    year = {2026},
+    isbn = {9798400720796},
+    publisher = {Association for Computing Machinery},
+    address = {New York, NY, USA},
+    url = {https://doi.org/10.1145/3748173.3779187},
+    doi = {10.1145/3748173.3779187},
+    booktitle = {Proceedings of the 2026 ACM/SIGDA International Symposium on Field Programmable Gate Arrays},
+    pages = {67–78},
+    numpages = {12},
+    keywords = {sparse-dense matrix multiplication, self-attention, sparse attention, tensor block},
+    location = {USA},
+    series = {FPGA '26}
 }
 ```
 
