@@ -3,12 +3,20 @@ import json, os
 from pathlib import Path
 from enum import Enum
 import itertools
+import numpy as np
 
 import cocotb
 # from cocotb.runner import get_runner
 from cocotb.binary import BinaryValue
 from cocotb.handle import SimHandleBase
-from cocotb.triggers import RisingEdge, FallingEdge, Timer, Combine, with_timeout
+from cocotb.triggers import (
+    RisingEdge, 
+    FallingEdge, 
+    Timer, 
+    Combine, 
+    ReadOnly, 
+    with_timeout
+)
 from cocotb.clock import Clock
 from tb.bfp_mat_gen import (
     BfpType,
@@ -18,7 +26,8 @@ from tb.bfp_mat_gen import (
     prepare_onchip_input_files,
     prepare_onchip_idx_file,
     prepare_onchip_matb_file,
-    update_or_create_json
+    update_or_create_json,
+    hex_to_float
 )
 
 def hex_to_bin(x: str, n_bits: int):
@@ -79,6 +88,10 @@ class tensor_core_array_wrapper_dut:
         self.hbm_out_chans = [hbm_chan(dut, i, hbm_chan.direction.HBM_OUT) for i in range(n_hbm_out_chan)]
         self.debug = debug
         self.data_dir = data_dir
+        self.mat_a_np = None
+        self.mat_b_np = None
+        self.ref_res_np = None
+        self.sim_res = None
 
     def init_test_stimulus(self, hidx: int):
         
@@ -119,7 +132,7 @@ class tensor_core_array_wrapper_dut:
                                             inst_id: str, attn_data_path: str, 
                                             inter_config_path: str):
 
-        _, mat_a_data_list = mat_a_gen(
+        mat_a_np, mat_a_data_list = mat_a_gen(
                             inst_id,
                             BFP(BfpType.BFP_12), 
                             self._hw_col, 
@@ -131,7 +144,7 @@ class tensor_core_array_wrapper_dut:
                             in_data_path=Path(attn_data_path),
                             out_data_path=Path(inter_config_path))
     
-        _, mat_b_data_list = mat_b_gen(
+        mat_b_np, mat_b_data_list = mat_b_gen(
                             self._hw_chainlen, 
                             BFP(BfpType.BFP_12), 0, self._hw_row, 
                             disable_file_writting=True, 
@@ -184,6 +197,12 @@ class tensor_core_array_wrapper_dut:
                 self.mat_a_data_hbm[hbm_idx] += input_data[lb][hbm_idx]
 
         self.mat_b_data_hbm = matb_data
+        self.mat_b_np = mat_b_np
+        # get n_rows from mat_b_np, pad mat_a_np's cols to the same size
+        n_rows = self.mat_b_np.shape[0]
+        self.mat_a_np = np.zeros((mat_a_np[hidx].shape[0], n_rows), dtype=mat_b_np.dtype)
+        self.mat_a_np[:, :mat_a_np[hidx].shape[1]] = mat_a_np[hidx]
+        self.ref_res_np = np.dot(self.mat_a_np, self.mat_b_np)
 
         self.dut._log.info(f"Loaded stimulus file for {hw_config_path}, {len(self.lb_idx_list)} large blocks in total")
 
@@ -375,10 +394,54 @@ class tensor_core_array_wrapper_dut:
             matb_out_sum = self.dut.softClrnArea_tcArray.debug_out_counter_value.value.integer
             matb_out_req_bd = cycles_to_bd(running_lat, matb_out_sum)
 
-            self.dut._log(f"Mat A input bandwidth: {mata_in_req_bd:.2f} GB/s")
-            self.dut._log(f"Output bandwidth: {matb_out_req_bd:.2f} GB/s")
+            self.dut._log.info(f"Mat A input bandwidth: {mata_in_req_bd:.2f} GB/s")
+            self.dut._log.info(f"Output bandwidth: {matb_out_req_bd:.2f} GB/s")
 
         return
+
+    async def get_mat_res_output(self, res_shape: tuple):
+        res_r, res_c = res_shape
+        last_hw_row = self._hw_row - 1
+        
+        res_buffer = [[float("inf")] * res_c] * res_r
+        res_col_counter = 0
+        curr_res_row_counter = 0
+        tc_array_res_blkdata, tc_array_res_ridx = 0., 0
+        tc_array_res_valid = 0
+        # check valid signal every clock cycle
+        while curr_res_row_counter < res_r - 1:
+            await clkCycles(self.dut.clk, 1)
+            # yield to wait for internal module signal propagation
+            await Timer(9, units="ns")
+
+            tc_core = getattr(self.dut.softClrnArea_tcArray, f"u_tc_core_r_{last_hw_row}_c_0")
+            tc_array_res_valid = tc_core.io_res_valid.value.integer
+            if tc_array_res_valid == 1:
+                for tc_r in range(self._hw_row):
+                    tc_array_res_cidx = res_col_counter * self._hw_row + tc_r
+                    for tc_c in range(self._hw_col):
+                        curr_tc_core = getattr(self.dut.softClrnArea_tcArray, f"u_tc_core_r_{tc_r}_c_{tc_c}")
+                        curr_last_row_tc_core = getattr(self.dut.softClrnArea_tcArray, f"u_tc_core_r_{last_hw_row}_c_{tc_c}")
+                        for tc_tcc_col in range(3):
+                            curr_tc_core_col = getattr(curr_tc_core, f"io_res_payload_{tc_tcc_col}_blkData")
+                            tc_array_res_blkdata = hex_to_float(f"{curr_tc_core_col.value.integer:x}".ljust(32 // 4, "0"))
+                            tc_array_res_ridx = curr_last_row_tc_core.io_res_payload_0_rIdx.value.integer * 3 + tc_tcc_col
+
+                            # pad zeros to the tail to make it 32-bit
+                            # self.dut._log.info(f"tc_array_res_blkdata({tc_r}, {tc_c}, {tc_tcc_col}): {tc_array_res_blkdata:.3f}")
+                            # self.dut._log.info(f"tc_array_res_ridx: {tc_array_res_ridx}")
+                            # self.dut._log.info(f"tc_array_res_cidx: {tc_array_res_cidx}")
+                            # self.dut._log.info(f"tc_tcc_col: {tc_tcc_col}")
+                            res_buffer[tc_array_res_ridx][tc_array_res_cidx] = tc_array_res_blkdata
+                    
+                    curr_res_row_counter = tc_array_res_ridx
+                
+                if tc_array_res_cidx == res_c - 1:
+                    res_col_counter = 0
+                else:
+                    res_col_counter += 1
+
+        self.sim_res = np.array(res_buffer)
 
 @cocotb.test()
 async def tensor_core_array_wrapper_test(dut):
@@ -398,6 +461,10 @@ async def tensor_core_array_wrapper_test(dut):
     )
     dut_tester.init_test_stimulus_wo_intermed_data(
         hidx, inst_id, attn_data_path, inter_config_path)
+    dut_tester.dut._log.info(f"shapes: " + 
+        f"mat a: {dut_tester.mat_a_np.shape}; " +
+        f"mat b: {dut_tester.mat_b_np.shape}; " +
+        f"mat res: {dut_tester.ref_res_np.shape}")
     
     cocotb.start_soon(main_clk.start(start_high=True))
     await dut_tester.init_inputs()
@@ -421,11 +488,19 @@ async def tensor_core_array_wrapper_test(dut):
     # start loading processes
     await cocotb.start(dut_tester.load_idx_process())
     await cocotb.start(dut_tester.load_mat_a_process())
+    # res dumping is broken for multi-large-block mode currently
+    # see bfp_mat_gen.py line 518
+    await cocotb.start(dut_tester.get_mat_res_output(dut_tester.ref_res_np.shape))
 
     # start calculation
     cocotb.start_soon(dut_tester.start_cal())
     await dut_tester.wait_compute_finish(hidx)
     await Timer(1, "us")
+
+    # store sim results
+    sim_res_path = f"./sim_res_{inst_id}_{hidx}.npy"
+    np.save(sim_res_path, dut_tester.sim_res)
+    dut_tester.dut._log.info(f"saved sim res to {sim_res_path}")
 
     dut_tester.calc_bdwidth(16)
 

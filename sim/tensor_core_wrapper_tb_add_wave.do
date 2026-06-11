@@ -38,6 +38,9 @@ add wave -noupdate -radix unsigned /tensor_core_array_wrapper/softClrnArea_idxGe
 add wave -noupdate /tensor_core_array_wrapper/softClrnArea_colRdFsm_stateReg
 add wave -noupdate -radix unsigned /tensor_core_array_wrapper/colRdFsm_0_rdCounter_value
 add wave -noupdate /tensor_core_array_wrapper/softClrnArea_calTileStart
+add wave -noupdate -radix decimal /tensor_core_array_wrapper/softClrnArea_totalLatCounter_value
+add wave -noupdate -radix decimal /tensor_core_array_wrapper/softClrnArea_tcArray/computeLatCounter_value
+add wave -noupdate /tensor_core_array_wrapper/softClrnArea_tcArray/outBfpConv_0_0_io_dataOut_payload
 add wave -noupdate -divider compute
 add wave -noupdate /tensor_core_array_wrapper/softClrnArea_tcArray/io_calFin
 add wave -noupdate /tensor_core_array_wrapper/data_tcarray_in_0
@@ -264,6 +267,20 @@ add wave -noupdate /tensor_core_array_wrapper/softClrnArea_tcArray/outBuffer_0/i
 add wave -noupdate /tensor_core_array_wrapper/softClrnArea_tcArray/outBuffer_0/io_pop_valid
 add wave -noupdate /tensor_core_array_wrapper/softClrnArea_tcArray/outBuffer_0/io_pop_ready
 add wave -noupdate /tensor_core_array_wrapper/softClrnArea_tcArray/outBuffer_0/io_pop_payload
+add wave -noupdate /tensor_core_array_wrapper/softClrnArea_tcArray/outBfpConv_0_0_io_dataOut_valid
+add wave -noupdate /tensor_core_array_wrapper/softClrnArea_tcArray/outBfpConv_0_0_io_dataOut_payload
+add wave -noupdate /tensor_core_array_wrapper/softClrnArea_tcArray/outBfpConv_0_1_io_dataOut_payload
+add wave -noupdate /tensor_core_array_wrapper/softClrnArea_tcArray/outBfpConv_0_2_io_dataOut_payload
+add wave -noupdate /tensor_core_array_wrapper/softClrnArea_tcArray/u_tc_core_r_5_c_0/io_res_valid
+add wave -noupdate -radix unsigned /tensor_core_array_wrapper/softClrnArea_tcArray/u_tc_core_r_5_c_0/io_res_payload_0_rIdx
+add wave -noupdate /tensor_core_array_wrapper/softClrnArea_tcArray/u_tc_core_r_0_c_0/io_res_payload_0_blkData
+add wave -noupdate /tensor_core_array_wrapper/softClrnArea_tcArray/u_tc_core_r_0_c_0/io_res_payload_1_blkData
+add wave -noupdate /tensor_core_array_wrapper/softClrnArea_tcArray/u_tc_core_r_0_c_0/io_res_payload_2_blkData
+add wave -noupdate /tensor_core_array_wrapper/softClrnArea_tcArray/u_tc_core_r_5_c_11/io_res_valid
+add wave -noupdate -radix unsigned /tensor_core_array_wrapper/softClrnArea_tcArray/u_tc_core_r_5_c_11/io_res_payload_0_rIdx
+add wave -noupdate /tensor_core_array_wrapper/softClrnArea_tcArray/u_tc_core_r_5_c_11/io_res_payload_0_blkData
+add wave -noupdate /tensor_core_array_wrapper/softClrnArea_tcArray/u_tc_core_r_5_c_11/io_res_payload_1_blkData
+add wave -noupdate /tensor_core_array_wrapper/softClrnArea_tcArray/u_tc_core_r_5_c_11/io_res_payload_2_blkData
 add wave -noupdate -divider {temp scope}
 add wave -noupdate /tensor_core_array_wrapper/softClrnArea_tcArray/outBuffer_0/AsymFifoCore/fifo/scfifo_component/data
 add wave -noupdate /tensor_core_array_wrapper/softClrnArea_tcArray/outBuffer_0/AsymFifoCore/fifo/scfifo_component/sclr
@@ -271,8 +288,8 @@ add wave -noupdate /tensor_core_array_wrapper/softClrnArea_tcArray/outBuffer_0/A
 add wave -noupdate /tensor_core_array_wrapper/softClrnArea_tcArray/outBuffer_0/AsymFifoCore/fifo/scfifo_component/almost_full
 add wave -noupdate /tensor_core_array_wrapper/softClrnArea_tcArray/outBuffer_0/AsymFifoCore/fifo/scfifo_component/almost_empty
 TreeUpdate [SetDefaultTree]
-WaveRestoreCursors {{Cursor 1} {22320000 ps} 0} {{Cursor 2} {19570061 ps} 0}
-quietly wave cursor active 2
+WaveRestoreCursors {{Cursor 1} {245318733 ps} 0} {{Cursor 2} {19570061 ps} 0}
+quietly wave cursor active 1
 configure wave -namecolwidth 471
 configure wave -valuecolwidth 100
 configure wave -justifyvalue left
@@ -287,4 +304,4 @@ configure wave -griddelta 40
 configure wave -timeline 0
 configure wave -timelineunits ns
 update
-WaveRestoreZoom {18763010 ps} {19869507 ps}
+WaveRestoreZoom {244981290 ps} {251259303 ps}

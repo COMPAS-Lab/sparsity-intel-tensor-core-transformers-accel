@@ -406,7 +406,8 @@ def mat_a_gen(
         
         # split matrix into large blocks if needed
         if n_large_blocks_actual > 1:
-            # Split src_ridx_h into uniformly distributed bins with integer edges
+            # Split src_ridx_h into uniformly distributed bins with integer edges,
+            # each bin forms one large block to be executed by the tensor core array
             r_hist, r_binedges = np.histogram(src_ridx_h, bins=100)
             print(f"rbin edges: {r_binedges}")
             r_blk_tail_bar = 2048
@@ -442,8 +443,8 @@ def mat_a_gen(
 
         mat_a_list[hidx] = {lblk_idx: {} for lblk_idx in range(n_large_blocks_actual)}
         for large_blk_idx in range(n_large_blocks_actual):
-            # prepare mat a
-            # pad rows to align with number of TC cols
+            # prepare mat a, large blocks by large blocks
+            # pad rows to align with number of TC cols for each large block
             curr_num_rows = len(np.unique(src_ridx_lblks[large_blk_idx]))
             nrows_to_pad = math.ceil(curr_num_rows / n_hw_cols) * n_hw_cols - curr_num_rows
             src_val = src_val_lblks[large_blk_idx] + [np.zeros((3, bfp_type.blk_size()))] * nrows_to_pad
@@ -514,6 +515,8 @@ def mat_a_gen(
         # construct dense mat from selected head to compute gold reference
         # TODO: change COO parsing to generate result for multiple matrices
         coo_pairs = []
+        # TODO: add function to reconstruct dense matrix from all large blocks
+        # (currently reconstruction is only for the last large block)
         for br, bc, bv in zip(src_ridx, src_cidx, src_val):
             curr_cids = [bc * bfp_type.blk_size() + i for i in range(bfp_type.blk_size())]
             curr_rids = [br * 3 + i for i in range(3)]
