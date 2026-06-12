@@ -397,7 +397,7 @@ def mat_a_gen(
     mat_a_list = {hidx: {} for hidx in hidices}
     mat_a_np_list = {}
     for hidx in hidices:
-        src_val_h, src_ridx_h, src_cidx_h = headgrp_vals[hidx], headgrp_ridx[hidx], headgrp_cidx[hidx] 
+        src_val_h, src_ridx_h, src_cidx_h = headgrp_vals[hidx], headgrp_ridx[hidx], headgrp_cidx[hidx]
 
         if n_large_blocks == -1:
             n_large_blocks_actual = math.ceil(len(src_ridx_h) / 2048)
@@ -442,6 +442,8 @@ def mat_a_gen(
         update_or_create_json(str(out_data_path / f"hwconfig_h{hidx}.json"), {"n_lbs": n_large_blocks_actual})
 
         mat_a_list[hidx] = {lblk_idx: {} for lblk_idx in range(n_large_blocks_actual)}
+        # coo_pairs is used to store mat a in coo format to construct dense mat for verification
+        coo_pairs = []
         for large_blk_idx in range(n_large_blocks_actual):
             # prepare mat a, large blocks by large blocks
             # pad rows to align with number of TC cols for each large block
@@ -512,26 +514,25 @@ def mat_a_gen(
                 for idx_pair in idx_after_redremove:
                     mat_a_list[hidx][large_blk_idx]["idx"].append(idx_pair[0] + idx_pair[1])
 
-        # construct dense mat from selected head to compute gold reference
-        # TODO: change COO parsing to generate result for multiple matrices
-        coo_pairs = []
-        # TODO: add function to reconstruct dense matrix from all large blocks
-        # (currently reconstruction is only for the last large block)
-        for br, bc, bv in zip(src_ridx, src_cidx, src_val):
-            curr_cids = [bc * bfp_type.blk_size() + i for i in range(bfp_type.blk_size())]
-            curr_rids = [br * 3 + i for i in range(3)]
-            for v_r, rid in enumerate(curr_rids):
-                for v_c, cid in enumerate(curr_cids):
-                    coo_pairs.append((rid, cid, bv[v_r][v_c]))
+            # construct dense mat from selected head to compute gold reference
+            # TODO: change COO parsing to generate result for multiple matrices
+            curr_coo_pairs = []
+            for br, bc, bv in zip(src_ridx, src_cidx, src_val):
+                curr_cids = [bc * bfp_type.blk_size() + i for i in range(bfp_type.blk_size())]
+                curr_rids = [br * 3 + i for i in range(3)]
+                for v_r, rid in enumerate(curr_rids):
+                    for v_c, cid in enumerate(curr_cids):
+                        curr_coo_pairs.append((rid, cid, bv[v_r][v_c]))
 
-        coo_pairs = sorted(coo_pairs)
-        assert(len(coo_pairs) == len(src_val) * 3 * bfp_type.blk_size())
+            assert(len(curr_coo_pairs) == len(src_val) * 3 * bfp_type.blk_size())
+            coo_pairs += curr_coo_pairs
         
+        coo_pairs = sorted(coo_pairs)
         coo_idx = [[p[0] for p in coo_pairs], [p[1] for p in coo_pairs]]
         coo_vals = [p[2] for p in coo_pairs]
-        mat_shape = max(coo_idx[0] + coo_idx[1])
-        mat = torch.sparse_coo_tensor(coo_idx, coo_vals, size=(mat_shape, mat_shape)).to_dense().numpy()
-        mat_a_np_list[hidx] = mat
+        mat_shape = (max(coo_idx[0])+1, max(coo_idx[1])+1)
+        print(f"mat a dense shape: {mat_shape}")
+        mat_a_np_list[hidx] = torch.sparse_coo_tensor(coo_idx, coo_vals, size=mat_shape).to_dense().numpy()
     
     # copy inst_profile.json
     if not (out_data_path / "inst_profile.json").exists():

@@ -403,7 +403,8 @@ class tensor_core_array_wrapper_dut:
         res_r, res_c = res_shape
         last_hw_row = self._hw_row - 1
         
-        res_buffer = [[float("inf")] * res_c] * res_r
+        res_buffer = np.zeros((res_r, res_c))
+        res_buffer[:, :] = float("inf")
         res_col_counter = 0
         curr_res_row_counter = 0
         tc_array_res_blkdata, tc_array_res_ridx = 0., 0
@@ -425,14 +426,22 @@ class tensor_core_array_wrapper_dut:
                         for tc_tcc_col in range(3):
                             curr_tc_core_col = getattr(curr_tc_core, f"io_res_payload_{tc_tcc_col}_blkData")
                             tc_array_res_blkdata = hex_to_float(f"{curr_tc_core_col.value.integer:x}".ljust(32 // 4, "0"))
-                            tc_array_res_ridx = curr_last_row_tc_core.io_res_payload_0_rIdx.value.integer * 3 + tc_tcc_col
+                            raw_block_idx = curr_last_row_tc_core.io_res_payload_0_rIdx.value.integer 
+                            tc_array_res_ridx = raw_block_idx * 3 + tc_tcc_col
 
                             # pad zeros to the tail to make it 32-bit
                             # self.dut._log.info(f"tc_array_res_blkdata({tc_r}, {tc_c}, {tc_tcc_col}): {tc_array_res_blkdata:.3f}")
                             # self.dut._log.info(f"tc_array_res_ridx: {tc_array_res_ridx}")
                             # self.dut._log.info(f"tc_array_res_cidx: {tc_array_res_cidx}")
                             # self.dut._log.info(f"tc_tcc_col: {tc_tcc_col}")
-                            res_buffer[tc_array_res_ridx][tc_array_res_cidx] = tc_array_res_blkdata
+                            try:
+                                res_buffer[tc_array_res_ridx][tc_array_res_cidx] = tc_array_res_blkdata
+                            except IndexError as e: 
+                                self.dut._log.warning(f"Invalid index: ({tc_array_res_ridx}, {tc_array_res_cidx})")
+                                self.dut._log.warning(f"Array shape: {res_buffer.shape}")
+                                self.dut._log.warning(f"blk ridx: {raw_block_idx}")
+                                self.dut._log.warning(f"tc tcc col: {tc_tcc_col}")
+                                self.dut._log.warning(f"Error: {e}")
                     
                     curr_res_row_counter = tc_array_res_ridx
                 
