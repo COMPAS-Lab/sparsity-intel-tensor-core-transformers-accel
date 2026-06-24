@@ -52,13 +52,27 @@ def read_outFP_file(filepath: str):
         print(f"An error occurred: {e}")
         return None, None
 
-def float_to_hex(f: float):
+#def float_to_hex(f: float):
 	# Courtesy of https://stackoverflow.com/a/23624284
-	return hex(struct.unpack('<I', struct.pack('<f', f))[0])[2:].zfill(8)
+	#return hex(struct.unpack('<I', struct.pack('<f', f))[0])[2:].zfill(8)
 
 def hex_to_float(x: str):
 	# still from stackoverflow
-    return struct.unpack('!f', codecs.decode(x,'hex'))[0]
+     return struct.unpack('!f', codecs.decode(x,'hex'))[0]
+
+
+def float_to_hex(f: float) -> str:
+      if f == 0.0:
+          return '00000000' if math.copysign(1.0, f) > 0 else '80000000'
+      d   = struct.unpack('<Q', struct.pack('<d', f))[0]
+      sign = (d >> 63) & 1
+      exp  = (d >> 52) & 0x7FF
+      mant = d & ((1 << 52) - 1)
+      if exp == 0:                       # subnormal double → zero in fp32
+          return '%08x' % (sign << 31)
+      fp32_exp  = exp - 1023 + 127
+      fp32_mant = mant >> 29             # ← truncate 52→23 bits (no round)
+      return '%08x' % ((sign << 31) | (fp32_exp << 23) | fp32_mant)
 
 def hex_to_bin(x: str, n_bits: int):
     return bin(int(x, 16))[2:].zfill(n_bits)
@@ -273,7 +287,11 @@ class BFP():
         num_elements = elements                                     # Number of elements that share a block  
         #print(f"blk_r length = {len(blk_r)}")
         bpe = (len(blk_r) - 8) / num_elements
+        if(bpe > 9.1):
+            print("THIS ONE HERE")
         print(f"bits_per_elem: {bpe}")
+        print(f"blk_r: {blk_r}, size: {len(blk_r)-8}")
+        print(f"num_elements: {num_elements}")
         bits_per_element = int((len(blk_r) - 8 ) / num_elements)  # There are 8 elements per block and each element mantissa have the same number of bits. 
         #print(f"Bits per element = {bits_per_element}")
         first_mant = 8                                       # first bit where we see the mantissa. 
@@ -281,11 +299,13 @@ class BFP():
             start_index = first_mant + i * bits_per_element
             end_index = start_index + bits_per_element
             element_bits = blk_r[start_index:end_index]
-            print(f"element_bits = {element_bits}")
-            print(f"start_index:end_idx = {start_index}: {end_index}")
+            
             
             sign_bit = int(element_bits[0],2) 
             mantissa_bits = element_bits[1:]
+           # if(bpe > 9.1):
+            print(f"element_bits = {element_bits}")
+            print(f"start_index:end_idx = {start_index}: {end_index}")
             print(f"sign_bit = {sign_bit}, mant = {mantissa_bits}")
 
             mant_real_val = 0.0
@@ -341,9 +361,9 @@ class BFP():
             # print(f"mantissa length = {len(mants[i])}")
             # print("hi1")
             # print(f"mant_with_sign length = {len(mant_with_sign)}")
-            shifted_mant = "0" * (self.mant_bits()) \
+            shifted_mant = "0" * (self.mant_bits() + 1) \
                 if (max(exps) - exps[i]) > len(mant_with_sign) \
-                else mant_with_sign[0:(len(mant_with_sign) + 1) - (max(exps) - exps[i]) ].zfill(len(mant_with_sign)) # + 1
+                else mant_with_sign[0:len(mant_with_sign) - (max(exps) - exps[i]) ].zfill(len(mant_with_sign)) # + 1
             # FIXME : To be in coherence with the hardware model don't take two's complement right now. Have this mantissa, keep the sign. Multiply and then do 2's complement. 
             final_mant =  signs[i] + shifted_mant                   #twos_comp(shifted_mant, signs[i])[0:self.mant_bits() + 1]
             print(f"shifted_mant = {shifted_mant}")
@@ -1127,7 +1147,8 @@ def main() :
     #             BFP(BfpType.BFP_24), BFP(BfpType.BFP_25), BFP(BfpType.BFP_26), BFP(BfpType.BFP_27), BFP(BfpType.BFP_28), BFP(BfpType.BFP_29), BFP(BfpType.BFP_30), 
     #             BFP(BfpType.BFP_31), BFP(BfpType.BFP_32)]
 
-    bfp_list = [BFP(BfpType.BFP_16)]
+    # Generate only for BFP32 data 
+    bfp_list = [BFP(BfpType.BFP_32)]
     for bfp_format in bfp_list:
         #bfp_format = BFP(BfpType.BFP_24) 
         print(f"bfp format : {bfp_format}")
@@ -1140,11 +1161,11 @@ def main() :
             bfp_block = bfp_format.vec_to_bfp_block(vec1)
             bfp_blocks_1.append(bfp_block)
             # Convert binary string to an integer
-            decimal_value = int(bfp_block, 2)
+            #decimal_value = int(bfp_block+0.5, 2)
 
             # Convert integer to a hexadecimal string
-            hex_string = hex(decimal_value)
-            print(f"bfp_block1[{count}] = {decimal_value}\n")
+           # hex_string = hex(decimal_value)
+           # print(f"bfp_block1[{count}] = {decimal_value}\n")
             count += 1
         #print(f"first block : {bfp_blocks_1[0]}")
 
@@ -1223,6 +1244,7 @@ def main() :
             error_count += 1
     print(f"Error count: {error_count}")
 
+    # Commented out code below: max error, average error. Unknown if we need for now
     # print(f"Max Error: {max_error}")
     # print("Max Error Lists") 
     # print(max_error_list)
@@ -1231,28 +1253,28 @@ def main() :
     # print("finished getting errors")
 
     # X-axis values from 7 to 23
-    x_vals = list(range(7, 24))
+#    x_vals = list(range(7, 24))
 
-    assert len(x_vals) == len(max_error_list), "Mismatch between x-axis and error list lengths"
+ #   assert len(x_vals) == len(max_error_list), "Mismatch between x-axis and error list lengths"
 
-    plt.figure(figsize=(10, 6))
+  #  plt.figure(figsize=(10, 6))
 
     # Plot Max Error (log scale)
-    plt.plot(x_vals, max_error_list, marker='o', label='Max Error', color='red')
+   # plt.plot(x_vals, max_error_list, marker='o', label='Max Error', color='red')
 
     # Plot Avg Error (log scale)
-    plt.plot(x_vals, avg_error_list, marker='x', label='Average Error', color='blue')
+   # plt.plot(x_vals, avg_error_list, marker='x', label='Average Error', color='blue')
 
-    plt.yscale('log')  # <<< Logarithmic y-axis
+   # plt.yscale('log')  # <<< Logarithmic y-axis
 
-    plt.title("Log Plot: Max and Average Error vs Mantissa Bits (BFP_16 to BFP_32)")
-    plt.xlabel("Number of Mantissa Bits (Effective Bits = BFP_N - 9)")
-    plt.ylabel("Error (log scale)")
-    plt.legend()
-    plt.grid(True, which="both", ls="--", linewidth=0.5)
-    plt.xticks(x_vals)
-    plt.tight_layout()
-    plt.savefig("bfp_errors_plot.png", dpi=300)
+   # plt.title("Log Plot: Max and Average Error vs Mantissa Bits (BFP_16 to BFP_32)")
+   # plt.xlabel("Number of Mantissa Bits (Effective Bits = BFP_N - 9)")
+   # plt.ylabel("Error (log scale)")
+   # plt.legend()
+   # plt.grid(True, which="both", ls="--", linewidth=0.5)
+   # plt.xticks(x_vals)
+   # plt.tight_layout()
+   # plt.savefig("bfp_errors_plot.png", dpi=300)
     
     #plt.show()  # does not work for me. 
 
